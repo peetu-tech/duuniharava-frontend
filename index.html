@@ -1,207 +1,263 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Duuniharava | Automatisoi työnhakusi</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
-<style>
-body {
-  font-family: 'Space Grotesk', sans-serif;
-  background-color: #0F0F0F;
-  color: #FFFFFF;
-  scroll-behavior: smooth;
-}
-.turkoosi-text { color: #00BFA6; }
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-.gradient-bg { background: linear-gradient(90deg, #00BFA6, #FF6F3C); }
-input::placeholder { color: rgba(255, 255, 255, 0.3); }
-@keyframes fadeIn { 0% {opacity:0; transform: translateY(10px);} 100% {opacity:1; transform: translateY(0);} }
-.animate-fadeIn { animation: fadeIn 0.6s ease forwards; }
-@keyframes bounceLogo { 0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);} }
-.logo-bounce { animation: bounceLogo 1.5s infinite; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duuniharava | Automatisoi työnhakusi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0F0F0F;
+            color: #FFFFFF;
+            scroll-behavior: smooth;
+        }
+        .turkoosi-text { color: #00BFA6; }
+        .oranssi-text { color: #FF6F3C; }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-bg { background: linear-gradient(90deg, #00BFA6, #FF6F3C); }
+        input::placeholder { color: rgba(255, 255, 255, 0.3); }
+        
+        @keyframes fadeIn { 
+            0% { opacity: 0; transform: translateY(10px); } 
+            100% { opacity: 1; transform: translateY(0); } 
+        }
+        .animate-fadeIn { animation: fadeIn 0.6s ease forwards; }
+        
+        @keyframes bounceLogo { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-10px); } 
+        }
+        .logo-bounce { animation: bounceLogo 1.5s infinite; }
+
+        /* Estää kaavion hyppimisen latauksessa */
+        .chart-container { position: relative; min-height: 256px; }
+    </style>
 </head>
 <body class="px-6">
 
 <main>
+    <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center py-20">
+        <div class="logo-bounce mb-8 text-6xl font-bold turkoosi-text" role="img" aria-label="Duuniharava-logo">🦡</div>
+        <div class="max-w-4xl glass p-8 md:p-12 rounded-[2.5rem] shadow-2xl">
+            <div class="text-3xl font-bold tracking-tighter mb-8">
+                <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Tehokas työkalu työnhakuun ja asiakashankintaan</h1>
+            <p class="text-gray-400 mb-6 text-lg">
+                Suomessa työttömyysaste on tammikuussa 2026 <strong>10,3 %</strong>. Hallitus leikkaa tukia ja vähentää työllistämistoimia. Duuniharava automatisoi työnhaun ja optimoi profiilisi, jotta tulet huomatuksi.
+            </p>
 
-<!-- Hero -->
-<section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center py-20">
-  <div class="logo-bounce mb-8 text-6xl font-bold turkoosi-text" role="img" aria-label="Duuniharava-logo">🦡</div>
-  <div class="max-w-4xl glass p-8 md:p-12 rounded-[2.5rem] shadow-2xl">
-    <div class="text-3xl font-bold tracking-tighter mb-8">
-      <span class="turkoosi-text">DUUNI</span><span class="text-[#FF6F3C]">HARAVA</span>
-    </div>
-    <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Tehokas työkalu työnhakuun ja asiakashankintaan</h1>
-    <p class="text-gray-400 mb-6 text-lg">
-      Suomessa työttömyysaste on tammikuussa 2026 <strong>10,3 %</strong>. Hallitus leikkaa tukia ja vähentää työllistämistoimia. Duuniharava automatisoi työnhaun ja optimoi profiilisi, jotta tulet huomatuksi.
-    </p>
+            <div class="glass p-4 md:p-6 rounded-2xl mt-6">
+                <h4 class="text-xl font-bold mb-4 text-center turkoosi-text">Työttömyyden trendi ja ennuste</h4>
+                <div class="chart-container w-full h-64 md:h-80">
+                    <canvas id="unemploymentChart"></canvas>
+                </div>
+                <p class="text-gray-400 text-xs mt-4 text-center">
+                    Vihreä: Historia | Oranssi: Ennuste ja nykytila (2026–2032)
+                </p>
+            </div>
 
-    <!-- Kaavio -->
-    <div class="glass p-4 md:p-6 rounded-2xl mt-6">
-      <h4 class="text-xl font-bold mb-4 text-center turkoosi-text">Työttömyyden trendi ja ennuste</h4>
-      <div class="w-full h-64 md:h-80 lg:h-96">
-        <canvas id="unemploymentChart"></canvas>
-      </div>
-      <p class="text-gray-400 text-xs mt-4 text-center">
-        Vihreä: Historia | Oranssi: Ennuste ja nykytila (2026–2032)
-      </p>
-    </div>
-
-    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-      <a href="#pricing" class="gradient-bg text-white font-black py-4 px-8 rounded-2xl hover:scale-[1.03] transition shadow-lg">KATSO HINNASTO</a>
-      <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="glass py-4 px-8 rounded-2xl hover:border-[#00BFA6] transition text-white">KIRJAUDU SISÄÄN</button>
-    </div>
-  </div>
-</section>
-
-<!-- Features -->
-<section class="py-24 max-w-6xl mx-auto">
-  <h2 class="text-3xl font-bold text-center mb-16">Mitä tarjoamme</h2>
-  <div class="grid md:grid-cols-2 gap-12">
-    
-    <!-- Työnhakijat -->
-    <div>
-      <h3 class="text-2xl font-bold turkoosi-text mb-8 text-center">Työnhakijoille</h3>
-      <div class="grid gap-6">
-        <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">📄</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">CV-optimoija</h4>
-            <p class="text-gray-400">Paranna CV:si houkuttelevuutta rekrytoijille ja ATS-järjestelmille automaattisesti.</p>
-          </div>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+                <a href="#pricing" class="gradient-bg text-white font-black py-4 px-8 rounded-2xl hover:scale-[1.03] transition shadow-lg">KATSO HINNASTO</a>
+                <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="glass py-4 px-8 rounded-2xl hover:border-[#00BFA6] transition text-white">KIRJAUDU SISÄÄN</button>
+            </div>
         </div>
-        <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">✉️</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">Hakemusoptimointi</h4>
-            <p class="text-gray-400">Optimoi hakemukset niin, että ne erottuvat ja ohittavat ATS-suodattimet.</p>
-          </div>
-        </div>
-        <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">🚀</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">Automaattinen lähetys</h4>
-            <p class="text-gray-400">Säästä aikaa ja lähetä hakemuksia yhdestä näkymästä strategisesti.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </section>
 
-    <!-- Yritykset -->
-    <div>
-      <h3 class="text-2xl font-bold text-[#FF6F3C] mb-8 text-center">Yrityksille</h3>
-      <div class="grid gap-6">
-        <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">📋</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">Asiakashallinta</h4>
-            <p class="text-gray-400">Pidä liidit, kontaktit ja tarjoukset järjestyksessä ilman Exceliä.</p>
-          </div>
+    <section class="py-24 max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-16">Mitä tarjoamme</h2>
+        <div class="grid md:grid-cols-2 gap-12">
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold turkoosi-text text-center">Työnhakijoille</h3>
+                <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
+                    <span class="text-3xl">📄</span>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">CV-optimoija</h4>
+                        <p class="text-gray-400">Paranna CV:si houkuttelevuutta rekrytoijille ja ATS-järjestelmille automaattisesti.</p>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
+                    <span class="text-3xl">✉️</span>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Hakemusoptimointi</h4>
+                        <p class="text-gray-400">Optimoi hakemukset niin, että ne erottuvat ja ohittavat ATS-suodattimet.</p>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
+                    <span class="text-3xl">🚀</span>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Automaattinen lähetys</h4>
+                        <p class="text-gray-400">Säästä aikaa ja lähetä hakemuksia yhdestä näkymästä strategisesti.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold oranssi-text text-center">Yrityksille</h3>
+                <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
+                    <span class="text-3xl">📋</span>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Asiakashallinta</h4>
+                        <p class="text-gray-400">Pidä liidit, kontaktit ja tarjoukset järjestyksessä ilman Exceliä.</p>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
+                    <span class="text-3xl">📈</span>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Analytiikka</h4>
+                        <p class="text-gray-400">Seuraa rekrytoinnin ja myynnin tehokkuutta reaaliaikaisen datan avulla.</p>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
+                    <span class="text-3xl">👥</span>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Tiimihallinta</h4>
+                        <p class="text-gray-400">Hallinnoi usean työntekijän käyttöoikeuksia ja yhteisiä projekteja.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">📈</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">Analytiikka</h4>
-            <p class="text-gray-400">Seuraa rekrytoinnin ja myynnin tehokkuutta reaaliaikaisen datan avulla.</p>
-          </div>
+    </section>
+
+    <section id="pricing" class="py-24 max-w-6xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-16">Valitse pakettisi</h2>
+        <div class="grid md:grid-cols-3 gap-8 px-4">
+            <div class="glass p-10 rounded-3xl">
+                <h3 class="text-xl font-bold mb-4 text-gray-300">Starter</h3>
+                <p class="text-4xl font-black mb-6">12,49€<span class="text-lg font-normal text-gray-500">/kk</span></p>
+                <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
+                    <li>✔ Perus dashboard</li>
+                    <li>✔ 50 hakemusta / kk</li>
+                </ul>
+                <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition">Valitse</a>
+            </div>
+            <div class="glass p-10 rounded-3xl border-2 border-[#00BFA6] scale-105 shadow-[0_0_30px_rgba(0,191,166,0.2)]">
+                <h3 class="text-xl font-bold mb-4 turkoosi-text">Pro</h3>
+                <p class="text-4xl font-black mb-6">29,99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
+                <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
+                    <li>✔ Rajattomat hakemukset</li>
+                    <li>✔ Asiakashallinta + Analytiikka</li>
+                    <li>✔ Strateginen tuki</li>
+                </ul>
+                <a href="#" class="block gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] transition text-white">Suosituin</a>
+            </div>
+            <div class="glass p-10 rounded-3xl">
+                <h3 class="text-xl font-bold mb-4 text-gray-300">Business</h3>
+                <p class="text-4xl font-black mb-6">99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
+                <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
+                    <li>✔ Kaikki Pro-ominaisuudet</li>
+                    <li>✔ Tiimikäyttö</li>
+                    <li>✔ Hallintatyökalut</li>
+                </ul>
+                <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition">Valitse</a>
+            </div>
         </div>
-        <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">👥</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">Tiimihallinta</h4>
-            <p class="text-gray-400">Hallinnoi usean työntekijän käyttöoikeuksia ja yhteisiä projekteja.</p>
-          </div>
+    </section>
+
+    <section class="py-24 max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold mb-16 text-center">Usein kysytyt kysymykset</h2>
+        <div class="space-y-6 px-4">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="text-xl font-bold turkoosi-text mb-2">Onko teksti botin luomaa?</h3>
+                <p class="text-gray-400">Kaikki sisältö on tarkistettu ja mukautettu varmistamaan, että työnhakusi pysyy henkilökohtaisena ja aitona.</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="text-xl font-bold turkoosi-text mb-2">Miten tietoni on suojattu?</h3>
+                <p class="text-gray-400">Käytämme Supabase-salattua tietokantaa ja alan korkeimpia tietoturvastandardeja tietojesi turvaamiseksi.</p>
+            </div>
         </div>
-      </div>
-    </div>
+    </section>
 
-  </div>
-</section>
+    <section id="auth-section" class="py-24 flex justify-center px-4">
+        <div class="max-w-md w-full glass p-10 rounded-[2.5rem] border-t-2 border-[#00BFA6]">
+            <h2 class="text-2xl font-bold mb-6 text-center">Kirjaudu sisään</h2>
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label for="email" class="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Sähköposti</label>
+                    <input type="email" id="email" required placeholder="matti@esimerkki.fi" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white">
+                </div>
+                <div>
+                    <label for="password" class="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Salasana</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white">
+                </div>
+                <button type="submit" class="w-full gradient-bg text-white font-black py-4 rounded-2xl hover:scale-[1.02] transition active:scale-95 shadow-lg">KIRJAUDU SISÄÄN ➔</button>
+            </form>
+            <div class="mt-6 text-center text-sm">
+                <p class="text-gray-400 mb-2">Eikö sinulla ole vielä pääsyä?</p>
+                <a href="#pricing" class="oranssi-text font-bold hover:underline">Osta käyttöoikeus tästä</a>
+            </div>
+        </div>
+    </section>
 
-<!-- Authentication -->
-<section id="auth-section" class="py-24 flex justify-center">
-  <div class="max-w-md w-full glass p-10 rounded-[2.5rem] border-t-2 border-[#00BFA6]">
-    <h2 class="text-2xl font-bold mb-6 text-center">Kirjaudu sisään</h2>
-    <form id="auth-form" class="space-y-4">
-      <div>
-        <label class="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Sähköposti</label>
-        <input type="email" id="email" required placeholder="matti@esimerkki.fi" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white">
-      </div>
-      <div>
-        <label class="block text-xs font-bold mb-2 uppercase tracking-widest text-gray-500">Salasana</label>
-        <input type="password" id="password" required placeholder="••••••••" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white">
-      </div>
-      <button type="submit" class="w-full gradient-bg text-white font-black py-4 rounded-2xl hover:scale-[1.02] transition active:scale-95 shadow-lg">KIRJAUDU SISÄÄN ➔</button>
-    </form>
-    <div class="mt-6 text-center text-sm">
-      <p class="text-gray-400 mb-2">Eikö sinulla ole vielä pääsyä?</p>
-      <a href="#pricing" class="text-[#FF6F3C] font-bold hover:underline">Osta käyttöoikeus tästä</a>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
-<footer class="py-12 text-center text-gray-600 border-t border-white/5">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
-
+    <footer class="py-12 text-center text-gray-600 border-t border-white/5">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
 </main>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Kaavion alustus
+    const canvas = document.getElementById('unemploymentChart');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const years = ['2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'];
+        const values = [7.8, 8.8, 9.4, 9.8, 10.3, 10.5, 10.7, 11.0, 11.3, 11.5, 11.8];
 
-  // Kaavio
-  const ctx = document.getElementById('unemploymentChart').getContext('2d');
-  const years = ['2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'];
-  const values = [7.8,8.8,9.4,9.8,10.3,10.5,10.7,11.0,11.3,11.5,11.8];
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: years,
-      datasets: [{
-        label: 'Työttömyysaste (%)',
-        data: values,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 6,
-        pointBackgroundColor: values.map((v,i)=> i>=4 ? '#FF6F3C':'#00BFA6'),
-        borderColor: values.map((v,i)=> i>=4 ? '#FF6F3C':'#00BFA6'),
-        backgroundColor: 'rgba(0,191,166,0.1)',
-        segment: {
-          borderColor: ctx => ctx.p0DataIndex >= 3 ? '#FF6F3C' : '#00BFA6',
-          backgroundColor: ctx => ctx.p0DataIndex >= 3 ? 'rgba(255,111,60,0.1)' : 'rgba(0,191,166,0.1)'
-        }
-      }]
-    },
-    options: {
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins: {
-        legend:{display:false},
-        tooltip:{backgroundColor:'#1A1A1A', titleColor:'#00BFA6', bodyColor:'#FFF', displayColors:false}
-      },
-      scales: {
-        y:{grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#CCC'}},
-        x:{grid:{display:false}, ticks:{color:'#CCC'}}
-      }
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Työttömyysaste (%)',
+                    data: values,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: values.map((v, i) => i >= 4 ? '#FF6F3C' : '#00BFA6'),
+                    borderColor: values.map((v, i) => i >= 4 ? '#FF6F3C' : '#00BFA6'),
+                    backgroundColor: 'rgba(0,191,166,0.1)',
+                    segment: {
+                        borderColor: ctx => ctx.p0DataIndex >= 3 ? '#FF6F3C' : '#00BFA6',
+                        backgroundColor: ctx => ctx.p0DataIndex >= 3 ? 'rgba(255,111,60,0.1)' : 'rgba(0,191,166,0.1)'
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { 
+                        backgroundColor: '#1A1A1A', 
+                        titleColor: '#00BFA6', 
+                        bodyColor: '#FFF', 
+                        displayColors: false,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#CCC' } },
+                    x: { grid: { display: false }, ticks: { color: '#CCC' } }
+                }
+            }
+        });
     }
-  });
 
-  // Lomake demo
-  document.getElementById('auth-form').addEventListener('submit', e => {
-    e.preventDefault();
-    alert('Kirjautuminen vaatii aktiivisen tilauksen. Ohjataan hinnoitteluun.');
-    document.getElementById('pricing').scrollIntoView({behavior:'smooth'});
-  });
-
+    // Lomakekäsittelijä
+    const authForm = document.getElementById('auth-form');
+    if (authForm) {
+        authForm.addEventListener('submit', e => {
+            e.preventDefault();
+            alert('Kirjautuminen vaatii aktiivisen tilauksen. Ohjataan hinnoitteluun.');
+            document.getElementById('pricing').scrollIntoView({behavior: 'smooth'});
+        });
+    }
 });
 </script>
 
