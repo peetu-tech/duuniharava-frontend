@@ -255,3 +255,5 @@ authForm.onsubmit = async (e) => {
       alert('Tili luotu! Voit nyt kirjautua sisään.');
       window.location.href = 'dashboard.html';
     }
+  } else {
+    const { error } = await supabaseClient.auth.sign
