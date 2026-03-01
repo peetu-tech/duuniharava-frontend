@@ -226,30 +226,43 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
 <footer class="py-12 text-center text-gray-600 border-t border-white/5">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
 
 <script>
-const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const urlParams = new URLSearchParams(window.location.search);
-const isSignUpMode = urlParams.get('signup') === 'true';
-if (isSignUpMode) {
-  document.getElementById('auth-title').innerText = 'Luo uusi tili';
-  document.getElementById('submit-btn').innerText = 'LUO TILI JA ALOITA';
-  document.getElementById('register-info').style.display = 'none';
-}
-
-const authForm = document.getElementById('auth-form');
-authForm.onsubmit = async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  if (isSignUpMode) {
-    const { data, error } = await supabaseClient.auth.signUp({email,password});
-    if (error) alert("Virhe tiliä luotaessa: " + error.message);
-    else {
-      alert('Tili luotu! Voit nyt kirjautua sisään.');
-      window.location.href = 'dashboard.html';
+// Työttömyyden trendi + ennuste (esimerkkidata)
+const ctx = document.getElementById('unemploymentChart').getContext('2d');
+const unemploymentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['2021', '2022', '2023', '2024', '2025', '2026', '2027'], 
+        datasets: [{
+            label: 'Työttömyysaste (%)',
+            data: [12.0, 11.5, 11.0, 10.8, 10.5, 10.3, 10.2],
+            borderColor: '#00BFA6',
+            backgroundColor: 'rgba(0,191,166,0.2)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: '#00BFA6'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                title: { display: true, text: 'Työttömyysaste (%)', color:'#FFFFFF' },
+                ticks: { color:'#FFFFFF' }
+            },
+            x: { 
+                title: { display: true, text: 'Vuosi', color:'#FFFFFF' },
+                ticks: { color:'#FFFFFF' }
+            }
+        }
     }
-  } else {
-    const { data, error } = await supabaseClient.auth.signInWithPassword({email,password});
-    if (error) alert
+});
+</script>
+
+</body>
+</html>
