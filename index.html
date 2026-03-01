@@ -25,6 +25,13 @@
         .gradient-bg { background: linear-gradient(90deg, #00BFA6, #FF6F3C); }
         input::placeholder { color: rgba(255, 255, 255, 0.3); }
         
+        /* Interaktiiviset tehosteet */
+        .hover-lift { transition: transform 0.3s ease, border-color 0.3s ease; }
+        .hover-lift:hover { 
+            transform: translateY(-8px);
+            border-color: rgba(0, 191, 166, 0.4);
+        }
+
         @keyframes fadeIn { 
             0% { opacity: 0; transform: translateY(10px); } 
             100% { opacity: 1; transform: translateY(0); } 
@@ -37,11 +44,28 @@
         }
         .logo-bounce { animation: bounceLogo 1.5s infinite; }
 
-        /* Estää kaavion hyppimisen latauksessa */
         .chart-container { position: relative; min-height: 256px; }
     </style>
 </head>
-<body class="px-6">
+<body class="px-6 pt-20">
+
+    <nav class="fixed top-0 left-0 right-0 z-50 glass px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="font-bold text-xl tracking-tighter cursor-pointer" onclick="window.scrollTo(0,0)">
+                <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium text-gray-400">
+                <a href="#hero" class="hover:text-white transition">Etusivu</a>
+                <a href="#features" class="hover:text-white transition">Palvelut</a>
+                <a href="#pricing" class="hover:text-white transition">Hinnasto</a>
+                <a href="#faq" class="hover:text-white transition">FAQ</a>
+            </div>
+            <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" 
+                    class="text-xs font-bold py-2 px-4 rounded-lg border border-[#00BFA6] turkoosi-text hover:bg-[#00BFA6] hover:text-black transition">
+                KIRJAUDU
+            </button>
+        </div>
+    </nav>
 
 <main>
     <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center py-20">
@@ -67,31 +91,31 @@
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
                 <a href="#pricing" class="gradient-bg text-white font-black py-4 px-8 rounded-2xl hover:scale-[1.03] transition shadow-lg">KATSO HINNASTO</a>
-                <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="glass py-4 px-8 rounded-2xl hover:border-[#00BFA6] transition text-white">KIRJAUDU SISÄÄN</button>
+                <button onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" class="glass py-4 px-8 rounded-2xl hover:border-[#00BFA6] transition text-white">LUE LISÄÄ</button>
             </div>
         </div>
     </section>
 
-    <section class="py-24 max-w-6xl mx-auto">
+    <section id="features" class="py-24 max-w-6xl mx-auto">
         <h2 class="text-3xl font-bold text-center mb-16">Mitä tarjoamme</h2>
         <div class="grid md:grid-cols-2 gap-12">
             <div class="space-y-6">
                 <h3 class="text-2xl font-bold turkoosi-text text-center">Työnhakijoille</h3>
-                <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
+                <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">📄</span>
                     <div>
                         <h4 class="text-xl font-bold mb-1">CV-optimoija</h4>
                         <p class="text-gray-400">Paranna CV:si houkuttelevuutta rekrytoijille ja ATS-järjestelmille automaattisesti.</p>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
+                <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">✉️</span>
                     <div>
                         <h4 class="text-xl font-bold mb-1">Hakemusoptimointi</h4>
                         <p class="text-gray-400">Optimoi hakemukset niin, että ne erottuvat ja ohittavat ATS-suodattimet.</p>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
+                <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">🚀</span>
                     <div>
                         <h4 class="text-xl font-bold mb-1">Automaattinen lähetys</h4>
@@ -102,21 +126,21 @@
 
             <div class="space-y-6">
                 <h3 class="text-2xl font-bold oranssi-text text-center">Yrityksille</h3>
-                <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
+                <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">📋</span>
                     <div>
                         <h4 class="text-xl font-bold mb-1">Asiakashallinta</h4>
                         <p class="text-gray-400">Pidä liidit, kontaktit ja tarjoukset järjestyksessä ilman Exceliä.</p>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
+                <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">📈</span>
                     <div>
                         <h4 class="text-xl font-bold mb-1">Analytiikka</h4>
                         <p class="text-gray-400">Seuraa rekrytoinnin ja myynnin tehokkuutta reaaliaikaisen datan avulla.</p>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
+                <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">👥</span>
                     <div>
                         <h4 class="text-xl font-bold mb-1">Tiimihallinta</h4>
@@ -130,7 +154,7 @@
     <section id="pricing" class="py-24 max-w-6xl mx-auto text-center">
         <h2 class="text-3xl font-bold mb-16">Valitse pakettisi</h2>
         <div class="grid md:grid-cols-3 gap-8 px-4">
-            <div class="glass p-10 rounded-3xl">
+            <div class="glass p-10 rounded-3xl hover-lift">
                 <h3 class="text-xl font-bold mb-4 text-gray-300">Starter</h3>
                 <p class="text-4xl font-black mb-6">12,49€<span class="text-lg font-normal text-gray-500">/kk</span></p>
                 <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
@@ -139,7 +163,8 @@
                 </ul>
                 <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition">Valitse</a>
             </div>
-            <div class="glass p-10 rounded-3xl border-2 border-[#00BFA6] scale-105 shadow-[0_0_30px_rgba(0,191,166,0.2)]">
+            <div class="glass p-10 rounded-3xl border-2 border-[#00BFA6] scale-105 shadow-[0_0_30px_rgba(0,191,166,0.2)] relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-[#00BFA6] text-black text-[10px] font-bold px-4 py-1 rotate-45 translate-x-4 translate-y-2">SUOSITUIN</div>
                 <h3 class="text-xl font-bold mb-4 turkoosi-text">Pro</h3>
                 <p class="text-4xl font-black mb-6">29,99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
                 <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
@@ -147,9 +172,9 @@
                     <li>✔ Asiakashallinta + Analytiikka</li>
                     <li>✔ Strateginen tuki</li>
                 </ul>
-                <a href="#" class="block gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] transition text-white">Suosituin</a>
+                <a href="#" class="block gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] transition text-white">Valitse</a>
             </div>
-            <div class="glass p-10 rounded-3xl">
+            <div class="glass p-10 rounded-3xl hover-lift">
                 <h3 class="text-xl font-bold mb-4 text-gray-300">Business</h3>
                 <p class="text-4xl font-black mb-6">99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
                 <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
@@ -162,17 +187,23 @@
         </div>
     </section>
 
-    <section class="py-24 max-w-4xl mx-auto">
+    <section id="faq" class="py-24 max-w-4xl mx-auto">
         <h2 class="text-3xl font-bold mb-16 text-center">Usein kysytyt kysymykset</h2>
-        <div class="space-y-6 px-4">
-            <div class="glass p-6 rounded-2xl">
-                <h3 class="text-xl font-bold turkoosi-text mb-2">Onko teksti botin luomaa?</h3>
-                <p class="text-gray-400">Kaikki sisältö on tarkistettu ja mukautettu varmistamaan, että työnhakusi pysyy henkilökohtaisena ja aitona.</p>
-            </div>
-            <div class="glass p-6 rounded-2xl">
-                <h3 class="text-xl font-bold turkoosi-text mb-2">Miten tietoni on suojattu?</h3>
-                <p class="text-gray-400">Käytämme Supabase-salattua tietokantaa ja alan korkeimpia tietoturvastandardeja tietojesi turvaamiseksi.</p>
-            </div>
+        <div class="space-y-4 px-4">
+            <details class="glass p-6 rounded-2xl cursor-pointer group">
+                <summary class="font-bold turkoosi-text list-none flex justify-between items-center">
+                    Onko teksti botin luomaa?
+                    <span class="group-open:rotate-180 transition-transform">↓</span>
+                </summary>
+                <p class="text-gray-400 mt-4 text-sm">Kaikki sisältö on tarkistettu ja mukautettu varmistamaan, että työnhakusi pysyy henkilökohtaisena ja aitona.</p>
+            </details>
+            <details class="glass p-6 rounded-2xl cursor-pointer group">
+                <summary class="font-bold turkoosi-text list-none flex justify-between items-center">
+                    Miten tietoni on suojattu?
+                    <span class="group-open:rotate-180 transition-transform">↓</span>
+                </summary>
+                <p class="text-gray-400 mt-4 text-sm">Käytämme Supabase-salattua tietokantaa ja alan korkeimpia tietoturvastandardeja tietojesi turvaamiseksi.</p>
+            </details>
         </div>
     </section>
 
