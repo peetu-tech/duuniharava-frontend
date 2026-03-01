@@ -172,6 +172,64 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
   </div>
 </section>
 
+<!-- Hinnoittelu -->
+<section id="pricing" class="py-24 max-w-6xl mx-auto text-center">
+  <h2 class="text-3xl font-bold mb-16">Valitse pakettisi</h2>
+  <div class="grid md:grid-cols-3 gap-8">
+
+    <!-- Starter -->
+    <div class="glass p-10 rounded-3xl">
+      <h3 class="text-xl font-bold mb-4 text-gray-300">Starter</h3>
+      <p class="text-4xl font-black mb-6">12,49€<span class="text-lg font-normal text-gray-500">/kk</span></p>
+      <ul class="text-gray-400 space-y-2 mb-8 text-left">
+        <li>✔ Perus dashboard</li>
+        <li>✔ 50 hakemusta / kk</li>
+      </ul>
+      <a href="https://buy.stripe.com/esimerkki1" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition">Valitse</a>
+    </div>
+
+    <!-- Core + Hakemukset psykologinen hinnoittelu -->
+    <div class="glass p-10 rounded-3xl border-2 border-[#00BFA6] scale-105 shadow-[0_0_30px_rgba(0,191,166,0.2)]">
+      <h3 class="text-xl font-bold mb-4 turkoosi-text">Pro</h3>
+      <p class="text-4xl font-black mb-6">Core + Hakemukset = 29,99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
+      <ul class="text-gray-400 space-y-2 mb-8 text-left">
+        <li>✔ Rajattomat hakemukset</li>
+        <li>✔ Asiakashallinta + Analytiikka</li>
+        <li>✔ Sotasuunnitelma työnhakuun</li>
+      </ul>
+      <a href="https://buy.stripe.com/esimerkki2" class="block gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] transition text-white">Suosituin</a>
+    </div>
+
+    <!-- Business -->
+    <div class="glass p-10 rounded-3xl">
+      <h3 class="text-xl font-bold mb-4 text-gray-300">Business</h3>
+      <p class="text-4xl font-black mb-6">99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
+      <ul class="text-gray-400 space-y-2 mb-8 text-left">
+        <li>✔ Kaikki Pro-ominaisuudet</li>
+        <li>✔ Tiimikäyttö</li>
+      </ul>
+      <a href="https://buy.stripe.com/esimerkki3" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition">Valitse</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="py-24 max-w-6xl mx-auto text-center">
+  <h2 class="text-3xl font-bold mb-16">Usein kysytyt kysymykset</h2>
+  <div class="space-y-8 text-left">
+    <div>
+      <h3 class="text-xl font-bold turkoosi-text mb-2">Onko teksti bottin luoma?</h3>
+      <p class="text-gray-400">Kaikki sisältö on tarkistettu ja mukautettu ihmisen toimesta, jotta työnhakusi pysyy henkilökohtaisena.</p>
+    </div>
+    <div>
+      <h3 class="text-xl font-bold turkoosi-text mb-2">Onko tietoni turvassa?</h3>
+      <p class="text-gray-400">Käytämme alan parhaita tietoturvakäytäntöjä ja Supabase-suojausta varmistaaksemme, että tietosi pysyvät turvassa.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="py-12 text-center text-gray-600 border-t border-white/5">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
+
 <script>
 const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
@@ -191,51 +249,4 @@ authForm.onsubmit = async (e) => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   if (isSignUpMode) {
-    const { data, error } = await supabaseClient.auth.signUp({email,password});
-    if (error) alert("Virhe tiliä luotaessa: " + error.message);
-    else {
-      alert('Tili luotu! Voit nyt kirjautua sisään.');
-      window.location.href = 'dashboard.html';
-    }
-  } else {
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) alert("Kirjautumisvirhe: " + error.message);
-    else window.location.href = 'dashboard.html';
-  }
-};
-
-// Chart.js kaavio työttömyydelle
-const ctx = document.getElementById('unemploymentChart').getContext('2d');
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: ["Heinä 2025","Elo 2025","Syys 2025","Loka 2025","Marras 2025","Joulu 2025","Tammi 2026","Helmi 2026","Maalis 2026","Huhti 2026","Touko 2026","Kesä 2026"],
-    datasets: [{
-      label: 'Työttömyysaste %',
-      data: [10.5,10.4,10.4,10.3,10.3,10.3,10.3,10.2,10.1,10.1,10.0,9.9],
-      borderColor: '#00BFA6',
-      backgroundColor: 'rgba(0,191,166,0.2)',
-      tension: 0.3,
-      fill: true,
-      pointRadius: 4
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        labels: {
-          color: 'white'
-        }
-      }
-    },
-    scales: {
-      x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-      y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' }, beginAtZero: false }
-    }
-  }
-});
-</script>
-
-</body>
-</html>
+    const { data, error } = await supabaseClient.auth.signUp({
