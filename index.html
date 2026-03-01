@@ -229,7 +229,7 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
 <footer class="py-12 text-center text-gray-600 border-t border-white/5">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
 
 <script>
-// Työttömyyden trendi + ennuste (toimiva)
+// Työttömyyden trendi + ennuste
 const ctx = document.getElementById('unemploymentChart').getContext('2d');
 const years = ['2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'];
 
@@ -251,10 +251,6 @@ new Chart(ctx, {
                 backgroundColor: 'rgba(0,191,166,0.2)',
                 fill: true,
                 tension: 0.3,
-                pointRadius: 4,
-                pointBackgroundColor: '#00BFA6'
-            },
-            {
-                label: 'Ennuste (2023–2032)',
-                data: forecast,
-               
+                pointRadius: 5,
+                pointBackgroundColor: '#00BFA6',
+                spanG
