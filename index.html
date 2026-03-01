@@ -58,6 +58,9 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
     <div class="glass p-6 rounded-2xl mt-6">
       <h4 class="text-xl font-bold mb-4 text-center turkoosi-text">Työttömyyden trendi ja ennuste</h4>
       <canvas id="unemploymentChart" class="w-full h-64"></canvas>
+      <p class="text-gray-400 text-sm mt-2">
+        Historia (laskutrendi) 2020–2022, nousu alkaa 2023. Vuonna 2026 tammikuussa työttömyysaste 10,3 %. Ennuste jatkuu nousuna aina 2032 asti.
+      </p>
     </div>
 
     <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
@@ -226,11 +229,15 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
 <footer class="py-12 text-center text-gray-600 border-t border-white/5">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
 
 <script>
-// Työttömyyden trendi + ennuste
+// Työttömyyden trendi + ennuste (toimiva)
 const ctx = document.getElementById('unemploymentChart').getContext('2d');
 const years = ['2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'];
-const historyData = [12.5,12.0,11.5,null,null,null,null,null,null,null,null,null,null];
-const forecastData = [null,null,null,11.6,11.8,11.9,10.3,10.5,10.7,11.0,11.3,11.5,11.8];
+
+// Historia 2020-2022 (laskutrendi)
+const history = [12.5, 12.0, 11.5, null, null, null, null, null, null, null, null, null, null];
+
+// Ennuste 2023–2032 (nousutrendi)
+const forecast = [null, null, null, 11.6, 11.8, 11.9, 10.3, 10.5, 10.7, 11.0, 11.3, 11.5, 11.8];
 
 new Chart(ctx, {
     type: 'line',
@@ -239,7 +246,7 @@ new Chart(ctx, {
         datasets: [
             {
                 label: 'Historia (2020–2022)',
-                data: historyData,
+                data: history,
                 borderColor: '#00BFA6',
                 backgroundColor: 'rgba(0,191,166,0.2)',
                 fill: true,
@@ -249,30 +256,5 @@ new Chart(ctx, {
             },
             {
                 label: 'Ennuste (2023–2032)',
-                data: forecastData,
-                borderColor: '#FF6F3C',
-                backgroundColor: 'rgba(255,111,60,0.2)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 4,
-                pointBackgroundColor: '#FF6F3C'
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { labels: { color:'#FFFFFF' } },
-            tooltip: { mode: 'index', intersect: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-                title: { display: true, text: 'Työttömyysaste (%)', color:'#FFFFFF' },
-                ticks: { color:'#FFFFFF' }
-            },
-            x: { 
-                title: { display: true, text: 'Vuosi', color:'#FFFFFF' },
-                ticks: { color:'#FFFFFF' }
-            }
-        }
+                data: forecast,
+               
