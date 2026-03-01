@@ -226,27 +226,39 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
 <footer class="py-12 text-center text-gray-600 border-t border-white/5">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
 
 <script>
-// Työttömyyden trendi + ennuste (esimerkkidata)
+// Työttömyyden trendi: historia + ennuste
 const ctx = document.getElementById('unemploymentChart').getContext('2d');
 const unemploymentChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: ['2021', '2022', '2023', '2024', '2025', '2026', '2027'], 
-        datasets: [{
-            label: 'Työttömyysaste (%)',
-            data: [12.0, 11.5, 11.0, 10.8, 10.5, 10.3, 10.2],
-            borderColor: '#00BFA6',
-            backgroundColor: 'rgba(0,191,166,0.2)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 4,
-            pointBackgroundColor: '#00BFA6'
-        }]
+        labels: ['2021','2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'],
+        datasets: [
+            {
+                label: 'Historia',
+                data: [12.0, 11.5, 11.0, 10.8, 10.5, null, null, null, null, null, null, null],
+                borderColor: '#00BFA6',
+                backgroundColor: 'rgba(0,191,166,0.2)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointBackgroundColor: '#00BFA6'
+            },
+            {
+                label: 'Ennuste',
+                data: [null, null, null, null, null, 10.3, 10.5, 10.8, 11.0, 11.3, 11.7, 12.0],
+                borderColor: '#FF6F3C',
+                backgroundColor: 'rgba(255,111,60,0.2)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointBackgroundColor: '#FF6F3C'
+            }
+        ]
     },
     options: {
         responsive: true,
         plugins: {
-            legend: { display: false },
+            legend: { labels: { color:'#FFFFFF' } },
             tooltip: { mode: 'index', intersect: false }
         },
         scales: {
@@ -264,5 +276,4 @@ const unemploymentChart = new Chart(ctx, {
 });
 </script>
 
-</body>
-</html>
+</body
