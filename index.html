@@ -36,7 +36,6 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
 </head>
 <body class="px-6">
 
-<!-- Hero -->
 <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center">
   <div class="logo-bounce mb-8 text-6xl font-bold turkoosi-text">🦡</div>
   <div class="max-w-3xl glass p-12 rounded-[2.5rem] shadow-2xl">
@@ -47,7 +46,7 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
       Tehokas työkalu työnhakuun ja asiakashankintaan
     </h1>
     <p class="text-gray-400 mb-6 text-lg">
-      Suomessa työttömyysaste 15–74-vuotiaiden osalta on tammikuussa 2026 <strong>10,3%</strong>. Hallitus leikkaa tukia ja vähentää työllistämistoimia, joten nyt on erityisen tärkeää tehostaa omaa työnhakua.
+      Työttömyysaste 15–74-vuotiailla alkoi nousta vuodesta 2022. Vuonna 2026 tammikuussa työttömyysaste on <strong>10,3 %</strong>. Hallitus leikkaa tukia ja vähentää työllistämistoimia, joten nyt on erityisen tärkeää tehostaa omaa työnhakua.
     </p>
 
     <!-- Työttömyyskaavio -->
@@ -55,46 +54,8 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
       <h4 class="text-xl font-bold mb-4 text-center turkoosi-text">Työttömyyden trendi ja ennuste</h4>
       <canvas id="unemploymentChart" class="w-full h-64"></canvas>
       <p class="text-gray-400 text-sm mt-2">
-        Historia (laskutrendi) 2020–2022, nousu alkaa 2023. Vuonna 2026 tammikuussa työttömyysaste 10,3 %. Ennuste jatkuu nousuna aina 2032 asti.
+        Kaavio yhdistää historian vuodesta 2022 ja ennusteen vuodesta 2026 eteenpäin yhdeksi linjaksi.
       </p>
-    </div>
-  </div>
-</section>
-
-<!-- Työnhakijat vs Yritykset -->
-<section class="py-24 max-w-6xl mx-auto">
-  <h2 class="text-3xl font-bold text-center mb-16">Mitä tarjoamme</h2>
-  <div class="grid md:grid-cols-2 gap-12">
-    <div>
-      <h3 class="text-2xl font-bold turkoosi-text mb-8 text-center">Työnhakijoille</h3>
-      <div class="grid gap-6">
-        <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">📄</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">CV-optimoija</h4>
-            <p class="text-gray-400">Paranna CV:si houkuttelevuutta rekrytoijille ja ATS-järjestelmille automaattisesti.</p>
-          </div>
-        </div>
-        <div class="glass p-6 rounded-2xl hover:border-[#00BFA6] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">✉️</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">Hakemusoptimointi</h4>
-            <p class="text-gray-400">Optimoi hakemukset niin, että ne erottuvat ja ohittavat ATS-suodattimet.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <h3 class="text-2xl font-bold turkoosi-text mb-8 text-center">Yrityksille</h3>
-      <div class="grid gap-6">
-        <div class="glass p-6 rounded-2xl hover:border-[#FF6F3C] transition flex items-start gap-4 animate-fadeIn">
-          <span class="text-3xl">📋</span>
-          <div>
-            <h4 class="text-xl font-bold mb-1">Asiakashallinta</h4>
-            <p class="text-gray-400">Pidä liidit, kontaktit ja tarjoukset järjestyksessä ilman Exceliä.</p>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -103,40 +64,37 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
 
 <script>
 const ctx = document.getElementById('unemploymentChart').getContext('2d');
-const years = ['2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'];
 
-// Historia: 2020–2022
-const history = [12.5, 12.0, 11.5, 11.6, 11.8, 11.9, 10.3, 10.5, 10.7, 11.0, 11.3, 11.5, 11.8];
+const years = ['2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'];
+const data = [11.5, 11.6, 11.8, 11.9, 10.3, 10.5, 10.7, 11.0, 11.3, 11.5, 11.8];
 
-// Ennuste: 2023–2032
-const forecast = [11.6, 11.8, 11.9, 10.3, 10.5, 10.7, 11.0, 11.3, 11.5, 11.8, 12.0, 12.2, 12.5];
-
-new Chart(ctx, {
+// Yksi linja, segmentti-värit
+const chart = new Chart(ctx, {
     type: 'line',
     data: {
         labels: years,
-        datasets: [
-            {
-                label: 'Historia (2020–2022)',
-                data: history,
-                borderColor: '#00BFA6',
-                backgroundColor: 'rgba(0,191,166,0.2)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 5,
-                pointBackgroundColor: '#00BFA6'
+        datasets: [{
+            label: 'Työttömyys 2022–2032',
+            data: data,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5,
+            pointBackgroundColor: function(ctx) {
+                const index = ctx.dataIndex;
+                return index <= 3 ? '#00BFA6' : '#FF6F3C'; // 2022-2025 turkoosi, 2026 eteenpäin oranssi
             },
-            {
-                label: 'Ennuste (2023–2032)',
-                data: forecast,
-                borderColor: '#FF6F3C',
-                backgroundColor: 'rgba(255,111,60,0.2)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 5,
-                pointBackgroundColor: '#FF6F3C'
+            borderColor: function(ctx) {
+                const index = ctx.dataIndex;
+                return index <= 3 ? '#00BFA6' : '#FF6F3C';
+            },
+            segment: {
+                borderColor: ctx => ctx.p0DataIndex <= 3 ? '#00BFA6' : '#FF6F3C'
+            },
+            backgroundColor: function(ctx) {
+                const index = ctx.dataIndex;
+                return index <= 3 ? 'rgba(0,191,166,0.2)' : 'rgba(255,111,60,0.2)';
             }
-        ]
+        }]
     },
     options: {
         responsive: true,
