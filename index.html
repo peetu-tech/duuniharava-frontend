@@ -60,10 +60,17 @@
                 <a href="#pricing" class="hover:text-white transition">Hinnasto</a>
                 <a href="#faq" class="hover:text-white transition">FAQ</a>
             </div>
-            <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" 
-                    class="text-xs font-bold py-2 px-4 rounded-lg border border-[#00BFA6] turkoosi-text hover:bg-[#00BFA6] hover:text-black transition">
-                KIRJAUDU
-            </button>
+            <div class="flex items-center gap-4">
+                <div class="flex gap-2 text-xs font-bold border-r border-white/10 pr-4">
+                    <button class="turkoosi-text hover:text-white transition">FI</button>
+                    <span class="text-gray-600">|</span>
+                    <button class="text-gray-400 hover:text-white transition" onclick="alert('English version coming soon!')">EN</button>
+                </div>
+                <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" 
+                        class="text-xs font-bold py-2 px-4 rounded-lg border border-[#00BFA6] turkoosi-text hover:bg-[#00BFA6] hover:text-black transition">
+                    KIRJAUDU
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -74,7 +81,7 @@
             <div class="text-3xl font-bold tracking-tighter mb-8">
                 <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Tehokas työkalu työnhakuun ja asiakashankintaan</h1>
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Tehokas työkalu työnhakuun ja urakehitykseen</h1>
             <p class="text-gray-400 mb-6 text-lg">
                 Suomessa työttömyysaste on tammikuussa 2026 <strong>10,3 %</strong>. Hallitus leikkaa tukia ja vähentää työllistämistoimia. Duuniharava automatisoi työnhaun ja optimoi profiilisi, jotta tulet huomatuksi.
             </p>
@@ -111,57 +118,57 @@
                     <p class="text-sm text-gray-400">Löydä harjoittelupaikat tai ensiaskeleet uudella uralla optimoidun profiilin avulla.</p>
                 </div>
                 <div class="glass p-6 rounded-2xl hover-lift transition animate-fadeIn">
-                    <h4 class="font-bold turkoosi-text mb-2">💼 Freelancerit</h4>
-                    <p class="text-sm text-gray-400">Automatisoi asiakashankinta ja keskity laskutettavaan työhön.</p>
+                    <h4 class="font-bold turkoosi-text mb-2">🔍 Aktiiviset hakijat</h4>
+                    <p class="text-sm text-gray-400">Automatisoi rutiinit ja keskity valmistautumaan haastatteluihin.</p>
                 </div>
             </div>
 
             <div class="space-y-6">
-                <h3 class="text-2xl font-bold turkoosi-text text-center border-b border-[#00BFA6]/20 pb-4">Työnhakijoille</h3>
+                <h3 class="text-2xl font-bold turkoosi-text text-center border-b border-[#00BFA6]/20 pb-4">Profiilin optimointi</h3>
                 <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">📄</span>
                     <div>
-                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">CV-optimoija</h4>
-                        <p class="text-gray-400 text-sm">Paranna CV:si houkuttelevuutta rekrytoijille ja ATS-järjestelmille.</p>
+                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">CV-analyysi & Palaute</h4>
+                        <p class="text-gray-400 text-sm">Saat suoraa palautetta ja parannusehdotuksia CV:si rakenteeseen ja sisältöön.</p>
                     </div>
                 </div>
                 <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">✉️</span>
                     <div>
                         <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Hakemusoptimointi</h4>
-                        <p class="text-gray-400 text-sm">Optimoi hakemukset niin, että ne erottuvat ja ohittavat ATS-suodattimet.</p>
+                        <p class="text-gray-400 text-sm">Optimoi hakemukset niin, että ne erottuvat ja läpäisevät ATS-suodattimet.</p>
                     </div>
                 </div>
                 <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
                     <span class="text-3xl">🚀</span>
                     <div>
-                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Automaattinen lähetys</h4>
-                        <p class="text-gray-400 text-sm">Säästä aikaa ja lähetä hakemuksia yhdestä näkymästä.</p>
+                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Automaattinen haku</h4>
+                        <p class="text-gray-400 text-sm">Etsi ja lähetä hakemuksia useisiin paikkoihin yhdellä kertaa automaation avulla.</p>
                     </div>
                 </div>
             </div>
 
             <div class="space-y-6">
-                <h3 class="text-2xl font-bold oranssi-text text-center border-b border-[#FF6F3C]/20 pb-4">Yrityksille</h3>
+                <h3 class="text-2xl font-bold oranssi-text text-center border-b border-[#FF6F3C]/20 pb-4">Verkostoituminen</h3>
                 <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
-                    <span class="text-3xl">📋</span>
+                    <span class="text-3xl">🔗</span>
                     <div>
-                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Asiakashallinta</h4>
-                        <p class="text-gray-400 text-sm">Pidä liidit ja kontaktit järjestyksessä ilman Exceliä.</p>
+                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">LinkedIn-hionta</h4>
+                        <p class="text-gray-400 text-sm">Vinkit ja työkalut, joilla teet LinkedIn-profiilistasi rekrytoijien magneetin.</p>
                     </div>
                 </div>
                 <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
-                    <span class="text-3xl">📈</span>
+                    <span class="text-3xl">💬</span>
                     <div>
-                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Analytiikka</h4>
-                        <p class="text-gray-400 text-sm">Seuraa rekrytoinnin ja myynnin tehokkuutta datalla.</p>
+                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Asiantuntijapalaute</h4>
+                        <p class="text-gray-400 text-sm">Analysoimme hakuprosessisi ja kerromme, missä voit vielä kehittyä.</p>
                     </div>
                 </div>
                 <div class="glass p-6 rounded-2xl hover-lift transition flex items-start gap-4 animate-fadeIn">
-                    <span class="text-3xl">👥</span>
+                    <span class="text-3xl">📊</span>
                     <div>
-                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Tiimihallinta</h4>
-                        <p class="text-gray-400 text-sm">Hallinnoi käyttöoikeuksia ja yhteisiä projekteja.</p>
+                        <h4 class="text-xl font-bold mb-1 text-sm md:text-base">Haun seuranta</h4>
+                        <p class="text-gray-400 text-sm">Pidä kirjaa kaikista lähetetyistä hakemuksista ja niiden tilasta yhdessä paikassa.</p>
                     </div>
                 </div>
             </div>
@@ -175,8 +182,8 @@
                 <h3 class="text-xl font-bold mb-4 text-gray-300">Starter</h3>
                 <p class="text-4xl font-black mb-6">12,49€<span class="text-lg font-normal text-gray-500">/kk</span></p>
                 <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
-                    <li>✔ Perus dashboard</li>
-                    <li>✔ 50 hakemusta / kk</li>
+                    <li>✔ CV-analyysi</li>
+                    <li>✔ 50 automaattihakua / kk</li>
                 </ul>
                 <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition">Valitse</a>
             </div>
@@ -186,18 +193,18 @@
                 <p class="text-4xl font-black mb-6">29,99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
                 <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
                     <li>✔ Rajattomat hakemukset</li>
-                    <li>✔ Asiakashallinta + Analytiikka</li>
-                    <li>✔ Strateginen tuki</li>
+                    <li>✔ LinkedIn-optimointityökalut</li>
+                    <li>✔ Henkilökohtainen palaute</li>
                 </ul>
                 <a href="#" class="block gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] transition text-white">Valitse</a>
             </div>
             <div class="glass p-10 rounded-3xl hover-lift">
-                <h3 class="text-xl font-bold mb-4 text-gray-300">Business</h3>
+                <h3 class="text-xl font-bold mb-4 text-gray-300">Ura-tuki</h3>
                 <p class="text-4xl font-black mb-6">99€<span class="text-lg font-normal text-gray-500">/kk</span></p>
                 <ul class="text-gray-400 space-y-2 mb-8 text-left text-sm">
                     <li>✔ Kaikki Pro-ominaisuudet</li>
-                    <li>✔ Tiimikäyttö</li>
-                    <li>✔ Hallintatyökalut</li>
+                    <li>✔ Syvällinen urasparraus</li>
+                    <li>✔ Portfolion tarkistus</li>
                 </ul>
                 <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition">Valitse</a>
             </div>
@@ -209,38 +216,38 @@
         <div class="space-y-4 px-4">
             <details class="glass p-6 rounded-2xl cursor-pointer group">
                 <summary class="font-bold turkoosi-text list-none flex justify-between items-center text-sm md:text-base">
-                    Onko teksti botin luomaa?
+                    Saanko palautetta omasta CV:stäni?
                     <span class="group-open:rotate-180 transition-transform">↓</span>
                 </summary>
-                <p class="text-gray-400 mt-4 text-sm">Sisältö on hiottu varmistamaan, että työnhakusi pysyy henkilökohtaisena. Työkalu auttaa optimoinnissa, mutta sinä säilytät kontrollin.</p>
+                <p class="text-gray-400 mt-4 text-sm">Kyllä. Palvelu analysoi CV:si ja antaa konkreettisia parannusehdotuksia, jotta se vastaa paremmin työnantajien odotuksia.</p>
             </details>
             <details class="glass p-6 rounded-2xl cursor-pointer group">
                 <summary class="font-bold turkoosi-text list-none flex justify-between items-center text-sm md:text-base">
-                    Miten tietoni on suojattu?
+                    Auttaako palvelu LinkedIn-profiilin kanssa?
                     <span class="group-open:rotate-180 transition-transform">↓</span>
                 </summary>
-                <p class="text-gray-400 mt-4 text-sm">Käytämme Supabase-salattua tietokantaa ja alan korkeimpia tietoturvastandardeja (AES-256) tietojesi turvaamiseksi.</p>
+                <p class="text-gray-400 mt-4 text-sm">Ehdottomasti. Pro-paketissamme on erilliset työkalut LinkedIn-sisältöjen ja profiilin hakukonenäkyvyyden parantamiseen.</p>
             </details>
             <details class="glass p-6 rounded-2xl cursor-pointer group">
                 <summary class="font-bold oranssi-text list-none flex justify-between items-center text-sm md:text-base">
                     Auttaako työkalu kieliesteiden kanssa?
                     <span class="group-open:rotate-180 transition-transform">↓</span>
                 </summary>
-                <p class="text-gray-400 mt-4 text-sm">Kyllä! Duuniharava auttaa muotoilemaan hakemukset ja CV:n sujuvalla suomella tai englannilla, mikä parantaa merkittävästi maahanmuuttajien työllistymismahdollisuuksia.</p>
+                <p class="text-gray-400 mt-4 text-sm">Kyllä! Duuniharava auttaa muotoilemaan hakemukset ja CV:n sujuvalla suomella tai englannilla, mikä parantaa merkittävästi työllistymismahdollisuuksia.</p>
             </details>
             <details class="glass p-6 rounded-2xl cursor-pointer group">
                 <summary class="font-bold oranssi-text list-none flex justify-between items-center text-sm md:text-base">
-                    Onko palvelu helppokäyttöinen, jos Suomen työmarkkinat ovat uusia?
+                    Miten automatisoitu haku toimii?
                     <span class="group-open:rotate-180 transition-transform">↓</span>
                 </summary>
-                <p class="text-gray-400 mt-4 text-sm">Ehdottomasti. Työkalu opastaa sinua paikallisten vaatimusten läpi ja auttaa sinua ymmärtämään, mitä suomalaiset rekrytoijat arvostavat hakemuksessa.</p>
+                <p class="text-gray-400 mt-4 text-sm">Voit määrittää kriteerit (ala, sijainti, palkka), ja järjestelmä etsii sopivat paikat ja auttaa luonnostelemaan hakemukset valmiiksi puolestasi.</p>
             </details>
             <details class="glass p-6 rounded-2xl cursor-pointer group">
                 <summary class="font-bold oranssi-text list-none flex justify-between items-center text-sm md:text-base">
                     Voinko peruuttaa tilaukseni milloin vain?
                     <span class="group-open:rotate-180 transition-transform">↓</span>
                 </summary>
-                <p class="text-gray-400 mt-4 text-sm">Kyllä. Tilauksemme ovat kuukausikohtaisia, eikä niissä ole pitkiä sitoutumisaikoja. Voit päättää tilauksen yhdellä klikkauksella asetuksista.</p>
+                <p class="text-gray-400 mt-4 text-sm">Kyllä. Tilauksemme ovat kuukausikohtaisia ilman sitoutumisaikoja. Voit päättää tilauksen yhdellä klikkauksella asetuksista.</p>
             </details>
         </div>
     </section>
@@ -318,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lomakekäsittelijä
     const authForm = document.getElementById('auth-form');
     if (authForm) {
         authForm.addEventListener('submit', e => {
