@@ -21,27 +21,29 @@
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
         .gradient-bg { background: linear-gradient(90deg, #00BFA6, #FF6F3C); }
         input::placeholder { color: rgba(255, 255, 255, 0.3); }
         
-        .hover-lift { transition: transform 0.3s ease, border-color 0.3s ease; }
+        .hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { 
-            transform: translateY(-8px);
-            border-color: rgba(0, 191, 166, 0.4);
+            transform: translateY(-10px);
+            border-color: rgba(0, 191, 166, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 191, 166, 0.3);
         }
 
-        @keyframes fadeIn { 
-            0% { opacity: 0; transform: translateY(10px); } 
-            100% { opacity: 1; transform: translateY(0); } 
+        @keyframes fadeInUp { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
-        .animate-fadeIn { animation: fadeIn 0.6s ease forwards; }
+        .reveal { animation: fadeInUp 0.8s ease out forwards; }
         
-        @keyframes bounceLogo { 
-            0%, 100% { transform: translateY(0); } 
-            50% { transform: translateY(-10px); } 
+        @keyframes rakeSwing { 
+            0%, 100% { transform: rotate(-5deg); } 
+            50% { transform: rotate(5deg); } 
         }
-        .logo-bounce { animation: bounceLogo 1.5s infinite; }
+        .logo-anim { animation: rakeSwing 3s infinite ease-in-out; }
 
         .chart-container { 
             position: relative; 
@@ -73,8 +75,9 @@
 
     <nav class="fixed top-0 left-0 right-0 z-50 glass px-4 md:px-6 py-4">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="font-bold text-lg md:text-xl tracking-tighter cursor-pointer" onclick="window.scrollTo(0,0)">
-                <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
+            <div class="font-bold text-lg md:text-xl tracking-tighter cursor-pointer flex items-center gap-2" onclick="window.scrollTo(0,0)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/></svg>
+                <div><span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span></div>
             </div>
             <div class="hidden lg:flex gap-8 text-sm font-medium text-gray-400">
                 <a href="#hero" class="hover:text-white transition" data-i18n="nav-home">Etusivu</a>
@@ -103,8 +106,12 @@
 
 <main>
     <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center py-12 md:py-20">
-        <div class="logo-bounce mb-8 text-5xl md:text-6xl font-bold turkoosi-text" role="img">🦡</div>
-        <div class="max-w-4xl glass p-6 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl">
+        <div class="logo-anim mb-8">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-[0_0_15px_rgba(0,191,166,0.5)]">
+                <path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/>
+            </svg>
+        </div>
+        <div class="max-w-4xl glass p-6 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl reveal">
             <div class="text-2xl md:text-3xl font-bold tracking-tighter mb-6 md:mb-8">
                 <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
             </div>
@@ -114,11 +121,11 @@
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <button onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" class="gradient-bg text-black font-black py-5 px-10 rounded-2xl hover:scale-[1.05] transition shadow-[0_0_20px_rgba(0,191,166,0.3)] text-sm md:text-lg" data-i18n="hero-cta">ALOITA ILMAINEN KOKEILU</button>
+                <button onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" class="gradient-bg text-black font-black py-5 px-10 rounded-2xl hover:scale-[1.05] active:scale-95 transition shadow-[0_0_20px_rgba(0,191,166,0.3)] text-sm md:text-lg" data-i18n="hero-cta">VALITSE PAKETTI</button>
                 <button onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" class="glass py-5 px-10 rounded-2xl hover:border-[#00BFA6] transition text-white text-sm md:text-lg" data-i18n="btn-more">KATSO MITEN SE TOIMII</button>
             </div>
 
-            <div class="glass p-4 md:p-6 rounded-2xl mt-6">
+            <div class="glass p-4 md:p-6 rounded-2xl mt-6 hover:border-white/20 transition">
                 <h4 class="text-lg md:text-xl font-bold mb-4 text-center turkoosi-text" data-i18n="chart-title">Työttömyyden trendi ja ennuste</h4>
                 <div class="chart-container">
                     <canvas id="unemploymentChart"></canvas>
@@ -130,7 +137,7 @@
         </div>
     </section>
 
-    <section id="features" class="py-16 md:py-24 max-w-6xl mx-auto">
+    <section id="features" class="py-16 md:py-24 max-w-6xl mx-auto reveal">
         <h2 class="text-2xl md:text-3xl font-bold text-center mb-12 md:mb-16" data-i18n="features-title">Kenelle ja mitä tarjoamme</h2>
         <div class="grid lg:grid-cols-3 gap-8">
             <div class="space-y-6">
@@ -201,22 +208,22 @@
         </div>
     </section>
 
-    <section id="value-proposition" class="py-16 md:py-24 max-w-6xl mx-auto">
-        <div class="glass p-8 md:p-16 rounded-[3rem] border-t-2 border-[#00BFA6]">
+    <section id="value-proposition" class="py-16 md:py-24 max-w-6xl mx-auto reveal">
+        <div class="glass p-8 md:p-16 rounded-[3rem] border-t-2 border-[#00BFA6] hover:shadow-[0_0_50px_rgba(0,191,166,0.1)] transition">
             <h2 class="text-3xl md:text-5xl font-bold text-center mb-12" data-i18n="value-title">Enemmän kuin pelkkää tekoälyä</h2>
             <div class="grid md:grid-cols-3 gap-12">
-                <div class="text-center">
-                    <div class="text-4xl mb-4">🇫🇮</div>
+                <div class="text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition">🇫🇮</div>
                     <h3 class="text-xl font-bold mb-3" data-i18n="value-1-h">Suomalainen konteksti</h3>
                     <p class="text-gray-400 text-sm md:text-base" data-i18n="value-1-p">Ymmärrämme kotimaan työmarkkinat, toimialakohtaiset erot ja suomalaisen rekrytointikulttuurin.</p>
                 </div>
-                <div class="text-center">
-                    <div class="text-4xl mb-4">⚙️</div>
+                <div class="text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition">⚙️</div>
                     <h3 class="text-xl font-bold mb-3" data-i18n="value-2-h">Tekninen ylivertaisuus</h3>
                     <p class="text-gray-400 text-sm md:text-base" data-i18n="value-2-p">n8n-pohjainen arkkitehtuurimme varmistaa, että datasi on turvassa ja prosessit rullaavat virheettömästi 24/7.</p>
                 </div>
-                <div class="text-center">
-                    <div class="text-4xl mb-4">💎</div>
+                <div class="text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition">💎</div>
                     <h3 class="text-xl font-bold mb-3" data-i18n="value-3-h">Laatu edellä</h3>
                     <p class="text-gray-400 text-sm md:text-base" data-i18n="value-3-p">Emme tuota "bottitekstiä". Käytämme kehittyneitä malleja, jotka säilyttävät persoonallisen äänesi ja ammattimaisen otteen.</p>
                 </div>
@@ -224,25 +231,25 @@
         </div>
     </section>
 
-    <section id="testimonials" class="py-16 md:py-24 max-w-6xl mx-auto">
+    <section id="testimonials" class="py-16 md:py-24 max-w-6xl mx-auto reveal">
         <h2 class="text-2xl md:text-3xl font-bold text-center mb-12" data-i18n="testi-title">Käyttäjien kokemuksia</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="glass p-8 rounded-2xl italic text-gray-300">
+            <div class="glass p-8 rounded-2xl italic text-gray-300 hover-lift">
                 <p class="mb-4" data-i18n="testi-1-text">"Sain viisi haastattelukutsua viikossa CV-optimoinnin jälkeen. Uskomaton työkalu!"</p>
                 <span class="text-sm font-bold turkoosi-text">— Mikko S., Ohjelmistokehittäjä</span>
             </div>
-            <div class="glass p-8 rounded-2xl italic text-gray-300 border-t-2 border-[#FF6F3C]">
+            <div class="glass p-8 rounded-2xl italic text-gray-300 border-t-2 border-[#FF6F3C] hover-lift">
                 <p class="mb-4" data-i18n="testi-2-text">"Automaattinen haku säästi minulta kymmeniä tunteja aikaa. Suosittelen kaikille!"</p>
                 <span class="text-sm font-bold oranssi-text">— Elena V., Markkinointi</span>
             </div>
-            <div class="glass p-8 rounded-2xl italic text-gray-300">
+            <div class="glass p-8 rounded-2xl italic text-gray-300 hover-lift">
                 <p class="mb-4" data-i18n="testi-3-text">"LinkedIn-profiilini hionta toi heti rekrytoijia viestittelemään minulle suoraan."</p>
                 <span class="text-sm font-bold turkoosi-text">— Joonas K., Myyntipäällikkö</span>
             </div>
         </div>
     </section>
 
-    <section id="pricing" class="py-16 md:py-24 max-w-6xl mx-auto text-center">
+    <section id="pricing" class="py-16 md:py-24 max-w-6xl mx-auto text-center reveal">
         <h2 class="text-2xl md:text-3xl font-bold mb-12 md:mb-16" data-i18n="pricing-title">Valitse pakettisi</h2>
         <div class="grid md:grid-cols-3 gap-6 md:gap-8 px-4">
             <div class="glass p-8 rounded-3xl hover-lift border border-white/5">
@@ -252,7 +259,7 @@
                     <li>✔ CV-analyysi</li>
                     <li>✔ 50 automaattihakua / kk</li>
                 </ul>
-                <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition text-sm" data-i18n="btn-select">Valitse</a>
+                <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition text-sm font-bold" data-i18n="btn-select">Valitse</a>
             </div>
             <div class="glass p-8 rounded-3xl border-2 border-[#00BFA6] scale-100 md:scale-105 shadow-[0_0_30px_rgba(0,191,166,0.1)] relative">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00BFA6] text-black text-[10px] font-bold px-4 py-1 rounded-full" data-i18n="popular">SUOSITUIN</div>
@@ -263,7 +270,7 @@
                     <li>✔ LinkedIn-työkalut</li>
                     <li>✔ Henkilökohtainen palaute</li>
                 </ul>
-                <a href="#" class="block gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] transition text-white text-sm" data-i18n="btn-select">Valitse</a>
+                <a href="#" class="block gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] active:scale-95 transition text-white text-sm" data-i18n="btn-select">Valitse</a>
             </div>
             <div class="glass p-8 rounded-3xl hover-lift border border-white/5">
                 <h3 class="text-lg font-bold mb-4 text-gray-300" data-i18n="price-3-name">Ura-tuki</h3>
@@ -273,15 +280,15 @@
                     <li>✔ Syvällinen urasparraus</li>
                     <li>✔ Portfolion tarkistus</li>
                 </ul>
-                <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition text-sm" data-i18n="btn-select">Valitse</a>
+                <a href="#" class="block glass py-3 rounded-xl hover:border-[#00BFA6] transition text-sm font-bold" data-i18n="btn-select">Valitse</a>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="py-16 md:py-24 max-w-4xl mx-auto">
+    <section id="faq" class="py-16 md:py-24 max-w-4xl mx-auto reveal">
         <h2 class="text-2xl md:text-3xl font-bold mb-12 text-center" data-i18n="faq-title">Usein kysytyt kysymykset</h2>
         <div class="space-y-4 px-4">
-            <details class="glass p-5 rounded-xl cursor-pointer group">
+            <details class="glass p-5 rounded-xl cursor-pointer group hover:border-[#00BFA6]/30">
                 <summary class="font-bold turkoosi-text list-none flex justify-between items-center text-sm md:text-base">
                     <span data-i18n="faq-1-q">Saanko palautetta CV:stä?</span>
                     <span class="group-open:rotate-180 transition-transform text-xs">▼</span>
@@ -291,8 +298,8 @@
         </div>
     </section>
 
-    <section id="auth-section" class="py-16 md:py-24 flex justify-center px-4">
-        <div class="max-w-md w-full glass p-8 md:p-10 rounded-[2rem] border-t-2 border-[#00BFA6]">
+    <section id="auth-section" class="py-16 md:py-24 flex justify-center px-4 reveal">
+        <div class="max-w-md w-full glass p-8 md:p-10 rounded-[2rem] border-t-2 border-[#00BFA6] shadow-2xl">
             <h2 class="text-xl md:text-2xl font-bold mb-6 text-center" data-i18n="login-title">Kirjaudu sisään</h2>
             <form id="auth-form" class="space-y-4">
                 <div>
@@ -303,12 +310,12 @@
                     <label class="block text-[10px] font-bold mb-2 uppercase tracking-widest text-gray-500" data-i18n="login-pass">Salasana</label>
                     <input type="password" required placeholder="••••••••" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white text-sm">
                 </div>
-                <button type="submit" class="w-full gradient-bg text-white font-black py-4 rounded-xl hover:scale-[1.02] transition active:scale-95 shadow-lg text-sm" data-i18n="login-btn">KIRJAUDU SISÄÄN ➔</button>
+                <button type="submit" class="w-full gradient-bg text-white font-black py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition shadow-lg text-sm" data-i18n="login-btn">KIRJAUDU SISÄÄN ➔</button>
             </form>
         </div>
     </section>
 
-    <footer class="py-12 text-center text-gray-600 border-t border-white/5 text-xs md:text-sm">© 2026 Duuniharava. All rights reserved.</footer>
+    <footer class="py-12 text-center text-gray-600 border-t border-white/5 text-xs md:text-sm">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
 </main>
 
 <script>
@@ -317,7 +324,7 @@ const translations = {
         "nav-home": "Etusivu", "nav-services": "Palvelut", "nav-value": "Miksi me?", "nav-pricing": "Hinnasto", "nav-faq": "FAQ", "nav-login": "KIRJAUDU", "nav-testimonials": "Kokemuksia",
         "hero-title": "Säästä 20 tuntia viikossa ja pääse useammin haastatteluihin", 
         "hero-desc": "Lopeta hakuammunta. Duuniharava löytää ja hakee unelmiesi työpaikat puolestasi samalla kun optimoimme profiilisi huomattavaksi.",
-        "hero-cta": "ALOITA ILMAINEN KOKEILU",
+        "hero-cta": "VALITSE PAKETTI",
         "chart-title": "Työttömyyden trendi ja ennuste", "chart-legend": "Vihreä: Historia | Oranssi: Ennuste (2026-2032)",
         "btn-pricing": "KATSO HINNASTO", "btn-more": "KATSO MITEN SE TOIMII", "features-title": "Kenelle ja mitä tarjoamme",
         "testi-title": "Käyttäjien kokemuksia", "testi-1-text": "\"Sain viisi haastattelukutsua viikossa CV-optimoinnin jälkeen. Uskomaton työkalu!\"",
@@ -346,7 +353,7 @@ const translations = {
         "nav-home": "Home", "nav-services": "Services", "nav-value": "Why us?", "nav-pricing": "Pricing", "nav-faq": "FAQ", "nav-login": "LOGIN", "nav-testimonials": "Stories",
         "hero-title": "Save 20 hours a week and get interviewed more often", 
         "hero-desc": "Stop the guesswork. Duuniharava finds and applies for your dream jobs while we optimize your profile to get noticed.",
-        "hero-cta": "START FREE TRIAL",
+        "hero-cta": "CHOOSE PLAN",
         "chart-title": "Unemployment Trends & Forecast", "chart-legend": "Green: History | Orange: Forecast (2026-2032)",
         "btn-pricing": "SEE PRICING", "btn-more": "SEE HOW IT WORKS", "features-title": "Who We Serve & What We Offer",
         "testi-title": "Success Stories", "testi-1-text": "\"I got five interview invites in a week after CV optimization. Amazing tool!\"",
@@ -377,8 +384,7 @@ function setLanguage(lang) {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (translations[lang][key]) {
-            if (el.tagName === 'BUTTON' || el.tagName === 'A') el.innerText = translations[lang][key];
-            else el.innerText = translations[lang][key];
+            el.innerText = translations[lang][key];
         }
     });
     document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
@@ -387,6 +393,19 @@ function setLanguage(lang) {
 
 document.getElementById('lang-fi').onclick = () => setLanguage('fi');
 document.getElementById('lang-en').onclick = () => setLanguage('en');
+
+// Intersection Observer for scroll animations
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('reveal');
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('section').forEach(section => {
+    observer.observe(section);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('unemploymentChart');
