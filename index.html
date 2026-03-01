@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duuniharava | Automatisoi työnhakusi</title>
+    <title>Duuniharava | Säästä 20h viikossa ja löydä töitä</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
@@ -43,7 +43,6 @@
         }
         .logo-bounce { animation: bounceLogo 1.5s infinite; }
 
-        /* Mobiilioptimoitu graafisäiliö */
         .chart-container { 
             position: relative; 
             height: 300px; 
@@ -53,7 +52,6 @@
             .chart-container { height: 250px; }
         }
 
-        /* Selkeämmät kielipainikkeet */
         .lang-btn {
             padding: 4px 10px;
             border-radius: 8px;
@@ -109,10 +107,15 @@
             <div class="text-2xl md:text-3xl font-bold tracking-tighter mb-6 md:mb-8">
                 <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
             </div>
-            <h1 class="text-3xl md:text-5xl font-bold mb-6 leading-tight" data-i18n="hero-title">Tehokas työkalu työnhakuun ja urakehitykseen</h1>
-            <p class="text-gray-400 mb-6 text-base md:text-lg" data-i18n="hero-desc">
-                Suomessa työttömyysaste on tammikuussa 2026 <strong>10,3 %</strong>. Duuniharava automatisoi työnhaun ja optimoi profiilisi.
+            <h1 class="text-3xl md:text-6xl font-bold mb-6 leading-tight" data-i18n="hero-title">Säästä 20 tuntia viikossa ja pääse useammin haastatteluihin</h1>
+            <p class="text-gray-400 mb-8 text-base md:text-lg max-w-2xl mx-auto" data-i18n="hero-desc">
+                Lopeta hakuammunta. Duuniharava löytää ja hakee unelmiesi työpaikat puolestasi samalla kun optimoimme profiilisi huomattavaksi.
             </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <button onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" class="gradient-bg text-black font-black py-5 px-10 rounded-2xl hover:scale-[1.05] transition shadow-[0_0_20px_rgba(0,191,166,0.3)] text-sm md:text-lg" data-i18n="hero-cta">ALOITA ILMAINEN KOKEILU</button>
+                <button onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" class="glass py-5 px-10 rounded-2xl hover:border-[#00BFA6] transition text-white text-sm md:text-lg" data-i18n="btn-more">KATSO MITEN SE TOIMII</button>
+            </div>
 
             <div class="glass p-4 md:p-6 rounded-2xl mt-6">
                 <h4 class="text-lg md:text-xl font-bold mb-4 text-center turkoosi-text" data-i18n="chart-title">Työttömyyden trendi ja ennuste</h4>
@@ -122,11 +125,6 @@
                 <p class="text-gray-500 text-[10px] md:text-xs mt-4 text-center" data-i18n="chart-legend">
                     Vihreä: Historia | Oranssi: Ennuste (2026–2032)
                 </p>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-                <a href="#pricing" class="gradient-bg text-white font-black py-4 px-8 rounded-2xl hover:scale-[1.03] transition shadow-lg text-sm md:text-base" data-i18n="btn-pricing">KATSO HINNASTO</a>
-                <button onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" class="glass py-4 px-8 rounded-2xl hover:border-[#00BFA6] transition text-white text-sm md:text-base" data-i18n="btn-more">LUE LISÄÄ</button>
             </div>
         </div>
     </section>
@@ -138,11 +136,15 @@
                 <h3 class="text-xl md:text-2xl font-bold text-white text-center border-b border-white/10 pb-4" data-i18n="target-title">Kenelle se sopii?</h3>
                 <div class="glass p-5 rounded-2xl hover-lift">
                     <h4 class="font-bold turkoosi-text mb-2" data-i18n="target-1-name">🌍 Maahanmuuttajat</h4>
-                    <p class="text-sm text-gray-400" data-i18n="target-1-desc">Madalla kynnystä Suomen työmarkkinoille kääntämällä osaamisesi paikalliseen muotoon.</p>
+                    <p class="text-sm text-gray-400" data-i18n="target-1-desc">Suomen työmarkkinat haltuun ilman kielimuuria. Käännämme osaamisesi paikalliseen muotoon automaattisesti.</p>
                 </div>
                 <div class="glass p-5 rounded-2xl hover-lift">
                     <h4 class="font-bold oranssi-text mb-2" data-i18n="target-2-name">🎓 Opiskelijat</h4>
-                    <p class="text-sm text-gray-400" data-i18n="target-2-desc">Löydä harjoittelupaikat ja uran ensiaskeleet vaivatta.</p>
+                    <p class="text-sm text-gray-400" data-i18n="target-2-desc">Ensimmäinen oman alan työpaikka helpommin. Löydä harjoittelupaikat ilman tuntikausien manuaalista etsintää.</p>
+                </div>
+                <div class="glass p-5 rounded-2xl hover-lift border-l-4 border-[#00BFA6]">
+                    <h4 class="font-bold text-white mb-2" data-i18n="target-3-name">💼 Aktiiviset hakijat</h4>
+                    <p class="text-sm text-gray-400" data-i18n="target-3-desc">Tehokkuutta kokeneen ammattilaisen hakuun. Automatisoi rutiinit ja keskity valmistautumaan haastatteluihin.</p>
                 </div>
             </div>
 
@@ -275,14 +277,18 @@
 const translations = {
     fi: {
         "nav-home": "Etusivu", "nav-services": "Palvelut", "nav-pricing": "Hinnasto", "nav-faq": "FAQ", "nav-login": "KIRJAUDU", "nav-testimonials": "Kokemuksia",
-        "hero-title": "Tehokas työkalu työnhakuun ja urakehitykseen", "hero-desc": "Suomessa työttömyysaste on tammikuussa 2026 10,3%. Duuniharava automatisoi työnhaun ja optimoi profiilisi.",
+        "hero-title": "Säästä 20 tuntia viikossa ja pääse useammin haastatteluihin", 
+        "hero-desc": "Lopeta hakuammunta. Duuniharava löytää ja hakee unelmiesi työpaikat puolestasi samalla kun optimoimme profiilisi huomattavaksi.",
+        "hero-cta": "ALOITA ILMAINEN KOKEILU",
         "chart-title": "Työttömyyden trendi ja ennuste", "chart-legend": "Vihreä: Historia | Oranssi: Ennuste (2026-2032)",
-        "btn-pricing": "KATSO HINNASTO", "btn-more": "LUE LISÄÄ", "features-title": "Kenelle ja mitä tarjoamme",
+        "btn-pricing": "KATSO HINNASTO", "btn-more": "KATSO MITEN SE TOIMII", "features-title": "Kenelle ja mitä tarjoamme",
         "testi-title": "Käyttäjien kokemuksia", "testi-1-text": "\"Sain viisi haastattelukutsua viikossa CV-optimoinnin jälkeen. Uskomaton työkalu!\"",
         "testi-2-text": "\"Automaattinen haku säästi minulta kymmeniä tunteja aikaa. Suosittelen kaikille!\"",
         "testi-3-text": "\"LinkedIn-profiilini hionta toi heti rekrytoijia viestittelemään minulle suoraan.\"",
-        "target-title": "Kenelle se sopii?", "target-1-name": "🌍 Maahanmuuttajat", "target-1-desc": "Madalla kynnystä kääntämällä osaamisesi paikalliseen muotoon.",
-        "target-2-name": "🎓 Opiskelijat", "target-2-desc": "Löydä harjoittelupaikat vaivatta.",
+        "target-title": "Kenelle se sopii?", 
+        "target-1-name": "🌍 Maahanmuuttajat", "target-1-desc": "Suomen työmarkkinat haltuun ilman kielimuuria. Käännämme osaamisesi paikalliseen muotoon automaattisesti.",
+        "target-2-name": "🎓 Opiskelijat", "target-2-desc": "Ensimmäinen oman alan työpaikka helpommin. Löydä harjoittelupaikat ilman tuntikausien manuaalista etsintää.",
+        "target-3-name": "💼 Aktiiviset hakijat", "target-3-desc": "Tehokkuutta kokeneen ammattilaisen hakuun. Automatisoi rutiinit ja keskity valmistautumaan haastatteluihin.",
         "opt-title": "Profiilin optimointi", "opt-1-name": "CV-analyysi", "opt-1-desc": "Saat konkreettista palautetta CV:n parantamiseksi.",
         "opt-3-name": "Automaattinen haku", "opt-3-desc": "Etsi ja lähetä hakemuksia tehokkaasti.",
         "net-title": "Verkostoituminen", "net-1-name": "LinkedIn-hionta", "net-1-desc": "Tee profiilistasi rekrytoijien magneetti.",
@@ -292,14 +298,18 @@ const translations = {
     },
     en: {
         "nav-home": "Home", "nav-services": "Services", "nav-pricing": "Pricing", "nav-faq": "FAQ", "nav-login": "LOGIN", "nav-testimonials": "Stories",
-        "hero-title": "Powerful Tool for Job Search and Career Growth", "hero-desc": "Unemployment in Finland is 10.3% in Jan 2026. Duuniharava automates your search and optimizes your profile.",
+        "hero-title": "Save 20 hours a week and get interviewed more often", 
+        "hero-desc": "Stop the guesswork. Duuniharava finds and applies for your dream jobs while we optimize your profile to get noticed.",
+        "hero-cta": "START FREE TRIAL",
         "chart-title": "Unemployment Trends & Forecast", "chart-legend": "Green: History | Orange: Forecast (2026-2032)",
-        "btn-pricing": "SEE PRICING", "btn-more": "READ MORE", "features-title": "Who We Serve & What We Offer",
+        "btn-pricing": "SEE PRICING", "btn-more": "SEE HOW IT WORKS", "features-title": "Who We Serve & What We Offer",
         "testi-title": "Success Stories", "testi-1-text": "\"I got five interview invites in a week after CV optimization. Amazing tool!\"",
         "testi-2-text": "\"Automated search saved me dozens of hours. I highly recommend it to everyone!\"",
         "testi-3-text": "\"Polishing my LinkedIn profile immediately brought recruiters to message me directly.\"",
-        "target-title": "Who is it for?", "target-1-name": "🌍 Immigrants", "target-1-desc": "Lower the barrier by localizing your expertise.",
-        "target-2-name": "🎓 Students", "target-2-desc": "Find internships and first career steps with ease.",
+        "target-title": "Who is it for?", 
+        "target-1-name": "🌍 Immigrants", "target-1-desc": "Master the Finnish job market without language barriers. We localize your skills automatically.",
+        "target-2-name": "🎓 Students", "target-2-desc": "Get your first professional job easier. Find internships without hours of manual searching.",
+        "target-3-name": "💼 Active Seekers", "target-3-desc": "Efficiency for the experienced pro. Automate routines and focus on acing the interview.",
         "opt-title": "Profile Optimization", "opt-1-name": "CV Analysis", "opt-1-desc": "Get concrete feedback to improve your CV impact.",
         "opt-3-name": "Automated Search", "opt-3-desc": "Find and send applications efficiently via automation.",
         "net-title": "Networking", "net-1-name": "LinkedIn Polish", "net-1-desc": "Turn your profile into a recruiter magnet.",
@@ -312,7 +322,10 @@ const translations = {
 function setLanguage(lang) {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) el.innerText = translations[lang][key];
+        if (translations[lang][key]) {
+            if (el.tagName === 'BUTTON' || el.tagName === 'A') el.innerText = translations[lang][key];
+            else el.innerText = translations[lang][key];
+        }
     });
     document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
     document.getElementById('lang-en').classList.toggle('active', lang === 'en');
