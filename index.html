@@ -228,14 +228,18 @@ input::placeholder { color: rgba(255, 255, 255, 0.3); }
 <script>
 // Työttömyyden trendi + ennuste
 const ctx = document.getElementById('unemploymentChart').getContext('2d');
-const unemploymentChart = new Chart(ctx, {
+const years = ['2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'];
+const historyData = [12.5,12.0,11.5,null,null,null,null,null,null,null,null,null,null];
+const forecastData = [null,null,null,11.6,11.8,11.9,10.3,10.5,10.7,11.0,11.3,11.5,11.8];
+
+new Chart(ctx, {
     type: 'line',
     data: {
-        labels: ['2020','2021','2022','2023','2024','2025','2026','2027','2028','2029','2030','2031','2032'],
+        labels: years,
         datasets: [
             {
-                label: 'Historia',
-                data: [12.5,12.0,11.5,null,null,null,null,null,null,null,null,null,null],
+                label: 'Historia (2020–2022)',
+                data: historyData,
                 borderColor: '#00BFA6',
                 backgroundColor: 'rgba(0,191,166,0.2)',
                 fill: true,
@@ -244,8 +248,8 @@ const unemploymentChart = new Chart(ctx, {
                 pointBackgroundColor: '#00BFA6'
             },
             {
-                label: 'Ennuste',
-                data: [null,null,null,11.0,11.2,11.5,10.3,10.5,10.7,11.0,11.3,11.5,11.8],
+                label: 'Ennuste (2023–2032)',
+                data: forecastData,
                 borderColor: '#FF6F3C',
                 backgroundColor: 'rgba(255,111,60,0.2)',
                 fill: true,
@@ -268,4 +272,7 @@ const unemploymentChart = new Chart(ctx, {
                 ticks: { color:'#FFFFFF' }
             },
             x: { 
-                title: { display:
+                title: { display: true, text: 'Vuosi', color:'#FFFFFF' },
+                ticks: { color:'#FFFFFF' }
+            }
+        }
