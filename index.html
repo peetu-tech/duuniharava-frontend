@@ -380,7 +380,7 @@
 </main>
 
 <script>
-// --- KIRJAUTUMISEN LOGIIKKA ---
+// --- PÄIVITETTY KIRJAUTUMISEN LOGIIKKA ---
 document.getElementById('auth-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = e.target.querySelector('input[type="email"]').value;
@@ -390,13 +390,30 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
     btn.disabled = true;
     btn.innerText = "KÄSITELLÄÄN...";
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
+    // 1. Yritetään kirjautua
+    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password,
     });
 
-    if (error) {
-        alert("Virhe: " + error.message);
+    if (authError) {
+        alert("Kirjautumisvirhe: " + authError.message);
+        btn.disabled = false;
+        btn.innerText = "KIRJAUDU SISÄÄN ➔";
+        return;
+    }
+
+    // 2. Haetaan profiilitieto Table Editorista
+    const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('customer_group')
+        .eq('id', authData.user.id)
+        .single();
+
+    // 3. Tarkistetaan onko käyttäjä "paid_customer"
+    if (profileError || !profile || profile.customer_group !== 'paid_customer') {
+        await supabaseClient.auth.signOut(); // Kirjaa ulos jos ei oikeutta
+        alert("Pääsy evätty: Sinulla ei ole voimassa olevaa tilausta.");
         btn.disabled = false;
         btn.innerText = "KIRJAUDU SISÄÄN ➔";
     } else {
@@ -499,18 +516,17 @@ window.onload = () => {
         data: {
             labels: ['2020', '2022', '2024', '2026', '2028', '2030', '2032'],
             datasets: [{
-                label: 'Työttömyysaste %',
-                data: [6.5, 6.7, 7.2, 7.8, 8.5, 9.1, 9.8],
-                borderColor: (context) => {
-                    const index = context.dataIndex;
-                    return index >= 3 ? '#FF6F3C' : '#00BFA6';
-                },
+                label: 'Työttömyys %',
+                data: [6.5, 6.7, 7.2, 7.5, 7.3, 7.0, 6.8],
+                borderColor: '#00BFA6',
                 backgroundColor: 'rgba(0, 191, 166, 0.1)',
-                borderWidth: 3,
-                pointBackgroundColor: (context) => {
-                    const index = context.dataIndex;
-                    return index >= 3 ? '#FF6F3C' : '#00BFA6';
-                },
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Ennuste (Duuniharava-efekti)',
+                data: [null, null, null, 7.5, 6.2, 5.1, 4.5],
+                borderColor: '#FF6F3C',
+                borderDash: [5, 5],
                 tension: 0.4
             }]
         },
