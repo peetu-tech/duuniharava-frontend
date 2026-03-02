@@ -372,6 +372,7 @@
                     <input type="password" required placeholder="••••••••" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white text-sm">
                 </div>
                 <button type="submit" class="w-full gradient-bg text-white font-black py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition shadow-lg text-sm" data-i18n="login-btn">KIRJAUDU SISÄÄN ➔</button>
+                <p class="text-center text-[10px] text-gray-500 mt-4">Jos sinulla ei ole vielä tiliä, se luodaan automaattisesti profiles-tauluun ensikirjautumisen yhteydessä.</p>
             </form>
         </div>
     </section>
@@ -380,7 +381,7 @@
 </main>
 
 <script>
-// --- PÄIVITETTY KIRJAUTUMISEN LOGIIKKA ---
+// --- PÄIVITETTY KIRJAUTUMISEN JA AUTOMAATTI-REKISTERÖINNIN LOGIIKKA ---
 document.getElementById('auth-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = e.target.querySelector('input[type="email"]').value;
@@ -391,10 +392,39 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
     btn.innerText = "KÄSITELLÄÄN...";
 
     // 1. Yritetään kirjautua
-    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+    let { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password,
     });
+
+    // 2. JOS KIRJAUTUMINEN EPÄONNISTUU (Käyttäjää ei ole Authentication-osiossa)
+    // Luodaan tili automaattisesti
+    if (authError && authError.message === "Invalid login credentials") {
+        console.log("Käyttäjää ei löytynyt, yritetään luoda uusi tili...");
+        
+        const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+        });
+
+        if (signUpError) {
+            alert("Virhe tilin luonnissa: " + signUpError.message);
+            btn.disabled = false;
+            btn.innerText = "KIRJAUDU SISÄÄN ➔";
+            return;
+        }
+        
+        authData = signUpData;
+        
+        // Luodaan samalla rivi profiles-tauluun
+        await supabaseClient.from('profiles').insert([
+            { id: authData.user.id, email: email, customer_group: 'paid_customer' }
+        ]);
+        
+        alert("Tili luotu automaattisesti! Voit nyt käyttää palvelua.");
+        window.location.href = 'dashboard.html';
+        return;
+    }
 
     if (authError) {
         alert("Kirjautumisvirhe: " + authError.message);
@@ -403,21 +433,29 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
         return;
     }
 
-    // 2. Haetaan profiilitieto Table Editorista
+    // 3. Haetaan profiilitieto Table Editorista
     const { data: profile, error: profileError } = await supabaseClient
         .from('profiles')
         .select('customer_group')
         .eq('id', authData.user.id)
         .single();
 
-    // 3. Tarkistetaan onko käyttäjä "paid_customer"
+    // 4. Tarkistetaan onko käyttäjä "paid_customer"
     if (profileError || !profile || profile.customer_group !== 'paid_customer') {
-        await supabaseClient.auth.signOut(); // Kirjaa ulos jos ei oikeutta
+        // Jos käyttäjä löytyy Authista mutta ei Table Editorista, lisätään hänet sinne nyt
+        if (!profile) {
+             await supabaseClient.from('profiles').insert([
+                { id: authData.user.id, email: email, customer_group: 'paid_customer' }
+            ]);
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
+        await supabaseClient.auth.signOut();
         alert("Pääsy evätty: Sinulla ei ole voimassa olevaa tilausta.");
         btn.disabled = false;
         btn.innerText = "KIRJAUDU SISÄÄN ➔";
     } else {
-        alert("Kirjautuminen onnistui!");
         window.location.href = 'dashboard.html'; 
     }
 });
@@ -488,7 +526,7 @@ const translations = {
 function setLanguage(lang) {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) {
+        if (translations[lang] && translations[lang][key]) {
             el.innerText = translations[lang][key];
         }
     });
@@ -499,48 +537,35 @@ function setLanguage(lang) {
 document.getElementById('lang-fi').onclick = () => setLanguage('fi');
 document.getElementById('lang-en').onclick = () => setLanguage('en');
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('reveal');
-        }
-    });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('section').forEach(section => observer.observe(section));
-
-window.onload = () => {
-    const ctx = document.getElementById('unemploymentChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['2020', '2022', '2024', '2026', '2028', '2030', '2032'],
-            datasets: [{
-                label: 'Työttömyys %',
-                data: [6.5, 6.7, 7.2, 7.5, 7.3, 7.0, 6.8],
-                borderColor: '#00BFA6',
-                backgroundColor: 'rgba(0, 191, 166, 0.1)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'Ennuste (Duuniharava-efekti)',
-                data: [null, null, null, 7.5, 6.2, 5.1, 4.5],
-                borderColor: '#FF6F3C',
-                borderDash: [5, 5],
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } },
-                x: { grid: { display: false }, ticks: { color: '#666' } }
+// --- CHART LOGIIKKA ---
+window.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('unemploymentChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['2020', '2022', '2024', '2026', '2028', '2030', '2032'],
+                datasets: [{
+                    label: 'Työttömyys %',
+                    data: [6.5, 7.2, 8.4, 9.1, 8.5, 7.8, 7.2],
+                    borderColor: '#00BFA6',
+                    backgroundColor: 'rgba(0, 191, 166, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } },
+                    x: { grid: { display: false }, ticks: { color: '#666' } }
+                }
             }
-        }
-    });
-};
+        });
+    }
+});
 </script>
 </body>
 </html>
