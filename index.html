@@ -401,7 +401,7 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
         btn.innerText = "KIRJAUDU SISÄÄN ➔";
     } else {
         alert("Kirjautuminen onnistui!");
-        window.location.reload(); // Tai ohjaus haluttuun sivuun
+        window.location.href = 'dashboard.html'; 
     }
 });
 
@@ -499,19 +499,18 @@ window.onload = () => {
         data: {
             labels: ['2020', '2022', '2024', '2026', '2028', '2030', '2032'],
             datasets: [{
-                label: 'Historia',
-                data: [6.5, 6.2, 7.1, 7.8, null, null, null],
-                borderColor: '#00BFA6',
+                label: 'Työttömyysaste %',
+                data: [6.5, 6.7, 7.2, 7.8, 8.5, 9.1, 9.8],
+                borderColor: (context) => {
+                    const index = context.dataIndex;
+                    return index >= 3 ? '#FF6F3C' : '#00BFA6';
+                },
                 backgroundColor: 'rgba(0, 191, 166, 0.1)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'Ennuste',
-                data: [null, null, null, 7.8, 8.5, 9.2, 10.5],
-                borderColor: '#FF6F3C',
-                borderDash: [5, 5],
-                backgroundColor: 'rgba(255, 111, 60, 0.1)',
-                fill: true,
+                borderWidth: 3,
+                pointBackgroundColor: (context) => {
+                    const index = context.dataIndex;
+                    return index >= 3 ? '#FF6F3C' : '#00BFA6';
+                },
                 tension: 0.4
             }]
         },
