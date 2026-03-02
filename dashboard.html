@@ -12,8 +12,19 @@
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .turkoosi-text { color: #00BFA6; }
         .oranssi-text { color: #FF6F3C; }
-        /* Korjaus: Varmistetaan että modaali on piilossa alussa */
         .modal-hidden { display: none !important; }
+        
+        /* Latausanimaatio */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 191, 166, 0.1);
+            border-left-color: #00BFA6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-8">
@@ -45,18 +56,28 @@
         </div>
 
         <div id="analysis-result" class="glass p-8 rounded-[2rem] mb-12 hidden border-t-4 border-[#00BFA6]">
-            <h2 class="text-2xl font-bold mb-4 uppercase tracking-tighter turkoosi-text">Analyysin tulos</h2>
-            <div id="report-content" class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap mb-6">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div id="score-container" class="flex-shrink-0 flex flex-col items-center bg-white/5 p-6 rounded-3xl border border-white/10 w-full md:w-48 text-center">
+                    <div id="score-circle" class="w-24 h-24 rounded-full border-8 flex items-center justify-center text-2xl font-black mb-2">
+                        0%
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">CV:n Laatu</span>
                 </div>
-            <a id="doc-link" href="#" target="_blank" class="inline-block bg-white/10 hover:bg-[#00BFA6] hover:text-black px-6 py-3 rounded-xl transition font-bold text-xs uppercase tracking-widest">
-                AVAA OPTIMOITU CV (Google Docs) ➔
-            </a>
+
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold mb-4 uppercase tracking-tighter turkoosi-text">Tekoälyn analyysi</h2>
+                    <div id="report-content" class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap mb-6">
+                        </div>
+                    <a id="doc-link" href="#" target="_blank" class="inline-block bg-[#00BFA6] text-black px-8 py-4 rounded-2xl transition font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 shadow-lg shadow-[#00BFA6]/20">
+                        AVAA OPTIMOITU CV (Google Docs) ➔
+                    </a>
+                </div>
+            </div>
         </div>
 
         <h2 class="text-sm font-black uppercase tracking-[0.3em] text-gray-500 mb-6 px-4">Työkalupakki</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
             <div class="glass p-8 rounded-[2.5rem] border-t-2 border-[#00BFA6] hover:bg-white/5 transition group">
                 <div class="text-3 mb-4 text-2xl">📄</div>
                 <h3 class="font-bold text-xl mb-2">CV-Analyysi & Muokkaus</h3>
@@ -82,7 +103,7 @@
 
     <div id="cv-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-hidden">
         <div class="glass max-w-2xl w-full p-8 rounded-[2.5rem] border border-white/10 relative">
-            <button onclick="closeCvModal()" class="absolute top-6 right-6 text-gray-500 hover:text-white text-xl">✕</button>
+            <button onclick="closeCvModal()" id="close-btn" class="absolute top-6 right-6 text-gray-500 hover:text-white text-xl">✕</button>
             
             <div id="step-1">
                 <h2 class="text-2xl font-bold mb-2 uppercase tracking-tighter">1/2: Lataa CV</h2>
@@ -99,30 +120,38 @@
                 </button>
             </div>
 
-            <div id="step-2" class="hidden">
-                <h2 class="text-2xl font-bold mb-2 uppercase tracking-tighter text-[#00BFA6]">2/2: Lisää supervoimasi</h2>
-                <p class="text-gray-400 text-sm mb-6">Nämä tiedot auttavat tekoälyä tekemään CV:stäsi vaikuttavamman.</p>
+            <div id="step-2" class="hidden text-center">
+                <div id="form-fields">
+                    <h2 class="text-2xl font-bold mb-2 uppercase tracking-tighter text-[#00BFA6] text-left">2/2: Lisää supervoimasi</h2>
+                    <p class="text-gray-400 text-sm mb-6 text-left">Nämä tiedot auttavat tekoälyä tekemään CV:stäsi vaikuttavamman.</p>
 
-                <div class="space-y-4 mb-8">
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Suurin saavutuksesi (esim. säästit rahaa tai tehostit tiimiä)</label>
-                        <textarea id="extra-achievements" rows="2" class="w-full glass p-3 rounded-xl focus:outline-none focus:border-[#00BFA6] text-sm text-white resize-none" placeholder="Esim. Kasvatin myyntiä 15% puolen vuoden aikana..."></textarea>
+                    <div class="space-y-4 mb-8 text-left">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Suurin saavutuksesi</label>
+                            <textarea id="extra-achievements" rows="2" class="w-full glass p-3 rounded-xl focus:outline-none focus:border-[#00BFA6] text-sm text-white resize-none" placeholder="Esim. Kasvatin myyntiä 15%..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Mihin rooliin tähtäät?</label>
+                            <input type="text" id="extra-target" class="w-full glass p-3 rounded-xl focus:outline-none focus:border-[#00BFA6] text-sm text-white" placeholder="Esim. Projektipäällikkö">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Tärkeät työkalut</label>
+                            <input type="text" id="extra-skills" class="w-full glass p-3 rounded-xl focus:outline-none focus:border-[#00BFA6] text-sm text-white" placeholder="Esim. SAP, Excel, Canva">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Mihin rooliin tähtäät seuraavaksi?</label>
-                        <input type="text" id="extra-target" class="w-full glass p-3 rounded-xl focus:outline-none focus:border-[#00BFA6] text-sm text-white" placeholder="Esim. Projektipäällikkö">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Tärkeät työkalut (esim. SAP, Excel, Canva, Python)</label>
-                        <input type="text" id="extra-skills" class="w-full glass p-3 rounded-xl focus:outline-none focus:border-[#00BFA6] text-sm text-white" placeholder="Listaa osaamasi ohjelmistot">
+
+                    <div class="flex gap-4">
+                        <button onclick="prevStep()" class="flex-1 bg-white/5 hover:bg-white/10 text-gray-400 py-4 rounded-xl transition uppercase tracking-widest text-[10px]">TAKAISIN</button>
+                        <button id="submit-cv-btn" class="flex-[2] bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-4 rounded-xl hover:scale-[1.02] transition uppercase tracking-widest text-xs">
+                            ANALYSOI JA OPTIMOI ➔
+                        </button>
                     </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <button onclick="prevStep()" class="flex-1 bg-white/5 hover:bg-white/10 text-gray-400 py-4 rounded-xl transition uppercase tracking-widest text-[10px]">TAKAISIN</button>
-                    <button id="submit-cv-btn" class="flex-[2] bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-4 rounded-xl hover:scale-[1.02] transition uppercase tracking-widest text-xs shadow-lg shadow-emerald-500/10">
-                        ANALYSOI JA OPTIMOI ➔
-                    </button>
+                <div id="loading-state" class="hidden py-12">
+                    <div class="spinner"></div>
+                    <h3 class="text-xl font-bold mb-2 animate-pulse">TEKOÄLY TYÖSKENTELEE...</h3>
+                    <p class="text-gray-400 text-sm">Analysoimme CV:täsi ja luomme Google Docs -dokumenttia.<br>Tässä kestää yleensä 15-30 sekuntia.</p>
                 </div>
             </div>
         </div>
@@ -149,14 +178,13 @@
             }
         }
 
-        // MODAALIN TOIMINNOT
         function openCvModal() {
             document.getElementById('cv-modal').classList.remove('modal-hidden');
         }
 
         function closeCvModal() {
             document.getElementById('cv-modal').classList.add('modal-hidden');
-            prevStep(); // Palautetaan alkuun suljettaessa
+            prevStep();
         }
 
         function nextStep() {
@@ -187,8 +215,10 @@
                 return;
             }
 
-            btn.innerText = "TEKOÄLY ANALYSOI...";
-            btn.disabled = true;
+            // Näytetään lataustila
+            document.getElementById('form-fields').classList.add('hidden');
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('close-btn').classList.add('hidden');
 
             const formData = new FormData();
             formData.append('cv', fileInput.files[0]);
@@ -208,23 +238,41 @@
                 if (response.ok) {
                     const result = await response.json();
                     
-                    // Näytetään tulos-osio
+                    // Pisteiden irrotus ja visualisointi
+                    const reportText = result.ai_report || "";
+                    const scoreMatch = reportText.match(/(\d+)\/100/);
+                    const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
+                    
+                    const circle = document.getElementById('score-circle');
+                    circle.innerText = score + "%";
+                    
+                    // Väritason määritys
+                    if(score < 50) circle.style.borderColor = "#EF4444";
+                    else if(score < 80) circle.style.borderColor = "#F59E0B";
+                    else circle.style.borderColor = "#10B981";
+
+                    // Näytetään tulokset
                     document.getElementById('analysis-result').classList.remove('hidden');
-                    document.getElementById('report-content').innerText = result.ai_report;
+                    document.getElementById('report-content').innerText = reportText;
                     document.getElementById('doc-link').href = result.downloadUrl;
 
-                    alert("Analyysi valmis! Tulokset näkyvät dashboardilla.");
                     closeCvModal();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     alert("Lähetys epäonnistui n8n-palvelussa.");
+                    resetModal();
                 }
             } catch (err) {
                 alert("Yhteysvirhe automaatiopalveluun.");
-            } finally {
-                btn.innerText = "ANALYSOI JA OPTIMOI ➔";
-                btn.disabled = false;
+                resetModal();
             }
         };
+
+        function resetModal() {
+            document.getElementById('form-fields').classList.remove('hidden');
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('close-btn').classList.remove('hidden');
+        }
 
         document.getElementById('logout-btn').onclick = async function() {
             await supabaseClient.auth.signOut();
