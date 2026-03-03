@@ -56,11 +56,11 @@
                 <div class="grid grid-cols-2 gap-4 w-full md:w-auto">
                     <div class="glass p-4 rounded-2xl border-l-4 border-[#00BFA6]">
                         <h3 class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Viikon uudet</h3>
-                        <p id="active-jobs-count" class="text-2xl font-bold">12</p>
+                        <p id="active-jobs-count" class="text-2xl font-bold">Ladataan...</p>
                     </div>
                     <div class="glass p-4 rounded-2xl border-l-4 border-[#FF6F3C]">
                         <h3 class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Huippuosumat</h3>
-                        <p id="new-matches-count" class="text-2xl font-bold">3</p>
+                        <p id="new-matches-count" class="text-2xl font-bold">Ladataan...</p>
                     </div>
                 </div>
             </div>
@@ -75,28 +75,9 @@
             </div>
 
             <div id="job-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass p-6 rounded-[2.5rem] border border-white/5 relative match-card transition duration-300">
-                    <div class="absolute top-4 right-4 bg-[#00BFA6]/10 text-[#00BFA6] px-3 py-1 rounded-full text-[10px] font-black uppercase">95% Match</div>
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Intersport</p>
-                    <h3 class="text-lg font-bold mb-4 pr-12">Myymäläpäällikkö</h3>
-                    <p class="text-xs text-gray-400 mb-6 line-clamp-2">Etsimme energistä vetäjää Vantaan toimipisteeseen...</p>
-                    <button class="w-full py-3 rounded-xl bg-[#00BFA6] text-black text-[10px] font-black tracking-widest uppercase hover:scale-[1.02] transition">Luo täsmähakemus (1kpl)</button>
-                </div>
-
-                <div class="glass p-6 rounded-[2.5rem] border border-white/5 relative match-card transition duration-300">
-                    <div class="absolute top-4 right-4 bg-white/5 text-gray-400 px-3 py-1 rounded-full text-[10px] font-black uppercase">82% Match</div>
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Elisa Oyj</p>
-                    <h3 class="text-lg font-bold mb-4 pr-12">Asiakaspalvelija</h3>
-                    <p class="text-xs text-gray-400 mb-6 line-clamp-2">Haluatko liittyä Suomen parhaaseen tiimiin?</p>
-                    <button class="w-full py-3 rounded-xl border border-white/10 text-[10px] font-black tracking-widest uppercase hover:bg-white/10 transition">Luo täsmähakemus (1kpl)</button>
-                </div>
-
-                <div class="glass p-6 rounded-[2.5rem] border border-white/5 relative match-card transition duration-300 opacity-60">
-                    <div class="absolute top-4 right-4 bg-white/5 text-gray-500 px-3 py-1 rounded-full text-[10px] font-black uppercase">45% Match</div>
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Posti Group</p>
-                    <h3 class="text-lg font-bold mb-4 pr-12">Varastotyöntekijä</h3>
-                    <p class="text-xs text-gray-400 mb-6 line-clamp-2">Etsimme sesonkiapulaisia Vantaan logistiikkakeskukseen.</p>
-                    <button class="w-full py-3 rounded-xl border border-white/5 text-[10px] font-black tracking-widest uppercase text-gray-500 cursor-not-allowed">Heikko osuma</button>
+                <div class="col-span-full text-center py-12 opacity-50">
+                    <div class="spinner"></div>
+                    <p class="text-xs uppercase tracking-widest font-bold">Haetaan uusimpia osumia...</p>
                 </div>
             </div>
         </section>
@@ -218,11 +199,67 @@
                     window.location.href = 'login.html';
                     return;
                 }
-                document.getElementById('user-email').innerText = "Käyttäjä: " + session.user.email;
+                const userEmail = session.user.email;
+                document.getElementById('user-email').innerText = "Käyttäjä: " + userEmail;
+
+                // HAETAAN VIIKKO-HARAVAN TULOKSET SUPABASESTA
+                fetchWeeklyMatches(userEmail);
+
             } catch (err) {
                 console.error("Virhe:", err);
             }
         }
+
+        // --- VIIKKO-HARAVA LOGIIKKA ALKAA ---
+        async function fetchWeeklyMatches(email) {
+            const jobList = document.getElementById('job-list');
+            
+            try {
+                // Haetaan matches-taulukosta uusimmat osumat tälle käyttäjälle
+                const { data, error } = await supabaseClient
+                    .from('matches')
+                    .select('*')
+                    .eq('customer_id', email) // n8n tallentaa sähköpostin customer_id:ksi
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    jobList.innerHTML = '<div class="col-span-full glass p-8 rounded-3xl text-center text-gray-500">Ei vielä viikoittaisia hakuja. Odottele seuraavaa ajoa!</div>';
+                    document.getElementById('active-jobs-count').innerText = "0";
+                    document.getElementById('new-matches-count').innerText = "0";
+                    return;
+                }
+
+                // Tyhjennetään spinneri
+                jobList.innerHTML = '';
+                
+                // Päivitetään laskurit (esimerkkinä data[0] eli uusin ajo)
+                const latestRun = data[0];
+                document.getElementById('active-jobs-count').innerText = "19"; // Staattinen esimerkki hakuajosta
+                document.getElementById('new-matches-count').innerText = "3";  // Yli 7/10 osumat
+
+                // Luodaan kortit tekoälyn reasoning-tekstistä
+                // Huom: Koska n8n tallentaa koko analyysin yhteen kenttään, näytetään se tässä tyylikkäästi
+                const matchCard = document.createElement('div');
+                matchCard.className = 'col-span-full glass p-8 rounded-[2.5rem] border border-[#00BFA6]/20 relative transition duration-300';
+                
+                matchCard.innerHTML = `
+                    <div class="absolute top-6 right-6 bg-[#00BFA6]/10 text-[#00BFA6] px-4 py-2 rounded-full text-xs font-black uppercase">Viikon Analyysi Valmis</div>
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Tekoälyn poiminnat</p>
+                    <h3 class="text-2xl font-bold mb-6 turkoosi-text">Uusimmat huippuosumasi</h3>
+                    <div class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap font-mono bg-black/20 p-6 rounded-2xl border border-white/5">
+                        ${latestRun.reasoning}
+                    </div>
+                `;
+                jobList.appendChild(matchCard);
+
+            } catch (err) {
+                console.error("Virhe matches-haussa:", err);
+                jobList.innerHTML = '<div class="col-span-full text-red-500 text-center">Virhe haettaessa työpaikkoja.</div>';
+            }
+        }
+        // --- VIIKKO-HARAVA LOGIIKKA PÄÄTTYY ---
 
         function openCvModal() {
             document.getElementById('cv-modal').classList.remove('modal-hidden');
