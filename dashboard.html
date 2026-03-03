@@ -102,30 +102,35 @@
             </div>
         </div>
 
-        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-gray-500 mb-6 px-4">Työkalupakki</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="glass p-8 rounded-[2.5rem] border-t-2 border-[#00BFA6] hover:bg-white/5 transition group">
-                <div class="text-3 mb-4 text-2xl">📄</div>
-                <h3 class="font-bold text-xl mb-2">Päivitä Universaali CV</h3>
-                <p class="text-gray-400 text-sm leading-relaxed mb-6">Hio perus-CV:si sellaiseksi, että Harava löytää parhaat mahdolliset osumat.</p>
-                <button onclick="openCvModal()" class="w-full py-3 rounded-xl border border-[#00BFA6]/30 text-[10px] font-black tracking-widest uppercase hover:bg-[#00BFA6] hover:text-black transition">Avaa työkalu</button>
-            </div>
+        <section class="mb-12">
+            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-gray-500 mb-8 px-4 text-center">Työnhakuprosessisi</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <div class="glass p-8 rounded-[2.5rem] border-t-4 border-[#00BFA6] relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 text-8xl font-black opacity-5 text-white">1</div>
+                    <div class="text-3xl mb-4">📄</div>
+                    <h3 class="font-bold text-xl mb-2">1. Optimoi CV</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">Päivitä "Universaali CV", jotta tekoäly ymmärtää osaamisesi täydellisesti.</p>
+                    <button onclick="openCvModal()" class="w-full py-4 rounded-xl bg-[#00BFA6] text-black font-black tracking-widest uppercase hover:scale-105 transition shadow-lg shadow-[#00BFA6]/20">Aloita tästä</button>
+                </div>
 
-            <div class="glass p-8 rounded-[2.5rem] border-t-2 border-purple-500 hover:bg-white/5 transition group">
-                <div class="text-3 mb-4 text-2xl">🚀</div>
-                <h3 class="font-bold text-xl mb-2">Automaattinen haku</h3>
-                <p class="text-gray-400 text-sm leading-relaxed mb-6">Palvelu etsii ja lähettää hakemuksia tehokkaasti käyttäjän puolesta.</p>
-                <button onclick="alert('Automaattinen haku on aktivoitu taustalla profiilisi perusteella.')" class="w-full py-3 rounded-xl border border-purple-500/30 text-[10px] font-black tracking-widest uppercase hover:bg-purple-500 hover:text-white transition">Hallitse hakuja</button>
-            </div>
+                <div class="glass p-8 rounded-[2.5rem] border-t-4 border-purple-500 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 text-8xl font-black opacity-5 text-white">2</div>
+                    <div class="text-3xl mb-4">🚀</div>
+                    <h3 class="font-bold text-xl mb-2">2. Aktivoi Haku</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">Laita automaattinen haravointi päälle. Etsimme osumia 24/7 puolestasi.</p>
+                    <button onclick="alert('Automaattinen haku on aktivoitu taustalla profiilisi perusteella.')" class="w-full py-4 rounded-xl border border-purple-500/50 text-white font-black tracking-widest uppercase hover:bg-purple-500 transition">Käynnistä haku</button>
+                </div>
 
-            <div class="glass p-8 rounded-[2.5rem] border-t-2 border-[#FF6F3C] hover:bg-white/5 transition opacity-50">
-                <div class="text-3 mb-4 text-2xl">📝</div>
-                <h3 class="font-bold text-xl mb-2">Hakemus-editori</h3>
-                <p class="text-gray-400 text-sm leading-relaxed mb-6">Muokkaa ja hallitse luotuja saatekirjeitäsi manuaalisesti yhdessä paikassa.</p>
-                <button class="w-full py-3 rounded-xl border border-[#FF6F3C]/30 text-[10px] font-black tracking-widest uppercase cursor-not-allowed">Tulossa pian</button>
+                <div class="glass p-8 rounded-[2.5rem] border-t-4 border-[#FF6F3C] relative overflow-hidden group opacity-60">
+                    <div class="absolute -right-4 -top-4 text-8xl font-black opacity-5 text-white">3</div>
+                    <div class="text-3xl mb-4">📝</div>
+                    <h3 class="font-bold text-xl mb-2">3. Viimeistele</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">Tarkista ja muokkaa luotuja hakemuksia ennen lähettämistä.</p>
+                    <button class="w-full py-4 rounded-xl border border-[#FF6F3C]/30 text-[10px] font-black tracking-widest uppercase cursor-not-allowed">Tulossa pian</button>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 
     <div id="cv-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-hidden">
@@ -215,11 +220,10 @@
             const jobList = document.getElementById('job-list');
             
             try {
-                // Haetaan matches-taulukosta uusimmat osumat tälle käyttäjälle
                 const { data, error } = await supabaseClient
                     .from('matches')
                     .select('*')
-                    .eq('customer_id', email) // n8n tallentaa sähköpostin customer_id:ksi
+                    .eq('customer_id', email)
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
@@ -231,15 +235,11 @@
                     return;
                 }
 
-                // Tyhjennetään spinneri
                 jobList.innerHTML = '';
-                
-                // Päivitetään laskurit (esimerkkinä data[0] eli uusin ajo)
                 const latestRun = data[0];
-                document.getElementById('active-jobs-count').innerText = "19"; // Staattinen esimerkki hakuajosta
-                document.getElementById('new-matches-count').innerText = "3";  // Yli 7/10 osumat
+                document.getElementById('active-jobs-count').innerText = "19"; 
+                document.getElementById('new-matches-count').innerText = "3";  
 
-                // Luodaan kortit tekoälyn reasoning-tekstistä
                 const matchCard = document.createElement('div');
                 matchCard.className = 'col-span-full glass p-8 rounded-[2.5rem] border border-[#00BFA6]/20 relative transition duration-300';
                 
@@ -258,7 +258,6 @@
                 jobList.innerHTML = '<div class="col-span-full text-red-500 text-center">Virhe haettaessa työpaikkoja.</div>';
             }
         }
-        // --- VIIKKO-HARAVA LOGIIKKA PÄÄTTYY ---
 
         function openCvModal() {
             document.getElementById('cv-modal').classList.remove('modal-hidden');
@@ -290,14 +289,11 @@
 
         document.getElementById('submit-cv-btn').onclick = async function() {
             const fileInput = document.getElementById('cv-file');
-            const btn = this;
-
             if (!fileInput.files[0]) {
                 alert("Lataa ensin PDF-tiedosto!");
                 return;
             }
 
-            // Näytetään lataustila
             document.getElementById('form-fields').classList.add('hidden');
             document.getElementById('loading-state').classList.remove('hidden');
             document.getElementById('close-btn').classList.add('hidden');
@@ -319,8 +315,6 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    
-                    // Pisteiden irrotus ja visualisointi
                     const reportText = result.ai_report || "";
                     const scoreMatch = reportText.match(/(\d+)\/100/);
                     const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
@@ -328,12 +322,10 @@
                     const circle = document.getElementById('score-circle');
                     circle.innerText = score + "%";
                     
-                    // Väritason määritys
                     if(score < 50) circle.style.borderColor = "#EF4444";
                     else if(score < 80) circle.style.borderColor = "#F59E0B";
                     else circle.style.borderColor = "#10B981";
 
-                    // Näytetään tulokset
                     document.getElementById('analysis-result').classList.remove('hidden');
                     document.getElementById('report-content').innerText = reportText;
                     document.getElementById('doc-link').href = result.downloadUrl;
