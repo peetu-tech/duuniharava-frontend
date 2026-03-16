@@ -124,7 +124,7 @@
                     <div class="text-3xl mb-4">🚀</div>
                     <h3 class="font-bold text-xl mb-2">2. Aktivoi Haku</h3>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6">Laita automaattinen haravointi päälle. Etsimme osumia 24/7 puolestasi.</p>
-                    <button onclick="alert('Automaattinen haku on aktivoitu taustalla profiilisi perusteella.')" class="w-full py-4 rounded-xl border border-purple-500/50 text-white font-black tracking-widest uppercase hover:bg-purple-500 transition">Käynnistä haku</button>
+                    <button id="run-haku-btn" class="w-full py-4 rounded-xl border border-purple-500/50 text-white font-black tracking-widest uppercase hover:bg-purple-500 transition">Käynnistä haku</button>
                 </div>
 
                 <div class="glass p-8 rounded-[2.5rem] border-t-4 border-[#FF6F3C] relative overflow-hidden group opacity-60">
@@ -235,7 +235,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    jobList.innerHTML = '<div class="col-span-full glass p-8 rounded-3xl text-center text-gray-500">Ei vielä viikoittaisia hakuja. Odottele seuraavaa ajoa!</div>';
+                    jobList.innerHTML = '<div class="col-span-full glass p-8 rounded-3xl text-center text-gray-500">Ei vielä viikoittaisia hakuja. Paina "Käynnistä haku" aloittaaksesi!</div>';
                     return;
                 }
 
@@ -274,6 +274,36 @@
                 jobList.innerHTML = '<div class="col-span-full text-red-500 text-center">Virhe haettaessa työpaikkoja.</div>';
             }
         }
+
+        // --- UUSI HAKUTOIMINTO ---
+        document.getElementById('run-haku-btn').onclick = async function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerText = "HARAVOIDAAN...";
+            btn.classList.add('opacity-50', 'cursor-wait');
+
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const userEmail = session.user.email;
+
+                // Kutsutaan n8n production webhookia
+                const response = await fetch(`https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4?email=${userEmail}`);
+
+                if (response.ok) {
+                    alert("Haku valmis! Päivitetään näkymä.");
+                    window.location.reload(); // Päivittää sivun jotta uudet osumat näkyvät
+                } else {
+                    alert("Haku epäonnistui n8n-päässä.");
+                }
+            } catch (err) {
+                console.error("Virhe:", err);
+                alert("Yhteysvirhe n8n-palveluun.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Käynnistä haku";
+                btn.classList.remove('opacity-50', 'cursor-wait');
+            }
+        };
 
         // --- APUFUNKTIOT ---
 
