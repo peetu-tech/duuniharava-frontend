@@ -210,9 +210,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-widest text-orange-500/70 mb-2">Karkota nämä (NOT-lista)</label>
-                    <input type="text" id="search-exclude" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-orange-500/50 text-sm text-white border-orange-500/10" placeholder="Esim. feissari, puhelinmyynti, provisio">
-                    <p class="text-[9px] text-gray-600 mt-2 font-mono uppercase tracking-tighter">Näitä sanoja sisältävät ilmoitukset piilotetaan automaattisesti.</p>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-orange-500/70 mb-2">Karkota nämä (Punaiset liput)</label>
+                    <input type="text" id="search-exclude" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-orange-500/50 text-sm text-white border-orange-500/10" placeholder="feissari, puhelinmyynti, provisio, kylmämyynti, epärealistinen palkka">
+                    <p class="text-[9px] text-gray-600 mt-2 font-mono uppercase tracking-tighter">Suodattaa pois epämääräiset ilmoitukset ja ei-toivotut palkkamallit.</p>
                 </div>
             </div>
 
@@ -326,8 +326,7 @@
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 const userEmail = session.user.email;
 
-                // Rakennetaan n8n ymmärtämä query-string
-                // Esim: Myyjä Helsinki NOT (feissari, stemma)
+                // Älykäs query-rakennus: yhdistetään kriteerit selkeäksi merkkijonoksi n8n:ää varten
                 let queryParts = [title];
                 if (location) queryParts.push(location);
                 if (exclude) queryParts.push(`NOT (${exclude})`);
@@ -353,7 +352,6 @@
             }
         };
 
-        // --- CV MODAALI FUNKTIOT ---
         function openCvModal() { document.getElementById('cv-modal').classList.remove('modal-hidden'); }
         function closeCvModal() { document.getElementById('cv-modal').classList.add('modal-hidden'); prevStep(); }
 
