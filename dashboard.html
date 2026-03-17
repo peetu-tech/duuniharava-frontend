@@ -123,7 +123,7 @@
                     <div class="text-3xl mb-4">🚀</div>
                     <h3 class="font-bold text-xl mb-2">2. Aktivoi Haku</h3>
                     <p class="text-gray-400 text-sm leading-relaxed mb-6">Laita automaattinen haravointi päälle kriteereilläsi.</p>
-                    <button id="run-haku-btn" class="w-full py-4 rounded-xl border border-purple-500/50 text-white font-black tracking-widest uppercase hover:bg-purple-500 transition">Käynnistä haku</button>
+                    <button onclick="openSearchModal()" class="w-full py-4 rounded-xl border border-purple-500/50 text-white font-black tracking-widest uppercase hover:bg-purple-500 transition">Käynnistä haku</button>
                 </div>
 
                 <div class="glass p-8 rounded-[2.5rem] border-t-4 border-[#FF6F3C] relative overflow-hidden group opacity-60">
@@ -193,6 +193,25 @@
         </div>
     </div>
 
+    <div id="search-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-hidden">
+        <div class="glass max-w-lg w-full p-8 rounded-[2.5rem] border border-white/10">
+            <h2 class="text-2xl font-bold mb-2 uppercase tracking-tighter">Käynnistä haku</h2>
+            <p class="text-gray-400 text-sm mb-6">Millaista työtä etsitään? Tekoäly haravoi avoimia paikkoja kriteeriesi mukaan.</p>
+            
+            <div class="mb-8">
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Hakukriteerit</label>
+                <textarea id="search-criteria-input" rows="3" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-purple-500 text-sm text-white resize-none" placeholder="Esim. Etätyö markkinoinnin parissa, Helsinki, vähintään 3500€/kk..."></textarea>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="closeSearchModal()" class="flex-1 bg-white/5 hover:bg-white/10 text-gray-400 py-4 rounded-xl transition uppercase tracking-widest text-[10px]">PERUUTA</button>
+                <button id="confirm-haku-btn" class="flex-[2] bg-purple-500 text-white font-black py-4 rounded-xl hover:scale-[1.02] transition uppercase tracking-widest text-xs shadow-lg shadow-purple-500/20">
+                    KÄYNNISTÄ HARAVOINTI ➔
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const config = {
             url: 'https://zxtnhitxachrudrcrotk.supabase.co',
@@ -205,7 +224,7 @@
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 if (error || !session) {
-                    window.location.href = 'index.html';
+                    window.location.href = 'login.html';
                     return;
                 }
                 const userEmail = session.user.email;
@@ -266,23 +285,39 @@
             }
         }
 
-        document.getElementById('run-haku-btn').onclick = async function() {
-            const kriteerit = prompt("Millaista työtä etsitään? (Esim: 'Etätyö markkinoinnin parissa')");
-            if (kriteerit === null || kriteerit.trim() === "") return;
+        // --- UUDET MODAALI-FUNKTIOT HAKUA VARTEN ---
+        function openSearchModal() {
+            document.getElementById('search-modal').classList.remove('modal-hidden');
+            document.getElementById('search-criteria-input').focus();
+        }
+
+        function closeSearchModal() {
+            document.getElementById('search-modal').classList.add('modal-hidden');
+        }
+
+        document.getElementById('confirm-haku-btn').onclick = async function() {
+            const kriteerit = document.getElementById('search-criteria-input').value;
+            
+            if (!kriteerit || kriteerit.trim() === "") {
+                alert("Syötä vähintään yksi hakuehto.");
+                return;
+            }
 
             const btn = this;
             btn.disabled = true;
             const originalText = btn.innerText;
-            btn.innerText = "HARAVOIDAAN...";
-            btn.classList.add('opacity-50', 'cursor-wait');
+            btn.innerText = "KÄYNNISTETÄÄN...";
+            btn.classList.add('opacity-50');
 
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 const userEmail = session.user.email;
+
                 const response = await fetch(`https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4?email=${userEmail}&kriteerit=${encodeURIComponent(kriteerit)}`);
 
                 if (response.ok) {
-                    alert("Haku suoritettu kriteereillä: " + kriteerit);
+                    closeSearchModal();
+                    alert("Haku käynnistetty! Tulokset ilmestyvät pian näkymään.");
                     window.location.reload();
                 } else {
                     alert("Haku epäonnistui.");
@@ -293,10 +328,11 @@
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;
-                btn.classList.remove('opacity-50', 'cursor-wait');
+                btn.classList.remove('opacity-50');
             }
         };
 
+        // --- CV MODAALI FUNKTIOT ---
         function openCvModal() { document.getElementById('cv-modal').classList.remove('modal-hidden'); }
         function closeCvModal() { document.getElementById('cv-modal').classList.add('modal-hidden'); prevStep(); }
 
@@ -341,9 +377,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    // n8n voi palauttaa tulokset objektina tai taulukkona
-                    const data = Array.isArray(result) ? result[0] : result;
-                    const reportText = data.ai_report || "";
+                    const reportText = result.ai_report || "";
                     const scoreMatch = reportText.match(/(\d+)\/100/);
                     const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
                     
@@ -353,7 +387,7 @@
 
                     document.getElementById('analysis-result').classList.remove('hidden');
                     document.getElementById('report-content').innerText = reportText;
-                    document.getElementById('doc-link').href = data.downloadUrl || "#";
+                    document.getElementById('doc-link').href = result.downloadUrl || "#";
 
                     closeCvModal();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
