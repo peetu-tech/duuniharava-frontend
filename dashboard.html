@@ -210,9 +210,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-widest text-orange-500/70 mb-2">Karkota nämä (Punaiset liput)</label>
-                    <input type="text" id="search-exclude" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-orange-500/50 text-sm text-white border-orange-500/10" placeholder="feissari, puhelinmyynti, provisio, kylmämyynti, epärealistinen palkka">
-                    <p class="text-[9px] text-gray-600 mt-2 font-mono uppercase tracking-tighter">Suodattaa pois epämääräiset ilmoitukset ja ei-toivotut palkkamallit.</p>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-orange-500/70 mb-2">Karkota nämä (SMART NOT-LISTA)</label>
+                    <input type="text" id="search-exclude" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-orange-500/50 text-sm text-white border-orange-500/10" placeholder="feissari, puhelinmyynti, provisio, kylmämyynti, nopea rikastuminen, epärealistinen palkka">
+                    <p class="text-[9px] text-gray-600 mt-2 font-mono uppercase tracking-tighter">Automaattinen suodatus: epärealistinen palkka, vain provisio, kylmämyynti jne.</p>
                 </div>
             </div>
 
@@ -326,10 +326,13 @@
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 const userEmail = session.user.email;
 
-                // Älykäs query-rakennus: yhdistetään kriteerit selkeäksi merkkijonoksi n8n:ää varten
+                // Rakennetaan haku älykkäällä NOT-listalla
                 let queryParts = [title];
                 if (location) queryParts.push(location);
-                if (exclude) queryParts.push(`NOT (${exclude})`);
+                
+                // Lisätään aina käyttäjän syöttämät TAI placeholderissa mainitut kriittiset kriteerit
+                const smartExcludes = exclude || "feissari, puhelinmyynti, provisio, kylmämyynti, nopea rikastuminen, epärealistinen palkka, freelance ilman takuuta, harjoittelu ilman palkkaa";
+                queryParts.push(`NOT (${smartExcludes})`);
                 
                 const lopullinenHaku = queryParts.join(' ');
 
@@ -337,7 +340,7 @@
 
                 if (response.ok) {
                     closeSearchModal();
-                    alert("Haku käynnistetty! Haravointi on alkanut taustalla.");
+                    alert("Haku käynnistetty! Haravointi on alkanut taustalla ja karsimme epämääräiset ilmoitukset.");
                     window.location.reload();
                 } else {
                     alert("Haku epäonnistui.");
