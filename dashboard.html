@@ -23,6 +23,20 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
         }
+        
+        /* Pieni spinneri napin sisälle */
+        .spinner-sm {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-left-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .match-card:hover { border-color: rgba(0, 191, 166, 0.4); transform: translateY(-2px); }
@@ -33,7 +47,6 @@
             overflow: hidden;
         }
 
-        /* Custom scrollbar for the large modal */
         #search-modal .modal-content::-webkit-scrollbar { width: 6px; }
         #search-modal .modal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
@@ -314,6 +327,12 @@
                     `;
                     jobList.appendChild(matchCard);
                 });
+                
+                // Päivitetään laskurit
+                document.getElementById('active-jobs-count').innerText = data.length;
+                const highMatches = data.filter(m => (m.match_percent || 0) > 80).length;
+                document.getElementById('new-matches-count').innerText = highMatches;
+
             } catch (err) {
                 console.error("Virhe matches-haussa:", err);
             }
@@ -330,8 +349,10 @@
             const title = document.getElementById('search-job-title').value;
             if (!title) { alert("Työnimike on pakollinen."); return; }
 
+            // Ladataan-tila päälle
             btn.disabled = true;
-            btn.innerText = "KÄYNNISTETÄÄN...";
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="spinner-sm"></span> HARAVOIDAAN...`;
 
             const criteria = {
                 job_title: title,
@@ -349,7 +370,6 @@
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 const userEmail = session.user.email;
 
-                // Kutsutaan webhookia POST-metodilla vakauden varmistamiseksi
                 const response = await fetch(`https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -357,18 +377,18 @@
                 });
 
                 if (response.ok) {
+                    // Haku on valmis! Suljetaan modaali ja päivitetään lista
                     closeSearchModal();
-                    alert("Haravointi käynnistetty!");
-                    window.location.reload();
+                    await fetchWeeklyMatches(userEmail); // Päivittää kortit heti
                 } else {
-                    alert("Haku epäonnistui.");
+                    alert("Haku epäonnistui palvelimen päässä.");
                 }
             } catch (err) {
                 console.error("Virhe prosessissa:", err);
-                alert("Virhe haussa.");
+                alert("Yhteysvirhe hakuun.");
             } finally {
                 btn.disabled = false;
-                btn.innerText = "KÄYNNISTÄ HARAVOINTI ➔";
+                btn.innerHTML = originalText;
             }
         };
 
