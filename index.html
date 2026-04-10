@@ -19,7 +19,6 @@
             <h1 class="text-3xl font-bold tracking-tighter mb-2"><span class="turkoosi-text">DUUNI</span>HARAVA</h1>
             <p class="text-gray-400 text-sm">Kirjaudu sisään jatkaaksesi hakuja.</p>
         </div>
-
         <form id="login-form" class="space-y-4">
             <div>
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Sähköposti</label>
@@ -29,8 +28,8 @@
                 <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Salasana</label>
                 <input type="password" id="password" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] text-white" required>
             </div>
-            <button type="submit" id="auth-btn" class="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl hover:scale-105 transition uppercase tracking-widest text-xs mt-4">Kirjaudu sisään</button>
-            <button type="button" id="signup-btn" class="w-full text-gray-500 text-[10px] uppercase font-bold tracking-widest hover:text-white transition">Tai luo uusi tili</button>
+            <button type="submit" class="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl hover:scale-105 transition uppercase tracking-widest text-xs mt-4">Kirjaudu sisään</button>
+            <button type="button" id="signup-btn" class="w-full text-gray-500 text-[10px] uppercase font-bold tracking-widest hover:text-white transition mt-2">Luo uusi tili</button>
         </form>
     </div>
 
@@ -43,19 +42,21 @@
 
         document.getElementById('login-form').onsubmit = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) alert("Virhe: " + error.message);
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            });
+            if (error) alert(error.message);
             else window.location.href = 'dashboard.html';
         };
 
         document.getElementById('signup-btn').onclick = async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) alert("Virhe: " + error.message);
-            else alert("Tili luotu! Voit nyt kirjautua sisään.");
+            const { error } = await supabase.auth.signUp({
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            });
+            if (error) alert(error.message);
+            else alert("Tili luotu! Kirjaudu nyt sisään.");
         };
     </script>
 </body>
