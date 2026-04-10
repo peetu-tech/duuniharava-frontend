@@ -3,61 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirjaudu | Duuniharava</title>
+    <title>Duuniharava | Säästä 20h viikossa ja löydä töitä</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background-color: #0F0F0F; color: white; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #0F0F0F; color: #FFFFFF; scroll-behavior: smooth; overflow-x: hidden; }
         .turkoosi-text { color: #00BFA6; }
+        .oranssi-text { color: #FF6F3C; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .gradient-bg { background: linear-gradient(90deg, #00BFA6, #FF6F3C); }
+        .hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .hover-lift:hover { transform: translateY(-10px); border-color: rgba(0, 191, 166, 0.5); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .reveal { animation: fadeInUp 0.8s ease-out forwards; }
+        .leaf { position: fixed; top: -10%; pointer-events: none; z-index: -1; animation: fall 10s linear infinite; }
+        @keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 0.4; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        .lang-btn { padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); font-size: 11px; cursor: pointer; }
+        .lang-btn.active { border-color: #00BFA6; background: rgba(0, 191, 166, 0.1); color: #00BFA6; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-6">
-    <div class="glass max-w-md w-full p-10 rounded-[2.5rem] border-t-4 border-[#00BFA6]">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold tracking-tighter mb-2"><span class="turkoosi-text">DUUNI</span>HARAVA</h1>
-            <p class="text-gray-400 text-sm">Kirjaudu sisään jatkaaksesi hakuja.</p>
+<body class="px-6 pt-20">
+
+    <nav class="fixed top-0 left-0 right-0 z-50 glass px-4 md:px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="font-bold text-xl tracking-tighter flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex gap-2 border-r border-white/10 pr-4">
+                    <button id="lang-fi" class="lang-btn active" onclick="setLang('fi')">🇫🇮 FI</button>
+                    <button id="lang-en" class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+                </div>
+                <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="text-xs font-bold py-2 px-4 rounded-lg border border-[#00BFA6] turkoosi-text hover:bg-[#00BFA6] hover:text-black transition">
+                    KIRJAUDU
+                </button>
+            </div>
         </div>
-        <form id="login-form" class="space-y-4">
-            <div>
-                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Sähköposti</label>
-                <input type="email" id="email" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] text-white" required>
+    </nav>
+
+    <main>
+        <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center py-20">
+            <div class="max-w-4xl glass p-12 rounded-[2.5rem] shadow-2xl reveal">
+                <h1 id="hero-title" class="text-4xl md:text-6xl font-bold mb-6">Säästä 20 tuntia viikossa ja pääse haastatteluihin</h1>
+                <p id="hero-desc" class="text-gray-400 mb-8 text-lg">Lopeta hakuammunta. Automaattinen harava löytää työt puolestasi.</p>
+                
+                <div class="chart-container mb-8">
+                    <canvas id="unemploymentChart"></canvas>
+                </div>
+
+                <button onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="gradient-bg text-black font-black py-5 px-10 rounded-2xl hover:scale-105 transition">
+                    ALOITA NYT ➔
+                </button>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">Salasana</label>
-                <input type="password" id="password" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] text-white" required>
+        </section>
+
+        <section id="auth-section" class="py-24 flex justify-center">
+            <div class="max-w-md w-full glass p-10 rounded-[2rem] border-t-4 border-[#00BFA6]">
+                <h2 id="login-title" class="text-2xl font-bold mb-6 text-center">Kirjaudu tai luo tili</h2>
+                <form id="auth-form" class="space-y-4">
+                    <input type="email" id="email" placeholder="Sähköposti" class="w-full glass p-4 rounded-xl focus:border-[#00BFA6] outline-none" required>
+                    <input type="password" id="password" placeholder="Salasana" class="w-full glass p-4 rounded-xl focus:border-[#00BFA6] outline-none" required>
+                    <button type="submit" id="submit-btn" class="w-full gradient-bg text-black font-bold py-4 rounded-xl transition">JATKA HALLINTAPANEELIIN</button>
+                </form>
+                <p class="text-[10px] text-gray-500 mt-4 text-center">Uusi tili luodaan automaattisesti ensikirjautumisella.</p>
             </div>
-            <button type="submit" class="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl hover:scale-105 transition uppercase tracking-widest text-xs mt-4">Kirjaudu sisään</button>
-            <button type="button" id="signup-btn" class="w-full text-gray-500 text-[10px] uppercase font-bold tracking-widest hover:text-white transition mt-2">Luo uusi tili</button>
-        </form>
-    </div>
+        </section>
+    </main>
 
     <script>
-        const config = {
-            url: 'https://zxtnhitxachrudrcrotk.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI'
-        };
-        const supabase = window.supabase.createClient(config.url, config.key);
+        const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        document.getElementById('login-form').onsubmit = async (e) => {
+        // Kirjautumislogiikka
+        document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            });
-            if (error) alert(error.message);
-            else window.location.href = 'dashboard.html';
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "HETKI...";
+
+            let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error && error.message.includes("Invalid login credentials")) {
+                const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({ email, password });
+                if (signUpError) alert(signUpError.message);
+                else {
+                    await supabaseClient.from('profiles').insert([{ id: signUpData.user.id, email, customer_group: 'paid_customer' }]);
+                    window.location.href = 'dashboard.html';
+                }
+            } else if (error) {
+                alert(error.message);
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+            btn.innerText = "JATKA HALLINTAPANEELIIN";
         };
 
-        document.getElementById('signup-btn').onclick = async () => {
-            const { error } = await supabase.auth.signUp({
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
+        // Kaavio
+        window.onload = () => {
+            const ctx = document.getElementById('unemploymentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2022', '2023', '2024', '2025', '2026', '2027'],
+                    datasets: [{
+                        label: 'Työttömyys %',
+                        data: [6.5, 7.2, 8.1, 7.8, 7.0, 6.2],
+                        borderColor: '#00BFA6',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 191, 166, 0.1)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
-            if (error) alert(error.message);
-            else alert("Tili luotu! Kirjaudu nyt sisään.");
         };
+
+        // Lehdet
+        for (let i = 0; i < 15; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.style.left = Math.random() * 100 + 'vw';
+            leaf.style.animationDelay = Math.random() * 5 + 's';
+            leaf.style.background = i % 2 === 0 ? '#00BFA6' : '#FF6F3C';
+            leaf.style.width = '12px'; leaf.style.height = '12px'; leaf.style.borderRadius = '2px 10px';
+            document.body.appendChild(leaf);
+        }
     </script>
 </body>
 </html>
