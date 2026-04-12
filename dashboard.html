@@ -15,6 +15,10 @@
         .btn-primary { background: #00BFA6; color: #000; font-weight: bold; }
         .btn-outline { border: 1px solid #FFFFFF; color: #FFFFFF; }
         .btn-primary:disabled, .btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* Tyyli tiedostovalitsimelle */
+        input[type="file"]::file-selector-button {
+            background: #00BFA6; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 12px;
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -40,10 +44,11 @@
             <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between">
                 <div>
                     <h3 class="text-xl font-bold mb-2">1. Optimoi CV</h3>
-                    <p class="text-gray-400 text-sm mb-8">Lähetä nykyinen CV:si tekoälylle analysoitavaksi ja optimoitavaksi.</p>
+                    <p class="text-gray-400 text-sm mb-6">Valitse PDF-tiedosto ja lähetä se tekoälylle.</p>
+                    <input type="file" id="cv-upload" accept=".pdf" class="block w-full text-sm text-gray-400 mb-8">
                 </div>
                 <button onclick="aloitaCVOptimointi(event)" class="btn-primary py-4 px-6 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition">
-                    ALOITA TÄSTÄ
+                    LATAA JA OPTIMOI
                 </button>
             </div>
 
@@ -60,16 +65,13 @@
     </main>
 
     <script>
-        // 1. Supabase Alustus
         const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 2. n8n Webhookit
         const CV_BOTTI_URL = 'https://n8nscalera.eu/webhook/uusi-hakemus';
         const VIIKKO_HARAVA_URL = 'https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4';
 
-        // TARKISTA KIRJAUTUMINEN
         async function checkUser() {
             const { data: { user }, error } = await supabaseClient.auth.getUser();
             if (error || !user) {
@@ -79,37 +81,40 @@
             }
         }
 
-        // CV OPTIMOINTI (Botti 1)
+        // KORJATTU CV OPTIMOINTI: Lähettää tiedoston
         async function aloitaCVOptimointi(event) {
+            const fileInput = document.getElementById('cv-upload');
+            if (!fileInput.files[0]) return alert("Valitse ensin CV-tiedosto (PDF)!");
+
             const btn = event.currentTarget;
             const originalText = btn.innerText;
             const { data: { user } } = await supabaseClient.auth.getUser();
 
-            btn.innerText = "YHDISTETÄÄN...";
+            btn.innerText = "LÄHETETÄÄN...";
             btn.disabled = true;
+
+            // Käytetään FormDataa, jotta n8n saa binääritiedoston
+            const formData = new FormData();
+            formData.append('cv', fileInput.files[0]); // Tämä täsmää n8n:n 'cv' binary fieldiin
+            formData.append('email', user.email);
+            formData.append('userId', user.id);
 
             try {
                 await fetch(CV_BOTTI_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        email: user.email,
-                        userId: user.id,
-                        type: 'cv_optimization'
-                    })
+                    body: formData, // FormData asettaa headerit automaattisesti
+                    mode: 'no-cors'
                 });
-                alert("CV-botti käynnistetty! n8n aloittaa käsittelyn.");
+                alert("CV lähetetty onnistuneesti käsiteltäväksi!");
             } catch (err) {
                 console.error(err);
-                alert("Yhteysvirhe n8n-palvelimeen.");
+                alert("Virhe lähetyksessä.");
             } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
         }
 
-        // VIIKKO HARAVA (Botti 2)
         async function aktivoiHaku(event) {
             const btn = event.currentTarget;
             const originalText = btn.innerText;
@@ -129,9 +134,8 @@
                         action: 'activate_search_bot'
                     })
                 });
-                alert("Viikko-Harava on nyt aktivoitu ja etsii työpaikkoja!");
+                alert("Viikko-Harava on nyt aktivoitu!");
             } catch (err) {
-                console.error(err);
                 alert("Virhe haun käynnistyksessä.");
             } finally {
                 btn.innerText = originalText;
@@ -139,13 +143,11 @@
             }
         }
 
-        // ULOSKIRJAUTUMINEN
         async function logout() {
             await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
         }
 
-        // Käynnistä tarkistus
         checkUser();
     </script>
 </body>
