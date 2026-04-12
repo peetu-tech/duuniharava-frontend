@@ -29,93 +29,211 @@
         .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; transition: background 0.3s; }
         .step.active .step-dot { background: #00BFA6; animation: pulse 1s infinite; }
         .step.done .step-dot { background: #00BFA6; }
-        
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .step.error .step-dot { background: #FF6F3C; }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
 
         .score-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-        .score-fill { height: 100%; background: #00BFA6; border-radius: 3px; width: 0%; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
+        .score-fill { height: 100%; background: #00BFA6; border-radius: 3px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
         .report-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.7; white-space: pre-wrap; max-height: 280px; overflow-y: auto; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
         .modal-box { background: #111; border: 1px solid rgba(0,191,166,0.3); border-radius: 2rem; padding: 2rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
 
-        input[type="text"], select { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 14px; width: 100%; outline: none; }
-        input[type="text"]:focus, select:focus { border-color: #00BFA6; }
-        
         .field-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 6px; }
-        .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; cursor: pointer; font-size: 13px; color: rgba(255,255,255,0.7); }
+        .field-label span { color: #FF6F3C; margin-left: 2px; }
+
+        input[type="text"], select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, select:focus { border-color: #00BFA6; }
+        input::placeholder { color: rgba(255,255,255,0.25); }
+        select option { background: #1a1a1a; color: #fff; }
+
+        .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; }
+        .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #00BFA6; cursor: pointer; flex-shrink: 0; }
+        .checkbox-row label { font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; }
+
+        .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1rem 0; }
         .section-title { font-size: 11px; font-weight: 700; color: #00BFA6; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-        .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1.2rem 0; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
-    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12">
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-16">
         <div class="text-xl font-bold tracking-tighter flex items-center gap-2">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2.5"><path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2.5" stroke-linecap="round"><path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/></svg>
             <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
         </div>
-        <button onclick="logout()" class="text-xs font-bold border border-red-500/50 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition">KIRJAUDU ULOS</button>
+        <button onclick="logout()" class="text-xs font-bold border border-red-500/50 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition">
+            KIRJAUDU ULOS
+        </button>
     </nav>
 
     <main class="max-w-4xl mx-auto">
         <div class="glass p-8 rounded-[2.5rem] mb-12">
-            <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
+            <h1 class="text-3xl font-bold mb-2">Tervetuloa takaisin!</h1>
             <p class="text-gray-500 font-mono text-sm">Käyttäjä: <span id="user-email" class="text-gray-300">ladataan...</span></p>
         </div>
 
+        <h2 class="text-xs font-bold tracking-[0.2em] text-gray-500 uppercase mb-8">Viikon Haravointi</h2>
+
         <div class="grid md:grid-cols-2 gap-6">
-            <div class="glass p-8 rounded-[2.5rem] flex flex-col">
-                <h3 class="text-xl font-bold mb-2">1. Optimoi CV</h3>
-                <p class="text-gray-400 text-sm mb-6">Tekoäly analysoi CV:si ja luo ATS-optimoidun version.</p>
 
-                <div class="upload-area mb-5" id="uploadArea">
-                    <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" onchange="handleFileChange(this)">
-                    <p class="text-sm text-gray-400" id="uploadText">Valitse CV-tiedosto</p>
-                    <p class="text-sm font-bold turkoosi-text mt-1 hidden" id="fileName"></p>
+            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">1. Optimoi CV</h3>
+                    <p class="text-gray-400 text-sm mb-6">Tekoäly analysoi CV:si ja kirjoittaa universaalin, ATS-optimoidun version suomalaiseen työnhakuun.</p>
+
+                    <div class="upload-area mb-5" id="uploadArea">
+                        <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" onchange="handleFileChange(this)">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" class="mx-auto mb-2">
+                            <rect x="4" y="2" width="20" height="24" rx="3"/>
+                            <path d="M9 2v7h10"/><path d="M14 17v-5M12 14l2-2 2 2"/>
+                        </svg>
+                        <p class="text-sm text-gray-400">Vedä CV tähän tai klikkaa</p>
+                        <p class="text-xs text-gray-600 mt-1">PDF, DOC tai DOCX</p>
+                        <p class="text-sm font-bold turkoosi-text mt-2 hidden" id="fileName"></p>
+                    </div>
+
+                    <div id="extraFields" class="hidden space-y-4">
+
+                        <div class="section-title">Perustiedot</div>
+
+                        <div>
+                            <label class="field-label">Mihin töihin haet? <span>*</span></label>
+                            <input type="text" id="targetJobs" placeholder="Esim. varastotyö, asiakaspalvelu, IT-tuki...">
+                        </div>
+
+                        <div>
+                            <label class="field-label">Koulutustaso</label>
+                            <select id="education">
+                                <option value="">Valitse...</option>
+                                <option value="Peruskoulu">Peruskoulu</option>
+                                <option value="Lukio">Lukio / ylioppilastutkinto</option>
+                                <option value="Ammattikoulu">Ammattikoulu (ammattitutkinto)</option>
+                                <option value="AMK">Ammattikorkeakoulu (AMK)</option>
+                                <option value="Yliopisto">Yliopisto / korkeakoulu</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Kokemus alalta</label>
+                            <select id="experience">
+                                <option value="">Valitse...</option>
+                                <option value="Ei kokemusta – etsin ensimmäistä työpaikkaa">Ei kokemusta — etsin ensimmäistä työpaikkaa</option>
+                                <option value="Alle 1 vuosi">Alle 1 vuosi</option>
+                                <option value="1–3 vuotta">1–3 vuotta</option>
+                                <option value="3–10 vuotta">3–10 vuotta</option>
+                                <option value="Yli 10 vuotta">Yli 10 vuotta</option>
+                            </select>
+                        </div>
+
+                        <hr class="section-divider">
+                        <div class="section-title">Kielitaito</div>
+
+                        <div>
+                            <label class="field-label">Suomen kielen taito</label>
+                            <select id="finnish">
+                                <option value="">Valitse...</option>
+                                <option value="Äidinkieli">Äidinkieli</option>
+                                <option value="Sujuva (C1–C2)">Sujuva (C1–C2)</option>
+                                <option value="Hyvä (B1–B2)">Hyvä (B1–B2)</option>
+                                <option value="Perustaso (A1–A2)">Perustaso (A1–A2)</option>
+                                <option value="Ei lainkaan">Ei lainkaan</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Englannin kielen taito</label>
+                            <select id="english">
+                                <option value="">Valitse...</option>
+                                <option value="Sujuva (C1–C2)">Sujuva (C1–C2)</option>
+                                <option value="Hyvä (B1–B2)">Hyvä (B1–B2)</option>
+                                <option value="Perustaso (A1–A2)">Perustaso (A1–A2)</option>
+                                <option value="Ei lainkaan">Ei lainkaan</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Muut kielet</label>
+                            <input type="text" id="otherLangs" placeholder="Esim. ruotsi (perustaso), venäjä (äidinkieli)...">
+                        </div>
+
+                        <hr class="section-divider">
+                        <div class="section-title">Käytännön tiedot</div>
+
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="drivingLicense">
+                            <label for="drivingLicense">Minulla on B-ajokortti (henkilöauto)</label>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="ownCar">
+                            <label for="ownCar">Minulla on oma auto käytössä</label>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="shiftWork">
+                            <label for="shiftWork">Voin tehdä vuorotyötä / viikonloppuja</label>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="nightWork">
+                            <label for="nightWork">Voin tehdä yötyötä</label>
+                        </div>
+
+                        <hr class="section-divider">
+                        <div class="section-title">Erityispätevyydet</div>
+
+                        <div>
+                            <label class="field-label">Kortit ja luvat (valitse kaikki sopivat)</label>
+                            <div class="space-y-1">
+                                <div class="checkbox-row"><input type="checkbox" id="hygienia"><label for="hygienia">Hygieniapassi</label></div>
+                                <div class="checkbox-row"><input type="checkbox" id="trukki"><label for="trukki">Trukkikortti</label></div>
+                                <div class="checkbox-row"><input type="checkbox" id="ea1"><label for="ea1">Ensiapukortti (EA1)</label></div>
+                                <div class="checkbox-row"><input type="checkbox" id="jv"><label for="jv">Järjestyksenvalvojakortti</label></div>
+                                <div class="checkbox-row"><input type="checkbox" id="tyo"><label for="tyo">Työturvallisuuskortti</label></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Muut pätevyydet tai kortit</label>
+                            <input type="text" id="otherCards" placeholder="Esim. anniskelupassi, sähköajokortti...">
+                        </div>
+
+                        <hr class="section-divider">
+                        <div class="section-title">Vahvuudet</div>
+
+                        <div>
+                            <label class="field-label">Suurin saavutuksesi tai vahvuutesi</label>
+                            <input type="text" id="achievements" placeholder="Esim. Jääkiekon kilpataso, myyntirekordini...">
+                        </div>
+
+                        <div>
+                            <label class="field-label">Hallitsemasi ohjelmat ja työkalut</label>
+                            <input type="text" id="tools" placeholder="Esim. Excel, SAP, Salesforce, Adobe...">
+                        </div>
+
+                    </div>
                 </div>
 
-                <div id="extraFields" class="hidden space-y-4">
-                    <div class="section-title">Työnhaku & Tausta</div>
-                    <div>
-                        <label class="field-label">Mihin töihin haet? *</label>
-                        <input type="text" id="targetJobs" placeholder="Esim. Varastotyöntekijä">
-                    </div>
-                    <div>
-                        <label class="field-label">Koulutustaso</label>
-                        <select id="education">
-                            <option value="">Valitse...</option>
-                            <option value="Peruskoulu">Peruskoulu</option>
-                            <option value="Ammattikoulu">Ammattikoulu</option>
-                            <option value="AMK">AMK / Korkeakoulu</option>
-                        </select>
-                    </div>
-                    
-                    <hr class="section-divider">
-                    <div class="section-title">Kortit & Pätevyydet</div>
-                    <div class="grid grid-cols-1 gap-1">
-                        <label class="checkbox-row"><input type="checkbox" id="drivingLicense"> B-ajokortti</label>
-                        <label class="checkbox-row"><input type="checkbox" id="ownCar"> Oma auto</label>
-                        <label class="checkbox-row"><input type="checkbox" id="hygienia"> Hygieniapassi</label>
-                        <label class="checkbox-row"><input type="checkbox" id="trukki"> Trukkikortti</label>
-                        <label class="checkbox-row"><input type="checkbox" id="tyo"> Työturvallisuuskortti</label>
-                    </div>
-
-                    <div>
-                        <label class="field-label">Muut taidot / ohjelmistot</label>
-                        <input type="text" id="tools" placeholder="Excel, SAP, tms.">
-                    </div>
-                </div>
-
-                <button onclick="aloitaCVOptimointi(event)" id="cvBtn" class="btn-primary py-4 px-6 rounded-2xl transition mt-6 opacity-50 cursor-not-allowed" disabled>
-                    OPTIMOI CV
+                <button onclick="aloitaCVOptimointi(event)" id="cvBtn"
+                    class="btn-primary py-4 px-6 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition mt-6 opacity-50 cursor-not-allowed"
+                    disabled>
+                    LATAA JA OPTIMOI
                 </button>
             </div>
 
             <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between border-purple-500/20">
                 <div>
-                    <h3 class="text-xl font-bold mb-2">2. Aktivoi Harava</h3>
-                    <p class="text-gray-400 text-sm mb-8">Botti etsii sinulle sopivia paikkoja taustasi perusteella.</p>
+                    <h3 class="text-xl font-bold mb-2 text-white">2. Aktivoi Haku</h3>
+                    <p class="text-gray-400 text-sm mb-8">Seuraa n8n-botin tekemiä hakemuksia ja niiden tilaa.</p>
                 </div>
                 <button onclick="aktivoiHaku(event)" class="btn-outline py-4 px-6 rounded-2xl hover:bg-white hover:text-black transition">
                     KÄYNNISTÄ HAKU
@@ -127,29 +245,42 @@
     <div class="modal-overlay hidden" id="resultModal">
         <div class="modal-box">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold turkoosi-text">CV-Prosessointi</h3>
-                <button onclick="suljeModaali()" class="text-gray-500 hover:text-white text-2xl">&times;</button>
+                <h3 class="text-lg font-bold turkoosi-text">CV-kuntotarkastus</h3>
+                <button onclick="suljeModaali()" class="text-gray-500 hover:text-white transition text-2xl leading-none">&times;</button>
             </div>
 
             <div id="progressSection" class="space-y-2 mb-6">
-                <div class="step" id="ms1"><div class="step-dot"></div><span>Lähetetään tiedostoa...</span></div>
-                <div class="step" id="ms2"><div class="step-dot"></div><span>Tekoäly analysoi...</span></div>
-                <div class="step" id="ms3"><div class="step-dot"></div><span>Luodaan dokumenttia...</span></div>
+                <div class="step" id="ms1"><div class="step-dot"></div><span>Lähetetään tiedosto...</span></div>
+                <div class="step" id="ms2"><div class="step-dot"></div><span>Tekoäly analysoi CV:n...</span></div>
+                <div class="step" id="ms3"><div class="step-dot"></div><span>Kirjoitetaan universaali versio...</span></div>
+                <div class="step" id="ms4"><div class="step-dot"></div><span>Luodaan Google Docs -dokumentti...</span></div>
             </div>
 
             <div id="resultSection" class="hidden">
                 <div class="mb-4">
                     <div class="flex justify-between items-baseline mb-2">
-                        <span class="text-3xl font-bold turkoosi-text" id="scoreNum">0/100</span>
-                        <span class="text-sm text-gray-500" id="scoreLabel">Pisteytys</span>
+                        <span class="text-3xl font-bold turkoosi-text" id="scoreNum">–/100</span>
+                        <span class="text-sm text-gray-500" id="scoreLabel"></span>
                     </div>
-                    <div class="score-track"><div class="score-fill" id="scoreFill"></div></div>
+                    <div class="score-track">
+                        <div class="score-fill" id="scoreFill" style="width:0%"></div>
+                    </div>
                 </div>
+
                 <div class="report-box mb-4" id="reportBox"></div>
-                <a href="#" id="docsLink" target="_blank" class="hidden flex items-center gap-3 p-4 rounded-xl border border-[#00BFA6]/30 hover:bg-[#00BFA6]/10 transition text-sm font-bold turkoosi-text mb-4">
-                    AVAA PARANNETTU CV (GOOGLE DOCS) →
+
+                <a href="#" id="docsLink" target="_blank"
+                    class="hidden items-center gap-3 p-3 rounded-xl border border-[#00BFA6]/30 hover:bg-[#00BFA6]/10 transition text-sm font-bold turkoosi-text mb-4">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <rect x="3" y="2" width="12" height="14" rx="2" stroke="#00BFA6" stroke-width="1.5"/>
+                        <path d="M6 6h6M6 9h6M6 12h4" stroke="#00BFA6" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    Avaa paranneltu CV Google Docsissa →
                 </a>
-                <button onclick="suljeModaali()" class="w-full py-3 text-gray-400 text-sm underline">Sulje</button>
+
+                <button onclick="suljeModaali()" class="w-full py-3 rounded-xl border border-white/10 text-sm text-gray-400 hover:border-white/30 hover:text-white transition">
+                    Sulje
+                </button>
             </div>
         </div>
     </div>
@@ -159,13 +290,13 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const CV_BOTTI_URL = 'https://n8nscalera.eu/webhook/uusi-hakemus';
-        const HARAVA_URL = 'https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4';
+        const CV_BOTTI_URL      = 'https://n8nscalera.eu/webhook/uusi-hakemus';
+        const VIIKKO_HARAVA_URL = 'https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4';
 
         async function checkUser() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) window.location.href = 'index.html';
-            else document.getElementById('user-email').innerText = user.email;
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
+            if (error || !user) { window.location.href = 'index.html'; }
+            else { document.getElementById('user-email').innerText = user.email; }
         }
 
         function handleFileChange(input) {
@@ -173,12 +304,26 @@
                 document.getElementById('uploadArea').classList.add('has-file');
                 document.getElementById('fileName').textContent = input.files[0].name;
                 document.getElementById('fileName').classList.remove('hidden');
-                document.getElementById('uploadText').classList.add('hidden');
                 document.getElementById('extraFields').classList.remove('hidden');
                 document.getElementById('cvBtn').disabled = false;
                 document.getElementById('cvBtn').classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
+
+        function getCheckboxes() {
+            const kortit = [];
+            if (document.getElementById('hygienia').checked) kortit.push('Hygieniapassi');
+            if (document.getElementById('trukki').checked)   kortit.push('Trukkikortti');
+            if (document.getElementById('ea1').checked)      kortit.push('EA1-ensiapukortti');
+            if (document.getElementById('jv').checked)       kortit.push('Järjestyksenvalvojakortti');
+            if (document.getElementById('tyo').checked)      kortit.push('Työturvallisuuskortti');
+            const muut = document.getElementById('otherCards').value.trim();
+            if (muut) kortit.push(muut);
+            return kortit.join(', ') || 'Ei erityiskortteja';
+        }
+
+        function setStep(n, state) { document.getElementById('ms' + n).className = 'step ' + state; }
+        function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
         async function aloitaCVOptimointi(event) {
             const fileInput = document.getElementById('cv-upload');
@@ -187,50 +332,59 @@
             const { data: { user } } = await supabaseClient.auth.getUser();
             const btn = event.currentTarget;
             btn.disabled = true;
+            btn.innerText = 'ANALYSOIDAAN...';
 
-            // Näytä modaali ja nollaa tilat
             document.getElementById('resultModal').classList.remove('hidden');
             document.getElementById('progressSection').classList.remove('hidden');
             document.getElementById('resultSection').classList.add('hidden');
-            setStep(1, 'active'); setStep(2, ''); setStep(3, '');
+            document.getElementById('docsLink').classList.add('hidden');
+            document.getElementById('docsLink').classList.remove('flex');
+            [1,2,3,4].forEach(n => setStep(n, ''));
+            setStep(1, 'active');
+
+            const ajolupa = [];
+            if (document.getElementById('drivingLicense').checked) ajolupa.push('B-ajokortti');
+            if (document.getElementById('ownCar').checked) ajolupa.push('Oma auto käytössä');
+
+            const vuorot = [];
+            if (document.getElementById('shiftWork').checked) vuorot.push('Vuorotyö ja viikonloput OK');
+            if (document.getElementById('nightWork').checked) vuorot.push('Yötyö OK');
 
             const formData = new FormData();
-            formData.append('cv', fileInput.files[0]);
-            formData.append('email', user.email);
-            formData.append('userId', user.id);
-            formData.append('targetJobs', document.getElementById('targetJobs').value);
-            formData.append('education', document.getElementById('education').value);
-            formData.append('tools', document.getElementById('tools').value);
-            
-            // Kerää checkboxit
-            const skills = [];
-            if (document.getElementById('drivingLicense').checked) skills.push('B-kortti');
-            if (document.getElementById('ownCar').checked) skills.push('Oma auto');
-            if (document.getElementById('hygienia').checked) skills.push('Hygieniapassi');
-            if (document.getElementById('trukki').checked) skills.push('Trukkikortti');
-            if (document.getElementById('tyo').checked) skills.push('Työturvallisuuskortti');
-            formData.append('skills', skills.join(', '));
+            formData.append('cv',           fileInput.files[0]);
+            formData.append('email',        user.email);
+            formData.append('userId',       user.id);
+            formData.append('targetJobs',   document.getElementById('targetJobs').value.trim());
+            formData.append('education',    document.getElementById('education').value);
+            formData.append('experience',   document.getElementById('experience').value);
+            formData.append('finnish',      document.getElementById('finnish').value);
+            formData.append('english',      document.getElementById('english').value);
+            formData.append('otherLangs',   document.getElementById('otherLangs').value.trim());
+            formData.append('driving',      ajolupa.join(', ') || 'Ei ajokorttia');
+            formData.append('shiftWork',    vuorot.join(', ') || 'Ei vuorotyötä');
+            formData.append('cards',        getCheckboxes());
+            formData.append('achievements', document.getElementById('achievements').value.trim());
+            formData.append('tools',        document.getElementById('tools').value.trim());
 
             try {
                 const response = await fetch(CV_BOTTI_URL, { method: 'POST', body: formData });
                 setStep(1, 'done'); setStep(2, 'active');
-
-                if (!response.ok) throw new Error('Virhe lähetyksessä');
-                
-                const data = await response.json();
+                await delay(700);
                 setStep(2, 'done'); setStep(3, 'active');
-                
-                // Pieni viive jotta käyttäjä näkee askeleet
-                setTimeout(() => {
-                    setStep(3, 'done');
-                    naytaTulos(data);
-                }, 1000);
+                await delay(500);
+                setStep(3, 'done'); setStep(4, 'active');
 
+                if (!response.ok) throw new Error('Palvelin vastasi virheellä ' + response.status);
+                const data = await response.json();
+                setStep(4, 'done');
+                await delay(400);
+                naytaTulos(data);
             } catch (err) {
-                alert('Yhteysvirhe n8n-palvelimeen.');
-                suljeModaali();
+                [1,2,3,4].forEach(n => setStep(n, 'error'));
+                console.error('CV-virhe:', err);
             } finally {
                 btn.disabled = false;
+                btn.innerText = 'LATAA JA OPTIMOI';
             }
         }
 
@@ -238,49 +392,69 @@
             document.getElementById('progressSection').classList.add('hidden');
             document.getElementById('resultSection').classList.remove('hidden');
 
-            const report = data.ai_report || "Analyysi valmis.";
+            const report = data.ai_report || '';
+            const scoreMatch = report.match(/KUNTOTARKASTUS:\s*(\d+)\/100/);
+            const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
+
+            if (score !== null) {
+                document.getElementById('scoreNum').textContent = score + '/100';
+                document.getElementById('scoreLabel').textContent =
+                    score >= 85 ? 'Erinomainen' : score >= 70 ? 'Hyvä' : score >= 50 ? 'Kohtalainen' : 'Kehitettävää';
+                setTimeout(() => { document.getElementById('scoreFill').style.width = score + '%'; }, 100);
+            }
             document.getElementById('reportBox').textContent = report;
 
-            // Etsi pisteet tekstistä (esim "KUNTOTARKASTUS: 85/100")
-            const scoreMatch = report.match(/(\d+)\/100/);
-            const score = scoreMatch ? parseInt(scoreMatch[1]) : 70;
-            
-            document.getElementById('scoreNum').textContent = score + '/100';
-            document.getElementById('scoreFill').style.width = score + '%';
-
-            if (data.downloadUrl || data.googleDocsUrl) {
+            if (data.downloadUrl) {
                 const link = document.getElementById('docsLink');
-                link.href = data.downloadUrl || data.googleDocsUrl;
+                link.href = data.downloadUrl;
                 link.classList.remove('hidden');
-            }
-        }
-
-        function setStep(id, state) {
-            const el = document.getElementById('ms' + id);
-            el.className = 'step ' + state;
-        }
-
-        async function aktivoiHaku(event) {
-            const btn = event.currentTarget;
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            btn.innerText = 'KÄYNNISTETÄÄN...';
-            
-            try {
-                await fetch(HARAVA_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: user.email, action: 'start_search' })
-                });
-                alert('Haku aktivoitu! Saat sähköpostia kun paikkoja löytyy.');
-            } catch (e) {
-                alert('Virhe haun käynnistyksessä.');
-            } finally {
-                btn.innerText = 'KÄYNNISTÄ HAKU';
+                link.classList.add('flex');
             }
         }
 
         function suljeModaali() { document.getElementById('resultModal').classList.add('hidden'); }
-        async function logout() { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
+        document.getElementById('resultModal').addEventListener('click', function(e) {
+            if (e.target === this) suljeModaali();
+        });
+
+        async function aktivoiHaku(event) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            
+            btn.innerText = 'KÄYNNISTETÄÄN...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(VIIKKO_HARAVA_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: user.email, 
+                        userId: user.id, 
+                        action: 'activate_search_bot',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Viikko-Harava on nyt aktivoitu!');
+                } else {
+                    alert('Botti vastaanotti pyynnön, mutta vastasi virheellä.');
+                }
+            } catch (err) {
+                console.error('Haku-virhe:', err);
+                alert('Yhteysvirhe n8n-palvelimeen.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
 
         checkUser();
     </script>
