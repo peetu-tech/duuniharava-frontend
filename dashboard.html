@@ -79,6 +79,21 @@
     </nav>
 
     <main class="max-w-4xl mx-auto">
+        <div id="analysis-display" class="hidden mb-12">
+            <div class="glass p-8 rounded-[2.5rem] border-[#00BFA6]/30">
+                <h3 class="text-xl font-bold mb-4 turkoosi-text">Viimeisin analyysitulos</h3>
+                <div id="mainScoreDisplay" class="mb-6">
+                     <div class="flex justify-between items-baseline mb-2">
+                        <span class="text-4xl font-bold turkoosi-text" id="mainScoreNum">0/100</span>
+                    </div>
+                    <div class="score-track">
+                        <div class="score-fill" id="mainScoreFill" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="report-box" id="mainReportBox" style="max-height: none;">Analyysiä ei vielä saatavilla.</div>
+            </div>
+        </div>
+
         <div class="glass p-8 rounded-[2.5rem] mb-12">
             <h1 class="text-3xl font-bold mb-2">Tervetuloa takaisin!</h1>
             <p class="text-gray-500 font-mono text-sm">Käyttäjä: <span id="user-email" class="text-gray-300">ladataan...</span></p>
@@ -369,6 +384,12 @@
             const score = scoreMatch ? parseInt(scoreMatch[1]) : 75;
             document.getElementById('scoreNum').textContent = score + '/100';
             document.getElementById('scoreFill').style.width = score + '%';
+
+            // Päivitetään päänäkymän analyysi
+            document.getElementById('analysis-display').classList.remove('hidden');
+            document.getElementById('mainReportBox').textContent = report;
+            document.getElementById('mainScoreNum').textContent = score + '/100';
+            document.getElementById('mainScoreFill').style.width = score + '%';
 
             if (data.downloadUrl || data.googleDocsUrl) {
                 const link = document.getElementById('docsLink');
