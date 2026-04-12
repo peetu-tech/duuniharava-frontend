@@ -4,189 +4,285 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duuniharava | Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Space Grotesk', sans-serif; background-color: #0B0B0B; color: #FFFFFF; }
         .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
-        .glass:hover { border-color: #00BFA6; }
+        .glass:hover { border-color: rgba(0,191,166,0.4); }
         .turkoosi-text { color: #00BFA6; }
         .oranssi-text { color: #FF6F3C; }
-        .btn-primary { background: #00BFA6; color: #000; font-weight: bold; border-radius: 12px; }
+        .btn-primary { background: #00BFA6; color: #000; font-weight: bold; }
+        .btn-outline { border: 1px solid #FFFFFF; color: #FFFFFF; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .upload-area { border: 2px dashed rgba(255,255,255,0.1); border-radius: 1.5rem; padding: 2rem; text-align: center; cursor: pointer; }
-        .upload-area.has-file { border-color: #00BFA6; background: rgba(0,191,166,0.05); }
-        
-        input[type="text"], select { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; color: #fff; width: 100%; outline: none; }
-        input[type="text"]:focus { border-color: #00BFA6; }
-        
-        .checkbox-row { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #ccc; }
-        .checkbox-row input { width: 18px; height: 18px; accent-color: #00BFA6; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal-box { background: #111; border: 1px solid #333; padding: 2.5rem; border-radius: 2rem; width: 100%; max-width: 500px; }
-        
-        .step { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #666; }
-        .step.active { color: #00BFA6; font-weight: bold; }
-        .step.done { color: #00BFA6; opacity: 0.8; }
+        .upload-area { border: 2px dashed rgba(255,255,255,0.15); border-radius: 1rem; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s ease; position: relative; }
+        .upload-area:hover { border-color: #00BFA6; background: rgba(0,191,166,0.04); }
+        .upload-area.has-file { border-color: #00BFA6; border-style: solid; background: rgba(0,191,166,0.06); }
+        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+        .step { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.03); font-size: 13px; color: rgba(255,255,255,0.4); transition: all 0.3s; }
+        .step.active { background: rgba(0,191,166,0.1); color: #00BFA6; }
+        .step.done { background: rgba(0,191,166,0.08); color: #00BFA6; }
+        .step.error { background: rgba(255,111,60,0.1); color: #FF6F3C; }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; transition: background 0.3s; }
+        .step.active .step-dot { background: #00BFA6; animation: pulse 1s infinite; }
+        .step.done .step-dot { background: #00BFA6; }
+        .step.error .step-dot { background: #FF6F3C; }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+        .score-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+        .score-fill { height: 100%; background: #00BFA6; border-radius: 3px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
+        .report-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.7; white-space: pre-wrap; max-height: 280px; overflow-y: auto; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-box { background: #111; border: 1px solid rgba(0,191,166,0.3); border-radius: 2rem; padding: 2rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
+
+        .field-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 6px; }
+        .field-label span { color: #FF6F3C; margin-left: 2px; }
+
+        input[type="text"], select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, select:focus { border-color: #00BFA6; }
+        input::placeholder { color: rgba(255,255,255,0.25); }
+        select option { background: #1a1a1a; color: #fff; }
+
+        .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; }
+        .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #00BFA6; cursor: pointer; flex-shrink: 0; }
+        .checkbox-row label { font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; }
+
+        .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1rem 0; }
+        .section-title { font-size: 11px; font-weight: 700; color: #00BFA6; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
     </style>
 </head>
-<body class="min-h-screen p-6">
+<body class="min-h-screen p-4 md:p-8">
+
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-16">
+        <div class="text-xl font-bold tracking-tighter flex items-center gap-2">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2.5" stroke-linecap="round"><path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/></svg>
+            <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
+        </div>
+        <button onclick="logout()" class="text-xs font-bold border border-red-500/50 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition">
+            KIRJAUDU ULOS
+        </button>
+    </nav>
 
     <main class="max-w-4xl mx-auto">
-        <div class="glass p-8 rounded-[2rem] mb-8">
-            <h1 class="text-2xl font-bold">Duuniharava Dashboard</h1>
-            <p class="text-gray-500 text-sm mt-1" id="user-display">Ladataan käyttäjää...</p>
+        <div class="glass p-8 rounded-[2.5rem] mb-12">
+            <h1 class="text-3xl font-bold mb-2">Tervetuloa takaisin!</h1>
+            <p class="text-gray-500 font-mono text-sm">Käyttäjä: <span id="user-email" class="text-gray-300">ladataan...</span></p>
         </div>
 
+        <h2 class="text-xs font-bold tracking-[0.2em] text-gray-500 uppercase mb-8">Viikon Haravointi</h2>
+
         <div class="grid md:grid-cols-2 gap-6">
-            <div class="glass p-8 rounded-[2.5rem] flex flex-col">
-                <h3 class="text-xl font-bold mb-4">1. Optimoi Profiili</h3>
-                
-                <div class="upload-area mb-6" id="uploadArea">
-                    <input type="file" id="cv-upload" class="hidden" accept=".pdf,.doc,.docx" onchange="handleFileChange(this)">
-                    <label for="cv-upload" class="cursor-pointer">
-                        <p class="text-sm text-gray-400" id="uploadText">Klikkaa ja valitse CV (PDF)</p>
-                        <p class="text-sm font-bold turkoosi-text hidden" id="fileName"></p>
-                    </label>
+
+            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">1. Optimoi CV</h3>
+                    <p class="text-gray-400 text-sm mb-6">Tekoäly analysoi CV:si ja kirjoittaa universaalin, ATS-optimoidun version suomalaiseen työnhakuun.</p>
+
+                    <div class="upload-area mb-5" id="uploadArea">
+                        <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" onchange="handleFileChange(this)">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" class="mx-auto mb-2">
+                            <rect x="4" y="2" width="20" height="24" rx="3"/>
+                            <path d="M9 2v7h10"/><path d="M14 17v-5M12 14l2-2 2 2"/>
+                        </svg>
+                        <p class="text-sm text-gray-400">Vedä CV tähän tai klikkaa</p>
+                        <p class="text-xs text-gray-600 mt-1">PDF, DOC tai DOCX</p>
+                        <p class="text-sm font-bold turkoosi-text mt-2 hidden" id="fileName"></p>
+                    </div>
+
+                    <div id="extraFields" class="hidden space-y-4">
+                        <div class="section-title">Perustiedot</div>
+                        <div>
+                            <label class="field-label">Mihin töihin haet? <span>*</span></label>
+                            <input type="text" id="targetJobs" placeholder="Esim. varastotyö, asiakaspalvelu, IT-tuki...">
+                        </div>
+                        <div>
+                            <label class="field-label">Koulutustaso</label>
+                            <select id="education">
+                                <option value="">Valitse...</option>
+                                <option value="Peruskoulu">Peruskoulu</option>
+                                <option value="Lukio">Lukio / ylioppilastutkinto</option>
+                                <option value="Ammattikoulu">Ammattikoulu (ammattitutkinto)</option>
+                                <option value="AMK">Ammattikorkeakoulu (AMK)</option>
+                                <option value="Yliopisto">Yliopisto / korkeakoulu</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="field-label">Kokemus alalta</label>
+                            <select id="experience">
+                                <option value="">Valitse...</option>
+                                <option value="Ei kokemusta">Ei kokemusta</option>
+                                <option value="Alle 1 vuosi">Alle 1 vuosi</option>
+                                <option value="1–3 vuotta">1–3 vuotta</option>
+                                <option value="3–10 vuotta">3–10 vuotta</option>
+                                <option value="Yli 10 vuotta">Yli 10 vuotta</option>
+                            </select>
+                        </div>
+
+                        <hr class="section-divider">
+                        <div class="section-title">Käytännön tiedot</div>
+                        <div class="checkbox-row"><input type="checkbox" id="drivingLicense"><label for="drivingLicense">B-ajokortti</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="ownCar"><label for="ownCar">Oma auto käytössä</label></div>
+                        
+                        <div class="section-title mt-4">Kortit</div>
+                        <div class="grid grid-cols-2 gap-1">
+                            <div class="checkbox-row"><input type="checkbox" id="hygienia"><label for="hygienia">Hygienia</label></div>
+                            <div class="checkbox-row"><input type="checkbox" id="trukki"><label for="trukki">Trukki</label></div>
+                            <div class="checkbox-row"><input type="checkbox" id="tyo"><label for="tyo">Työturva</label></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="extraFields" class="space-y-4 mb-6 hidden">
-                    <div>
-                        <label class="text-[10px] uppercase text-gray-500 font-bold">Mihin töihin haet?</label>
-                        <input type="text" id="targetJobs" placeholder="Esim. Logistiikka, Myynti...">
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="checkbox-row"><input type="checkbox" id="drivingLicense"><label>Ajokortti (B)</label></div>
-                        <div class="checkbox-row"><input type="checkbox" id="ownCar"><label>Oma auto</label></div>
-                        <div class="checkbox-row"><input type="checkbox" id="hygienia"><label>Hygieniapassi</label></div>
-                        <div class="checkbox-row"><input type="checkbox" id="trukki"><label>Trukkikortti</label></div>
-                    </div>
-                </div>
-
-                <button onclick="lahetaBottiin(event)" id="cvBtn" class="btn-primary py-4 w-full opacity-50 cursor-not-allowed" disabled>
-                    OPTIMOI JA ANALYSOI
+                <button onclick="aloitaCVOptimointi(event)" id="cvBtn"
+                    class="btn-primary py-4 px-6 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition mt-6 opacity-50 cursor-not-allowed"
+                    disabled>
+                    LATAA JA OPTIMOI
                 </button>
             </div>
 
-            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between border-purple-900/20">
+            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between border-purple-500/20">
                 <div>
-                    <h3 class="text-xl font-bold mb-2">2. Aktivoi Harava</h3>
-                    <p class="text-gray-400 text-sm">Kun profiili on kunnossa, bitti alkaa etsiä sinulle töitä automaattisesti.</p>
+                    <h3 class="text-xl font-bold mb-2 text-white">2. Aktivoi Haku</h3>
+                    <p class="text-gray-400 text-sm mb-8">Seuraa n8n-botin tekemiä hakemuksia ja niiden tilaa.</p>
                 </div>
-                <button onclick="aktivoiHaku(event)" class="btn-primary bg-white text-black hover:bg-gray-200 py-4 mt-8">
+                <button onclick="aktivoiHaku(event)" class="btn-outline py-4 px-6 rounded-2xl hover:bg-white hover:text-black transition">
                     KÄYNNISTÄ HAKU
                 </button>
             </div>
         </div>
     </main>
 
-    <div id="loadingModal" class="modal-overlay hidden">
+    <div class="modal-overlay hidden" id="resultModal">
         <div class="modal-box">
-            <h3 class="text-xl font-bold mb-6 turkoosi-text">Käsitellään...</h3>
-            <div class="space-y-4">
-                <div id="s1" class="step">● Lähetetään tiedostoja</div>
-                <div id="s2" class="step">● Tekoäly optimoi sisältöä</div>
-                <div id="s3" class="step">● Luodaan raporttia</div>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold turkoosi-text">CV-kuntotarkastus</h3>
+                <button onclick="suljeModaali()" class="text-gray-500 hover:text-white transition text-2xl leading-none">&times;</button>
             </div>
-            <button onclick="document.getElementById('loadingModal').classList.add('hidden')" class="mt-8 text-gray-500 text-sm underline w-full">Sulje ikkuna</button>
+
+            <div id="progressSection" class="space-y-2 mb-6">
+                <div class="step" id="ms1"><div class="step-dot"></div><span>Lähetetään tiedosto...</span></div>
+                <div class="step" id="ms2"><div class="step-dot"></div><span>Tekoäly analysoi...</span></div>
+                <div class="step" id="ms3"><div class="step-dot"></div><span>Kirjoitetaan versio...</span></div>
+                <div class="step" id="ms4"><div class="step-dot"></div><span>Valmis!</span></div>
+            </div>
+
+            <div id="resultSection" class="hidden">
+                <div class="mb-4">
+                    <div class="flex justify-between items-baseline mb-2">
+                        <span class="text-3xl font-bold turkoosi-text" id="scoreNum">–/100</span>
+                    </div>
+                    <div class="score-track"><div class="score-fill" id="scoreFill" style="width:0%"></div></div>
+                </div>
+                <div class="report-box mb-4" id="reportBox"></div>
+                <button onclick="suljeModaali()" class="w-full py-3 rounded-xl border border-white/10 text-sm text-gray-400 hover:border-white/30 hover:text-white transition">Sulje</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- KONFIGURAATIO ---
         const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // n8n TUOTANTO-URLit
-        const URL_CV_BOTTI = 'https://n8nscalera.eu/webhook/uusi-hakemus';
-        const URL_HARAVA = 'https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4';
-
-        // --- TOIMINNOT ---
+        const CV_BOTTI_URL      = 'https://n8nscalera.eu/webhook/uusi-hakemus';
+        const VIIKKO_HARAVA_URL = 'https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4';
 
         async function checkUser() {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) { window.location.href = 'index.html'; return; }
-            document.getElementById('user-display').innerText = `Kirjautuneena: ${user.email}`;
+            if (!user) { window.location.href = 'index.html'; }
+            else { document.getElementById('user-email').innerText = user.email; }
         }
 
         function handleFileChange(input) {
             if (input.files && input.files[0]) {
                 document.getElementById('uploadArea').classList.add('has-file');
-                document.getElementById('fileName').innerText = input.files[0].name;
+                document.getElementById('fileName').textContent = input.files[0].name;
                 document.getElementById('fileName').classList.remove('hidden');
-                document.getElementById('uploadText').classList.add('hidden');
                 document.getElementById('extraFields').classList.remove('hidden');
                 document.getElementById('cvBtn').disabled = false;
                 document.getElementById('cvBtn').classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
-        async function lahetaBottiin(e) {
-            const btn = e.currentTarget;
+        function setStep(n, state) { document.getElementById('ms' + n).className = 'step ' + state; }
+        const delay = ms => new Promise(r => setTimeout(r, ms));
+
+        async function aloitaCVOptimointi(event) {
             const fileInput = document.getElementById('cv-upload');
             const { data: { user } } = await supabaseClient.auth.getUser();
+            const btn = event.currentTarget;
 
-            document.getElementById('loadingModal').classList.remove('hidden');
-            document.getElementById('s1').classList.add('active');
+            btn.disabled = true;
+            document.getElementById('resultModal').classList.remove('hidden');
+            document.getElementById('progressSection').classList.remove('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            [1,2,3,4].forEach(n => setStep(n, ''));
+            setStep(1, 'active');
 
             const formData = new FormData();
             formData.append('cv', fileInput.files[0]);
             formData.append('email', user.email);
-            formData.append('userId', user.id);
             formData.append('targetJobs', document.getElementById('targetJobs').value);
-            formData.append('has_car', document.getElementById('ownCar').checked);
-            formData.append('has_license', document.getElementById('drivingLicense').checked);
-
+            formData.append('education', document.getElementById('education').value);
+            
             try {
-                const response = await fetch(URL_CV_BOTTI, {
-                    method: 'POST',
-                    body: formData // FormData asettaa Content-Typeksi multipart/form-data automaattisesti
-                });
+                const response = await fetch(CV_BOTTI_URL, { method: 'POST', body: formData });
+                if (!response.ok) throw new Error('Virhe');
 
-                if (response.ok) {
-                    document.getElementById('s1').className = 'step done';
-                    document.getElementById('s2').className = 'step active';
-                    alert('CV lähetetty onnistuneesti! n8n aloittaa prosessoinnin.');
-                } else {
-                    throw new Error('Palvelin vastasi virheellä: ' + response.status);
+                setStep(1, 'done'); setStep(2, 'active');
+                const data = await response.json();
+                
+                await delay(500); setStep(2, 'done'); setStep(3, 'active');
+                await delay(500); setStep(3, 'done'); setStep(4, 'done');
+                
+                document.getElementById('progressSection').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+                document.getElementById('reportBox').textContent = data.ai_report || 'Analyysi valmistui.';
+                
+                const scoreMatch = (data.ai_report || '').match(/KUNTOTARKASTUS:\s*(\d+)/);
+                if (scoreMatch) {
+                    const s = scoreMatch[1];
+                    document.getElementById('scoreNum').textContent = s + '/100';
+                    document.getElementById('scoreFill').style.width = s + '%';
                 }
             } catch (err) {
-                console.error(err);
-                alert('Virhe lähetyksessä. Tarkista n8n CORS-asetukset ja että workflow on ACTIVE.');
+                [1,2,3,4].forEach(n => setStep(n, 'error'));
             } finally {
-                btn.innerText = 'OPTIMOI JA ANALYSOI';
-                document.getElementById('loadingModal').classList.add('hidden');
+                btn.disabled = false;
             }
         }
 
-        async function aktivoiHaku(e) {
-            const btn = e.currentTarget;
+        async function aktivoiHaku(event) {
+            const btn = event.currentTarget;
             const { data: { user } } = await supabaseClient.auth.getUser();
-            btn.innerText = 'AKTIVOIDAAN...';
-
+            btn.innerText = 'KÄYNNISTETÄÄN...';
             try {
-                const res = await fetch(URL_HARAVA, {
+                await fetch(VIIKKO_HARAVA_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: user.email, timestamp: new Date() })
+                    body: JSON.stringify({ email: user.email, action: 'start' })
                 });
-                if (res.ok) alert('Viikko-Harava käynnistetty!');
-            } catch (err) {
-                alert('Yhteysvirhe n8n-palvelimeen.');
-            } finally {
-                btn.innerText = 'KÄYNNISTÄ HAKU';
-            }
+                alert('Harava käynnistetty!');
+            } catch (err) { alert('Virhe.'); }
+            btn.innerText = 'KÄYNNISTÄ HAKU';
         }
 
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            window.location.href = 'index.html';
-        }
+        function suljeModaali() { document.getElementById('resultModal').classList.add('hidden'); }
+        async function logout() { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
 
         checkUser();
     </script>
