@@ -3,339 +3,509 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duuniharava | Dashboard</title>
+    <title>Duuniharava | Säästä 20h viikossa ja löydä töitä</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background-color: #0B0B0B; color: #FFFFFF; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
-        .glass:hover { border-color: rgba(0, 191, 166, 0.4); }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0F0F0F;
+            color: #FFFFFF;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
         .turkoosi-text { color: #00BFA6; }
         .oranssi-text { color: #FF6F3C; }
-        .btn-primary { background: #00BFA6; color: #000; font-weight: bold; }
-        .btn-outline { border: 1px solid #FFFFFF; color: #FFFFFF; }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .gradient-bg { background: linear-gradient(90deg, #00BFA6, #FF6F3C); }
+        input::placeholder { color: rgba(255, 255, 255, 0.3); }
+        
+        .hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease; }
+        .hover-lift:hover { 
+            transform: translateY(-10px);
+            border-color: rgba(0, 191, 166, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 191, 166, 0.3);
+        }
 
-        .upload-area { border: 2px dashed rgba(255,255,255,0.15); border-radius: 1rem; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s ease; position: relative; }
-        .upload-area:hover { border-color: #00BFA6; background: rgba(0,191,166,0.04); }
-        .upload-area.has-file { border-color: #00BFA6; border-style: solid; background: rgba(0,191,166,0.06); }
-        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        @keyframes fadeInUp { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .reveal { animation: fadeInUp 0.8s ease-out forwards; }
+        
+        @keyframes rake3D { 
+            0%, 100% { transform: rotateY(-20deg) rotateX(10deg); } 
+            50% { transform: rotateY(20deg) rotateX(5deg); } 
+        }
+        .logo-container { perspective: 1000px; position: relative; }
+        .logo-3d { 
+            animation: rake3D 4s infinite ease-in-out; 
+            transform-style: preserve-3d;
+        }
+        
+        @keyframes particleSuck {
+            0% { transform: translateY(100px) scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-20px) scale(1); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: particleSuck 2s infinite linear;
+        }
 
-        .step { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.03); font-size: 13px; color: rgba(255,255,255,0.4); transition: all 0.3s; }
-        .step.active { background: rgba(0,191,166,0.1); color: #00BFA6; }
-        .step.done { background: rgba(0,191,166,0.08); color: #00BFA6; }
-        .step.error { background: rgba(255,111,60,0.1); color: #FF6F3C; }
-        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; transition: background 0.3s; }
-        .step.active .step-dot { background: #00BFA6; animation: pulse 1s infinite; }
-        .step.done .step-dot { background: #00BFA6; }
-        .step.error .step-dot { background: #FF6F3C; }
-        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+        .leaf {
+            position: fixed;
+            top: -10%;
+            pointer-events: none;
+            z-index: -1;
+            animation: fall 10s linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(110vh) rotate(720deg) translateX(100px); opacity: 0; }
+        }
 
-        .score-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-        .score-fill { height: 100%; background: #00BFA6; border-radius: 3px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
-        .report-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.7; white-space: pre-wrap; max-height: 260px; overflow-y: auto; }
+        .chart-container { 
+            position: relative; 
+            height: 300px; 
+            width: 100%;
+        }
+        @media (max-width: 640px) {
+            .chart-container { height: 250px; }
+        }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-        .modal-box { background: #111; border: 1px solid rgba(0,191,166,0.3); border-radius: 2rem; padding: 2rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
-
-        input[type="text"] { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 14px; width: 100%; outline: none; transition: border-color 0.2s; }
-        input[type="text"]:focus { border-color: #00BFA6; }
-        input::placeholder { color: rgba(255,255,255,0.25); }
+        .lang-btn {
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: white;
+            background: transparent;
+            cursor: pointer;
+        }
+        .lang-btn.active {
+            border-color: #00BFA6;
+            background: rgba(0, 191, 166, 0.1);
+            color: #00BFA6;
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
-
-    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-16">
-        <div class="text-xl font-bold tracking-tighter flex items-center gap-2">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2.5" stroke-linecap="round"><path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/></svg>
-            <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
-        </div>
-        <button onclick="logout()" class="text-xs font-bold border border-red-500/50 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition">
-            KIRJAUDU ULOS
-        </button>
-    </nav>
-
-    <main class="max-w-4xl mx-auto">
-        <div class="glass p-8 rounded-[2.5rem] mb-12">
-            <h1 class="text-3xl font-bold mb-2">Tervetuloa takaisin!</h1>
-            <p class="text-gray-500 font-mono text-sm">Käyttäjä: <span id="user-email" class="text-gray-300">ladataan...</span></p>
-        </div>
-
-        <h2 class="text-xs font-bold tracking-[0.2em] text-gray-500 uppercase mb-8">Viikon Haravointi</h2>
-
-        <div class="grid md:grid-cols-2 gap-6">
-
-            <!-- CV OPTIMOINTI -->
-            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between">
-                <div>
-                    <h3 class="text-xl font-bold mb-2">1. Optimoi CV</h3>
-                    <p class="text-gray-400 text-sm mb-6">Tekoäly analysoi CV:si, antaa kuntotarkastuksen ja kirjoittaa parannellun version Google Docsiin.</p>
-
-                    <div class="upload-area mb-4" id="uploadArea">
-                        <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" onchange="handleFileChange(this)">
-                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" class="mx-auto mb-2">
-                            <rect x="4" y="2" width="20" height="24" rx="3"/>
-                            <path d="M9 2v7h10"/><path d="M14 17v-5M12 14l2-2 2 2"/>
-                        </svg>
-                        <p class="text-sm text-gray-400">Vedä CV tähän tai klikkaa</p>
-                        <p class="text-xs text-gray-600 mt-1">PDF, DOC tai DOCX</p>
-                        <p class="text-sm font-bold turkoosi-text mt-2 hidden" id="fileName"></p>
-                    </div>
-
-                    <!-- Lisäkentät — näkyy vasta kun tiedosto valittu -->
-                    <div id="extraFields" class="hidden space-y-3 mb-4">
-                        <div>
-                            <label class="text-xs text-gray-500 uppercase tracking-wider block mb-1">Suurin saavutuksesi / Supervoima</label>
-                            <input type="text" id="achievements" placeholder="Esim. Jääkiekon kilpataso...">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 uppercase tracking-wider block mb-1">Tavoiteltu rooli</label>
-                            <input type="text" id="targetRole" placeholder="Esim. Logistiikka-alan ammattilainen">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 uppercase tracking-wider block mb-1">Hallitsemasi työkalut</label>
-                            <input type="text" id="tools" placeholder="Esim. Excel, Slack, Microsoft Office...">
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="aloitaCVOptimointi(event)" id="cvBtn"
-                    class="btn-primary py-4 px-6 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition mt-4 opacity-50 cursor-not-allowed"
-                    disabled>
-                    LATAA JA OPTIMOI
-                </button>
-            </div>
-
-            <!-- AKTIVOI HAKU -->
-            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between border-purple-500/20">
-                <div>
-                    <h3 class="text-xl font-bold mb-2 text-white">2. Aktivoi Haku</h3>
-                    <p class="text-gray-400 text-sm mb-8">Seuraa n8n-botin tekemiä hakemuksia ja niiden tilaa.</p>
-                </div>
-                <button onclick="aktivoiHaku(event)" class="btn-outline py-4 px-6 rounded-2xl hover:bg-white hover:text-black transition">
-                    KÄYNNISTÄ HAKU
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- TULOSMODAALI -->
-    <div class="modal-overlay hidden" id="resultModal">
-        <div class="modal-box">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold turkoosi-text">CV-kuntotarkastus</h3>
-                <button onclick="suljeModaali()" class="text-gray-500 hover:text-white transition text-2xl leading-none">&times;</button>
-            </div>
-
-            <!-- Vaiheet -->
-            <div id="progressSection" class="space-y-2 mb-6">
-                <div class="step" id="ms1"><div class="step-dot"></div><span>Lähetetään tiedosto...</span></div>
-                <div class="step" id="ms2"><div class="step-dot"></div><span>Tekoäly analysoi CV:n...</span></div>
-                <div class="step" id="ms3"><div class="step-dot"></div><span>Kirjoitetaan paranneltu versio...</span></div>
-                <div class="step" id="ms4"><div class="step-dot"></div><span>Luodaan Google Docs -dokumentti...</span></div>
-            </div>
-
-            <!-- Tulos -->
-            <div id="resultSection" class="hidden">
-                <div class="mb-4">
-                    <div class="flex justify-between items-baseline mb-2">
-                        <span class="text-3xl font-bold turkoosi-text" id="scoreNum">–/100</span>
-                        <span class="text-sm text-gray-500" id="scoreLabel"></span>
-                    </div>
-                    <div class="score-track">
-                        <div class="score-fill" id="scoreFill" style="width:0%"></div>
-                    </div>
-                </div>
-
-                <div class="report-box mb-4" id="reportBox"></div>
-
-                <a href="#" id="docsLink" target="_blank"
-                    class="hidden items-center gap-3 p-3 rounded-xl border border-[#00BFA6]/30 hover:bg-[#00BFA6]/10 transition text-sm font-bold turkoosi-text mb-4">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                        <rect x="3" y="2" width="12" height="14" rx="2" stroke="#00BFA6" stroke-width="1.5"/>
-                        <path d="M6 6h6M6 9h6M6 12h4" stroke="#00BFA6" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                    Avaa paranneltu CV Google Docsissa →
-                </a>
-
-                <button onclick="suljeModaali()" class="w-full py-3 rounded-xl border border-white/10 text-sm text-gray-400 hover:border-white/30 hover:text-white transition">
-                    Sulje
-                </button>
-            </div>
-        </div>
-    </div>
+<body class="px-6 pt-20">
 
     <script>
-        // ── SUPABASE ──────────────────────────────────────────────
+        // --- SUPABASE ALUSTUS ---
         const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ── N8N WEBHOOKIT ─────────────────────────────────────────
-        const CV_BOTTI_URL      = 'https://n8nscalera.eu/webhook/uusi-hakemus';
-        const VIIKKO_HARAVA_URL = 'https://n8nscalera.eu/webhook/dbf6d297-1d27-4d24-839d-bb98ebc87cc4';
-
-        // ── KIRJAUTUMISTARKISTUS ──────────────────────────────────
-        async function checkUser() {
-            const { data: { user }, error } = await supabaseClient.auth.getUser();
-            if (error || !user) {
-                window.location.href = 'index.html';
-            } else {
-                document.getElementById('user-email').innerText = user.email;
+        // Lehdet animaatio
+        document.addEventListener('DOMContentLoaded', () => {
+            const colors = ['#00BFA6', '#FF6F3C', '#2D2D2D'];
+            for (let i = 0; i < 15; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.style.left = Math.random() * 100 + 'vw';
+                leaf.style.animationDuration = (Math.random() * 5 + 7) + 's';
+                leaf.style.animationDelay = (Math.random() * 5) + 's';
+                leaf.style.width = '15px';
+                leaf.style.height = '15px';
+                leaf.style.background = colors[Math.floor(Math.random() * colors.length)];
+                leaf.style.borderRadius = '2px 10px';
+                document.body.appendChild(leaf);
             }
-        }
+        });
+    </script>
 
-        // ── TIEDOSTON VALINTA ─────────────────────────────────────
-        function handleFileChange(input) {
-            const area       = document.getElementById('uploadArea');
-            const nameEl     = document.getElementById('fileName');
-            const extraFields = document.getElementById('extraFields');
-            const btn        = document.getElementById('cvBtn');
+    <nav class="fixed top-0 left-0 right-0 z-50 glass px-4 md:px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="font-bold text-lg md:text-xl tracking-tighter cursor-pointer flex items-center gap-2" onclick="window.scrollTo(0,0)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/></svg>
+                <div><span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span></div>
+            </div>
+            <div class="hidden lg:flex gap-8 text-sm font-medium text-gray-400">
+                <a href="#hero" class="hover:text-white transition" data-i18n="nav-home">Etusivu</a>
+                <a href="#features" class="hover:text-white transition" data-i18n="nav-services">Palvelut</a>
+                <a href="#value-proposition" class="hover:text-white transition" data-i18n="nav-value">Miksi me?</a>
+                <a href="#testimonials" class="hover:text-white transition" data-i18n="nav-testimonials">Kokemuksia</a>
+                <a href="#pricing" class="hover:text-white transition" data-i18n="nav-pricing">Hinnasto</a>
+                <a href="#faq" class="hover:text-white transition" data-i18n="nav-faq">FAQ</a>
+            </div>
+            <div class="flex items-center gap-3 md:gap-4">
+                <div class="flex gap-2 border-r border-white/10 pr-3 md:pr-4">
+                    <button id="lang-fi" class="lang-btn active" onclick="changeLang('fi')">
+                        <span>🇫🇮</span> FI
+                    </button>
+                    <button id="lang-en" class="lang-btn" onclick="changeLang('en')">
+                        <span>🇬🇧</span> EN
+                    </button>
+                </div>
+                <button onclick="const s = document.getElementById('auth-section'); s.classList.remove('hidden'); s.scrollIntoView({behavior:'smooth'})" 
+                        class="text-[10px] md:text-xs font-bold py-2 px-3 md:px-4 rounded-lg border border-[#00BFA6] turkoosi-text hover:bg-[#00BFA6] hover:text-black transition" data-i18n="nav-login">
+                    KIRJAUDU
+                </button>
+            </div>
+        </div>
+    </nav>
 
-            if (input.files && input.files[0]) {
-                area.classList.add('has-file');
-                nameEl.textContent = input.files[0].name;
-                nameEl.classList.remove('hidden');
-                extraFields.classList.remove('hidden');
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
+<main>
+    <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center py-12 md:py-20">
+        <div class="logo-container mb-8">
+            <div class="particle bg-[#00BFA6]" style="left: -20px; animation-delay: 0s;"></div>
+            <div class="particle bg-[#FF6F3C]" style="left: 40px; animation-delay: 0.5s;"></div>
+            <div class="particle bg-white" style="left: 10px; animation-delay: 1.2s;"></div>
+            
+            <div class="logo-3d">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_20px_rgba(0,191,166,0.6)]">
+                    <path d="M6 12V21M13 12V21M20 12V21M6 12H20M13 5V12" stroke="#005A4E" stroke-width="2" transform="translate(2, 2)"/>
+                    <path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11" stroke="#00BFA6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5 11H19" stroke="white" stroke-width="0.5" opacity="0.5"/>
+                </svg>
+            </div>
+        </div>
+        <div class="max-w-4xl glass p-6 md:p-12 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl reveal">
+            <div class="text-2xl md:text-3xl font-bold tracking-tighter mb-6 md:mb-8">
+                <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
+            </div>
+            <h1 class="text-3xl md:text-6xl font-bold mb-6 leading-tight" data-i18n="hero-title">Säästä 20 tuntia viikossa ja pääse useammin haastatteluihin</h1>
+            <p class="text-gray-400 mb-8 text-base md:text-lg max-w-2xl mx-auto" data-i18n="hero-desc">
+                Lopeta hakuammunta. Duuniharava löytää ja hakee unelmiesi työpaikat puolestasi samalla kun optimoimme profiilisi huomattavaksi.
+            </p>
 
-        // ── APUFUNKTIOT ───────────────────────────────────────────
-        function setStep(n, state) {
-            document.getElementById('ms' + n).className = 'step ' + state;
-        }
-        function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <button onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" class="gradient-bg text-black font-black py-5 px-10 rounded-2xl hover:scale-[1.05] active:scale-95 transition shadow-[0_0_20px_rgba(0,191,166,0.3)] text-sm md:text-lg" data-i18n="hero-cta">VALITSE PAKETTI</button>
+                <button onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" class="glass py-5 px-10 rounded-2xl hover:border-[#00BFA6] transition text-white text-sm md:text-lg" data-i18n="btn-more">KATSO MITEN SE TOIMII</button>
+            </div>
 
-        // ── CV OPTIMOINTI ─────────────────────────────────────────
-        async function aloitaCVOptimointi(event) {
-            const fileInput = document.getElementById('cv-upload');
-            if (!fileInput.files[0]) return;
+            <div class="glass p-4 md:p-6 rounded-2xl mt-6 hover:border-white/20 transition">
+                <h4 class="text-lg md:text-xl font-bold mb-4 text-center turkoosi-text" data-i18n="chart-title">Työttömyyden trendi ja ennuste</h4>
+                <div class="chart-container">
+                    <canvas id="unemploymentChart"></canvas>
+                </div>
+                <p class="text-gray-500 text-[10px] md:text-xs mt-4 text-center" data-i18n="chart-legend">
+                    Vihreä: Historia | Oranssi: Ennuste (2026–2032)
+                </p>
+            </div>
+        </div>
+    </section>
 
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            const btn = event.currentTarget;
-            btn.disabled = true;
-            btn.innerText = 'ANALYSOIDAAN...';
+    <section id="features" class="py-16 md:py-24 max-w-6xl mx-auto reveal">
+        <h2 class="text-2xl md:text-3xl font-bold text-center mb-12 md:mb-16" data-i18n="features-title">Kenelle ja mitä tarjoamme</h2>
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="space-y-6">
+                <h3 class="text-xl md:text-2xl font-bold text-white text-center border-b border-white/10 pb-4" data-i18n="target-title">Kenelle se sopii?</h3>
+                <div class="glass p-5 rounded-2xl hover-lift">
+                    <h4 class="font-bold turkoosi-text mb-2" data-i18n="target-1-name">🌍 Maahanmuuttajat</h4>
+                    <p class="text-sm text-gray-400" data-i18n="target-1-desc">Suomen työmarkkinat haltuun ilman kielimuuria.</p>
+                </div>
+                <div class="glass p-5 rounded-2xl hover-lift">
+                    <h4 class="font-bold oranssi-text mb-2" data-i18n="target-2-name">🎓 Opiskelijat</h4>
+                    <p class="text-sm text-gray-400" data-i18n="target-2-desc">Ensimmäinen oman alan työpaikka helpommin.</p>
+                </div>
+                <div class="glass p-5 rounded-2xl hover-lift border-l-4 border-[#00BFA6]">
+                    <h4 class="font-bold text-white mb-2" data-i18n="target-3-name">💼 Aktiiviset hakijat</h4>
+                    <p class="text-sm text-gray-400" data-i18n="target-3-desc">Automatisoi rutiinit ja keskity haastatteluihin.</p>
+                </div>
+            </div>
 
-            // Avaa modaali, nollaa tila
-            document.getElementById('resultModal').classList.remove('hidden');
-            document.getElementById('progressSection').classList.remove('hidden');
-            document.getElementById('resultSection').classList.add('hidden');
-            document.getElementById('docsLink').classList.add('hidden');
-            document.getElementById('docsLink').classList.remove('flex');
-            [1,2,3,4].forEach(n => setStep(n, ''));
-            setStep(1, 'active');
+            <div class="space-y-6">
+                <h3 class="text-xl md:text-2xl font-bold turkoosi-text text-center border-b border-[#00BFA6]/20 pb-4" data-i18n="opt-title">Tuotteemme</h3>
+                <div class="glass p-5 rounded-2xl hover-lift flex items-start gap-4">
+                    <span class="text-2xl">📄</span>
+                    <div>
+                        <h4 class="font-bold text-sm md:text-base" data-i18n="opt-1-name">CV-analyysi</h4>
+                        <p class="text-gray-400 text-xs md:text-sm" data-i18n="opt-1-desc">Konkreettista palautetta parantamiseksi.</p>
+                    </div>
+                </div>
+                <div class="glass p-5 rounded-2xl hover-lift flex items-start gap-4">
+                    <span class="text-2xl">🚀</span>
+                    <div>
+                        <h4 class="font-bold text-sm md:text-base" data-i18n="opt-3-name">Automaattihaku</h4>
+                        <p class="text-gray-400 text-xs md:text-sm" data-i18n="opt-3-desc">Lähetämme hakemukset puolestasi.</p>
+                    </div>
+                </div>
+                <div class="glass p-5 rounded-2xl hover-lift flex items-start gap-4">
+                    <span class="text-2xl">🎯</span>
+                    <div>
+                        <h4 class="font-bold text-sm md:text-base" data-i18n="opt-4-name">Optimointi</h4>
+                        <p class="text-gray-400 text-xs md:text-sm" data-i18n="opt-4-desc">Ohita ATS-suodattimet.</p>
+                    </div>
+                </div>
+            </div>
 
-            // Rakenna FormData — ILMAN mode:'no-cors' jotta saadaan JSON takaisin
-            const formData = new FormData();
-            formData.append('cv',           fileInput.files[0]);
-            formData.append('email',        user.email);
-            formData.append('userId',       user.id);
-            formData.append('achievements', document.getElementById('achievements').value.trim());
-            formData.append('targetRole',   document.getElementById('targetRole').value.trim());
-            formData.append('tools',        document.getElementById('tools').value.trim());
+            <div class="space-y-6">
+                <h3 class="text-xl md:text-2xl font-bold oranssi-text text-center border-b border-[#FF6F3C]/20 pb-4" data-i18n="net-title">Verkostoituminen</h3>
+                <div class="glass p-5 rounded-2xl hover-lift flex items-start gap-4">
+                    <span class="text-2xl">🔗</span>
+                    <div>
+                        <h4 class="font-bold text-sm md:text-base" data-i18n="net-1-name">LinkedIn-hionta</h4>
+                        <p class="text-gray-400 text-xs md:text-sm" data-i18n="net-1-desc">Tee profiilista rekrymagneetti.</p>
+                    </div>
+                </div>
+                <div class="glass p-5 rounded-2xl hover-lift flex items-start gap-4">
+                    <span class="text-2xl">💬</span>
+                    <div>
+                        <h4 class="font-bold text-sm md:text-base" data-i18n="net-2-name">Urapalaute</h4>
+                        <p class="text-gray-400 text-xs md:text-sm" data-i18n="net-2-desc">Analysoimme pullonkaulat.</p>
+                    </div>
+                </div>
+                <div class="glass p-5 rounded-2xl hover-lift flex items-start gap-4">
+                    <span class="text-2xl">💰</span>
+                    <div>
+                        <h4 class="font-bold text-sm md:text-base" data-i18n="net-3-name">Palkka-apu</h4>
+                        <p class="text-gray-400 text-xs md:text-sm" data-i18n="net-3-desc">Data-pohjainen tuki neuvotteluun.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            try {
-                const response = await fetch(CV_BOTTI_URL, { method: 'POST', body: formData });
+    <section id="value-proposition" class="py-16 md:py-24 max-w-6xl mx-auto reveal">
+        <div class="glass p-8 md:p-16 rounded-[3rem] border-t-2 border-[#00BFA6] hover:shadow-[0_0_50px_rgba(0,191,166,0.1)] transition">
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-12" data-i18n="value-title">Enemmän kuin pelkkää tekoälyä</h2>
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition">🇫🇮</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="value-1-h">Suomalainen konteksti</h3>
+                    <p class="text-gray-400 text-sm md:text-base">Ymmärrämme kotimaan työmarkkinat ja rekrytointikulttuurin.</p>
+                </div>
+                <div class="text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition">⚙️</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="value-2-h">Tekninen ylivertaisuus</h3>
+                    <p class="text-gray-400 text-sm md:text-base">Datan turvallisuus ja prosessien tehokkuus 24/7.</p>
+                </div>
+                <div class="text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition">💎</div>
+                    <h3 class="text-xl font-bold mb-3" data-i18n="value-3-h">Laatu edellä</h3>
+                    <p class="text-gray-400 text-sm md:text-base">Ei "bottitekstiä", vaan aito ja ammattimainen ote.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                setStep(1, 'done'); setStep(2, 'active');
-                await delay(700);
-                setStep(2, 'done'); setStep(3, 'active');
-                await delay(500);
-                setStep(3, 'done'); setStep(4, 'active');
+    <section id="testimonials" class="py-16 md:py-24 max-w-6xl mx-auto reveal">
+        <h2 class="text-2xl md:text-3xl font-bold text-center mb-12" data-i18n="nav-testimonials">Kokemuksia</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass p-8 rounded-2xl italic text-gray-300 hover-lift">
+                <p class="mb-4">"Sain viisi haastattelukutsua viikossa CV-optimoinnin jälkeen. Uskomaton työkalu!"</p>
+                <span class="text-sm font-bold turkoosi-text">— Mikko S., Ohjelmistokehittäjä</span>
+            </div>
+            <div class="glass p-8 rounded-2xl italic text-gray-300 border-t-2 border-[#FF6F3C] hover-lift">
+                <p class="mb-4">"Automaattinen haku säästi minulta kymmeniä tunteja aikaa. Suosittelen kaikille!"</p>
+                <span class="text-sm font-bold oranssi-text">— Elena V., Markkinointi</span>
+            </div>
+            <div class="glass p-8 rounded-2xl italic text-gray-300 hover-lift">
+                <p class="mb-4">"LinkedIn-profiilini hionta toi heti rekrytoijia viestittelemään minulle suoraan."</p>
+                <span class="text-sm font-bold turkoosi-text">— Joonas K., Myyntipäällikkö</span>
+            </div>
+        </div>
+    </section>
 
-                if (!response.ok) throw new Error('Palvelin vastasi virheellä ' + response.status);
-                const data = await response.json();
+    <section id="pricing" class="py-16 md:py-24 max-w-6xl mx-auto text-center reveal">
+        <h2 class="text-2xl md:text-3xl font-bold mb-12 md:mb-16" data-i18n="nav-pricing">Hinnasto</h2>
+        <div class="grid md:grid-cols-3 gap-6 md:gap-8 px-4">
+            <div class="glass p-8 rounded-3xl hover-lift border border-white/5">
+                <h3 class="text-lg font-bold mb-4 text-gray-300">Starter</h3>
+                <p class="text-3xl font-black mb-6">12,49€<span class="text-sm font-normal text-gray-500">/kk</span></p>
+                <ul class="text-gray-400 space-y-2 mb-8 text-left text-xs md:text-sm">
+                    <li>✔ CV-analyysi</li>
+                    <li>✔ 50 automaattihakua / kk</li>
+                </ul>
+                <button onclick="document.getElementById('auth-section').classList.remove('hidden'); document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="w-full glass py-3 rounded-xl hover:border-[#00BFA6] transition text-sm font-bold" data-i18n="btn-select">Valitse</button>
+            </div>
+            <div class="glass p-8 rounded-3xl border-2 border-[#00BFA6] scale-100 md:scale-105 shadow-[0_0_30px_rgba(0,191,166,0.1)] relative">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00BFA6] text-black text-[10px] font-bold px-4 py-1 rounded-full" data-i18n="popular">SUOSITUIN</div>
+                <h3 class="text-lg font-bold mb-4 turkoosi-text">Pro</h3>
+                <p class="text-3xl font-black mb-6">29,99€<span class="text-sm font-normal text-gray-500">/kk</span></p>
+                <ul class="text-gray-400 space-y-2 mb-8 text-left text-xs md:text-sm">
+                    <li>✔ Rajattomat hakemukset</li>
+                    <li>✔ LinkedIn-työkalut</li>
+                    <li>✔ Henkilökohtainen palaute</li>
+                </ul>
+                <button onclick="document.getElementById('auth-section').classList.remove('hidden'); document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="w-full gradient-bg py-3 rounded-xl font-bold hover:scale-[1.03] active:scale-95 transition text-white text-sm" data-i18n="btn-select">Valitse</button>
+            </div>
+            <div class="glass p-8 rounded-3xl hover-lift border border-white/5">
+                <h3 class="text-lg font-bold mb-4 text-gray-300">Ura-tuki</h3>
+                <p class="text-3xl font-black mb-6">99€<span class="text-sm font-normal text-gray-500">/kk</span></p>
+                <ul class="text-gray-400 space-y-2 mb-8 text-left text-xs md:text-sm">
+                    <li>✔ Kaikki Pro-ominaisuudet</li>
+                    <li>✔ Syvällinen urasparraus</li>
+                    <li>✔ Portfolion tarkistus</li>
+                </ul>
+                <button onclick="document.getElementById('auth-section').classList.remove('hidden'); document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})" class="w-full glass py-3 rounded-xl hover:border-[#00BFA6] transition text-sm font-bold" data-i18n="btn-select">Valitse</button>
+            </div>
+        </div>
+    </section>
 
-                setStep(4, 'done');
-                await delay(400);
-                naytaTulos(data);
+    <section id="faq" class="py-16 md:py-24 max-w-4xl mx-auto reveal">
+        <h2 class="text-2xl md:text-3xl font-bold mb-12 text-center" data-i18n="nav-faq">FAQ</h2>
+        <div class="space-y-4 px-4">
+            <details class="glass p-5 rounded-xl cursor-pointer group hover:border-[#00BFA6]/30">
+                <summary class="font-bold turkoosi-text list-none flex justify-between items-center text-sm md:text-base">
+                    <span>Saanko palautetta CV:stä?</span>
+                    <span class="group-open:rotate-180 transition-transform text-xs">▼</span>
+                </summary>
+                <p class="text-gray-400 mt-4 text-xs md:text-sm">Kyllä. Palvelu analysoi CV:si ja antaa konkreettisia parannusehdotuksia.</p>
+            </details>
+        </div>
+    </section>
 
-            } catch (err) {
-                [1,2,3,4].forEach(n => setStep(n, 'error'));
-                console.error('CV-virhe:', err);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'LATAA JA OPTIMOI';
-            }
-        }
+    <section id="auth-section" class="py-16 md:py-24 flex justify-center px-4 reveal hidden">
+        <div class="max-w-md w-full glass p-8 md:p-10 rounded-[2rem] border-t-2 border-[#00BFA6] shadow-2xl">
+            <h2 class="text-xl md:text-2xl font-bold mb-6 text-center" data-i18n="login-title">Kirjaudu sisään</h2>
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold mb-2 uppercase tracking-widest text-gray-500" data-i18n="login-email">Sähköposti</label>
+                    <input type="email" id="email" required placeholder="matti@esimerkki.fi" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold mb-2 uppercase tracking-widest text-gray-500" data-i18n="login-pass">Salasana</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full glass p-4 rounded-xl focus:outline-none focus:border-[#00BFA6] transition text-white text-sm">
+                </div>
+                <button type="submit" id="auth-btn" class="w-full gradient-bg text-white font-black py-4 rounded-xl hover:scale-[1.02] active:scale-95 transition shadow-lg text-sm" data-i18n="login-btn">KIRJAUDU SISÄÄN ➔</button>
+                <p class="text-center text-[10px] text-gray-500 mt-4">Jos sinulla ei ole vielä tiliä, se luodaan automaattisesti ensikirjautumisen yhteydessä.</p>
+            </form>
+        </div>
+    </section>
 
-        // ── TULOSTEN NÄYTTÖ ───────────────────────────────────────
-        function naytaTulos(data) {
-            document.getElementById('progressSection').classList.add('hidden');
-            document.getElementById('resultSection').classList.remove('hidden');
+    <footer class="py-12 text-center text-gray-600 border-t border-white/5 text-xs md:text-sm">© 2026 Duuniharava. Kaikki oikeudet pidätetään.</footer>
+</main>
 
-            const report     = data.ai_report || '';
-            const scoreMatch = report.match(/KUNTOTARKASTUS:\s*(\d+)\/100/);
-            const score      = scoreMatch ? parseInt(scoreMatch[1]) : null;
+<script>
+// --- SUPABASE KIRJAUTUMINEN ---
+document.getElementById('auth-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('auth-btn');
 
-            if (score !== null) {
-                document.getElementById('scoreNum').textContent  = score + '/100';
-                document.getElementById('scoreLabel').textContent =
-                    score >= 85 ? 'Erinomainen' :
-                    score >= 70 ? 'Hyvä' :
-                    score >= 50 ? 'Kohtalainen' : 'Kehitettävää';
-                setTimeout(() => {
-                    document.getElementById('scoreFill').style.width = score + '%';
-                }, 100);
-            }
+    btn.disabled = true;
+    const originalText = btn.innerText;
+    btn.innerText = "KÄSITELLÄÄN...";
 
-            document.getElementById('reportBox').textContent = report;
-
-            if (data.downloadUrl) {
-                const link = document.getElementById('docsLink');
-                link.href = data.downloadUrl;
-                link.classList.remove('hidden');
-                link.classList.add('flex');
-            }
-        }
-
-        // ── MODAALI ───────────────────────────────────────────────
-        function suljeModaali() {
-            document.getElementById('resultModal').classList.add('hidden');
-        }
-        document.getElementById('resultModal').addEventListener('click', function(e) {
-            if (e.target === this) suljeModaali();
+    try {
+        const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password,
         });
 
-        // ── AKTIVOI HAKU (Viikko-Harava) ─────────────────────────
-        async function aktivoiHaku(event) {
-            const btn = event.currentTarget;
-            const originalText = btn.innerText;
-            const { data: { user } } = await supabaseClient.auth.getUser();
+        if (signInError && (signInError.message.includes("Invalid login credentials") || signInError.status === 400)) {
+            const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+            });
 
-            btn.innerText  = 'KÄYNNISTETÄÄN...';
-            btn.disabled   = true;
+            if (signUpError) throw signUpError;
 
-            try {
-                await fetch(VIIKKO_HARAVA_URL, {
-                    method:  'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    mode:    'no-cors',
-                    body:    JSON.stringify({
-                        email:  user.email,
-                        userId: user.id,
-                        action: 'activate_search_bot'
-                    })
-                });
-                alert('Viikko-Harava on nyt aktivoitu!');
-            } catch (err) {
-                alert('Virhe haun käynnistyksessä.');
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled  = false;
+            if (signUpData.user) {
+                await supabaseClient.from('profiles').insert([
+                    { id: signUpData.user.id, email: email, customer_group: 'paid_customer' }
+                ]);
+            }
+            
+            alert("Tili luotu onnistuneesti!");
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
+        if (signInError) throw signInError;
+
+        if (signInData.user) {
+            window.location.href = 'dashboard.html';
+        }
+
+    } catch (err) {
+        alert("Virhe: " + err.message);
+        btn.disabled = false;
+        btn.innerText = originalText;
+    }
+});
+
+// --- TRANSLATIONS ---
+const translations = {
+    fi: {
+        "nav-home": "Etusivu", "nav-services": "Palvelut", "nav-value": "Miksi me?", "nav-pricing": "Hinnasto", "nav-faq": "FAQ", "nav-login": "KIRJAUDU", "nav-testimonials": "Kokemuksia",
+        "hero-title": "Säästä 20 tuntia viikossa ja pääse useammin haastatteluihin", 
+        "hero-desc": "Lopeta hakuammunta. Duuniharava löytää ja hakee unelmiesi työpaikat puolestasi samalla kun optimoimme profiilisi huomattavaksi.",
+        "hero-cta": "VALITSE PAKETTI", "btn-more": "KATSO MITEN SE TOIMII",
+        "chart-title": "Työttömyyden trendi ja ennuste", "chart-legend": "Vihreä: Historia | Oranssi: Ennuste (2026–2032)",
+        "features-title": "Kenelle ja mitä tarjoamme", "target-title": "Kenelle se sopii?",
+        "opt-title": "Tuotteemme", "net-title": "Verkostoituminen",
+        "value-title": "Enemmän kuin tekoälyä", "login-title": "Kirjaudu sisään", "login-btn": "KIRJAUDU SISÄÄN ➔"
+    },
+    en: {
+        "nav-home": "Home", "nav-services": "Services", "nav-value": "Why us?", "nav-pricing": "Pricing", "nav-faq": "FAQ", "nav-login": "LOGIN", "nav-testimonials": "Stories",
+        "hero-title": "Save 20 hours a week and get more interviews", 
+        "hero-desc": "Stop the manual hunt. Duuniharava finds and applies for jobs while we optimize your profile.",
+        "hero-cta": "CHOOSE PLAN", "btn-more": "HOW IT WORKS",
+        "chart-title": "Unemployment Trend & Forecast", "chart-legend": "Green: History | Orange: Forecast (2026-2032)",
+        "features-title": "Who We Help", "target-title": "For Whom?",
+        "opt-title": "Products", "net-title": "Career Support",
+        "value-title": "Beyond Just AI", "login-title": "Login", "login-btn": "LOGIN NOW ➔"
+    }
+};
+
+function changeLang(lang) {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) el.innerText = translations[lang][key];
+    });
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+}
+
+// --- CHART.JS KORJAUS ---
+function initChart() {
+    const canvas = document.getElementById('unemploymentChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['2020', '2022', '2024', '2026', '2028', '2030', '2032'],
+            datasets: [{
+                label: 'Työttömyysaste (%)',
+                data: [6.8, 7.2, 7.9, 8.5, 7.4, 6.2, 5.5],
+                borderColor: '#00BFA6',
+                borderWidth: 4,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } },
+                x: { grid: { display: false }, ticks: { color: '#666' } }
             }
         }
+    });
+}
 
-        // ── ULOSKIRJAUTUMINEN ─────────────────────────────────────
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            window.location.href = 'index.html';
-        }
-
-        checkUser();
-    </script>
+// Suoritetaan heti kun DOM on valmis
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChart);
+} else {
+    initChart();
+}
+</script>
 </body>
 </html>
