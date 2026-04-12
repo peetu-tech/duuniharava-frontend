@@ -8,108 +8,193 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background-color: #0B0B0B; color: #FFFFFF; }
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
-        .glass:hover { border-color: rgba(0,191,166,0.4); }
-        .turkoosi-text { color: #00BFA6; }
-        .oranssi-text { color: #FF6F3C; }
-        .btn-primary { background: #00BFA6; color: #000; font-weight: bold; }
-        .btn-outline { border: 1px solid #FFFFFF; color: #FFFFFF; }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .upload-area { border: 2px dashed rgba(255,255,255,0.15); border-radius: 1rem; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s ease; position: relative; }
-        .upload-area:hover { border-color: #00BFA6; background: rgba(0,191,166,0.04); }
-        .upload-area.has-file { border-color: #00BFA6; border-style: solid; background: rgba(0,191,166,0.06); }
-        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-
-        .step { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.03); font-size: 13px; color: rgba(255,255,255,0.4); transition: all 0.3s; }
-        .step.active { background: rgba(0,191,166,0.1); color: #00BFA6; }
-        .step.done { background: rgba(0,191,166,0.08); color: #00BFA6; }
-        .step.error { background: rgba(255,111,60,0.1); color: #FF6F3C; }
-        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; transition: background 0.3s; }
-        .step.active .step-dot { background: #00BFA6; animation: pulse 1s infinite; }
-        .step.done .step-dot { background: #00BFA6; }
-        .step.error .step-dot { background: #FF6F3C; }
-        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
-
-        .score-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-        .score-fill { height: 100%; background: #00BFA6; border-radius: 3px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
-        .report-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.7; white-space: pre-wrap; max-height: 280px; overflow-y: auto; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-        .modal-box { background: #111; border: 1px solid rgba(0,191,166,0.3); border-radius: 2rem; padding: 2rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
-
-        .field-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 6px; }
-        .field-label span { color: #FF6F3C; margin-left: 2px; }
-
-        input[type="text"], select {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 10px 14px;
-            color: #fff;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 14px;
-            width: 100%;
-            outline: none;
-            transition: border-color 0.2s;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --teal: #00BFA6;
+            --orange: #FF6F3C;
+            --bg: #090909;
+            --surface: #111111;
+            --surface2: #181818;
+            --border: rgba(255,255,255,0.08);
+            --border-hover: rgba(0,191,166,0.35);
+            --text: #FFFFFF;
+            --muted: rgba(255,255,255,0.45);
         }
-        input[type="text"]:focus, select:focus { border-color: #00BFA6; }
-        input::placeholder { color: rgba(255,255,255,0.25); }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        ::selection { background: var(--teal); color: #000; }
+
+        nav { position: sticky; top: 0; z-index: 50; background: rgba(9,9,9,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-icon { width: 32px; height: 32px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+        .logo-text span:first-child { color: var(--teal); }
+        .logo-text span:last-child { color: var(--orange); }
+        .logout-btn { font-size: 12px; font-weight: 700; color: rgba(255,80,80,0.8); border: 1px solid rgba(255,80,80,0.25); padding: 6px 14px; border-radius: 8px; background: none; cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; }
+        .logout-btn:hover { background: rgba(255,80,80,0.1); color: #ff5050; border-color: rgba(255,80,80,0.5); }
+
+        .hero { padding: 2.5rem 1.5rem 0; max-width: 800px; margin: 0 auto; }
+        .hero-greeting { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 0.4rem; }
+        .hero-greeting span { color: var(--teal); }
+        .hero-sub { font-size: 14px; color: var(--muted); }
+        .user-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 4px 12px 4px 6px; margin-top: 0.75rem; }
+        .user-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); animation: blink 2s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+        .user-chip span { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+        .analysis-banner { max-width: 800px; margin: 1.5rem auto 0; padding: 0 1.5rem; }
+        .analysis-card { background: linear-gradient(135deg, rgba(0,191,166,0.08) 0%, rgba(0,191,166,0.03) 100%); border: 1px solid rgba(0,191,166,0.25); border-radius: 20px; padding: 1.5rem; }
+        .analysis-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.75rem; }
+        .score-big { font-size: 3rem; font-weight: 700; letter-spacing: -0.04em; color: var(--teal); line-height: 1; margin-bottom: 0.75rem; }
+        .score-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
+        .score-fill { height: 100%; background: var(--teal); border-radius: 4px; transition: width 1.4s cubic-bezier(0.34,1.56,0.64,1); }
+        .report-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.8; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+
+        .main { max-width: 800px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+        .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem; padding: 0 0.25rem; }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; transition: border-color 0.25s; }
+        .card:hover { border-color: rgba(255,255,255,0.14); }
+        .card-header { padding: 1.5rem 1.5rem 0; }
+        .card-body { padding: 1rem 1.5rem 1.5rem; }
+        .card-num { width: 28px; height: 28px; background: var(--teal); color: #000; border-radius: 8px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+        .card-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.35rem; }
+        .card-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+        .upload-area { border: 2px dashed rgba(255,255,255,0.12); border-radius: 14px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; margin: 1rem 0; }
+        .upload-area:hover { border-color: var(--teal); background: rgba(0,191,166,0.04); }
+        .upload-area.has-file { border-color: var(--teal); border-style: solid; background: rgba(0,191,166,0.06); }
+        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-icon { width: 40px; height: 40px; background: rgba(0,191,166,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; }
+        .upload-title { font-size: 14px; font-weight: 600; margin-bottom: 0.25rem; }
+        .upload-sub { font-size: 12px; color: var(--muted); }
+        .upload-filename { font-size: 13px; font-weight: 700; color: var(--teal); margin-top: 0.5rem; }
+
+        .fields-wrapper { display: flex; flex-direction: column; gap: 0.75rem; }
+        .field-section { margin-bottom: 0.25rem; }
+        .field-section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.6rem; }
+        .field-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; display: block; }
+        .field-label .req { color: var(--orange); }
+        input[type="text"], select { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 14px; width: 100%; outline: none; transition: border-color 0.2s; }
+        input[type="text"]:focus, select:focus { border-color: var(--teal); }
+        input::placeholder { color: rgba(255,255,255,0.2); }
         select option { background: #1a1a1a; color: #fff; }
+        .divider { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
 
-        .checkbox-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; }
-        .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #00BFA6; cursor: pointer; flex-shrink: 0; }
-        .checkbox-row label { font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; }
+        .checks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+        .check-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: 10px; border: 1px solid transparent; cursor: pointer; transition: border-color 0.2s; }
+        .check-row:hover { border-color: rgba(0,191,166,0.2); }
+        .check-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
+        .check-row label { font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; line-height: 1.3; }
 
-        .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1rem 0; }
-        .section-title { font-size: 11px; font-weight: 700; color: #00BFA6; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+        .btn-primary { width: 100%; padding: 14px; border-radius: 12px; background: var(--teal); color: #000; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; border: none; cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-outline { width: 100%; padding: 14px; border-radius: 12px; background: transparent; color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; border: 1px solid rgba(255,255,255,0.18); cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s; }
+        .btn-outline:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.35); }
+
+        .search-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,111,60,0.1); border: 1px solid rgba(255,111,60,0.2); border-radius: 100px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: var(--orange); letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+        .search-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: #111; border: 1px solid rgba(0,191,166,0.25); border-radius: 24px; padding: 1.75rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 16px; font-weight: 700; color: var(--teal); }
+        .modal-close { background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; line-height: 1; padding: 0; transition: color 0.2s; }
+        .modal-close:hover { color: #fff; }
+
+        .step { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.03); font-size: 13px; color: var(--muted); transition: all 0.3s; margin-bottom: 6px; }
+        .step.active { background: rgba(0,191,166,0.1); color: var(--teal); }
+        .step.done { background: rgba(0,191,166,0.07); color: var(--teal); }
+        .step.error { background: rgba(255,111,60,0.1); color: var(--orange); }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12); flex-shrink: 0; transition: background 0.3s; }
+        .step.active .step-dot { background: var(--teal); animation: blink 1s infinite; }
+        .step.done .step-dot { background: var(--teal); }
+        .step.error .step-dot { background: var(--orange); }
+
+        .result-score { font-size: 2.5rem; font-weight: 700; color: var(--teal); letter-spacing: -0.03em; }
+        .docs-link { display: none; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(0,191,166,0.25); color: var(--teal); text-decoration: none; font-size: 13px; font-weight: 700; transition: background 0.2s; margin-bottom: 0.75rem; }
+        .docs-link:hover { background: rgba(0,191,166,0.08); }
+        .btn-close { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: none; color: var(--muted); font-family: 'Space Grotesk', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .btn-close:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+
+        @media (max-width: 600px) {
+            .checks-grid { grid-template-columns: 1fr; }
+            .hero-greeting { font-size: 1.6rem; }
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body>
 
-    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-16">
-        <div class="text-xl font-bold tracking-tighter flex items-center gap-2">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2.5" stroke-linecap="round"><path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/></svg>
-            <span class="turkoosi-text">DUUNI</span><span class="oranssi-text">HARAVA</span>
-        </div>
-        <button onclick="logout()" class="text-xs font-bold border border-red-500/50 text-red-500 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition">
-            KIRJAUDU ULOS
-        </button>
+    <nav>
+        <a href="/" class="logo">
+            <div class="logo-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span>DUUNI</span><span>HARAVA</span>
+            </div>
+        </a>
+        <button class="logout-btn" onclick="logout()">Kirjaudu ulos</button>
     </nav>
 
-    <main class="max-w-4xl mx-auto">
-        <div class="glass p-8 rounded-[2.5rem] mb-12">
-            <h1 class="text-3xl font-bold mb-2">Tervetuloa takaisin!</h1>
-            <p class="text-gray-500 font-mono text-sm">Käyttäjä: <span id="user-email" class="text-gray-300">ladataan...</span></p>
+    <div class="hero">
+        <p class="hero-greeting">Hei, <span>haravoija</span> 👋</p>
+        <p class="hero-sub">Tee CV:stäsi paras versio ja löydä töitä nopeammin.</p>
+        <div class="user-chip">
+            <div class="user-dot"></div>
+            <span id="user-email">ladataan...</span>
         </div>
+    </div>
 
-        <h2 class="text-xs font-bold tracking-[0.2em] text-gray-500 uppercase mb-8">Viikon Haravointi</h2>
+    <div class="analysis-banner" id="analysis-display" style="display:none;">
+        <div class="analysis-card">
+            <p class="analysis-label">Viimeisin analyysitulos</p>
+            <p class="score-big" id="mainScoreNum">0/100</p>
+            <div class="score-track">
+                <div class="score-fill" id="mainScoreFill" style="width:0%"></div>
+            </div>
+            <div class="report-box" id="mainReportBox">Analyysiä ei vielä saatavilla.</div>
+        </div>
+    </div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between">
-                <div>
-                    <h3 class="text-xl font-bold mb-2">1. Optimoi CV</h3>
-                    <p class="text-gray-400 text-sm mb-6">Tekoäly analysoi CV:si ja kirjoittaa universaalin, ATS-optimoidun version suomalaiseen työnhakuun.</p>
+    <main class="main">
+        <p class="section-label">Viikon haravointi</p>
 
-                    <div class="upload-area mb-5" id="uploadArea">
-                        <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" onchange="handleFileChange(this)">
-                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" class="mx-auto mb-2">
-                            <rect x="4" y="2" width="20" height="24" rx="3"/>
-                            <path d="M9 2v7h10"/><path d="M14 17v-5M12 14l2-2 2 2"/>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-num">1</div>
+                <p class="card-title">Optimoi CV</p>
+                <p class="card-desc">Tekoäly analysoi CV:si ja kirjoittaa ATS-optimoidun version suomalaiseen työnhakuun. Kestää vain hetken!</p>
+            </div>
+            <div class="card-body">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" onchange="handleFileChange(this)">
+                    <div class="upload-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00BFA6" stroke-width="2" stroke-linecap="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="12" y1="18" x2="12" y2="12"/>
+                            <line x1="9" y1="15" x2="15" y2="15"/>
                         </svg>
-                        <p class="text-sm text-gray-400">Vedä CV tähän tai klikkaa</p>
-                        <p class="text-xs text-gray-600 mt-1">PDF, DOC tai DOCX</p>
-                        <p class="text-sm font-bold turkoosi-text mt-2 hidden" id="fileName"></p>
                     </div>
+                    <p class="upload-title">Vedä CV tähän tai klikkaa</p>
+                    <p class="upload-sub">PDF, DOC tai DOCX — max 10 MB</p>
+                    <p class="upload-filename" id="fileName"></p>
+                </div>
 
-                    <div id="extraFields" class="hidden space-y-4">
-                        <div class="section-title">Perustiedot</div>
-                        <div>
-                            <label class="field-label">Mihin töihin haet? <span>*</span></label>
+                <div id="extraFields" style="display:none;" class="fields-wrapper">
+                    <div class="field-section">
+                        <p class="field-section-title">Perustiedot</p>
+                        <div style="margin-bottom:0.6rem;">
+                            <label class="field-label">Mihin töihin haet? <span class="req">*</span></label>
                             <input type="text" id="targetJobs" placeholder="Esim. varastotyö, asiakaspalvelu, IT-tuki...">
                         </div>
-                        <div>
+                        <div style="margin-bottom:0.6rem;">
                             <label class="field-label">Koulutustaso</label>
                             <select id="education">
                                 <option value="">Valitse...</option>
@@ -131,10 +216,12 @@
                                 <option value="Yli 10 vuotta">Yli 10 vuotta</option>
                             </select>
                         </div>
+                    </div>
 
-                        <hr class="section-divider">
-                        <div class="section-title">Kielitaito</div>
-                        <div>
+                    <hr class="divider">
+                    <div class="field-section">
+                        <p class="field-section-title">Kielitaito</p>
+                        <div style="margin-bottom:0.6rem;">
                             <label class="field-label">Suomen kielen taito</label>
                             <select id="finnish">
                                 <option value="">Valitse...</option>
@@ -145,7 +232,7 @@
                                 <option value="Ei lainkaan">Ei lainkaan</option>
                             </select>
                         </div>
-                        <div>
+                        <div style="margin-bottom:0.6rem;">
                             <label class="field-label">Englannin kielen taito</label>
                             <select id="english">
                                 <option value="">Valitse...</option>
@@ -159,107 +246,98 @@
                             <label class="field-label">Muut kielet</label>
                             <input type="text" id="otherLangs" placeholder="Esim. ruotsi (perustaso), venäjä (äidinkieli)...">
                         </div>
+                    </div>
 
-                        <hr class="section-divider">
-                        <div class="section-title">Käytännön tiedot</div>
-                        <div class="checkbox-row">
-                            <input type="checkbox" id="drivingLicense">
-                            <label for="drivingLicense">Minulla on B-ajokortti (henkilöauto)</label>
+                    <hr class="divider">
+                    <div class="field-section">
+                        <p class="field-section-title">Käytännön tiedot</p>
+                        <div class="checks-grid">
+                            <div class="check-row"><input type="checkbox" id="drivingLicense"><label for="drivingLicense">B-ajokortti</label></div>
+                            <div class="check-row"><input type="checkbox" id="ownCar"><label for="ownCar">Oma auto</label></div>
+                            <div class="check-row"><input type="checkbox" id="shiftWork"><label for="shiftWork">Vuorotyö / viikonloput</label></div>
+                            <div class="check-row"><input type="checkbox" id="nightWork"><label for="nightWork">Yötyö</label></div>
                         </div>
-                        <div class="checkbox-row">
-                            <input type="checkbox" id="ownCar">
-                            <label for="ownCar">Minulla on oma auto käytössä</label>
-                        </div>
-                        <div class="checkbox-row">
-                            <input type="checkbox" id="shiftWork">
-                            <label for="shiftWork">Voin tehdä vuorotyötä / viikonloppuja</label>
-                        </div>
-                        <div class="checkbox-row">
-                            <input type="checkbox" id="nightWork">
-                            <label for="nightWork">Voin tehdä yötyötä</label>
-                        </div>
+                    </div>
 
-                        <hr class="section-divider">
-                        <div class="section-title">Erityispätevyydet</div>
-                        <div>
-                            <label class="field-label">Kortit ja luvat</label>
-                            <div class="space-y-1">
-                                <div class="checkbox-row"><input type="checkbox" id="hygienia"><label for="hygienia">Hygieniapassi</label></div>
-                                <div class="checkbox-row"><input type="checkbox" id="trukki"><label for="trukki">Trukkikortti</label></div>
-                                <div class="checkbox-row"><input type="checkbox" id="ea1"><label for="ea1">Ensiapukortti (EA1)</label></div>
-                                <div class="checkbox-row"><input type="checkbox" id="jv"><label for="jv">Järjestyksenvalvojakortti</label></div>
-                                <div class="checkbox-row"><input type="checkbox" id="tyo"><label for="tyo">Työturvallisuuskortti</label></div>
-                            </div>
+                    <hr class="divider">
+                    <div class="field-section">
+                        <p class="field-section-title">Kortit ja luvat</p>
+                        <div class="checks-grid">
+                            <div class="check-row"><input type="checkbox" id="hygienia"><label for="hygienia">Hygieniapassi</label></div>
+                            <div class="check-row"><input type="checkbox" id="trukki"><label for="trukki">Trukkikortti</label></div>
+                            <div class="check-row"><input type="checkbox" id="ea1"><label for="ea1">EA1-kortti</label></div>
+                            <div class="check-row"><input type="checkbox" id="jv"><label for="jv">JV-kortti</label></div>
+                            <div class="check-row"><input type="checkbox" id="tyo"><label for="tyo">Työturvallisuuskortti</label></div>
                         </div>
-                        <div>
-                            <label class="field-label">Muut pätevyydet tai kortit</label>
+                        <div style="margin-top:0.6rem;">
+                            <label class="field-label">Muut kortit</label>
                             <input type="text" id="otherCards" placeholder="Esim. anniskelupassi, sähköajokortti...">
                         </div>
+                    </div>
 
-                        <hr class="section-divider">
-                        <div class="section-title">Lisätiedot</div>
-                        <div>
+                    <hr class="divider">
+                    <div class="field-section">
+                        <p class="field-section-title">Lisätiedot</p>
+                        <div style="margin-bottom:0.6rem;">
                             <label class="field-label">Hallitsemasi ohjelmat</label>
                             <input type="text" id="tools" placeholder="Esim. Excel, SAP, Salesforce...">
                         </div>
                         <div>
                             <label class="field-label">Suurin saavutuksesi</label>
-                            <input type="text" id="achievements" placeholder="Esim. Myyntirekordi...">
+                            <input type="text" id="achievements" placeholder="Esim. Myyntirekordi, projektin läpivienti...">
                         </div>
                     </div>
                 </div>
 
-                <button onclick="aloitaCVOptimointi()" id="cvBtn"
-                    class="btn-primary py-4 px-6 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition mt-6 opacity-50 cursor-not-allowed"
-                    disabled>
-                    LATAA JA OPTIMOI
+                <button onclick="aloitaCVOptimointi()" id="cvBtn" class="btn-primary" style="margin-top:1rem;" disabled>
+                    Lataa ja optimoi CV
                 </button>
             </div>
+        </div>
 
-            <div class="glass p-8 rounded-[2.5rem] flex flex-col justify-between border-purple-500/20">
-                <div>
-                    <h3 class="text-xl font-bold mb-2 text-white">2. Aktivoi Haku</h3>
-                    <p class="text-gray-400 text-sm mb-8">Seuraa n8n-botin tekemiä hakemuksia ja niiden tilaa.</p>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-num" style="background:var(--orange);">2</div>
+                <p class="card-title">Aktivoi haku</p>
+                <p class="card-desc">Käynnistä automaattinen työnhaku. Botti hakee puolestasi ja seuraat tilannetta reaaliajassa.</p>
+            </div>
+            <div class="card-body" style="margin-top:1rem;">
+                <div class="search-badge">
+                    <div class="search-badge-dot"></div>
+                    Valmis käynnistettäväksi
                 </div>
-                <button onclick="aktivoiHaku(event)" class="btn-outline py-4 px-6 rounded-2xl hover:bg-white hover:text-black transition">
-                    KÄYNNISTÄ HAKU
-                </button>
+                <button onclick="aktivoiHaku(event)" class="btn-outline">Käynnistä haku</button>
             </div>
         </div>
     </main>
 
-    <div class="modal-overlay hidden" id="resultModal">
+    <div class="modal-overlay" id="resultModal">
         <div class="modal-box">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold turkoosi-text">CV-kuntotarkastus</h3>
-                <button onclick="suljeModaali()" class="text-gray-500 hover:text-white transition text-2xl leading-none">&times;</button>
+            <div class="modal-header">
+                <p class="modal-title">CV-kuntotarkastus</p>
+                <button class="modal-close" onclick="suljeModaali()">&times;</button>
             </div>
-
-            <div id="progressSection" class="space-y-2 mb-6">
+            <div id="progressSection">
                 <div class="step" id="ms1"><div class="step-dot"></div><span>Lähetetään tiedosto...</span></div>
                 <div class="step" id="ms2"><div class="step-dot"></div><span>Analysoidaan CV:tä...</span></div>
                 <div class="step" id="ms3"><div class="step-dot"></div><span>Kirjoitetaan parannuksia...</span></div>
                 <div class="step" id="ms4"><div class="step-dot"></div><span>Viimeistellään dokumenttia...</span></div>
             </div>
-
-            <div id="resultSection" class="hidden">
-                <div class="mb-4">
-                    <div class="flex justify-between items-baseline mb-2">
-                        <span class="text-3xl font-bold turkoosi-text" id="scoreNum">–/100</span>
-                        <span class="text-sm text-gray-500" id="scoreLabel"></span>
+            <div id="resultSection" style="display:none;">
+                <div style="margin-bottom:1rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.5rem;">
+                        <span class="result-score" id="scoreNum">–/100</span>
+                        <span style="font-size:12px; color:var(--muted);" id="scoreLabel"></span>
                     </div>
                     <div class="score-track">
                         <div class="score-fill" id="scoreFill" style="width:0%"></div>
                     </div>
                 </div>
-                <div class="report-box mb-4" id="reportBox"></div>
-                <a href="#" id="docsLink" target="_blank"
-                    class="hidden items-center gap-3 p-3 rounded-xl border border-[#00BFA6]/30 hover:bg-[#00BFA6]/10 transition text-sm font-bold turkoosi-text mb-4">
+                <div class="report-box" id="reportBox" style="margin-bottom:1rem;"></div>
+                <a href="#" id="docsLink" target="_blank" class="docs-link">
                     Avaa paranneltu CV Google Docsissa →
                 </a>
-                <button onclick="suljeModaali()" class="w-full py-3 rounded-xl border border-white/10 text-sm text-gray-400 hover:border-white/30 hover:text-white transition">
-                    Sulje
-                </button>
+                <button onclick="suljeModaali()" class="btn-close">Sulje</button>
             </div>
         </div>
     </div>
@@ -282,10 +360,9 @@
             if (input.files && input.files[0]) {
                 document.getElementById('uploadArea').classList.add('has-file');
                 document.getElementById('fileName').textContent = input.files[0].name;
-                document.getElementById('fileName').classList.remove('hidden');
-                document.getElementById('extraFields').classList.remove('hidden');
+                document.getElementById('extraFields').style.display = 'flex';
+                document.getElementById('extraFields').style.flexDirection = 'column';
                 document.getElementById('cvBtn').disabled = false;
-                document.getElementById('cvBtn').classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
@@ -298,15 +375,13 @@
             const fileInput = document.getElementById('cv-upload');
             const btn = document.getElementById('cvBtn');
             if (!fileInput.files[0] || !btn) return;
-
             const { data: { user } } = await supabaseClient.auth.getUser();
             btn.disabled = true;
 
-            document.getElementById('resultModal').classList.remove('hidden');
-            document.getElementById('progressSection').classList.remove('hidden');
-            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('resultModal').classList.add('open');
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
             [1,2,3,4].forEach(n => setStep(n, ''));
-            
             setStep(1, 'active');
 
             const formData = new FormData();
@@ -332,25 +407,13 @@
             formData.append('achievements', document.getElementById('achievements').value);
 
             try {
-                const response = await fetch(CV_BOTTI_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const response = await fetch(CV_BOTTI_URL, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error('Palvelinvirhe');
-                
-                setStep(1, 'done');
-                setStep(2, 'active');
-                
+                setStep(1, 'done'); setStep(2, 'active');
                 const data = await response.json();
-                
-                setStep(2, 'done');
-                setStep(3, 'done');
-                setStep(4, 'done');
-                
+                setStep(2, 'done'); setStep(3, 'done'); setStep(4, 'done');
                 naytaTulos(data);
             } catch (err) {
-                console.error('Virhe:', err);
                 [1,2,3,4].forEach(n => setStep(n, 'error'));
                 alert('Yhteys n8n-palvelimeen epäonnistui.');
             } finally {
@@ -359,22 +422,22 @@
         }
 
         function naytaTulos(data) {
-            document.getElementById('progressSection').classList.add('hidden');
-            document.getElementById('resultSection').classList.remove('hidden');
-
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
             const report = data.ai_report || data.output || 'Analyysi valmis.';
             document.getElementById('reportBox').textContent = report;
-
             const scoreMatch = report.match(/(\d+)\/100/);
             const score = scoreMatch ? parseInt(scoreMatch[1]) : 75;
             document.getElementById('scoreNum').textContent = score + '/100';
             document.getElementById('scoreFill').style.width = score + '%';
-
+            document.getElementById('analysis-display').style.display = 'block';
+            document.getElementById('mainReportBox').textContent = report;
+            document.getElementById('mainScoreNum').textContent = score + '/100';
+            document.getElementById('mainScoreFill').style.width = score + '%';
             if (data.downloadUrl || data.googleDocsUrl) {
                 const link = document.getElementById('docsLink');
                 link.href = data.downloadUrl || data.googleDocsUrl;
-                link.classList.remove('hidden');
-                link.classList.add('flex');
+                link.style.display = 'flex';
             }
         }
 
@@ -382,8 +445,7 @@
             const btn = event.currentTarget;
             const { data: { user } } = await supabaseClient.auth.getUser();
             btn.disabled = true;
-            btn.innerText = 'KÄYNNISTETÄÄN...';
-
+            btn.innerText = 'Käynnistetään...';
             try {
                 const response = await fetch(VIIKKO_HARAVA_URL, {
                     method: 'POST',
@@ -395,13 +457,12 @@
                 alert('Yhteysvirhe.');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'KÄYNNISTÄ HAKU';
+                btn.innerText = 'Käynnistä haku';
             }
         }
 
-        function suljeModaali() { document.getElementById('resultModal').classList.add('hidden'); }
+        function suljeModaali() { document.getElementById('resultModal').classList.remove('open'); }
         async function logout() { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
-
         checkUser();
     </script>
 </body>
