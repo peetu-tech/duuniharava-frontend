@@ -1,65 +1,120 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    // 1. Supabase konfiguraatio antamallasi avaimella
-    const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
-    
-    // Alustetaan client
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const n8nWebhookUrl = 'https://n8nscalera.eu/webhook/uusi-hakemus';
-
-    async function handleOptimization(event) {
-        if (event) event.preventDefault();
-
-        // Haetaan kirjautunut käyttäjä
-        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-
-        if (userError || !user) {
-            alert("Kirjaudu sisään ensin!");
-            console.error("Käyttäjävirhe:", userError);
-            return;
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duuniharava | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0F0F0F;
+            color: #FFFFFF;
         }
+        .turkoosi-text { color: #00BFA6; }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-bg { background: linear-gradient(90deg, #00BFA6, #FF6F3C); }
+    </style>
+</head>
+<body class="p-6">
 
-        // Napin visuaalinen palaute
-        const btn = event.currentTarget;
-        const originalText = btn.innerText;
-        btn.innerText = "Käsitellään...";
-        btn.disabled = true;
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12">
+        <div class="font-bold text-xl tracking-tighter flex items-center gap-2">
+            <span class="turkoosi-text">DUUNI</span><span class="text-orange-500">HARAVA</span>
+        </div>
+        <button onclick="logout()" class="text-xs font-bold py-2 px-4 rounded-lg border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition">
+            KIRJAUDU ULOS
+        </button>
+    </nav>
 
-        try {
-            // Lähetetään data n8n-webhookiin
-            const response = await fetch(n8nWebhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                mode: 'no-cors', // Auttaa jos n8n päässä on CORS-rajoituksia
-                body: JSON.stringify({
-                    email: user.email,
-                    userId: user.id,
-                    action: 'cv_optimization',
-                    timestamp: new Date().toISOString()
-                })
-            });
+    <main class="max-w-4xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Tervetuloa takaisin!</h1>
+            <p id="user-email" class="text-gray-400">Ladataan käyttäjätietoja...</p>
+        </header>
 
-            alert("CV:n optimointipyyntö lähetetty onnistuneesti!");
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="glass p-8 rounded-[2rem]">
+                <h3 class="text-xl font-bold mb-4 turkoosi-text">CV Optimointi</h3>
+                <p class="text-gray-400 text-sm mb-6">Lähetä nykyinen CV:si tekoälylle analysoitavaksi ja optimoitavaksi.</p>
+                <button onclick="handleOptimization(event)" class="optimoitu-nappi gradient-bg text-black font-bold py-3 px-6 rounded-xl w-full hover:scale-105 transition">
+                    ALOITA OPTIMOINTI
+                </button>
+            </div>
+
+            <div class="glass p-8 rounded-[2rem]">
+                <h3 class="text-xl font-bold mb-4 text-orange-500">Automaattihaku</h3>
+                <p class="text-gray-400 text-sm mb-6">Seuraa n8n-botin tekemiä hakemuksia ja niiden tilaa.</p>
+                <div class="bg-white/5 p-4 rounded-xl">
+                    <span class="text-xs text-gray-500 uppercase">Tila:</span>
+                    <span class="text-sm font-bold block">Aktiivinen / Etsitään paikkoja</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- KONFIGURAATIO ---
+        const SUPABASE_URL = 'https://zxtnhitxachrudrcrotk.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dG5oaXR4YWNocnVkcmNyb3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODEwOTUsImV4cCI6MjA4Nzg1NzA5NX0.DPXJlYDI2L8oLYo6ofyPJzQDTbXAhreJx7VsqhV7VdI';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const n8nWebhookUrl = 'https://n8nscalera.eu/webhook/uusi-hakemus';
+
+        // --- TARKISTA KIRJAUTUMINEN ---
+        async function checkUser() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
             
-        } catch (error) {
-            console.error("Webhook-virhe:", error);
-            alert("Yhteysvirhe n8n-palvelimeen.");
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
+            if (!user) {
+                // Jos ei kirjauduttu, potki takaisin etusivulle
+                window.location.href = 'index.html';
+            } else {
+                document.getElementById('user-email').innerText = user.email;
+            }
         }
-    }
 
-    // Lisätään tapahtumakuuntelija
-    document.addEventListener('DOMContentLoaded', () => {
-        // Etsitään nappi, joka käynnistää toiminnon
-        // Voit vaihtaa tähän esim. id-valitsimen: document.getElementById('oma-nappi-id')
-        const startBtn = document.querySelector('.optimoitu-nappi') || document.querySelector('button'); 
-        
-        if (startBtn) {
-            startBtn.addEventListener('click', handleOptimization);
+        // --- ULOSKIRJAUTUMINEN ---
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
         }
-    });
-</script>
+
+        // --- N8N WEBHOOK TOIMINTO ---
+        async function handleOptimization(event) {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+
+            btn.innerText = "Käsitellään...";
+            btn.disabled = true;
+
+            try {
+                await fetch(n8nWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        email: user.email,
+                        userId: user.id,
+                        action: 'cv_optimization'
+                    })
+                });
+                alert("Pyyntö lähetetty n8n-automaatioon!");
+            } catch (e) {
+                alert("Virhe lähetyksessä.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Käynnistä tarkistus
+        checkUser();
+    </script>
+</body>
+</html>
