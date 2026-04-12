@@ -23,7 +23,7 @@
         .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
         .step { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.03); font-size: 13px; color: rgba(255,255,255,0.4); transition: all 0.3s; }
-        .step.active { background: rgba(0,191,166,0.1); color: #00BFA6; }
+        .step.active { background: rgba(0,191,166,10); color: #00BFA6; }
         .step.done { background: rgba(0,191,166,0.08); color: #00BFA6; }
         .step.error { background: rgba(255,111,60,0.1); color: #FF6F3C; }
         .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; transition: background 0.3s; }
@@ -354,7 +354,7 @@
             } catch (err) {
                 console.error('Virhe:', err);
                 [1,2,3,4].forEach(n => setStep(n, 'error'));
-                alert('Yhteys n8n-palvelimeen epäonnistui. Varmista, että n8n webhook on aktiivinen ja Respond to Webhook -solmu on käytössä.');
+                alert('Yhteys n8n-palvelimeen epäonnistui.');
             } finally {
                 btn.disabled = false;
             }
