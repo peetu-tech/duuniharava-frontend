@@ -1,4 +1,4 @@
-type CvPromptInput = {
+export type CvPromptInput = {
   cvText?: string;
   targetJob?: string;
   education?: string;
@@ -13,7 +13,7 @@ type CvPromptInput = {
   name?: string;
 };
 
-type CreateCvPromptInput = {
+export type CreateCvPromptInput = {
   name?: string;
   phone?: string;
   email?: string;
@@ -27,7 +27,7 @@ type CreateCvPromptInput = {
   hobbies?: string;
 };
 
-type JobSuggestionsPromptInput = {
+export type JobSuggestionsPromptInput = {
   desiredRoles?: string;
   desiredLocation?: string;
   workType?: string;
@@ -40,7 +40,7 @@ type JobSuggestionsPromptInput = {
   languages?: string;
 };
 
-type TailoredCvPromptInput = {
+export type TailoredCvPromptInput = {
   currentCv?: string;
   jobTitle?: string;
   companyName?: string;
@@ -49,7 +49,7 @@ type TailoredCvPromptInput = {
 
 export type CoverLetterTone = "professional" | "warm" | "sales";
 
-type CoverLetterPromptInput = {
+export type CoverLetterPromptInput = {
   name?: string;
   phone?: string;
   email?: string;
@@ -70,36 +70,32 @@ export function buildImproveCvPrompt(input: CvPromptInput) {
   return `
 Paranna seuraava CV suomen kielellä.
 
-TÄRKEIN TAVOITE:
-Tee CV:stä uskottava, selkeä, moderni ja helposti luettava suomalaisen työnhaun käyttöön.
+Tavoite:
+- Tee CV:stä uskottava, selkeä, moderni ja helposti luettava suomalaisen työnhaun käyttöön.
+- Korosta käyttäjän vahvuuksia suhteessa tavoiteltuun työhön.
+- Säilytä sisältö realistisena ja käytännöllisenä.
 
-YLEISET SÄÄNNÖT:
+Säännöt:
+- Älä keksi kokemusta, tutkintoja, kursseja, saavutuksia tai vastuualueita.
+- Käytä vain käyttäjän antamia tietoja tai niistä hyvin varovasti pääteltäviä painotuksia.
+- Poista toisto, ympäripyöreys ja liian heikko ilmaisu.
 - Kirjoita luonnollista, sujuvaa suomea.
-- Älä keksi kokemusta, tutkintoja, saavutuksia, kursseja tai vastuualueita.
-- Käytä vain käyttäjän antamia tietoja tai niistä varovasti pääteltäviä asioita.
-- Poista toisto, liian heikko ilmaisu ja turha täytesisältö.
-- Nosta esiin vahvuudet, jotka tukevat tavoiteltua työtä.
-- Tee tekstistä napakka ja uskottava.
-- Älä kirjoita liian mahtipontisesti.
-- Älä käytä tekoälymäisiä fraaseja kuten “olen erittäin motivoitunut ja intohimoinen”.
-- Jos jokin osio on lähes tyhjä, pidä se lyhyenä äläkä keksi sisältöä.
+- Vältä geneerisiä tekoälymäisiä fraaseja.
+- Jos jokin osio on lähes tyhjä, pidä se lyhyenä äläkä täytä sitä keksityllä sisällöllä.
 
-MITÄ HALUAN SISÄLTÖÖN:
-- Profiili-osion tulee olla 3–5 lausetta.
-- Työkokemus-osiossa pitää painottaa konkreettista tekemistä.
-- Taidot-osio ei saa olla pelkkä geneerinen lista, vaan siinä voi näkyä työn kannalta olennaiset vahvuudet.
-- Kielitaito, kortit ja harrastukset pidetään selkeinä ja lyhyinä.
-- Tavoiteltu työ saa näkyä profiilissa tai muuten luonnollisesti painotuksissa.
+Sisältöohje:
+- Profiili: 3–5 lausetta, napakka ja työnhakuun sopiva.
+- Työkokemus: painota konkreettista tekemistä.
+- Taidot: nosta esiin työn kannalta olennaiset vahvuudet.
+- Kielitaito, kortit ja harrastukset: pidä selkeinä ja lyhyinä.
 
-ARVIOINTI:
-KUNTOTARKASTUS-pisteiden pitää perustua siihen, kuinka valmis CV on työnhakuun.
+Arviointi:
 - 50–65 = puutteellinen
 - 66–79 = käyttökelpoinen mutta kaipaa hiomista
 - 80–89 = hyvä
 - 90–100 = erittäin hyvä
 
-MUOTO:
-Palauta vastaus TÄSMÄLLEEN tässä muodossa:
+Palauta vastaus täsmälleen tässä muodossa:
 
 KUNTOTARKASTUS:
 [pisteet muodossa esim. 78/100]
@@ -113,10 +109,12 @@ MUUTOSRAPORTTI:
 CV_BODY:
 [koko valmis parannettu CV]
 
-CV_BODY-RAKENNE:
-- Ensimmäinen rivi: nimi
-- Seuraavat rivit: puhelin, sähköposti, paikkakunta
-- Sen jälkeen osiot tässä järjestyksessä:
+CV_BODY-rakenne:
+Nimi
+Puhelin
+Sähköposti
+Paikkakunta
+
 Profiili
 Työkokemus
 Koulutus
@@ -125,14 +123,13 @@ Taidot
 Kortit ja pätevyydet
 Harrastukset
 
-TÄRKEITÄ LISÄOHJEITA CV_BODYYN:
-- Ei bullet pointteja, ellei se ole aivan välttämätöntä.
-- Ei markdown-merkkejä.
-- Ei selityksiä CV:n sekaan.
-- Vain valmis CV-teksti.
-- Tee rakenteesta visuaalisesti siisti tavallisena tekstinä.
+Lisäsäännöt:
+- Ei markdownia
+- Ei selityksiä CV_BODYn sisään
+- Ei bullet pointteja ellei ole aivan pakko
+- Vain valmis CV-teksti
 
-Käyttäjän nykyinen CV:
+Nykyinen CV:
 ${clean(input.cvText)}
 
 Lisätiedot:
@@ -154,36 +151,34 @@ export function buildCreateCvPrompt(input: CreateCvPromptInput) {
   return `
 Luo uusi valmis CV suomen kielellä käyttäjän antamien tietojen pohjalta.
 
-PÄÄTAVOITE:
-Kirjoita uskottava, selkeä ja työnhakuun sopiva CV, joka näyttää aidolta eikä tekoälyn tekemältä.
+Tavoite:
+- Kirjoita uskottava, selkeä ja työnhakuun sopiva CV.
+- Tee lopputuloksesta luonnollinen ja aidon oloinen.
+- Korosta käyttäjän vahvuuksia suhteessa tavoiteltuun työhön.
 
-YLEISET SÄÄNNÖT:
+Säännöt:
 - Älä keksi kokemusta, koulutuksia, saavutuksia tai vastuita.
 - Käytä vain käyttäjän antamia tietoja.
-- Jos tieto puuttuu, älä täytä sitä keksityllä sisällöllä.
-- Kirjoita luonnollista, napakkaa ja hyvää suomea.
+- Jos tietoa puuttuu, älä täytä sitä keksityllä sisällöllä.
+- Kirjoita napakkaa, hyvää suomea.
 - Pidä sävy ammattimaisena mutta inhimillisenä.
-- Tuo profiilissa esiin käyttäjän vahvuudet suhteessa tavoiteltuun työhön.
-- Tee tekstistä helppolukuinen.
 
-SISÄLTÖOHJE:
+Sisältöohje:
 - Profiili: 3–5 lausetta
-- Työkokemus: käytännöllinen, konkreettinen ja uskottava
+- Työkokemus: konkreettinen ja uskottava
 - Koulutus: vain annetut tiedot
 - Kielitaito: selkeästi
 - Taidot: työn kannalta relevantit
 - Kortit ja pätevyydet: lyhyesti
 - Harrastukset: lyhyesti
 
-ARVIOINTI:
-Anna KUNTOTARKASTUS sen mukaan, kuinka käyttövalmis CV on.
+Arviointi:
 - 50–65 = puutteellinen
 - 66–79 = käyttökelpoinen
 - 80–89 = hyvä
 - 90–100 = erittäin hyvä
 
-MUOTO:
-Palauta vastaus TÄSMÄLLEEN tässä muodossa:
+Palauta vastaus täsmälleen tässä muodossa:
 
 KUNTOTARKASTUS:
 [pisteet muodossa esim. 84/100]
@@ -197,7 +192,7 @@ MUUTOSRAPORTTI:
 CV_BODY:
 [koko valmis CV]
 
-CV_BODY-RAKENNE:
+CV_BODY-rakenne:
 Nimi
 Puhelin
 Sähköposti
@@ -211,11 +206,10 @@ Taidot
 Kortit ja pätevyydet
 Harrastukset
 
-LISÄSÄÄNNÖT:
+Lisäsäännöt:
 - Ei markdownia
-- Ei bullet pointteja, ellei sisältö muuten hajoa
 - Ei selityksiä CV_BODYn sisään
-- Tee lopputuloksesta suoraan käyttökelpoinen
+- Ei bullet pointteja ellei ole pakko
 
 Käyttäjän tiedot:
 Nimi: ${clean(input.name)}
@@ -236,20 +230,19 @@ export function buildJobSuggestionsPrompt(input: JobSuggestionsPromptInput) {
   return `
 Ehdota käyttäjälle sopivia työpaikkoja suomen kielellä.
 
-TAVOITE:
-Muodosta realistisia ja hyödyllisiä työpaikkaehdotuksia käyttäjän profiilin perusteella.
+Tavoite:
+- Luo realistisia ja hyödyllisiä työpaikkaehdotuksia käyttäjän profiilin perusteella.
+- Keskity rooleihin, jotka aidosti sopivat käyttäjän kokemukseen, taitoihin ja toiveisiin.
+- Suosi käytännöllisiä ja realistisia rooleja.
 
-SÄÄNNÖT:
-- Keskity rooleihin, jotka oikeasti sopivat käyttäjän kokemukseen, taitoihin ja toiveisiin.
+Säännöt:
 - Älä ehdota epärealistisia asiantuntija- tai johtorooleja, jos tausta ei tue niitä.
-- Suosi käytännöllisiä rooleja, jos käyttäjän profiili on käytännönläheinen.
-- Huomioi sijainti, työmuoto ja avainsanat.
-- Jos jokin toive puuttuu, tee järkeviä mutta maltillisia oletuksia.
-- company voi olla realistinen esimerkkityönantaja.
-- Tee ehdotuksista erilaisia mutta saman profiilin sisällä.
+- Huomioi sijainti, työmuoto, vuorotoive ja avainsanat.
+- company voi olla realistinen esimerkkiyritys.
+- Tee ehdotuksista hieman erilaisia, mutta pysy saman profiilin sisällä.
 - Palauta 4–6 ehdotusta.
 
-JOKAISESSA EHDOTUKSESSA PITÄÄ OLLA KENTÄT:
+Jokaisessa ehdotuksessa pitää olla kentät:
 - title
 - company
 - location
@@ -260,23 +253,23 @@ JOKAISESSA EHDOTUKSESSA PITÄÄ OLLA KENTÄT:
 - source
 - matchScore
 
-KENTTIEN OHJEET:
+Kenttien ohjeet:
 - title: realistinen työnimike
 - company: uskottava yritysnimi
 - location: käyttäjän toiveeseen sopiva alue
 - type: esim. kokoaikainen, osa-aikainen, vuorotyö
 - summary: 1–2 virkettä
-- adText: 3–5 virkettä, kuin tiivistetty työpaikkakuvaus
-- whyFit: 2–4 virkettä siitä miksi työ sopii käyttäjälle
+- adText: 3–5 virkettä, tiivistetty työpaikkakuvaus
+- whyFit: 2–4 virkettä miksi työ sopii käyttäjälle
 - source: käytä arvoa "AI-ehdotus"
-- matchScore: numero 1–100, käytä realistista vaihtelua
+- matchScore: numero 1–100
 
 ERITTÄIN TÄRKEÄÄ:
 - Palauta VAIN validi JSON-taulukko
 - Ei markdownia
 - Ei selityksiä
-- Ei otsikoita ennen tai jälkeen
-- Kaikkien kenttien arvot pitää olla merkkijonoja paitsi matchScore, joka on numero
+- Ei otsikoita
+- Kaikki kentät ovat merkkijonoja paitsi matchScore, joka on numero
 
 Käyttäjän hakuprofiili:
 Halutut roolit: ${clean(input.desiredRoles)}
@@ -298,27 +291,27 @@ export function buildTailoredCvPrompt(input: TailoredCvPromptInput) {
   return `
 Muokkaa annettua CV:tä paremmin sopivaksi tiettyyn työpaikkaan.
 
-PÄÄTAVOITE:
-Tee CV:stä kohdistetumpi juuri tähän työpaikkaan ilman että sisältö muuttuu epäuskottavaksi.
+Tavoite:
+- Tee CV:stä kohdistetumpi juuri tähän työpaikkaan.
+- Säilytä sisältö uskottavana ja realistisena.
+- Korosta työn kannalta olennaisimpia jo olemassa olevia vahvuuksia.
 
-SÄÄNNÖT:
+Säännöt:
 - Älä keksi uutta kokemusta, koulutusta, saavutuksia tai taitoja.
 - Käytä vain nykyisessä CV:ssä olevia tietoja tai niistä varovasti pääteltäviä painotuksia.
 - Muokkaa erityisesti profiilia, taitoja ja työkokemuksen painotuksia.
-- Korosta niitä asioita, jotka ovat työn kannalta olennaisimpia.
 - Tee tekstistä edelleen selkeä, napakka ja luonnollinen.
-- Jos työpaikkailmoituksessa painotetaan asiakaspalvelua, vastuullisuutta, myyntiä, tarkkuutta tai tiimityötä, nosta niitä esiin vain jos ne sopivat nykyiseen CV:hen.
-- Älä tee CV:stä pidempää vain pidentämisen vuoksi.
+- Älä pidennä CV:tä turhaan.
 
-PALAUTA TÄSMÄLLEEN TÄSSÄ MUODOSSA:
+Palauta täsmälleen tässä muodossa:
 
 CV_BODY:
 [koko uusi työpaikkaan kohdistettu CV]
 
-LISÄOHJEET:
+Lisäsäännöt:
 - Säilytä rakenne selkeänä
-- Älä lisää selityksiä ennen tai jälkeen
 - Ei markdownia
+- Ei selityksiä ennen tai jälkeen
 - Ei bullet pointteja ellei ole pakko
 
 Työpaikka:
@@ -336,7 +329,7 @@ export function buildCoverLetterPrompt(input: CoverLetterPromptInput) {
   const toneGuide =
     input.tone === "warm"
       ? `
-SÄVY:
+Sävy:
 - lämmin
 - helposti lähestyttävä
 - inhimillinen
@@ -345,16 +338,16 @@ SÄVY:
 `
       : input.tone === "sales"
       ? `
-SÄVY:
+Sävy:
 - energinen
 - vakuuttava
 - myyntihenkinen
 - aktiivinen
 - itsevarma mutta ei ylimielinen
-- korosta asiakaspalvelua, tuloshakuisuutta ja oma-aloitteisuutta silloin kun se sopii taustaan
+- korosta asiakaspalvelua, oma-aloitteisuutta ja tuloshakuisuutta vain jos ne sopivat taustaan
 `
       : `
-SÄVY:
+Sävy:
 - asiallinen
 - ammattimainen
 - selkeä
@@ -364,59 +357,37 @@ SÄVY:
   return `
 Kirjoita SUOMEKSI laadukas, uskottava ja napakka työhakemus.
 
-PÄÄTAVOITE:
-Kirjoita hakemus, joka tuntuu aidosti tältä hakijalta eikä geneeriseltä mallipohjalta.
-
-YLEISET SÄÄNNÖT:
+Päätavoite:
+- Kirjoita hakemus, joka tuntuu aidosti tältä hakijalta eikä geneeriseltä mallipohjalta.
 - Hyödynnä sekä käyttäjän CV:tä että työpaikkailmoitusta.
-- Älä keksi työkokemusta, koulutusta, saavutuksia tai vastuuta, joita käyttäjä ei ole antanut.
-- Älä käytä ympäripyöreitä ja geneerisiä lauseita.
-- Älä käytä tekoälymäisiä fraaseja.
+- Korosta vain sellaisia vahvuuksia, jotka sopivat aidosti käyttäjän taustaan.
+
+Säännöt:
+- Älä keksi työkokemusta, koulutusta, saavutuksia tai vastuuta.
+- Älä käytä ympäripyöreitä tai tekoälymäisiä fraaseja.
 - Älä kirjoita liian muodollisesti tai liian korulauseisesti.
-- Hakemuksen pitää tuntua suomalaisen työnhaun tyyliin sopivalta.
-- Korosta 2–4 oikeasti relevanttia vahvuutta.
-- Näytä, miksi hakija sopii juuri tähän tehtävään.
-- Yrityksen nimeä ja tehtävää pitää käyttää luontevasti tekstissä.
-- Tekstin pitää olla helposti luettava ja luonnollinen.
+- Käytä yrityksen nimeä ja tehtävää luontevasti.
+- Nosta esiin 2–4 relevanttia vahvuutta.
+- Hakemuksen pitää kuulostaa suomalaisen työnhaun tyyliin sopivalta.
 
 ${toneGuide}
 
-RAKENNE:
-1. Avaus:
-   - mainitse haettava tehtävä
-   - mainitse yritys
-   - kerro kiinnostus tehtävää kohtaan luonnollisesti
+Rakenne:
+1. Lyhyt avaus, jossa mainitaan tehtävä ja yritys
+2. Keskiosa, jossa yhdistetään hakijan kokemus ja työpaikan tarpeet
+3. Luonteva lopetus, jossa ilmaistaan kiinnostus keskustella lisää
+4. Allekirjoitus käyttäjän tiedoilla
 
-2. Keskiosa:
-   - nosta esiin hakijan relevantti kokemus
-   - yhdistä kokemus työpaikan tarpeisiin
-   - nosta esiin käytännöllisiä vahvuuksia, ei pelkkää yleistä itsekehua
-   - osoita miksi hakija olisi hyvä lisä tiimiin
-
-3. Lopetus:
-   - ilmaise halu keskustella lisää
-   - pidä lopetus luontevana ja napakkana
-
-4. Allekirjoitus:
-   - nimi
-   - puhelin
-   - sähköposti
-   - paikkakunta tarvittaessa
-
-PITUUS:
+Pituus:
 - noin 170–260 sanaa
 - ei bullet pointteja
 - ei väliotsikoita itse hakemukseen
 
-ERITTÄIN TÄRKEÄÄ:
-- Hakemus ei saa kuulostaa samalta kuin tavallinen geneerinen ChatGPT-hakemus
-- Kirjoita vaihtelevaa ja luonnollista lauserakennetta
-- Vältä näitä ilmauksia tai vastaavia:
-  - "olen erittäin motivoitunut"
-  - "intohimoni on"
-  - "olen täydellinen valinta"
-  - "haluan tuoda lisäarvoa organisaatiollenne"
-- Pidä hakemus uskottavana nuorelle tai käytännönläheiselle hakijalle, jos tausta viittaa siihen
+Vältä erityisesti tällaisia ilmauksia:
+- "olen erittäin motivoitunut"
+- "intohimoni on"
+- "olen täydellinen valinta"
+- "haluan tuoda lisäarvoa organisaatiollenne"
 
 Käyttäjän tiedot:
 Nimi: ${clean(input.name)}
