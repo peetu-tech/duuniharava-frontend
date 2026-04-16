@@ -54,6 +54,8 @@ type JobItem = {
   contactPerson?: string;
   contactEmail?: string;
   companyWebsite?: string;
+  favorite?: boolean;
+  archived?: boolean;
 };
 
 type SavedLetter = {
@@ -249,6 +251,8 @@ function normalizeJob(partial: Partial<JobItem>): JobItem {
     contactPerson: partial.contactPerson || "",
     contactEmail: partial.contactEmail || "",
     companyWebsite: partial.companyWebsite || "",
+    favorite: partial.favorite ?? false,
+    archived: partial.archived ?? false,
   };
 }
 
@@ -303,6 +307,33 @@ function getPriorityLabel(priority: JobPriority) {
     default:
       return priority;
   }
+}
+
+function priorityRank(priority: JobPriority) {
+  switch (priority) {
+    case "high":
+      return 3;
+    case "medium":
+      return 2;
+    case "low":
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+function daysUntil(dateString?: string) {
+  if (!dateString) return null;
+  const today = new Date();
+  const target = new Date(dateString);
+
+  if (Number.isNaN(target.getTime())) return null;
+
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+
+  const diff = target.getTime() - today.getTime();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
 function PdfSafePreview({
@@ -488,6 +519,7 @@ function JobCard({
   onUpdate: (patch: Partial<JobItem>) => void;
 }) {
   const score = safeMatchScore(job.matchScore);
+  const daysLeft = daysUntil(job.deadline);
 
   return (
     <div
@@ -514,6 +546,11 @@ function JobCard({
             <span className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
               {getPriorityLabel(job.priority)}
             </span>
+            {job.favorite && (
+              <span className="rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
+                Suosikki
+              </span>
+            )}
           </div>
 
           <h4 className="text-xl font-semibold text-white">
@@ -526,6 +563,18 @@ function JobCard({
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => onUpdate({ favorite: !job.favorite })}
+            className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+              job.favorite
+                ? "bg-amber-500 text-black"
+                : "bg-zinc-800 text-white hover:bg-zinc-700"
+            }`}
+          >
+            {job.favorite ? "★ Suosikki" : "☆ Suosikiksi"}
+          </button>
+
           <button
             type="button"
             onClick={onSelect}
@@ -558,6 +607,24 @@ function JobCard({
             Miksi sopii
           </p>
           <p className="mt-2 text-sm leading-6 text-emerald-200">{job.whyFit}</p>
+        </div>
+      )}
+
+      {daysLeft !== null && (
+        <div
+          className={`mt-4 rounded-2xl border p-3 text-sm ${
+            daysLeft < 0
+              ? "border-red-900 bg-red-950 text-red-300"
+              : daysLeft <= 7
+              ? "border-amber-900 bg-amber-950 text-amber-300"
+              : "border-zinc-800 bg-zinc-900 text-zinc-300"
+          }`}
+        >
+          {daysLeft < 0
+            ? `Deadline meni ${Math.abs(daysLeft)} päivää sitten`
+            : daysLeft === 0
+            ? "Deadline on tänään"
+            : `Deadline ${daysLeft} päivän päästä`}
         </div>
       )}
 
@@ -739,6 +806,15 @@ export default function Home() {
   const [profileImage, setProfileImage] = useState("");
   const [jobFilter, setJobFilter] = useState("");
 
+  const [jobStatusFilter, setJobStatusFilter] =
+    useState<"all" | JobStatus>("all");
+  const [jobPriorityFilter, setJobPriorityFilter] =
+    useState<"all" | JobPriority>("all");
+  const [jobSort, setJobSort] = useState<
+    "match" | "deadline" | "priority" | "newest" | "company"
+  >("newest");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+
   const [form, setForm] = useState(emptyForm);
   const [searchProfile, setSearchProfile] = useState(emptySearchProfile);
   const [jobForm, setJobForm] = useState(emptyJobForm);
@@ -775,6 +851,10 @@ export default function Home() {
       setSavedLetters(parsed.savedLetters ?? []);
       setSavedCvVariants(parsed.savedCvVariants ?? []);
       setCustomStyles(parsed.customStyles ?? defaultCustomStyles);
+      setJobStatusFilter(parsed.jobStatusFilter ?? "all");
+      setJobPriorityFilter(parsed.jobPriorityFilter ?? "all");
+      setJobSort(parsed.jobSort ?? "newest");
+      setShowFavoritesOnly(parsed.showFavoritesOnly ?? false);
     } catch {
       console.error("Tallennetun tilan lukeminen epäonnistui.");
     }
@@ -798,6 +878,10 @@ export default function Home() {
       savedLetters,
       savedCvVariants,
       customStyles,
+      jobStatusFilter,
+      jobPriorityFilter,
+      jobSort,
+      showFavoritesOnly,
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -818,6 +902,10 @@ export default function Home() {
     savedLetters,
     savedCvVariants,
     customStyles,
+    jobStatusFilter,
+    jobPriorityFilter,
+    jobSort,
+    showFavoritesOnly,
   ]);
 
   const parsedCv = useMemo(() => parseCvResult(cvResult), [cvResult]);
@@ -842,32 +930,71 @@ export default function Home() {
   }, [savedCvVariants, activeJob]);
 
   const filteredJobs = useMemo(() => {
-    if (!jobFilter.trim()) return jobs;
+    const q = jobFilter.trim().toLowerCase();
 
-    const q = jobFilter.toLowerCase();
-    return jobs.filter((job) =>
-      [
-        job.title,
-        job.company,
-        job.location,
-        job.type,
-        job.summary,
-        job.whyFit,
-        job.source,
-        job.notes,
-        job.contactPerson,
-        job.contactEmail,
-        job.companyWebsite,
-        job.salary,
-        job.status,
-        job.priority,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(q)
-    );
-  }, [jobs, jobFilter]);
+    return jobs
+      .filter((job) => !job.archived)
+      .filter((job) => {
+        if (showFavoritesOnly && !job.favorite) return false;
+        if (jobStatusFilter !== "all" && job.status !== jobStatusFilter) {
+          return false;
+        }
+        if (jobPriorityFilter !== "all" && job.priority !== jobPriorityFilter) {
+          return false;
+        }
+
+        if (!q) return true;
+
+        return [
+          job.title,
+          job.company,
+          job.location,
+          job.type,
+          job.summary,
+          job.whyFit,
+          job.source,
+          job.notes,
+          job.contactPerson,
+          job.contactEmail,
+          job.companyWebsite,
+          job.salary,
+          job.status,
+          job.priority,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q);
+      })
+      .sort((a, b) => {
+        switch (jobSort) {
+          case "match":
+            return safeMatchScore(b.matchScore) - safeMatchScore(a.matchScore);
+          case "deadline": {
+            const aDays = daysUntil(a.deadline);
+            const bDays = daysUntil(b.deadline);
+            if (aDays === null && bDays === null) return 0;
+            if (aDays === null) return 1;
+            if (bDays === null) return -1;
+            return aDays - bDays;
+          }
+          case "priority":
+            return priorityRank(b.priority) - priorityRank(a.priority);
+          case "company":
+            return a.company.localeCompare(b.company, "fi");
+          case "newest":
+          default:
+            return b.id.localeCompare(a.id);
+        }
+      });
+  }, [
+    jobs,
+    jobFilter,
+    jobStatusFilter,
+    jobPriorityFilter,
+    jobSort,
+    showFavoritesOnly,
+  ]);
 
   function updateField(key: keyof typeof emptyForm, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -886,7 +1013,9 @@ export default function Home() {
 
   function updateJob(id: string, patch: Partial<JobItem>) {
     setJobs((prev) =>
-      prev.map((job) => (job.id === id ? normalizeJob({ ...job, ...patch }) : job))
+      prev.map((job) =>
+        job.id === id ? normalizeJob({ ...job, ...patch }) : job
+      )
     );
   }
 
@@ -931,6 +1060,10 @@ export default function Home() {
     setCvStyle("modern");
     setLetterTone("professional");
     setJobFilter("");
+    setJobStatusFilter("all");
+    setJobPriorityFilter("all");
+    setJobSort("newest");
+    setShowFavoritesOnly(false);
     setCustomStyles(defaultCustomStyles);
     localStorage.removeItem(STORAGE_KEY);
   }
@@ -1212,6 +1345,8 @@ export default function Home() {
       contactPerson: jobForm.contactPerson.trim(),
       contactEmail: jobForm.contactEmail.trim(),
       companyWebsite: jobForm.companyWebsite.trim(),
+      favorite: false,
+      archived: false,
     });
 
     setJobs((prev) => [job, ...prev]);
@@ -1269,6 +1404,8 @@ export default function Home() {
           source: job.source || "AI-ehdotus",
           status: (job.status as JobStatus) || "interested",
           priority: (job.priority as JobPriority) || "medium",
+          favorite: Boolean(job.favorite),
+          archived: false,
         })
       );
 
@@ -1927,6 +2064,31 @@ export default function Home() {
 
               {tab === "job" && (
                 <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Työpaikat</p>
+                      <p className="mt-2 text-2xl font-semibold text-white">{jobs.length}</p>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Haettu</p>
+                      <p className="mt-2 text-2xl font-semibold text-white">
+                        {jobs.filter((job) => job.status === "applied").length}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Haastattelu</p>
+                      <p className="mt-2 text-2xl font-semibold text-white">
+                        {jobs.filter((job) => job.status === "interview").length}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Suosikit</p>
+                      <p className="mt-2 text-2xl font-semibold text-white">
+                        {jobs.filter((job) => job.favorite).length}
+                      </p>
+                    </div>
+                  </div>
+
                   <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-4 space-y-4">
                     <h3 className="text-lg font-semibold text-white">Lisää työpaikka</h3>
 
@@ -1974,6 +2136,66 @@ export default function Home() {
                         placeholder="Suodata työpaikkoja"
                         className="w-full max-w-xs rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600"
                       />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                      <select
+                        value={jobStatusFilter}
+                        onChange={(e) => setJobStatusFilter(e.target.value as "all" | JobStatus)}
+                        className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-zinc-600"
+                      >
+                        <option value="all">Kaikki statukset</option>
+                        <option value="saved">Tallennettu</option>
+                        <option value="interested">Kiinnostava</option>
+                        <option value="applied">Haettu</option>
+                        <option value="interview">Haastattelu</option>
+                        <option value="offer">Tarjous</option>
+                        <option value="rejected">Hylätty</option>
+                      </select>
+
+                      <select
+                        value={jobPriorityFilter}
+                        onChange={(e) => setJobPriorityFilter(e.target.value as "all" | JobPriority)}
+                        className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-zinc-600"
+                      >
+                        <option value="all">Kaikki prioriteetit</option>
+                        <option value="low">Matala</option>
+                        <option value="medium">Keskitaso</option>
+                        <option value="high">Korkea</option>
+                      </select>
+
+                      <select
+                        value={jobSort}
+                        onChange={(e) =>
+                          setJobSort(
+                            e.target.value as
+                              | "match"
+                              | "deadline"
+                              | "priority"
+                              | "newest"
+                              | "company"
+                          )
+                        }
+                        className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-zinc-600"
+                      >
+                        <option value="newest">Uusimmat ensin</option>
+                        <option value="match">Paras match</option>
+                        <option value="deadline">Lähin deadline</option>
+                        <option value="priority">Korkein prioriteetti</option>
+                        <option value="company">Yritys A–Ö</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowFavoritesOnly((prev) => !prev)}
+                        className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                          showFavoritesOnly
+                            ? "bg-amber-500 text-black"
+                            : "border border-zinc-800 bg-zinc-950 text-white hover:bg-zinc-900"
+                        }`}
+                      >
+                        {showFavoritesOnly ? "Näytetään suosikit" : "Vain suosikit"}
+                      </button>
                     </div>
 
                     {filteredJobs.length === 0 ? (
