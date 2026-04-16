@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { saveAs } from "file-saver";
@@ -336,6 +336,63 @@ function daysUntil(dateString?: string) {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+function gradientButton(baseClassName: string) {
+  return `${baseClassName} shadow-lg shadow-black/20`;
+}
+
+function SectionShell({
+  step,
+  title,
+  description,
+  action,
+  children,
+}: {
+  step: string;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl md:p-7">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.26em] text-zinc-500">
+            {step}
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{title}</h2>
+          {description && (
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+              {description}
+            </p>
+          )}
+        </div>
+
+        {action}
+      </div>
+
+      {children}
+    </section>
+  );
+}
+
+function TinyStat({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+        {label}
+      </p>
+      <p className="mt-2 text-lg font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
 function PdfSafePreview({
   cvText,
   image,
@@ -494,7 +551,9 @@ function StatCard({
 }) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-      <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">{title}</p>
+      <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
+        {title}
+      </p>
       <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
       <p className="mt-2 text-sm text-zinc-400">{description}</p>
     </div>
@@ -525,15 +584,15 @@ function JobCard({
     <div
       className={`rounded-[28px] border p-5 transition ${
         isActive
-          ? "border-blue-500 bg-gradient-to-br from-blue-950/30 to-zinc-950"
-          : "border-zinc-800 bg-zinc-950 hover:border-zinc-700"
+          ? "border-cyan-400/60 bg-gradient-to-br from-cyan-500/10 via-sky-500/5 to-purple-500/10 shadow-xl shadow-cyan-950/20"
+          : "border-white/10 bg-black/20 hover:border-white/20"
       }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {job.source && (
-              <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
                 {job.source}
               </span>
             )}
@@ -568,8 +627,8 @@ function JobCard({
             onClick={() => onUpdate({ favorite: !job.favorite })}
             className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
               job.favorite
-                ? "bg-amber-500 text-black"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
+                ? "bg-amber-400 text-black hover:bg-amber-300"
+                : "bg-white/5 text-white hover:bg-white/10"
             }`}
           >
             {job.favorite ? "★ Suosikki" : "☆ Suosikiksi"}
@@ -581,7 +640,7 @@ function JobCard({
             className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
               isActive
                 ? "bg-white text-black"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
+                : "bg-white/5 text-white hover:bg-white/10"
             }`}
           >
             {isActive ? "Valittu" : "Valitse"}
@@ -602,11 +661,13 @@ function JobCard({
       )}
 
       {job.whyFit && (
-        <div className="mt-4 rounded-2xl border border-emerald-900/60 bg-emerald-950/30 p-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-emerald-400">
+        <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+          <p className="text-xs uppercase tracking-[0.18em] text-emerald-300">
             Miksi sopii
           </p>
-          <p className="mt-2 text-sm leading-6 text-emerald-200">{job.whyFit}</p>
+          <p className="mt-2 text-sm leading-6 text-emerald-100">
+            {job.whyFit}
+          </p>
         </div>
       )}
 
@@ -614,10 +675,10 @@ function JobCard({
         <div
           className={`mt-4 rounded-2xl border p-3 text-sm ${
             daysLeft < 0
-              ? "border-red-900 bg-red-950 text-red-300"
+              ? "border-red-500/20 bg-red-500/10 text-red-300"
               : daysLeft <= 7
-              ? "border-amber-900 bg-amber-950 text-amber-300"
-              : "border-zinc-800 bg-zinc-900 text-zinc-300"
+              ? "border-amber-500/20 bg-amber-500/10 text-amber-300"
+              : "border-white/10 bg-white/5 text-zinc-300"
           }`}
         >
           {daysLeft < 0
@@ -629,39 +690,10 @@ function JobCard({
       )}
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            Yritys
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">
-            {job.company || "-"}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            Sijainti
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">
-            {job.location || "-"}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            Hakemukset
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">
-            {applicationsCount}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            CV-versiot
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">{cvsCount}</p>
-        </div>
+        <TinyStat label="Yritys" value={job.company || "-"} />
+        <TinyStat label="Sijainti" value={job.location || "-"} />
+        <TinyStat label="Hakemukset" value={applicationsCount} />
+        <TinyStat label="CV-versiot" value={cvsCount} />
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -670,7 +702,7 @@ function JobCard({
           <select
             value={job.status}
             onChange={(e) => onUpdate({ status: e.target.value as JobStatus })}
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-cyan-400/40"
           >
             <option value="saved">Tallennettu</option>
             <option value="interested">Kiinnostava</option>
@@ -682,13 +714,15 @@ function JobCard({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-zinc-400">Prioriteetti</label>
+          <label className="mb-2 block text-sm text-zinc-400">
+            Prioriteetti
+          </label>
           <select
             value={job.priority}
             onChange={(e) =>
               onUpdate({ priority: e.target.value as JobPriority })
             }
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-cyan-400/40"
           >
             <option value="low">Matala</option>
             <option value="medium">Keskitaso</option>
@@ -702,7 +736,7 @@ function JobCard({
             type="date"
             value={job.appliedAt || ""}
             onChange={(e) => onUpdate({ appliedAt: e.target.value })}
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-cyan-400/40"
           />
         </div>
 
@@ -712,7 +746,7 @@ function JobCard({
             type="date"
             value={job.deadline || ""}
             onChange={(e) => onUpdate({ deadline: e.target.value })}
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-cyan-400/40"
           />
         </div>
 
@@ -722,7 +756,7 @@ function JobCard({
             value={job.salary || ""}
             onChange={(e) => onUpdate({ salary: e.target.value })}
             placeholder="Esim. 2800–3200 €/kk"
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40"
           />
         </div>
 
@@ -734,7 +768,7 @@ function JobCard({
             value={job.contactPerson || ""}
             onChange={(e) => onUpdate({ contactPerson: e.target.value })}
             placeholder="Esim. Rekrytoija"
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40"
           />
         </div>
 
@@ -746,17 +780,19 @@ function JobCard({
             value={job.contactEmail || ""}
             onChange={(e) => onUpdate({ contactEmail: e.target.value })}
             placeholder="esim. rekry@firma.fi"
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40"
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-zinc-400">Yrityksen sivu</label>
+          <label className="mb-2 block text-sm text-zinc-400">
+            Yrityksen sivu
+          </label>
           <input
             value={job.companyWebsite || ""}
             onChange={(e) => onUpdate({ companyWebsite: e.target.value })}
             placeholder="https://..."
-            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600"
+            className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40"
           />
         </div>
       </div>
@@ -767,7 +803,7 @@ function JobCard({
           value={job.notes || ""}
           onChange={(e) => onUpdate({ notes: e.target.value })}
           placeholder="Kirjaa tähän mitä pitää tehdä seuraavaksi, yhteydenotot, fiilikset jne."
-          className="min-h-[120px] w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600"
+          className="min-h-[120px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40"
         />
       </div>
 
@@ -776,7 +812,7 @@ function JobCard({
           href={job.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex rounded-2xl border border-blue-900/60 bg-blue-950/30 px-4 py-2 text-sm font-medium text-blue-300 transition hover:bg-blue-950/50"
+          className="mt-4 inline-flex rounded-2xl border border-cyan-500/20 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:bg-cyan-500/15"
         >
           Avaa työpaikkalinkki
         </a>
@@ -1587,30 +1623,34 @@ export default function Home() {
   const customStyle = customStyles[cvStyle];
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_25%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.10),transparent_20%),#09090b] text-white">
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_26%),radial-gradient(circle_at_bottom,rgba(16,185,129,0.12),transparent_24%)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <div className="mb-5 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.22em] text-zinc-300 backdrop-blur-sm">
-                CV Studio · Hakuprofiili · Työpaikat · Hakemukset
+                duuniharava.org · CV Studio · Hakuprofiili · Työpaikat · Hakemukset
               </div>
 
               <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.05]">
-                Rakenna parempi CV, löydä sopivat työt ja tee personoidut hakemukset samassa näkymässä.
+                Rakenna parempi CV, löydä sopivat työt ja tee personoidut
+                hakemukset samassa näkymässä.
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 md:text-lg">
-                Duuniharava auttaa luomaan tai parantamaan CV:n, suuntaamaan sen oikeaan rooliin,
-                ehdottamaan sopivia työpaikkoja ja kirjoittamaan hakemuksia, jotka tukevat CV:täsi.
+                Duuniharava auttaa luomaan tai parantamaan CV:n, suuntaamaan sen
+                oikeaan rooliin, ehdottamaan sopivia työpaikkoja ja
+                kirjoittamaan hakemuksia, jotka tukevat CV:täsi.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={fillExample}
-                  className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
+                  className={gradientButton(
+                    "rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
+                  )}
                 >
                   Täytä esimerkki
                 </button>
@@ -1670,7 +1710,7 @@ export default function Home() {
             className={`rounded-2xl px-5 py-3 text-sm font-semibold transition ${
               mode === "improve"
                 ? "bg-white text-black"
-                : "border border-zinc-800 bg-zinc-900 text-white hover:bg-zinc-800"
+                : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
             }`}
           >
             Paranna CV
@@ -1682,7 +1722,7 @@ export default function Home() {
             className={`rounded-2xl px-5 py-3 text-sm font-semibold transition ${
               mode === "create"
                 ? "bg-white text-black"
-                : "border border-zinc-800 bg-zinc-900 text-white hover:bg-zinc-800"
+                : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
             }`}
           >
             Luo uusi CV
@@ -1695,26 +1735,20 @@ export default function Home() {
 
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1.02fr_0.98fr]">
           <section className="space-y-6">
-            <div className="rounded-[32px] border border-zinc-800 bg-zinc-900/70 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm md:p-7">
-              <div className="mb-6 flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">
-                    Vaihe 1
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">
-                    Hakijan tiedot
-                  </h2>
-                </div>
-
+            <SectionShell
+              step="Vaihe 1"
+              title="Hakijan tiedot"
+              description="Täytä tiedot, valitse tyyli ja generoi CV. Voit myös säätää esikatselun ulkoasua tarkasti."
+              action={
                 <button
                   type="button"
                   onClick={clearForm}
-                  className="rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-900"
+                  className="rounded-2xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-black/50"
                 >
                   Tyhjennä
                 </button>
-              </div>
-
+              }
+            >
               <form onSubmit={handleCvSubmit} className="space-y-5">
                 {mode === "improve" && (
                   <div>
@@ -1725,47 +1759,47 @@ export default function Home() {
                       placeholder="Liitä nykyinen CV tähän"
                       value={form.cvText}
                       onChange={(e) => updateField("cvText", e.target.value)}
-                      className="min-h-[220px] w-full rounded-3xl border border-zinc-800 bg-zinc-950 px-4 py-4 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                      className="min-h-[220px] w-full rounded-3xl border border-white/10 bg-black/30 px-4 py-4 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                     />
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <input placeholder="Nimi" value={form.name} onChange={(e) => updateField("name", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
-                  <input placeholder="Puhelin" value={form.phone} onChange={(e) => updateField("phone", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
-                  <input placeholder="Sähköposti" value={form.email} onChange={(e) => updateField("email", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
-                  <input placeholder="Paikkakunta" value={form.location} onChange={(e) => updateField("location", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
+                  <input placeholder="Nimi" value={form.name} onChange={(e) => updateField("name", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                  <input placeholder="Puhelin" value={form.phone} onChange={(e) => updateField("phone", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                  <input placeholder="Sähköposti" value={form.email} onChange={(e) => updateField("email", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                  <input placeholder="Paikkakunta" value={form.location} onChange={(e) => updateField("location", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
                 </div>
 
                 <input
                   placeholder="Tavoiteltu työ"
                   value={form.targetJob}
                   onChange={(e) => updateField("targetJob", e.target.value)}
-                  className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                 />
 
-                <textarea placeholder="Koulutus" value={form.education} onChange={(e) => updateField("education", e.target.value)} className="min-h-[96px] w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
-                <textarea placeholder="Kokemus" value={form.experience} onChange={(e) => updateField("experience", e.target.value)} className="min-h-[124px] w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
+                <textarea placeholder="Koulutus" value={form.education} onChange={(e) => updateField("education", e.target.value)} className="min-h-[96px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                <textarea placeholder="Kokemus" value={form.experience} onChange={(e) => updateField("experience", e.target.value)} className="min-h-[124px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <textarea placeholder="Kielet" value={form.languages} onChange={(e) => updateField("languages", e.target.value)} className="min-h-[110px] w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
-                  <textarea placeholder="Taidot" value={form.skills} onChange={(e) => updateField("skills", e.target.value)} className="min-h-[110px] w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
+                  <textarea placeholder="Kielet" value={form.languages} onChange={(e) => updateField("languages", e.target.value)} className="min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                  <textarea placeholder="Taidot" value={form.skills} onChange={(e) => updateField("skills", e.target.value)} className="min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <textarea placeholder="Kortit ja pätevyydet" value={form.cards} onChange={(e) => updateField("cards", e.target.value)} className="min-h-[96px] w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
-                  <textarea placeholder="Harrastukset" value={form.hobbies} onChange={(e) => updateField("hobbies", e.target.value)} className="min-h-[96px] w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600" />
+                  <textarea placeholder="Kortit ja pätevyydet" value={form.cards} onChange={(e) => updateField("cards", e.target.value)} className="min-h-[96px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                  <textarea placeholder="Harrastukset" value={form.hobbies} onChange={(e) => updateField("hobbies", e.target.value)} className="min-h-[96px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40" />
                 </div>
 
                 <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
 
-                <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
+                <div className="rounded-[28px] border border-white/10 bg-black/20 p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="text-sm font-medium text-zinc-300">CV-tyyli</p>
                     <button
                       type="button"
                       onClick={resetCurrentStyle}
-                      className="rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800"
+                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
                     >
                       Palauta oletukset
                     </button>
@@ -1781,7 +1815,7 @@ export default function Home() {
                           className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
                             cvStyle === variant
                               ? "bg-white text-black"
-                              : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+                              : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
                           }`}
                         >
                           {variant === "modern" && "Moderni"}
@@ -1796,116 +1830,112 @@ export default function Home() {
                   <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Sivupalkin väri</label>
-                      <input type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2" />
+                      <input type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-black/30 p-2" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Sivupalkin tekstiväri</label>
-                      <input type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2" />
+                      <input type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-black/30 p-2" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Pääalueen tausta</label>
-                      <input type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2" />
+                      <input type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-black/30 p-2" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Tekstin väri</label>
-                      <input type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2" />
+                      <input type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-black/30 p-2" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Otsikon väri</label>
-                      <input type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2" />
+                      <input type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-black/30 p-2" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Korosteväri</label>
-                      <input type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2" />
+                      <input type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-black/30 p-2" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Sivupalkin leveys ({customStyle.sidebarWidth}px)</label>
-                      <input type="range" min={180} max={340} value={customStyle.sidebarWidth} onChange={(e) => updateCustomStyle("sidebarWidth", Number(e.target.value))} className="w-full" />
+                      <input type="range" min={180} max={340} value={customStyle.sidebarWidth} onChange={(e) => updateCustomStyle("sidebarWidth", Number(e.target.value))} className="w-full accent-cyan-400" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Nimen koko ({customStyle.nameSize}px)</label>
-                      <input type="range" min={28} max={64} value={customStyle.nameSize} onChange={(e) => updateCustomStyle("nameSize", Number(e.target.value))} className="w-full" />
+                      <input type="range" min={28} max={64} value={customStyle.nameSize} onChange={(e) => updateCustomStyle("nameSize", Number(e.target.value))} className="w-full accent-cyan-400" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Tekstin koko ({customStyle.bodySize}px)</label>
-                      <input type="range" min={12} max={20} value={customStyle.bodySize} onChange={(e) => updateCustomStyle("bodySize", Number(e.target.value))} className="w-full" />
+                      <input type="range" min={12} max={20} value={customStyle.bodySize} onChange={(e) => updateCustomStyle("bodySize", Number(e.target.value))} className="w-full accent-cyan-400" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Kulmien pyöreys ({customStyle.borderRadius}px)</label>
-                      <input type="range" min={0} max={40} value={customStyle.borderRadius} onChange={(e) => updateCustomStyle("borderRadius", Number(e.target.value))} className="w-full" />
+                      <input type="range" min={0} max={40} value={customStyle.borderRadius} onChange={(e) => updateCustomStyle("borderRadius", Number(e.target.value))} className="w-full accent-cyan-400" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Riviväli ({customStyle.lineHeight})</label>
-                      <input type="range" min={1.2} max={2} step={0.05} value={customStyle.lineHeight} onChange={(e) => updateCustomStyle("lineHeight", Number(e.target.value))} className="w-full" />
+                      <input type="range" min={1.2} max={2} step={0.05} value={customStyle.lineHeight} onChange={(e) => updateCustomStyle("lineHeight", Number(e.target.value))} className="w-full accent-cyan-400" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Osioiden väli ({customStyle.sectionSpacing}px)</label>
-                      <input type="range" min={8} max={36} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full" />
+                      <input type="range" min={8} max={36} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full accent-cyan-400" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">Kuvan kulmat ({customStyle.imageRadius}px)</label>
-                      <input type="range" min={0} max={40} value={customStyle.imageRadius} onChange={(e) => updateCustomStyle("imageRadius", Number(e.target.value))} className="w-full" />
+                      <input type="range" min={0} max={40} value={customStyle.imageRadius} onChange={(e) => updateCustomStyle("imageRadius", Number(e.target.value))} className="w-full accent-cyan-400" />
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-3 pt-1">
-                  <button type="submit" disabled={loadingCv} className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50">
+                  <button type="submit" disabled={loadingCv} className={gradientButton("rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50")}>
                     {loadingCv ? "Luodaan CV..." : "Generoi CV"}
                   </button>
 
                   {parsedCv.cvBody && (
                     <>
-                      <button type="button" onClick={() => copyText(parsedCv.cvBody, "CV kopioitu leikepöydälle.")} className="rounded-2xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500">
+                      <button type="button" onClick={() => copyText(parsedCv.cvBody, "CV kopioitu leikepöydälle.")} className={gradientButton("rounded-2xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500")}>
                         Kopioi CV
                       </button>
 
-                      <button type="button" onClick={downloadPdf} disabled={downloadingPdf} className="rounded-2xl bg-fuchsia-600 px-5 py-3 font-semibold text-white transition hover:bg-fuchsia-500 disabled:opacity-50">
+                      <button type="button" onClick={downloadPdf} disabled={downloadingPdf} className={gradientButton("rounded-2xl bg-fuchsia-600 px-5 py-3 font-semibold text-white transition hover:bg-fuchsia-500 disabled:opacity-50")}>
                         {downloadingPdf ? "Luodaan PDF..." : "Lataa PDF"}
                       </button>
 
-                      <button type="button" onClick={downloadDocx} disabled={downloadingDocx} className="rounded-2xl bg-cyan-600 px-5 py-3 font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50">
+                      <button type="button" onClick={downloadDocx} disabled={downloadingDocx} className={gradientButton("rounded-2xl bg-cyan-600 px-5 py-3 font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50")}>
                         {downloadingDocx ? "Luodaan DOCX..." : "Lataa DOCX"}
                       </button>
                     </>
                   )}
                 </div>
               </form>
-            </div>
+            </SectionShell>
 
-            <div className="rounded-[32px] border border-zinc-800 bg-zinc-900/70 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm md:p-7">
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">
-                    Vaihe 2
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">
-                    Hakuprofiili
-                  </h2>
-                </div>
-
+            <SectionShell
+              step="Vaihe 2"
+              title="Hakuprofiili"
+              description="Määritä millaisia töitä etsit, niin saat paremmin osuvia ehdotuksia."
+              action={
                 <button
                   type="button"
                   onClick={suggestJobs}
                   disabled={loadingJobs}
-                  className="rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+                  className={gradientButton(
+                    "rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+                  )}
                 >
                   {loadingJobs ? "Ehdotetaan..." : "Ehdota työpaikkoja"}
                 </button>
-              </div>
-
+              }
+            >
               <div className="space-y-4">
                 <textarea
                   placeholder="Millaisia työpaikkoja etsit?"
@@ -1913,7 +1943,7 @@ export default function Home() {
                   onChange={(e) =>
                     updateSearchProfile("desiredRoles", e.target.value)
                   }
-                  className="min-h-[96px] w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                  className="min-h-[96px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                 />
                 <input
                   placeholder="Millä alueella etsit töitä?"
@@ -1921,7 +1951,7 @@ export default function Home() {
                   onChange={(e) =>
                     updateSearchProfile("desiredLocation", e.target.value)
                   }
-                  className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                 />
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -1931,7 +1961,7 @@ export default function Home() {
                     onChange={(e) =>
                       updateSearchProfile("workType", e.target.value)
                     }
-                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                   />
                   <input
                     placeholder="Vuorotoive"
@@ -1939,7 +1969,7 @@ export default function Home() {
                     onChange={(e) =>
                       updateSearchProfile("shiftPreference", e.target.value)
                     }
-                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                   />
                 </div>
 
@@ -1950,7 +1980,7 @@ export default function Home() {
                     onChange={(e) =>
                       updateSearchProfile("salaryWish", e.target.value)
                     }
-                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                   />
                   <input
                     placeholder="Avainsanat"
@@ -1958,19 +1988,19 @@ export default function Home() {
                     onChange={(e) =>
                       updateSearchProfile("keywords", e.target.value)
                     }
-                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40"
                   />
                 </div>
               </div>
-            </div>
+            </SectionShell>
           </section>
 
           <section className="space-y-6 xl:sticky xl:top-6 xl:self-start">
-            <div className="rounded-[32px] border border-zinc-800 bg-zinc-900/70 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm md:p-7">
+            <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl md:p-7">
               <div className="mb-6 flex flex-wrap items-center gap-3">
-                <button type="button" onClick={() => setTab("cv")} className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${tab === "cv" ? "bg-white text-black" : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"}`}>CV</button>
-                <button type="button" onClick={() => setTab("job")} className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${tab === "job" ? "bg-white text-black" : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"}`}>Työpaikat</button>
-                <button type="button" onClick={() => setTab("letter")} className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${tab === "letter" ? "bg-white text-black" : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"}`}>Hakemukset</button>
+                <button type="button" onClick={() => setTab("cv")} className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${tab === "cv" ? "bg-white text-black" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}>CV</button>
+                <button type="button" onClick={() => setTab("job")} className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${tab === "job" ? "bg-white text-black" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}>Työpaikat</button>
+                <button type="button" onClick={() => setTab("letter")} className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${tab === "letter" ? "bg-white text-black" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}>Hakemukset</button>
               </div>
 
               {tab === "cv" && (
@@ -1981,7 +2011,7 @@ export default function Home() {
                         type="button"
                         onClick={createTailoredCv}
                         disabled={loadingTailoredCv}
-                        className="rounded-2xl bg-violet-600 px-5 py-3 font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50"
+                        className={gradientButton("rounded-2xl bg-violet-600 px-5 py-3 font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50")}
                       >
                         {loadingTailoredCv ? "Luodaan kohdistettua CV:tä..." : "Luo tähän työpaikkaan sopiva CV-versio"}
                       </button>
@@ -1989,7 +2019,7 @@ export default function Home() {
                   )}
 
                   {activeJobCvVariants.length > 0 && (
-                    <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-4">
+                    <div className="rounded-[28px] border border-white/10 bg-black/20 p-4">
                       <h3 className="mb-3 text-lg font-semibold text-white">Tallennetut CV-versiot</h3>
                       <div className="space-y-3">
                         {activeJobCvVariants.map((cv) => (
@@ -1997,7 +2027,7 @@ export default function Home() {
                             key={cv.id}
                             type="button"
                             onClick={() => setCvResult(`CV_BODY:\n${cv.content}`)}
-                            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-left transition hover:bg-zinc-800"
+                            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:bg-white/10"
                           >
                             <p className="font-medium text-white">
                               {cv.jobTitle} · {cv.companyName}
@@ -2014,7 +2044,7 @@ export default function Home() {
                   {cvResult ? (
                     <>
                       {parsedCv.score && (
-                        <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
+                        <div className="rounded-[28px] border border-white/10 bg-black/20 p-5">
                           <h2 className="text-lg font-semibold text-white">Kuntotarkastus</h2>
                           <p className="mt-2 text-3xl font-semibold text-emerald-400">
                             {parsedCv.score}
@@ -2023,7 +2053,7 @@ export default function Home() {
                       )}
 
                       {parsedCv.report.length > 0 && (
-                        <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
+                        <div className="rounded-[28px] border border-white/10 bg-black/20 p-5">
                           <h2 className="mb-3 text-lg font-semibold text-white">Muutosraportti</h2>
                           <ul className="space-y-2 pl-5 text-sm text-zinc-300">
                             {parsedCv.report.map((item, index) => (
@@ -2035,7 +2065,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-3 md:p-5">
+                      <div className="rounded-[28px] border border-white/10 bg-black/20 p-3 md:p-5">
                         <CvPreview
                           cvText={parsedCv.cvBody}
                           image={profileImage}
@@ -2055,7 +2085,7 @@ export default function Home() {
                       </div>
                     </>
                   ) : (
-                    <div className="rounded-[28px] border border-dashed border-zinc-800 bg-zinc-950 p-8 text-zinc-400">
+                    <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-8 text-zinc-400">
                       Generoitu CV-esikatselu näkyy täällä.
                     </div>
                   )}
@@ -2065,64 +2095,55 @@ export default function Home() {
               {tab === "job" && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Työpaikat</p>
-                      <p className="mt-2 text-2xl font-semibold text-white">{jobs.length}</p>
-                    </div>
-                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Haettu</p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
-                        {jobs.filter((job) => job.status === "applied").length}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Haastattelu</p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
-                        {jobs.filter((job) => job.status === "interview").length}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Suosikit</p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
-                        {jobs.filter((job) => job.favorite).length}
-                      </p>
-                    </div>
+                    <TinyStat label="Työpaikat" value={jobs.length} />
+                    <TinyStat
+                      label="Haettu"
+                      value={jobs.filter((job) => job.status === "applied").length}
+                    />
+                    <TinyStat
+                      label="Haastattelu"
+                      value={jobs.filter((job) => job.status === "interview").length}
+                    />
+                    <TinyStat
+                      label="Suosikit"
+                      value={jobs.filter((job) => job.favorite).length}
+                    />
                   </div>
 
-                  <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-4 space-y-4">
+                  <div className="rounded-[28px] border border-white/10 bg-black/20 p-4 space-y-4">
                     <h3 className="text-lg font-semibold text-white">Lisää työpaikka</h3>
 
-                    <input placeholder="Työpaikan otsikko" value={jobForm.title} onChange={(e) => updateJobForm("title", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                    <input placeholder="Työpaikan otsikko" value={jobForm.title} onChange={(e) => updateJobForm("title", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <input placeholder="Yrityksen nimi" value={jobForm.company} onChange={(e) => updateJobForm("company", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
-                      <input placeholder="Sijainti" value={jobForm.location} onChange={(e) => updateJobForm("location", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                      <input placeholder="Yrityksen nimi" value={jobForm.company} onChange={(e) => updateJobForm("company", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                      <input placeholder="Sijainti" value={jobForm.location} onChange={(e) => updateJobForm("location", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <input placeholder="Työsuhde" value={jobForm.type} onChange={(e) => updateJobForm("type", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
-                      <input placeholder="Työpaikan linkki" value={jobForm.url} onChange={(e) => updateJobForm("url", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                      <input placeholder="Työsuhde" value={jobForm.type} onChange={(e) => updateJobForm("type", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                      <input placeholder="Työpaikan linkki" value={jobForm.url} onChange={(e) => updateJobForm("url", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <input placeholder="Palkka" value={jobForm.salary} onChange={(e) => updateJobForm("salary", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
-                      <input type="date" value={jobForm.deadline} onChange={(e) => updateJobForm("deadline", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none focus:border-zinc-600" />
+                      <input placeholder="Palkka" value={jobForm.salary} onChange={(e) => updateJobForm("salary", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                      <input type="date" value={jobForm.deadline} onChange={(e) => updateJobForm("deadline", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none focus:border-cyan-400/40" />
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <input placeholder="Yhteyshenkilö" value={jobForm.contactPerson} onChange={(e) => updateJobForm("contactPerson", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
-                      <input placeholder="Yhteyshenkilön sähköposti" value={jobForm.contactEmail} onChange={(e) => updateJobForm("contactEmail", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                      <input placeholder="Yhteyshenkilö" value={jobForm.contactPerson} onChange={(e) => updateJobForm("contactPerson", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
+                      <input placeholder="Yhteyshenkilön sähköposti" value={jobForm.contactEmail} onChange={(e) => updateJobForm("contactEmail", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
                     </div>
 
-                    <input placeholder="Yrityksen kotisivu" value={jobForm.companyWebsite} onChange={(e) => updateJobForm("companyWebsite", e.target.value)} className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                    <input placeholder="Yrityksen kotisivu" value={jobForm.companyWebsite} onChange={(e) => updateJobForm("companyWebsite", e.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
 
-                    <textarea placeholder="Lyhyt yhteenveto työpaikasta" value={jobForm.summary} onChange={(e) => updateJobForm("summary", e.target.value)} className="min-h-[90px] w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                    <textarea placeholder="Lyhyt yhteenveto työpaikasta" value={jobForm.summary} onChange={(e) => updateJobForm("summary", e.target.value)} className="min-h-[90px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
 
-                    <textarea placeholder="Liitä työpaikkailmoituksen teksti tähän" value={jobForm.adText} onChange={(e) => updateJobForm("adText", e.target.value)} className="min-h-[180px] w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                    <textarea placeholder="Liitä työpaikkailmoituksen teksti tähän" value={jobForm.adText} onChange={(e) => updateJobForm("adText", e.target.value)} className="min-h-[180px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
 
-                    <textarea placeholder="Muistiinpanot" value={jobForm.notes} onChange={(e) => updateJobForm("notes", e.target.value)} className="min-h-[110px] w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600" />
+                    <textarea placeholder="Muistiinpanot" value={jobForm.notes} onChange={(e) => updateJobForm("notes", e.target.value)} className="min-h-[110px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40" />
 
-                    <button type="button" onClick={addJob} className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500">
+                    <button type="button" onClick={addJob} className={gradientButton("rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500")}>
                       Lisää työpaikka listaan
                     </button>
                   </div>
@@ -2134,7 +2155,7 @@ export default function Home() {
                         value={jobFilter}
                         onChange={(e) => setJobFilter(e.target.value)}
                         placeholder="Suodata työpaikkoja"
-                        className="w-full max-w-xs rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-zinc-600"
+                        className="w-full max-w-xs rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-cyan-400/40"
                       />
                     </div>
 
@@ -2142,7 +2163,7 @@ export default function Home() {
                       <select
                         value={jobStatusFilter}
                         onChange={(e) => setJobStatusFilter(e.target.value as "all" | JobStatus)}
-                        className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-zinc-600"
+                        className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/40"
                       >
                         <option value="all">Kaikki statukset</option>
                         <option value="saved">Tallennettu</option>
@@ -2156,7 +2177,7 @@ export default function Home() {
                       <select
                         value={jobPriorityFilter}
                         onChange={(e) => setJobPriorityFilter(e.target.value as "all" | JobPriority)}
-                        className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-zinc-600"
+                        className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/40"
                       >
                         <option value="all">Kaikki prioriteetit</option>
                         <option value="low">Matala</option>
@@ -2176,7 +2197,7 @@ export default function Home() {
                               | "company"
                           )
                         }
-                        className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-zinc-600"
+                        className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/40"
                       >
                         <option value="newest">Uusimmat ensin</option>
                         <option value="match">Paras match</option>
@@ -2190,8 +2211,8 @@ export default function Home() {
                         onClick={() => setShowFavoritesOnly((prev) => !prev)}
                         className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
                           showFavoritesOnly
-                            ? "bg-amber-500 text-black"
-                            : "border border-zinc-800 bg-zinc-950 text-white hover:bg-zinc-900"
+                            ? "bg-amber-400 text-black"
+                            : "border border-white/10 bg-black/30 text-white hover:bg-white/10"
                         }`}
                       >
                         {showFavoritesOnly ? "Näytetään suosikit" : "Vain suosikit"}
@@ -2199,7 +2220,7 @@ export default function Home() {
                     </div>
 
                     {filteredJobs.length === 0 ? (
-                      <div className="rounded-[28px] border border-dashed border-zinc-800 bg-zinc-950 p-8 text-zinc-400">
+                      <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-8 text-zinc-400">
                         {jobs.length === 0
                           ? "Ei lisättyjä työpaikkoja vielä."
                           : "Suodatuksella ei löytynyt työpaikkoja."}
@@ -2230,7 +2251,7 @@ export default function Home() {
 
               {tab === "letter" && (
                 <div className="space-y-4">
-                  <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
+                  <div className="rounded-[28px] border border-white/10 bg-black/20 p-5">
                     <h3 className="text-lg font-semibold text-white">
                       Valittu työpaikka
                     </h3>
@@ -2248,9 +2269,9 @@ export default function Home() {
                     <div className="mt-5">
                       <p className="mb-2 text-sm font-medium text-zinc-300">Hakemuksen sävy</p>
                       <div className="flex flex-wrap gap-2">
-                        <button type="button" onClick={() => setLetterTone("professional")} className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${letterTone === "professional" ? "bg-white text-black" : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"}`}>Asiallinen</button>
-                        <button type="button" onClick={() => setLetterTone("warm")} className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${letterTone === "warm" ? "bg-white text-black" : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"}`}>Lämmin</button>
-                        <button type="button" onClick={() => setLetterTone("sales")} className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${letterTone === "sales" ? "bg-white text-black" : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"}`}>Myyvä</button>
+                        <button type="button" onClick={() => setLetterTone("professional")} className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${letterTone === "professional" ? "bg-white text-black" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}>Asiallinen</button>
+                        <button type="button" onClick={() => setLetterTone("warm")} className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${letterTone === "warm" ? "bg-white text-black" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}>Lämmin</button>
+                        <button type="button" onClick={() => setLetterTone("sales")} className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${letterTone === "sales" ? "bg-white text-black" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}>Myyvä</button>
                       </div>
                     </div>
 
@@ -2258,14 +2279,14 @@ export default function Home() {
                       type="button"
                       onClick={handleCoverLetterSubmit}
                       disabled={loadingLetter || !activeJob}
-                      className="mt-5 rounded-2xl bg-purple-600 px-5 py-3 font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50"
+                      className={gradientButton("mt-5 rounded-2xl bg-purple-600 px-5 py-3 font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50")}
                     >
                       {loadingLetter ? "Luodaan hakemus..." : "Luo hakemus valittuun työpaikkaan"}
                     </button>
                   </div>
 
                   {activeJobLetters.length > 0 && (
-                    <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-4">
+                    <div className="rounded-[28px] border border-white/10 bg-black/20 p-4">
                       <h3 className="mb-3 text-lg font-semibold text-white">Tallennetut hakemukset</h3>
                       <div className="space-y-3">
                         {activeJobLetters.map((letter) => (
@@ -2276,7 +2297,7 @@ export default function Home() {
                               setLetterResult(`HAKEMUS:\n${letter.content}`);
                               setLetterDraft(letter.content);
                             }}
-                            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-left transition hover:bg-zinc-800"
+                            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:bg-white/10"
                           >
                             <p className="font-medium text-white">
                               {letter.jobTitle} · {letter.companyName}
@@ -2292,13 +2313,13 @@ export default function Home() {
 
                   {letterResult ? (
                     <>
-                      <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
+                      <div className="rounded-[28px] border border-white/10 bg-black/20 p-5">
                         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                           <h2 className="text-xl font-semibold text-white">Hakemus</h2>
                           <button
                             type="button"
                             onClick={saveEditedLetter}
-                            className="rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                            className={gradientButton("rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500")}
                           >
                             Tallenna muokattu versio
                           </button>
@@ -2307,7 +2328,7 @@ export default function Home() {
                         <textarea
                           value={letterDraft}
                           onChange={(e) => setLetterDraft(e.target.value)}
-                          className="min-h-[360px] w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-4 font-sans text-sm leading-7 text-zinc-200 outline-none transition focus:border-zinc-600"
+                          className="min-h-[360px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-4 font-sans text-sm leading-7 text-zinc-200 outline-none transition focus:border-cyan-400/40"
                         />
                       </div>
 
@@ -2316,26 +2337,26 @@ export default function Home() {
                         onClick={() =>
                           copyText(letterDraft || parsedLetter, "Hakemus kopioitu leikepöydälle.")
                         }
-                        className="rounded-2xl bg-amber-600 px-5 py-3 font-semibold text-white transition hover:bg-amber-500"
+                        className={gradientButton("rounded-2xl bg-amber-600 px-5 py-3 font-semibold text-white transition hover:bg-amber-500")}
                       >
                         Kopioi hakemus
                       </button>
                     </>
                   ) : (
-                    <div className="rounded-[28px] border border-dashed border-zinc-800 bg-zinc-950 p-8 text-zinc-400">
+                    <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-8 text-zinc-400">
                       Generoitu hakemus näkyy täällä, kun valitset työpaikan ja luot hakemuksen.
                     </div>
                   )}
                 </div>
               )}
-            </div>
+            </section>
 
             {(message || errorMessage) && (
               <div
-                className={`rounded-[28px] border p-4 text-sm ${
+                className={`rounded-[28px] border p-4 text-sm backdrop-blur-sm ${
                   errorMessage
-                    ? "border-red-900 bg-red-950 text-red-300"
-                    : "border-emerald-900 bg-emerald-950 text-emerald-300"
+                    ? "border-red-500/20 bg-red-500/10 text-red-300"
+                    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
                 }`}
               >
                 {errorMessage || message}
