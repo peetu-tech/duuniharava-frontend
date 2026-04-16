@@ -24,6 +24,7 @@ type ParsedCvResult = {
 type Tab = "cv" | "job" | "letter";
 type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 type LetterTone = "professional" | "warm" | "sales";
+type JobStatus = "saved" | "applying" | "applied" | "interview" | "rejected";
 
 type JobItem = {
   id: string;
@@ -37,6 +38,9 @@ type JobItem = {
   whyFit?: string;
   source?: string;
   matchScore?: number;
+  status: JobStatus;
+  favorite: boolean;
+  notes: string;
 };
 
 type SavedLetter = {
@@ -57,7 +61,7 @@ type SavedCvVariant = {
   createdAt: string;
 };
 
-const STORAGE_KEY = "duuniharava_state_v7";
+const STORAGE_KEY = "duuniharava_state_v8";
 
 const emptyForm = {
   cvText: "",
@@ -203,7 +207,10 @@ function safeMatchScore(value?: number) {
   return Math.max(1, Math.min(100, Math.round(value)));
 }
 
-function safeJsonParseJobs(text: string): Omit<JobItem, "id">[] {
+function safeJsonParseJobs(text: string): Omit<
+  JobItem,
+  "id" | "status" | "favorite" | "notes"
+>[] {
   try {
     const parsed = JSON.parse(text);
     if (Array.isArray(parsed)) return parsed;
@@ -222,6 +229,40 @@ function splitPdfLines(text: string) {
 
 function isPdfHeading(line: string) {
   return line === line.toUpperCase() || pdfHeadingNames.includes(line);
+}
+
+function getStatusLabel(status: JobStatus) {
+  switch (status) {
+    case "saved":
+      return "Tallennettu";
+    case "applying":
+      return "Hakemus työn alla";
+    case "applied":
+      return "Haettu";
+    case "interview":
+      return "Haastattelu";
+    case "rejected":
+      return "Ei edennyt";
+    default:
+      return status;
+  }
+}
+
+function getStatusClass(status: JobStatus) {
+  switch (status) {
+    case "saved":
+      return "bg-zinc-800 text-zinc-200";
+    case "applying":
+      return "bg-blue-500/15 text-blue-300";
+    case "applied":
+      return "bg-emerald-500/15 text-emerald-300";
+    case "interview":
+      return "bg-amber-500/15 text-amber-300";
+    case "rejected":
+      return "bg-red-500/15 text-red-300";
+    default:
+      return "bg-zinc-800 text-zinc-200";
+  }
 }
 
 function PdfSafePreview({
@@ -383,7 +424,9 @@ function StatCard({
 }) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-      <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">{title}</p>
+      <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">
+        {title}
+      </p>
       <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
       <p className="mt-2 text-sm text-zinc-400">{description}</p>
     </div>
@@ -397,6 +440,9 @@ function JobCard({
   cvsCount,
   onSelect,
   onRemove,
+  onToggleFavorite,
+  onStatusChange,
+  onNotesChange,
 }: {
   job: JobItem;
   isActive: boolean;
@@ -404,6 +450,9 @@ function JobCard({
   cvsCount: number;
   onSelect: () => void;
   onRemove: () => void;
+  onToggleFavorite: () => void;
+  onStatusChange: (status: JobStatus) => void;
+  onNotesChange: (notes: string) => void;
 }) {
   const score = safeMatchScore(job.matchScore);
 
@@ -423,12 +472,22 @@ function JobCard({
                 {job.source}
               </span>
             )}
+
             <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
               Match {score}%
+            </span>
+
+            <span
+              className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${getStatusClass(
+                job.status
+              )}`}
+            >
+              {getStatusLabel(job.status)}
             </span>
           </div>
 
           <h4 className="text-xl font-semibold text-white">
+            {job.favorite ? "⭐ " : ""}
             {job.title || "Nimetön työpaikka"}
           </h4>
 
@@ -438,6 +497,14 @@ function JobCard({
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onToggleFavorite}
+            className="rounded-2xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700"
+          >
+            {job.favorite ? "Poista suosikki" : "Suosikki"}
+          </button>
+
           <button
             type="button"
             onClick={onSelect}
@@ -469,7 +536,9 @@ function JobCard({
           <p className="text-xs uppercase tracking-[0.18em] text-emerald-400">
             Miksi sopii
           </p>
-          <p className="mt-2 text-sm leading-6 text-emerald-200">{job.whyFit}</p>
+          <p className="mt-2 text-sm leading-6 text-emerald-200">
+            {job.whyFit}
+          </p>
         </div>
       )}
 
@@ -509,6 +578,35 @@ function JobCard({
         </div>
       </div>
 
+      <div className="mt-4 grid gap-4 md:grid-cols-[220px_1fr]">
+        <div>
+          <label className="mb-2 block text-sm text-zinc-400">Status</label>
+          <select
+            value={job.status}
+            onChange={(e) => onStatusChange(e.target.value as JobStatus)}
+            className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white outline-none focus:border-zinc-600"
+          >
+            <option value="saved">Tallennettu</option>
+            <option value="applying">Hakemus työn alla</option>
+            <option value="applied">Haettu</option>
+            <option value="interview">Haastattelu</option>
+            <option value="rejected">Ei edennyt</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm text-zinc-400">
+            Muistiinpanot
+          </label>
+          <textarea
+            value={job.notes}
+            onChange={(e) => onNotesChange(e.target.value)}
+            placeholder="Kirjoita muistiinpanoja tästä työpaikasta"
+            className="min-h-[96px] w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+          />
+        </div>
+      </div>
+
       {job.url && (
         <a
           href={job.url}
@@ -538,6 +636,7 @@ export default function Home() {
 
   const [cvResult, setCvResult] = useState("");
   const [letterResult, setLetterResult] = useState("");
+  const [letterDraft, setLetterDraft] = useState("");
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [profileImage, setProfileImage] = useState("");
@@ -569,6 +668,7 @@ export default function Home() {
       setLetterTone(parsed.letterTone ?? "professional");
       setCvResult(parsed.cvResult ?? "");
       setLetterResult(parsed.letterResult ?? "");
+      setLetterDraft(parsed.letterDraft ?? "");
       setProfileImage(parsed.profileImage ?? "");
       setForm(parsed.form ?? emptyForm);
       setSearchProfile(parsed.searchProfile ?? emptySearchProfile);
@@ -591,6 +691,7 @@ export default function Home() {
       letterTone,
       cvResult,
       letterResult,
+      letterDraft,
       profileImage,
       form,
       searchProfile,
@@ -610,6 +711,7 @@ export default function Home() {
     letterTone,
     cvResult,
     letterResult,
+    letterDraft,
     profileImage,
     form,
     searchProfile,
@@ -655,6 +757,8 @@ export default function Home() {
         job.summary,
         job.whyFit,
         job.source,
+        job.notes,
+        getStatusLabel(job.status),
       ]
         .filter(Boolean)
         .join(" ")
@@ -708,6 +812,7 @@ export default function Home() {
     setActiveJobId("");
     setCvResult("");
     setLetterResult("");
+    setLetterDraft("");
     setSavedLetters([]);
     setSavedCvVariants([]);
     setMessage("");
@@ -790,6 +895,15 @@ export default function Home() {
     }
 
     setTimeout(() => setMessage(""), 2500);
+  }
+
+  function updateJobMeta(
+    id: string,
+    patch: Partial<Pick<JobItem, "status" | "favorite" | "notes">>
+  ) {
+    setJobs((prev) =>
+      prev.map((job) => (job.id === id ? { ...job, ...patch } : job))
+    );
   }
 
   async function copyText(text: string, successMessage: string) {
@@ -992,6 +1106,9 @@ export default function Home() {
           : "",
       source: "Lisätty käsin",
       matchScore: safeMatchScore(82),
+      status: "saved",
+      favorite: false,
+      notes: "",
     };
 
     setJobs((prev) => [job, ...prev]);
@@ -1054,6 +1171,9 @@ export default function Home() {
         whyFit: job.whyFit || "",
         source: job.source || "AI-ehdotus",
         matchScore: safeMatchScore(job.matchScore),
+        status: "saved",
+        favorite: false,
+        notes: "",
       }));
 
       setJobs((prev) => [...newJobs, ...prev]);
@@ -1190,6 +1310,7 @@ export default function Home() {
       const parsed = parseCoverLetter(output);
 
       setLetterResult(output);
+      setLetterDraft(parsed);
 
       const savedLetter: SavedLetter = {
         id: makeId(),
@@ -1212,6 +1333,31 @@ export default function Home() {
     }
   }
 
+  function saveEditedLetter() {
+    if (!activeJob || !letterDraft.trim()) return;
+
+    const savedLetter: SavedLetter = {
+      id: makeId(),
+      jobId: activeJob.id,
+      jobTitle: activeJob.title,
+      companyName: activeJob.company,
+      content: letterDraft.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    setSavedLetters((prev) => [savedLetter, ...prev]);
+    setLetterResult(`HAKEMUS:\n${letterDraft.trim()}`);
+    setMessage("Muokattu hakemus tallennettu.");
+    setTimeout(() => setMessage(""), 2500);
+  }
+
+  const customStyle = customStyles[cvStyle];
+  const jobsCount = jobs.length;
+  const favoritesCount = jobs.filter((job) => job.favorite).length;
+  const appliedCount = jobs.filter((job) =>
+    ["applied", "interview"].includes(job.status)
+  ).length;
+
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       <section className="relative overflow-hidden border-b border-white/10">
@@ -1224,12 +1370,14 @@ export default function Home() {
               </div>
 
               <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.05]">
-                Rakenna parempi CV, löydä sopivat työt ja tee personoidut hakemukset samassa näkymässä.
+                Rakenna parempi CV, löydä sopivat työt ja tee personoidut
+                hakemukset samassa näkymässä.
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 md:text-lg">
-                Duuniharava auttaa luomaan tai parantamaan CV:n, suuntaamaan sen oikeaan rooliin,
-                ehdottamaan sopivia työpaikkoja ja kirjoittamaan hakemuksia, jotka tukevat CV:täsi.
+                Duuniharava auttaa luomaan tai parantamaan CV:n, suuntaamaan sen
+                oikeaan rooliin, ehdottamaan sopivia työpaikkoja ja kirjoittamaan
+                hakemuksia, jotka tukevat CV:täsi.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -1269,19 +1417,19 @@ export default function Home() {
 
             <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
               <StatCard
-                title="CV"
-                value="Muokattava"
-                description="Säädä värejä, fonttikokoja, kulmia ja rakennetta."
+                title="Työpaikat"
+                value={String(jobsCount)}
+                description="Tallennetut ja AI:n ehdottamat työpaikat."
               />
               <StatCard
-                title="Hakemukset"
-                value="3 sävyä"
-                description="Asiallinen, lämmin tai myyvä työpaikan mukaan."
+                title="Suosikit"
+                value={String(favoritesCount)}
+                description="Merkitse kiinnostavimmat paikat talteen."
               />
               <StatCard
-                title="Workflow"
-                value="GitHub + Vercel"
-                description="Muutokset julkaistaan helposti tuotantoon."
+                title="Edetty"
+                value={String(appliedCount)}
+                description="Hakemukset ja haastatteluvaiheessa olevat."
               />
             </div>
           </div>
@@ -1441,7 +1589,9 @@ export default function Home() {
 
                 <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-sm font-medium text-zinc-300">CV-tyyli</p>
+                    <p className="text-sm font-medium text-zinc-300">
+                      CV-tyyli
+                    </p>
                     <button
                       type="button"
                       onClick={resetCurrentStyle}
@@ -1452,25 +1602,25 @@ export default function Home() {
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map(
-                      (variant) => (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={() => setCvStyle(variant)}
-                          className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
-                            cvStyle === variant
-                              ? "bg-white text-black"
-                              : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
-                          }`}
-                        >
-                          {variant === "modern" && "Moderni"}
-                          {variant === "classic" && "Klassinen"}
-                          {variant === "compact" && "Tiivis"}
-                          {variant === "bold" && "Näyttävä"}
-                        </button>
-                      )
-                    )}
+                    {(
+                      ["modern", "classic", "compact", "bold"] as CvStyleVariant[]
+                    ).map((variant) => (
+                      <button
+                        key={variant}
+                        type="button"
+                        onClick={() => setCvStyle(variant)}
+                        className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
+                          cvStyle === variant
+                            ? "bg-white text-black"
+                            : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+                        }`}
+                      >
+                        {variant === "modern" && "Moderni"}
+                        {variant === "classic" && "Klassinen"}
+                        {variant === "compact" && "Tiivis"}
+                        {variant === "bold" && "Näyttävä"}
+                      </button>
+                    ))}
                   </div>
 
                   <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -1480,7 +1630,7 @@ export default function Home() {
                       </label>
                       <input
                         type="color"
-                        value={customStyles[cvStyle].sidebarBg}
+                        value={customStyle.sidebarBg}
                         onChange={(e) =>
                           updateCustomStyle("sidebarBg", e.target.value)
                         }
@@ -1494,7 +1644,7 @@ export default function Home() {
                       </label>
                       <input
                         type="color"
-                        value={customStyles[cvStyle].sidebarText}
+                        value={customStyle.sidebarText}
                         onChange={(e) =>
                           updateCustomStyle("sidebarText", e.target.value)
                         }
@@ -1508,7 +1658,7 @@ export default function Home() {
                       </label>
                       <input
                         type="color"
-                        value={customStyles[cvStyle].mainBg}
+                        value={customStyle.mainBg}
                         onChange={(e) =>
                           updateCustomStyle("mainBg", e.target.value)
                         }
@@ -1522,7 +1672,7 @@ export default function Home() {
                       </label>
                       <input
                         type="color"
-                        value={customStyles[cvStyle].mainText}
+                        value={customStyle.mainText}
                         onChange={(e) =>
                           updateCustomStyle("mainText", e.target.value)
                         }
@@ -1536,7 +1686,7 @@ export default function Home() {
                       </label>
                       <input
                         type="color"
-                        value={customStyles[cvStyle].headingColor}
+                        value={customStyle.headingColor}
                         onChange={(e) =>
                           updateCustomStyle("headingColor", e.target.value)
                         }
@@ -1550,7 +1700,7 @@ export default function Home() {
                       </label>
                       <input
                         type="color"
-                        value={customStyles[cvStyle].accentColor}
+                        value={customStyle.accentColor}
                         onChange={(e) =>
                           updateCustomStyle("accentColor", e.target.value)
                         }
@@ -1560,13 +1710,13 @@ export default function Home() {
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
-                        Sivupalkin leveys ({customStyles[cvStyle].sidebarWidth}px)
+                        Sivupalkin leveys ({customStyle.sidebarWidth}px)
                       </label>
                       <input
                         type="range"
                         min={180}
                         max={340}
-                        value={customStyles[cvStyle].sidebarWidth}
+                        value={customStyle.sidebarWidth}
                         onChange={(e) =>
                           updateCustomStyle(
                             "sidebarWidth",
@@ -1579,13 +1729,13 @@ export default function Home() {
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
-                        Nimen koko ({customStyles[cvStyle].nameSize}px)
+                        Nimen koko ({customStyle.nameSize}px)
                       </label>
                       <input
                         type="range"
                         min={28}
                         max={64}
-                        value={customStyles[cvStyle].nameSize}
+                        value={customStyle.nameSize}
                         onChange={(e) =>
                           updateCustomStyle("nameSize", Number(e.target.value))
                         }
@@ -1595,13 +1745,13 @@ export default function Home() {
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
-                        Tekstin koko ({customStyles[cvStyle].bodySize}px)
+                        Tekstin koko ({customStyle.bodySize}px)
                       </label>
                       <input
                         type="range"
                         min={12}
                         max={20}
-                        value={customStyles[cvStyle].bodySize}
+                        value={customStyle.bodySize}
                         onChange={(e) =>
                           updateCustomStyle("bodySize", Number(e.target.value))
                         }
@@ -1611,13 +1761,13 @@ export default function Home() {
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
-                        Kulmien pyöreys ({customStyles[cvStyle].borderRadius}px)
+                        Kulmien pyöreys ({customStyle.borderRadius}px)
                       </label>
                       <input
                         type="range"
                         min={0}
                         max={40}
-                        value={customStyles[cvStyle].borderRadius}
+                        value={customStyle.borderRadius}
                         onChange={(e) =>
                           updateCustomStyle(
                             "borderRadius",
@@ -1630,14 +1780,14 @@ export default function Home() {
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
-                        Riviväli ({customStyles[cvStyle].lineHeight})
+                        Riviväli ({customStyle.lineHeight})
                       </label>
                       <input
                         type="range"
                         min={1.2}
                         max={2}
                         step={0.05}
-                        value={customStyles[cvStyle].lineHeight}
+                        value={customStyle.lineHeight}
                         onChange={(e) =>
                           updateCustomStyle(
                             "lineHeight",
@@ -1650,13 +1800,13 @@ export default function Home() {
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
-                        Osioiden väli ({customStyles[cvStyle].sectionSpacing}px)
+                        Osioiden väli ({customStyle.sectionSpacing}px)
                       </label>
                       <input
                         type="range"
                         min={8}
                         max={36}
-                        value={customStyles[cvStyle].sectionSpacing}
+                        value={customStyle.sectionSpacing}
                         onChange={(e) =>
                           updateCustomStyle(
                             "sectionSpacing",
@@ -1669,13 +1819,13 @@ export default function Home() {
 
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
-                        Kuvan kulmat ({customStyles[cvStyle].imageRadius}px)
+                        Kuvan kulmat ({customStyle.imageRadius}px)
                       </label>
                       <input
                         type="range"
                         min={0}
                         max={40}
-                        value={customStyles[cvStyle].imageRadius}
+                        value={customStyle.imageRadius}
                         onChange={(e) =>
                           updateCustomStyle(
                             "imageRadius",
@@ -1927,7 +2077,7 @@ export default function Home() {
                           cvText={parsedCv.cvBody}
                           image={profileImage}
                           styleVariant={cvStyle}
-                          customStyle={customStyles[cvStyle]}
+                          customStyle={customStyle}
                         />
                       </div>
 
@@ -1946,7 +2096,7 @@ export default function Home() {
                           <PdfSafePreview
                             cvText={parsedCv.cvBody}
                             image={profileImage}
-                            customStyle={customStyles[cvStyle]}
+                            customStyle={customStyle}
                           />
                         </div>
                       </div>
@@ -1962,7 +2112,9 @@ export default function Home() {
               {tab === "job" && (
                 <div className="space-y-6">
                   <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-4 space-y-4">
-                    <h3 className="text-lg font-semibold text-white">Lisää työpaikka</h3>
+                    <h3 className="text-lg font-semibold text-white">
+                      Lisää työpaikka
+                    </h3>
 
                     <input
                       placeholder="Työpaikan otsikko"
@@ -2030,7 +2182,9 @@ export default function Home() {
 
                   <div className="space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h3 className="text-lg font-semibold text-white">Työpaikat</h3>
+                      <h3 className="text-lg font-semibold text-white">
+                        Työpaikat
+                      </h3>
                       <input
                         value={jobFilter}
                         onChange={(e) => setJobFilter(e.target.value)}
@@ -2064,6 +2218,17 @@ export default function Home() {
                             cvsCount={jobCvs.length}
                             onSelect={() => setActiveJobId(job.id)}
                             onRemove={() => removeJob(job.id)}
+                            onToggleFavorite={() =>
+                              updateJobMeta(job.id, {
+                                favorite: !job.favorite,
+                              })
+                            }
+                            onStatusChange={(status) =>
+                              updateJobMeta(job.id, { status })
+                            }
+                            onNotesChange={(notes) =>
+                              updateJobMeta(job.id, { notes })
+                            }
                           />
                         );
                       })
@@ -2166,6 +2331,7 @@ export default function Home() {
                             type="button"
                             onClick={() => {
                               setLetterResult(`HAKEMUS:\n${letter.content}`);
+                              setLetterDraft(letter.content);
                             }}
                             className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-left transition hover:bg-zinc-800"
                           >
@@ -2184,19 +2350,31 @@ export default function Home() {
                   {letterResult ? (
                     <>
                       <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
-                        <h2 className="mb-3 text-xl font-semibold text-white">
-                          Hakemus
-                        </h2>
-                        <pre className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-200">
-                          {parsedLetter}
-                        </pre>
+                        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                          <h2 className="text-xl font-semibold text-white">
+                            Hakemus
+                          </h2>
+                          <button
+                            type="button"
+                            onClick={saveEditedLetter}
+                            className="rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                          >
+                            Tallenna muokattu versio
+                          </button>
+                        </div>
+
+                        <textarea
+                          value={letterDraft}
+                          onChange={(e) => setLetterDraft(e.target.value)}
+                          className="min-h-[360px] w-full rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-4 font-sans text-sm leading-7 text-zinc-200 outline-none transition focus:border-zinc-600"
+                        />
                       </div>
 
                       <button
                         type="button"
                         onClick={() =>
                           copyText(
-                            parsedLetter,
+                            letterDraft || parsedLetter,
                             "Hakemus kopioitu leikepöydälle."
                           )
                         }

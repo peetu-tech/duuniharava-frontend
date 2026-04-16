@@ -2,11 +2,18 @@ import OpenAI from "openai";
 import { buildJobSuggestionsPrompt } from "@/lib/prompts";
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return Response.json(
+        { error: "OPENAI_API_KEY puuttuu palvelimen ympäristömuuttujista." },
+        { status: 500 }
+      );
+    }
+
     const body = await req.json();
 
     const prompt = buildJobSuggestionsPrompt({
@@ -27,11 +34,12 @@ export async function POST(req: Request) {
       input: prompt,
     });
 
-    const output = response.output_text || "[]";
+    const output = response.output_text?.trim() || "[]";
 
     return Response.json({ output });
   } catch (error) {
-    console.error(error);
+    console.error("jobs route error:", error);
+
     return Response.json(
       { error: "Työpaikkaehdotusten haku epäonnistui." },
       { status: 500 }
