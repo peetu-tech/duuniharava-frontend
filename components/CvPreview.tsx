@@ -2,10 +2,27 @@
 
 type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
+export type CvCustomStyle = {
+  sidebarBg: string;
+  sidebarText: string;
+  mainBg: string;
+  mainText: string;
+  headingColor: string;
+  accentColor: string;
+  borderRadius: number;
+  sidebarWidth: number;
+  nameSize: number;
+  bodySize: number;
+  lineHeight: number;
+  sectionSpacing: number;
+  imageRadius: number;
+};
+
 type CvPreviewProps = {
   cvText: string;
   image?: string;
   styleVariant?: CvStyleVariant;
+  customStyle?: CvCustomStyle;
 };
 
 function splitLines(text: string) {
@@ -29,56 +46,72 @@ function isHeading(line: string) {
   return line === line.toUpperCase() || headingNames.includes(line);
 }
 
-function getVariantClasses(styleVariant: CvStyleVariant) {
+function getDefaultCustomStyle(styleVariant: CvStyleVariant): CvCustomStyle {
   switch (styleVariant) {
     case "classic":
       return {
-        root: "bg-white text-slate-900",
-        shell: "border border-slate-200 shadow-[0_30px_80px_rgba(15,23,42,0.12)]",
-        aside: "bg-stone-100 text-slate-900 border-r border-stone-200",
-        heading:
-          "text-[11px] font-bold uppercase tracking-[0.24em] text-stone-500 border-t border-stone-200 pt-4 mt-6",
-        name: "text-4xl font-serif font-bold tracking-tight text-slate-900",
-        role: "text-sm text-stone-600 mt-2",
-        body: "text-[15px] leading-7 text-slate-700",
-        chip: "bg-stone-200 text-stone-700",
+        sidebarBg: "#f5f5f4",
+        sidebarText: "#111827",
+        mainBg: "#ffffff",
+        mainText: "#111827",
+        headingColor: "#78716c",
+        accentColor: "#a16207",
+        borderRadius: 30,
+        sidebarWidth: 255,
+        nameSize: 40,
+        bodySize: 15,
+        lineHeight: 1.7,
+        sectionSpacing: 24,
+        imageRadius: 24,
       };
     case "compact":
       return {
-        root: "bg-white text-slate-900",
-        shell: "border border-slate-200 shadow-[0_24px_70px_rgba(15,23,42,0.10)]",
-        aside: "bg-slate-50 text-slate-900 border-r border-slate-200",
-        heading:
-          "text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500 border-t border-slate-200 pt-3 mt-5",
-        name: "text-3xl font-bold tracking-tight text-slate-900",
-        role: "text-sm text-slate-500 mt-2",
-        body: "text-[14px] leading-6 text-slate-700",
-        chip: "bg-slate-200 text-slate-700",
+        sidebarBg: "#f8fafc",
+        sidebarText: "#111827",
+        mainBg: "#ffffff",
+        mainText: "#111827",
+        headingColor: "#64748b",
+        accentColor: "#0f766e",
+        borderRadius: 30,
+        sidebarWidth: 220,
+        nameSize: 32,
+        bodySize: 14,
+        lineHeight: 1.6,
+        sectionSpacing: 18,
+        imageRadius: 20,
       };
     case "bold":
       return {
-        root: "bg-white text-slate-900",
-        shell: "border border-indigo-200 shadow-[0_30px_90px_rgba(67,56,202,0.16)]",
-        aside: "bg-indigo-950 text-white",
-        heading:
-          "text-[11px] font-black uppercase tracking-[0.24em] text-indigo-400 border-t border-indigo-200/15 pt-4 mt-6",
-        name: "text-5xl font-black tracking-tight text-slate-950",
-        role: "text-sm text-indigo-700 mt-2 font-semibold",
-        body: "text-[15px] leading-7 text-slate-700",
-        chip: "bg-indigo-500/15 text-indigo-200",
+        sidebarBg: "#1e1b4b",
+        sidebarText: "#ffffff",
+        mainBg: "#ffffff",
+        mainText: "#111827",
+        headingColor: "#4338ca",
+        accentColor: "#4f46e5",
+        borderRadius: 30,
+        sidebarWidth: 255,
+        nameSize: 48,
+        bodySize: 15,
+        lineHeight: 1.7,
+        sectionSpacing: 24,
+        imageRadius: 24,
       };
     case "modern":
     default:
       return {
-        root: "bg-white text-slate-900",
-        shell: "border border-slate-200 shadow-[0_30px_80px_rgba(15,23,42,0.14)]",
-        aside: "bg-slate-900 text-white",
-        heading:
-          "text-[11px] font-bold uppercase tracking-[0.24em] text-slate-500 border-t border-slate-200 pt-4 mt-6",
-        name: "text-4xl font-bold tracking-tight text-slate-900",
-        role: "text-sm text-sky-700 mt-2 font-medium",
-        body: "text-[15px] leading-7 text-slate-700",
-        chip: "bg-white/10 text-slate-200",
+        sidebarBg: "#0f172a",
+        sidebarText: "#ffffff",
+        mainBg: "#ffffff",
+        mainText: "#111827",
+        headingColor: "#475569",
+        accentColor: "#0369a1",
+        borderRadius: 30,
+        sidebarWidth: 255,
+        nameSize: 40,
+        bodySize: 15,
+        lineHeight: 1.7,
+        sectionSpacing: 24,
+        imageRadius: 24,
       };
   }
 }
@@ -87,9 +120,10 @@ export default function CvPreview({
   cvText,
   image,
   styleVariant = "modern",
+  customStyle,
 }: CvPreviewProps) {
   const lines = splitLines(cvText);
-  const styles = getVariantClasses(styleVariant);
+  const style = customStyle ?? getDefaultCustomStyle(styleVariant);
 
   if (!lines.length) {
     return (
@@ -112,22 +146,49 @@ export default function CvPreview({
   return (
     <div
       id="cv-preview"
-      className={`mx-auto w-full max-w-[860px] overflow-hidden rounded-[30px] ${styles.root} ${styles.shell}`}
+      className="mx-auto w-full max-w-[860px] overflow-hidden border shadow-[0_30px_80px_rgba(15,23,42,0.14)]"
+      style={{
+        backgroundColor: style.mainBg,
+        color: style.mainText,
+        borderRadius: `${style.borderRadius}px`,
+        borderColor: "#e2e8f0",
+      }}
     >
       <div
-        className={`grid min-h-[1120px] ${
-          isCompact ? "grid-cols-[220px_1fr]" : "grid-cols-[255px_1fr]"
-        }`}
+        className="grid min-h-[1120px]"
+        style={{
+          gridTemplateColumns: `${style.sidebarWidth}px 1fr`,
+        }}
       >
-        <aside className={`${styles.aside} flex flex-col p-7`}>
+        <aside
+          className="flex flex-col p-7"
+          style={{
+            backgroundColor: style.sidebarBg,
+            color: style.sidebarText,
+            borderRight:
+              styleVariant === "bold"
+                ? "none"
+                : "1px solid rgba(148,163,184,0.2)",
+          }}
+        >
           {image ? (
             <img
               src={image}
               alt="Profiilikuva"
-              className="mb-6 aspect-square w-full rounded-[24px] object-cover"
+              className="mb-6 aspect-square w-full object-cover"
+              style={{
+                borderRadius: `${style.imageRadius}px`,
+              }}
             />
           ) : (
-            <div className="mb-6 flex aspect-square w-full items-center justify-center rounded-[24px] border border-white/10 bg-white/5 text-sm opacity-80">
+            <div
+              className="mb-6 flex aspect-square w-full items-center justify-center text-sm opacity-80"
+              style={{
+                borderRadius: `${style.imageRadius}px`,
+                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.05)",
+              }}
+            >
               Ei kuvaa
             </div>
           )}
@@ -152,12 +213,49 @@ export default function CvPreview({
               </p>
               <div className="flex flex-wrap gap-2">
                 <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${styles.chip}`}
+                  className="rounded-full px-3 py-1 text-xs font-medium"
+                  style={{
+                    backgroundColor:
+                      styleVariant === "bold"
+                        ? "rgba(99,102,241,0.18)"
+                        : styleVariant === "classic"
+                        ? "#e7e5e4"
+                        : styleVariant === "compact"
+                        ? "#e2e8f0"
+                        : "rgba(255,255,255,0.10)",
+                    color:
+                      styleVariant === "bold"
+                        ? "#c7d2fe"
+                        : styleVariant === "classic"
+                        ? "#57534e"
+                        : styleVariant === "compact"
+                        ? "#475569"
+                        : "#e2e8f0",
+                  }}
                 >
                   CV Studio
                 </span>
+
                 <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${styles.chip}`}
+                  className="rounded-full px-3 py-1 text-xs font-medium"
+                  style={{
+                    backgroundColor:
+                      styleVariant === "bold"
+                        ? "rgba(99,102,241,0.18)"
+                        : styleVariant === "classic"
+                        ? "#e7e5e4"
+                        : styleVariant === "compact"
+                        ? "#e2e8f0"
+                        : "rgba(255,255,255,0.10)",
+                    color:
+                      styleVariant === "bold"
+                        ? "#c7d2fe"
+                        : styleVariant === "classic"
+                        ? "#57534e"
+                        : styleVariant === "compact"
+                        ? "#475569"
+                        : "#e2e8f0",
+                  }}
                 >
                   Duuniharava
                 </span>
@@ -174,22 +272,82 @@ export default function CvPreview({
         </aside>
 
         <main className={isCompact ? "p-7" : "p-9 md:p-10"}>
-          <header className="mb-8 border-b border-slate-200 pb-6">
-            <h1 className={styles.name}>{name}</h1>
-            {roleLine && <p className={styles.role}>{roleLine}</p>}
+          <header
+            className="mb-8 pb-6"
+            style={{
+              borderBottom: "1px solid #e2e8f0",
+            }}
+          >
+            <h1
+              style={{
+                fontSize: `${style.nameSize}px`,
+                lineHeight: 1.05,
+                fontWeight: styleVariant === "bold" ? 900 : 700,
+                letterSpacing: "-0.03em",
+                color: style.mainText,
+                fontFamily:
+                  styleVariant === "classic"
+                    ? "Georgia, serif"
+                    : "inherit",
+              }}
+            >
+              {name}
+            </h1>
+
+            {roleLine && (
+              <p
+                className="mt-2 text-sm"
+                style={{
+                  color: style.accentColor,
+                  fontWeight:
+                    styleVariant === "bold" || styleVariant === "modern"
+                      ? 600
+                      : 500,
+                }}
+              >
+                {roleLine}
+              </p>
+            )}
           </header>
 
-          <div className={`space-y-2 whitespace-pre-wrap ${styles.body}`}>
+          <div
+            className="whitespace-pre-wrap"
+            style={{
+              fontSize: `${style.bodySize}px`,
+              lineHeight: style.lineHeight,
+              color: style.mainText,
+            }}
+          >
             {remainingContent.map((line, index) => {
               if (isHeading(line)) {
                 return (
-                  <h2 key={index} className={styles.heading}>
+                  <h2
+                    key={index}
+                    style={{
+                      fontSize: styleVariant === "compact" ? "10px" : "11px",
+                      fontWeight: styleVariant === "bold" ? 900 : 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.24em",
+                      color: style.headingColor,
+                      borderTop:
+                        styleVariant === "bold"
+                          ? "1px solid rgba(67,56,202,0.15)"
+                          : "1px solid #e2e8f0",
+                      paddingTop: styleVariant === "compact" ? "12px" : "16px",
+                      marginTop: `${style.sectionSpacing}px`,
+                      marginBottom: "10px",
+                    }}
+                  >
                     {line}
                   </h2>
                 );
               }
 
-              return <p key={index}>{line}</p>;
+              return (
+                <p key={index} style={{ marginBottom: "8px" }}>
+                  {line}
+                </p>
+              );
             })}
           </div>
         </main>

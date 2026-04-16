@@ -12,7 +12,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview from "@/components/CvPreview";
+import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 
 type ParsedCvResult = {
@@ -57,7 +57,7 @@ type SavedCvVariant = {
   createdAt: string;
 };
 
-const STORAGE_KEY = "duuniharava_state_v6";
+const STORAGE_KEY = "duuniharava_state_v7";
 
 const emptyForm = {
   cvText: "",
@@ -102,6 +102,69 @@ const pdfHeadingNames = [
   "Kortit ja pätevyydet",
   "Harrastukset",
 ];
+
+const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
+  modern: {
+    sidebarBg: "#0f172a",
+    sidebarText: "#ffffff",
+    mainBg: "#ffffff",
+    mainText: "#111827",
+    headingColor: "#475569",
+    accentColor: "#0369a1",
+    borderRadius: 30,
+    sidebarWidth: 255,
+    nameSize: 40,
+    bodySize: 15,
+    lineHeight: 1.7,
+    sectionSpacing: 24,
+    imageRadius: 24,
+  },
+  classic: {
+    sidebarBg: "#f5f5f4",
+    sidebarText: "#111827",
+    mainBg: "#ffffff",
+    mainText: "#111827",
+    headingColor: "#78716c",
+    accentColor: "#a16207",
+    borderRadius: 30,
+    sidebarWidth: 255,
+    nameSize: 40,
+    bodySize: 15,
+    lineHeight: 1.7,
+    sectionSpacing: 24,
+    imageRadius: 24,
+  },
+  compact: {
+    sidebarBg: "#f8fafc",
+    sidebarText: "#111827",
+    mainBg: "#ffffff",
+    mainText: "#111827",
+    headingColor: "#64748b",
+    accentColor: "#0f766e",
+    borderRadius: 30,
+    sidebarWidth: 220,
+    nameSize: 32,
+    bodySize: 14,
+    lineHeight: 1.6,
+    sectionSpacing: 18,
+    imageRadius: 20,
+  },
+  bold: {
+    sidebarBg: "#1e1b4b",
+    sidebarText: "#ffffff",
+    mainBg: "#ffffff",
+    mainText: "#111827",
+    headingColor: "#4338ca",
+    accentColor: "#4f46e5",
+    borderRadius: 30,
+    sidebarWidth: 255,
+    nameSize: 48,
+    bodySize: 15,
+    lineHeight: 1.7,
+    sectionSpacing: 24,
+    imageRadius: 24,
+  },
+};
 
 function parseCvResult(raw: string): ParsedCvResult {
   const scoreMatch = raw.match(/KUNTOTARKASTUS:\s*([^\n]+)/);
@@ -161,60 +224,16 @@ function isPdfHeading(line: string) {
   return line === line.toUpperCase() || pdfHeadingNames.includes(line);
 }
 
-function getPdfStyle(styleVariant: CvStyleVariant) {
-  switch (styleVariant) {
-    case "classic":
-      return {
-        sidebarBg: "#f5f5f4",
-        sidebarText: "#111827",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#78716c",
-        nameFont: "Georgia, serif",
-      };
-    case "compact":
-      return {
-        sidebarBg: "#f8fafc",
-        sidebarText: "#111827",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#64748b",
-        nameFont: "Arial, Helvetica, sans-serif",
-      };
-    case "bold":
-      return {
-        sidebarBg: "#1e1b4b",
-        sidebarText: "#ffffff",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#4338ca",
-        nameFont: "Arial Black, Arial, sans-serif",
-      };
-    case "modern":
-    default:
-      return {
-        sidebarBg: "#0f172a",
-        sidebarText: "#ffffff",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#475569",
-        nameFont: "Arial, Helvetica, sans-serif",
-      };
-  }
-}
-
 function PdfSafePreview({
   cvText,
   image,
-  styleVariant,
+  customStyle,
 }: {
   cvText: string;
   image?: string;
-  styleVariant: CvStyleVariant;
+  customStyle: CvCustomStyle;
 }) {
   const lines = splitPdfLines(cvText);
-  const style = getPdfStyle(styleVariant);
-
   if (!lines.length) return null;
 
   const name = lines[0] || "";
@@ -224,24 +243,24 @@ function PdfSafePreview({
   const wrapperStyle: CSSProperties = {
     width: "794px",
     minHeight: "1123px",
-    background: "#ffffff",
-    color: style.mainText,
+    background: customStyle.mainBg,
+    color: customStyle.mainText,
     display: "grid",
-    gridTemplateColumns: "240px 1fr",
+    gridTemplateColumns: `${customStyle.sidebarWidth}px 1fr`,
     fontFamily: "Arial, Helvetica, sans-serif",
-    borderRadius: "28px",
+    borderRadius: `${customStyle.borderRadius}px`,
     overflow: "hidden",
   };
 
   const sidebarStyle: CSSProperties = {
-    background: style.sidebarBg,
-    color: style.sidebarText,
+    background: customStyle.sidebarBg,
+    color: customStyle.sidebarText,
     padding: "28px",
   };
 
   const mainStyle: CSSProperties = {
-    background: style.mainBg,
-    color: style.mainText,
+    background: customStyle.mainBg,
+    color: customStyle.mainText,
     padding: "36px",
   };
 
@@ -249,7 +268,7 @@ function PdfSafePreview({
     width: "100%",
     aspectRatio: "1 / 1",
     objectFit: "cover",
-    borderRadius: "22px",
+    borderRadius: `${customStyle.imageRadius}px`,
     marginBottom: "24px",
     display: "block",
   };
@@ -257,7 +276,7 @@ function PdfSafePreview({
   const placeholderStyle: CSSProperties = {
     width: "100%",
     aspectRatio: "1 / 1",
-    borderRadius: "22px",
+    borderRadius: `${customStyle.imageRadius}px`,
     marginBottom: "24px",
     background: "rgba(255,255,255,0.12)",
     display: "flex",
@@ -267,12 +286,11 @@ function PdfSafePreview({
   };
 
   const nameStyle: CSSProperties = {
-    fontSize: "42px",
+    fontSize: `${customStyle.nameSize}px`,
     lineHeight: 1.1,
     fontWeight: 700,
     margin: "0 0 28px 0",
-    fontFamily: style.nameFont,
-    color: style.mainText,
+    color: customStyle.mainText,
   };
 
   const sectionTitleStyle: CSSProperties = {
@@ -281,16 +299,16 @@ function PdfSafePreview({
     fontWeight: 700,
     textTransform: "uppercase",
     letterSpacing: "0.18em",
-    color: style.headingColor,
+    color: customStyle.headingColor,
     borderTop: "1px solid #d1d5db",
     paddingTop: "14px",
-    marginTop: "18px",
+    marginTop: `${customStyle.sectionSpacing}px`,
     marginBottom: "10px",
   };
 
   const paragraphStyle: CSSProperties = {
-    fontSize: "15px",
-    lineHeight: 1.7,
+    fontSize: `${customStyle.bodySize}px`,
+    lineHeight: customStyle.lineHeight,
     margin: "0 0 8px 0",
     whiteSpace: "pre-wrap",
   };
@@ -368,23 +386,6 @@ function StatCard({
       <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">{title}</p>
       <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
       <p className="mt-2 text-sm text-zinc-400">{description}</p>
-    </div>
-  );
-}
-
-function MiniStat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-        {label}
-      </p>
-      <p className="mt-2 text-lg font-semibold text-white">{value}</p>
     </div>
   );
 }
@@ -473,10 +474,39 @@ function JobCard({
       )}
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <MiniStat label="Yritys" value={job.company || "-"} />
-        <MiniStat label="Sijainti" value={job.location || "-"} />
-        <MiniStat label="Hakemukset" value={applicationsCount} />
-        <MiniStat label="CV-versiot" value={cvsCount} />
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Yritys
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">
+            {job.company || "-"}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Sijainti
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">
+            {job.location || "-"}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Hakemukset
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">
+            {applicationsCount}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            CV-versiot
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">{cvsCount}</p>
+        </div>
       </div>
 
       {job.url && (
@@ -498,7 +528,6 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("cv");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
   const [letterTone, setLetterTone] = useState<LetterTone>("professional");
-  const [jobFilter, setJobFilter] = useState("");
 
   const [loadingCv, setLoadingCv] = useState(false);
   const [loadingLetter, setLoadingLetter] = useState(false);
@@ -512,6 +541,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [profileImage, setProfileImage] = useState("");
+  const [jobFilter, setJobFilter] = useState("");
 
   const [form, setForm] = useState(emptyForm);
   const [searchProfile, setSearchProfile] = useState(emptySearchProfile);
@@ -522,6 +552,8 @@ export default function Home() {
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
+  const [customStyles, setCustomStyles] =
+    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -545,6 +577,7 @@ export default function Home() {
       setActiveJobId(parsed.activeJobId ?? "");
       setSavedLetters(parsed.savedLetters ?? []);
       setSavedCvVariants(parsed.savedCvVariants ?? []);
+      setCustomStyles(parsed.customStyles ?? defaultCustomStyles);
     } catch {
       console.error("Tallennetun tilan lukeminen epäonnistui.");
     }
@@ -566,6 +599,7 @@ export default function Home() {
       activeJobId,
       savedLetters,
       savedCvVariants,
+      customStyles,
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -584,6 +618,7 @@ export default function Home() {
     activeJobId,
     savedLetters,
     savedCvVariants,
+    customStyles,
   ]);
 
   const parsedCv = useMemo(() => parseCvResult(cvResult), [cvResult]);
@@ -597,10 +632,20 @@ export default function Home() {
     [jobs, activeJobId]
   );
 
-  const filteredJobs = useMemo(() => {
-    const query = jobFilter.trim().toLowerCase();
-    if (!query) return jobs;
+  const activeJobLetters = useMemo(() => {
+    if (!activeJob) return [];
+    return savedLetters.filter((letter) => letter.jobId === activeJob.id);
+  }, [savedLetters, activeJob]);
 
+  const activeJobCvVariants = useMemo(() => {
+    if (!activeJob) return [];
+    return savedCvVariants.filter((cv) => cv.jobId === activeJob.id);
+  }, [savedCvVariants, activeJob]);
+
+  const filteredJobs = useMemo(() => {
+    if (!jobFilter.trim()) return jobs;
+
+    const q = jobFilter.toLowerCase();
     return jobs.filter((job) =>
       [
         job.title,
@@ -614,19 +659,9 @@ export default function Home() {
         .filter(Boolean)
         .join(" ")
         .toLowerCase()
-        .includes(query)
+        .includes(q)
     );
   }, [jobs, jobFilter]);
-
-  const activeJobLetters = useMemo(() => {
-    if (!activeJob) return [];
-    return savedLetters.filter((letter) => letter.jobId === activeJob.id);
-  }, [savedLetters, activeJob]);
-
-  const activeJobCvVariants = useMemo(() => {
-    if (!activeJob) return [];
-    return savedCvVariants.filter((cv) => cv.jobId === activeJob.id);
-  }, [savedCvVariants, activeJob]);
 
   function updateField(key: keyof typeof emptyForm, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -641,6 +676,28 @@ export default function Home() {
 
   function updateJobForm(key: keyof typeof emptyJobForm, value: string) {
     setJobForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function updateCustomStyle<K extends keyof CvCustomStyle>(
+    key: K,
+    value: CvCustomStyle[K]
+  ) {
+    setCustomStyles((prev) => ({
+      ...prev,
+      [cvStyle]: {
+        ...prev[cvStyle],
+        [key]: value,
+      },
+    }));
+  }
+
+  function resetCurrentStyle() {
+    setCustomStyles((prev) => ({
+      ...prev,
+      [cvStyle]: defaultCustomStyles[cvStyle],
+    }));
+    setMessage("CV-tyylin asetukset palautettu.");
+    setTimeout(() => setMessage(""), 2500);
   }
 
   function clearForm() {
@@ -661,6 +718,7 @@ export default function Home() {
     setCvStyle("modern");
     setLetterTone("professional");
     setJobFilter("");
+    setCustomStyles(defaultCustomStyles);
     localStorage.removeItem(STORAGE_KEY);
   }
 
@@ -1212,13 +1270,13 @@ export default function Home() {
             <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
               <StatCard
                 title="CV"
-                value="1 näkymä"
-                description="Luo, muokkaa ja lataa CV yhdestä paikasta."
+                value="Muokattava"
+                description="Säädä värejä, fonttikokoja, kulmia ja rakennetta."
               />
               <StatCard
                 title="Hakemukset"
                 value="3 sävyä"
-                description="Asiallinen, lämmin tai myyvä hakemus työpaikan mukaan."
+                description="Asiallinen, lämmin tai myyvä työpaikan mukaan."
               />
               <StatCard
                 title="Workflow"
@@ -1382,8 +1440,18 @@ export default function Home() {
                 />
 
                 <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-5">
-                  <p className="mb-3 text-sm font-medium text-zinc-300">CV-tyyli</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-zinc-300">CV-tyyli</p>
+                    <button
+                      type="button"
+                      onClick={resetCurrentStyle}
+                      className="rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800"
+                    >
+                      Palauta oletukset
+                    </button>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
                     {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map(
                       (variant) => (
                         <button
@@ -1403,6 +1471,220 @@ export default function Home() {
                         </button>
                       )
                     )}
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Sivupalkin väri
+                      </label>
+                      <input
+                        type="color"
+                        value={customStyles[cvStyle].sidebarBg}
+                        onChange={(e) =>
+                          updateCustomStyle("sidebarBg", e.target.value)
+                        }
+                        className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Sivupalkin tekstiväri
+                      </label>
+                      <input
+                        type="color"
+                        value={customStyles[cvStyle].sidebarText}
+                        onChange={(e) =>
+                          updateCustomStyle("sidebarText", e.target.value)
+                        }
+                        className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Pääalueen tausta
+                      </label>
+                      <input
+                        type="color"
+                        value={customStyles[cvStyle].mainBg}
+                        onChange={(e) =>
+                          updateCustomStyle("mainBg", e.target.value)
+                        }
+                        className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Tekstin väri
+                      </label>
+                      <input
+                        type="color"
+                        value={customStyles[cvStyle].mainText}
+                        onChange={(e) =>
+                          updateCustomStyle("mainText", e.target.value)
+                        }
+                        className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Otsikon väri
+                      </label>
+                      <input
+                        type="color"
+                        value={customStyles[cvStyle].headingColor}
+                        onChange={(e) =>
+                          updateCustomStyle("headingColor", e.target.value)
+                        }
+                        className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Korosteväri
+                      </label>
+                      <input
+                        type="color"
+                        value={customStyles[cvStyle].accentColor}
+                        onChange={(e) =>
+                          updateCustomStyle("accentColor", e.target.value)
+                        }
+                        className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-950 p-2"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Sivupalkin leveys ({customStyles[cvStyle].sidebarWidth}px)
+                      </label>
+                      <input
+                        type="range"
+                        min={180}
+                        max={340}
+                        value={customStyles[cvStyle].sidebarWidth}
+                        onChange={(e) =>
+                          updateCustomStyle(
+                            "sidebarWidth",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Nimen koko ({customStyles[cvStyle].nameSize}px)
+                      </label>
+                      <input
+                        type="range"
+                        min={28}
+                        max={64}
+                        value={customStyles[cvStyle].nameSize}
+                        onChange={(e) =>
+                          updateCustomStyle("nameSize", Number(e.target.value))
+                        }
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Tekstin koko ({customStyles[cvStyle].bodySize}px)
+                      </label>
+                      <input
+                        type="range"
+                        min={12}
+                        max={20}
+                        value={customStyles[cvStyle].bodySize}
+                        onChange={(e) =>
+                          updateCustomStyle("bodySize", Number(e.target.value))
+                        }
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Kulmien pyöreys ({customStyles[cvStyle].borderRadius}px)
+                      </label>
+                      <input
+                        type="range"
+                        min={0}
+                        max={40}
+                        value={customStyles[cvStyle].borderRadius}
+                        onChange={(e) =>
+                          updateCustomStyle(
+                            "borderRadius",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Riviväli ({customStyles[cvStyle].lineHeight})
+                      </label>
+                      <input
+                        type="range"
+                        min={1.2}
+                        max={2}
+                        step={0.05}
+                        value={customStyles[cvStyle].lineHeight}
+                        onChange={(e) =>
+                          updateCustomStyle(
+                            "lineHeight",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Osioiden väli ({customStyles[cvStyle].sectionSpacing}px)
+                      </label>
+                      <input
+                        type="range"
+                        min={8}
+                        max={36}
+                        value={customStyles[cvStyle].sectionSpacing}
+                        onChange={(e) =>
+                          updateCustomStyle(
+                            "sectionSpacing",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm text-zinc-400">
+                        Kuvan kulmat ({customStyles[cvStyle].imageRadius}px)
+                      </label>
+                      <input
+                        type="range"
+                        min={0}
+                        max={40}
+                        value={customStyles[cvStyle].imageRadius}
+                        onChange={(e) =>
+                          updateCustomStyle(
+                            "imageRadius",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1645,6 +1927,7 @@ export default function Home() {
                           cvText={parsedCv.cvBody}
                           image={profileImage}
                           styleVariant={cvStyle}
+                          customStyle={customStyles[cvStyle]}
                         />
                       </div>
 
@@ -1663,7 +1946,7 @@ export default function Home() {
                           <PdfSafePreview
                             cvText={parsedCv.cvBody}
                             image={profileImage}
-                            styleVariant={cvStyle}
+                            customStyle={customStyles[cvStyle]}
                           />
                         </div>
                       </div>
@@ -1679,12 +1962,7 @@ export default function Home() {
               {tab === "job" && (
                 <div className="space-y-6">
                   <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-4 space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h3 className="text-lg font-semibold text-white">Lisää työpaikka</h3>
-                      <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs uppercase tracking-[0.18em] text-zinc-300">
-                        Yhteensä {jobs.length}
-                      </span>
-                    </div>
+                    <h3 className="text-lg font-semibold text-white">Lisää työpaikka</h3>
 
                     <input
                       placeholder="Työpaikan otsikko"
@@ -1750,44 +2028,14 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {activeJob && (
-                    <div className="rounded-[28px] border border-blue-900/40 bg-blue-950/20 p-5">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.18em] text-blue-300">
-                            Valittu työpaikka
-                          </p>
-                          <h3 className="mt-2 text-xl font-semibold text-white">
-                            {activeJob.title}
-                          </h3>
-                          <p className="mt-2 text-sm text-zinc-300">
-                            {[activeJob.company, activeJob.location, activeJob.type]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </p>
-                        </div>
-
-                        <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
-                          Match {safeMatchScore(activeJob.matchScore)}%
-                        </span>
-                      </div>
-
-                      {activeJob.summary && (
-                        <p className="mt-4 text-sm leading-6 text-zinc-300">
-                          {activeJob.summary}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
                   <div className="space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <h3 className="text-lg font-semibold text-white">Työpaikat</h3>
                       <input
-                        placeholder="Suodata työpaikkoja"
                         value={jobFilter}
                         onChange={(e) => setJobFilter(e.target.value)}
-                        className="w-full max-w-xs rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                        placeholder="Suodata työpaikkoja"
+                        className="w-full max-w-xs rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
                       />
                     </div>
 
