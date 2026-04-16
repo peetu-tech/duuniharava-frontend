@@ -27,6 +27,16 @@ export type CreateCvPromptInput = {
   hobbies?: string;
 };
 
+export type JobSuggestionStatus =
+  | "saved"
+  | "interested"
+  | "applied"
+  | "interview"
+  | "offer"
+  | "rejected";
+
+export type JobSuggestionPriority = "low" | "medium" | "high";
+
 export type JobSuggestionsPromptInput = {
   desiredRoles?: string;
   desiredLocation?: string;
@@ -252,6 +262,14 @@ Jokaisessa ehdotuksessa pitää olla kentät:
 - whyFit
 - source
 - matchScore
+- status
+- priority
+- salary
+- deadline
+- notes
+- contactPerson
+- contactEmail
+- companyWebsite
 
 Kenttien ohjeet:
 - title: realistinen työnimike
@@ -263,6 +281,14 @@ Kenttien ohjeet:
 - whyFit: 2–4 virkettä miksi työ sopii käyttäjälle
 - source: käytä arvoa "AI-ehdotus"
 - matchScore: numero 1–100
+- status: käytä arvoa "interested"
+- priority: valitse "low", "medium" tai "high"
+- salary: merkkijono, esim. "2800–3200 €/kk" tai ""
+- deadline: merkkijono muodossa YYYY-MM-DD tai ""
+- notes: lyhyt käytännöllinen huomio tai ""
+- contactPerson: nimi tai rooli, jos luontevaa, muuten ""
+- contactEmail: sähköposti jos luontevaa, muuten ""
+- companyWebsite: URL jos luontevaa, muuten ""
 
 ERITTÄIN TÄRKEÄÄ:
 - Palauta VAIN validi JSON-taulukko
