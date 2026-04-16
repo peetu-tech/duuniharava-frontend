@@ -34,6 +34,8 @@ type JobItem = {
   adText: string;
   url?: string;
   whyFit?: string;
+  source?: string;
+  matchScore?: number;
 };
 
 type SavedLetter = {
@@ -54,7 +56,7 @@ type SavedCvVariant = {
   createdAt: string;
 };
 
-const STORAGE_KEY = "duuniharava_state_v4";
+const STORAGE_KEY = "duuniharava_state_v5";
 
 const emptyForm = {
   cvText: "",
@@ -130,6 +132,11 @@ function parseTailoredCv(raw: string) {
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function safeMatchScore(value?: number) {
+  if (typeof value !== "number" || Number.isNaN(value)) return 78;
+  return Math.max(1, Math.min(100, Math.round(value)));
 }
 
 function safeJsonParseJobs(text: string): Omit<JobItem, "id">[] {
@@ -360,6 +367,139 @@ function StatCard({
       <p className="text-xs uppercase tracking-[0.22em] text-zinc-400">{title}</p>
       <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
       <p className="mt-2 text-sm text-zinc-400">{description}</p>
+    </div>
+  );
+}
+
+function JobCard({
+  job,
+  isActive,
+  applicationsCount,
+  cvsCount,
+  onSelect,
+  onRemove,
+}: {
+  job: JobItem;
+  isActive: boolean;
+  applicationsCount: number;
+  cvsCount: number;
+  onSelect: () => void;
+  onRemove: () => void;
+}) {
+  const score = safeMatchScore(job.matchScore);
+
+  return (
+    <div
+      className={`rounded-[28px] border p-5 transition ${
+        isActive
+          ? "border-blue-500 bg-gradient-to-br from-blue-950/30 to-zinc-950"
+          : "border-zinc-800 bg-zinc-950 hover:border-zinc-700"
+      }`}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {job.source && (
+              <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
+                {job.source}
+              </span>
+            )}
+            <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+              Match {score}%
+            </span>
+          </div>
+
+          <h4 className="text-xl font-semibold text-white">
+            {job.title || "Nimetön työpaikka"}
+          </h4>
+
+          <p className="mt-2 text-sm text-zinc-400">
+            {[job.company, job.location, job.type].filter(Boolean).join(" · ")}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onSelect}
+            className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+              isActive
+                ? "bg-white text-black"
+                : "bg-zinc-800 text-white hover:bg-zinc-700"
+            }`}
+          >
+            {isActive ? "Valittu" : "Valitse"}
+          </button>
+
+          <button
+            type="button"
+            onClick={onRemove}
+            className="rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500"
+          >
+            Poista
+          </button>
+        </div>
+      </div>
+
+      {job.summary && (
+        <p className="mt-4 text-sm leading-6 text-zinc-300">{job.summary}</p>
+      )}
+
+      {job.whyFit && (
+        <div className="mt-4 rounded-2xl border border-emerald-900/60 bg-emerald-950/30 p-4">
+          <p className="text-xs uppercase tracking-[0.18em] text-emerald-400">
+            Miksi sopii
+          </p>
+          <p className="mt-2 text-sm leading-6 text-emerald-200">{job.whyFit}</p>
+        </div>
+      )}
+
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Yritys
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">
+            {job.company || "-"}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Sijainti
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">
+            {job.location || "-"}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Hakemukset
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">
+            {applicationsCount}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            CV-versiot
+          </p>
+          <p className="mt-2 text-sm font-medium text-white">{cvsCount}</p>
+        </div>
+      </div>
+
+      {job.url && (
+        <a
+          href={job.url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 inline-flex rounded-2xl border border-blue-900/60 bg-blue-950/30 px-4 py-2 text-sm font-medium text-blue-300 transition hover:bg-blue-950/50"
+        >
+          Avaa työpaikkalinkki
+        </a>
+      )}
     </div>
   );
 }
@@ -775,6 +915,8 @@ export default function Home() {
         form.targetJob || searchProfile.desiredRoles
           ? `Sopii profiiliin: ${form.targetJob || searchProfile.desiredRoles}`
           : "",
+      source: "Lisätty käsin",
+      matchScore: safeMatchScore(82),
     };
 
     setJobs((prev) => [job, ...prev]);
@@ -833,8 +975,10 @@ export default function Home() {
         type: job.type || "",
         summary: job.summary || "",
         adText: job.adText || "",
-        url: "",
+        url: job.url || "",
         whyFit: job.whyFit || "",
+        source: job.source || "AI-ehdotus",
+        matchScore: safeMatchScore(job.matchScore),
       }));
 
       setJobs((prev) => [...newJobs, ...prev]);
@@ -1601,71 +1745,15 @@ export default function Home() {
                         );
 
                         return (
-                          <div
+                          <JobCard
                             key={job.id}
-                            className={`rounded-[28px] border p-5 transition ${
-                              isActive
-                                ? "border-blue-500 bg-blue-950/20"
-                                : "border-zinc-800 bg-zinc-950"
-                            }`}
-                          >
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                              <div>
-                                <h4 className="text-lg font-semibold text-white">
-                                  {job.title || "Nimetön työpaikka"}
-                                </h4>
-                                <p className="mt-1 text-sm text-zinc-400">
-                                  {[job.company, job.location, job.type]
-                                    .filter(Boolean)
-                                    .join(" · ")}
-                                </p>
-                              </div>
-
-                              <div className="flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setActiveJobId(job.id)}
-                                  className="rounded-2xl bg-zinc-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-zinc-700"
-                                >
-                                  {isActive ? "Valittu" : "Valitse"}
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => removeJob(job.id)}
-                                  className="rounded-2xl bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-500"
-                                >
-                                  Poista
-                                </button>
-                              </div>
-                            </div>
-
-                            {job.summary && (
-                              <p className="mt-3 text-sm text-zinc-300">{job.summary}</p>
-                            )}
-
-                            {job.whyFit && (
-                              <p className="mt-3 text-sm text-emerald-300">
-                                {job.whyFit}
-                              </p>
-                            )}
-
-                            <div className="mt-4 space-y-1 text-xs text-zinc-500">
-                              <p>Hakemuksia tallennettu: {jobLetters.length}</p>
-                              <p>CV-versioita tallennettu: {jobCvs.length}</p>
-                            </div>
-
-                            {job.url && (
-                              <a
-                                href={job.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="mt-4 inline-block text-sm text-blue-400 transition hover:text-blue-300"
-                              >
-                                Avaa työpaikkalinkki
-                              </a>
-                            )}
-                          </div>
+                            job={job}
+                            isActive={isActive}
+                            applicationsCount={jobLetters.length}
+                            cvsCount={jobCvs.length}
+                            onSelect={() => setActiveJobId(job.id)}
+                            onRemove={() => removeJob(job.id)}
+                          />
                         );
                       })
                     )}
