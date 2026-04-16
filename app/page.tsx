@@ -23,6 +23,7 @@ type ParsedCvResult = {
 
 type Tab = "cv" | "job" | "letter";
 type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
+type LetterTone = "professional" | "warm" | "sales";
 
 type JobItem = {
   id: string;
@@ -56,7 +57,7 @@ type SavedCvVariant = {
   createdAt: string;
 };
 
-const STORAGE_KEY = "duuniharava_state_v5";
+const STORAGE_KEY = "duuniharava_state_v6";
 
 const emptyForm = {
   cvText: "",
@@ -371,6 +372,23 @@ function StatCard({
   );
 }
 
+function MiniStat({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+        {label}
+      </p>
+      <p className="mt-2 text-lg font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
 function JobCard({
   job,
   isActive,
@@ -455,39 +473,10 @@ function JobCard({
       )}
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            Yritys
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">
-            {job.company || "-"}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            Sijainti
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">
-            {job.location || "-"}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            Hakemukset
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">
-            {applicationsCount}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-            CV-versiot
-          </p>
-          <p className="mt-2 text-sm font-medium text-white">{cvsCount}</p>
-        </div>
+        <MiniStat label="Yritys" value={job.company || "-"} />
+        <MiniStat label="Sijainti" value={job.location || "-"} />
+        <MiniStat label="Hakemukset" value={applicationsCount} />
+        <MiniStat label="CV-versiot" value={cvsCount} />
       </div>
 
       {job.url && (
@@ -508,6 +497,8 @@ export default function Home() {
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
+  const [letterTone, setLetterTone] = useState<LetterTone>("professional");
+  const [jobFilter, setJobFilter] = useState("");
 
   const [loadingCv, setLoadingCv] = useState(false);
   const [loadingLetter, setLoadingLetter] = useState(false);
@@ -543,6 +534,7 @@ export default function Home() {
       setMode(parsed.mode ?? "improve");
       setTab(parsed.tab ?? "cv");
       setCvStyle(parsed.cvStyle ?? "modern");
+      setLetterTone(parsed.letterTone ?? "professional");
       setCvResult(parsed.cvResult ?? "");
       setLetterResult(parsed.letterResult ?? "");
       setProfileImage(parsed.profileImage ?? "");
@@ -563,6 +555,7 @@ export default function Home() {
       mode,
       tab,
       cvStyle,
+      letterTone,
       cvResult,
       letterResult,
       profileImage,
@@ -580,6 +573,7 @@ export default function Home() {
     mode,
     tab,
     cvStyle,
+    letterTone,
     cvResult,
     letterResult,
     profileImage,
@@ -602,6 +596,27 @@ export default function Home() {
     () => jobs.find((job) => job.id === activeJobId) || null,
     [jobs, activeJobId]
   );
+
+  const filteredJobs = useMemo(() => {
+    const query = jobFilter.trim().toLowerCase();
+    if (!query) return jobs;
+
+    return jobs.filter((job) =>
+      [
+        job.title,
+        job.company,
+        job.location,
+        job.type,
+        job.summary,
+        job.whyFit,
+        job.source,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    );
+  }, [jobs, jobFilter]);
 
   const activeJobLetters = useMemo(() => {
     if (!activeJob) return [];
@@ -644,6 +659,8 @@ export default function Home() {
     setTab("cv");
     setMode("improve");
     setCvStyle("modern");
+    setLetterTone("professional");
+    setJobFilter("");
     localStorage.removeItem(STORAGE_KEY);
   }
 
@@ -1106,6 +1123,7 @@ export default function Home() {
           jobTitle: activeJob.title,
           companyName: activeJob.company,
           jobAd: activeJob.adText,
+          tone: letterTone,
         }),
       });
 
@@ -1199,8 +1217,8 @@ export default function Home() {
               />
               <StatCard
                 title="Hakemukset"
-                value="Personoidut"
-                description="Tee työpaikkakohtaiset hakemukset nopeasti."
+                value="3 sävyä"
+                description="Asiallinen, lämmin tai myyvä hakemus työpaikan mukaan."
               />
               <StatCard
                 title="Workflow"
@@ -1661,7 +1679,12 @@ export default function Home() {
               {tab === "job" && (
                 <div className="space-y-6">
                   <div className="rounded-[28px] border border-zinc-800 bg-zinc-950 p-4 space-y-4">
-                    <h3 className="text-lg font-semibold text-white">Lisää työpaikka</h3>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h3 className="text-lg font-semibold text-white">Lisää työpaikka</h3>
+                      <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs uppercase tracking-[0.18em] text-zinc-300">
+                        Yhteensä {jobs.length}
+                      </span>
+                    </div>
 
                     <input
                       placeholder="Työpaikan otsikko"
@@ -1727,15 +1750,55 @@ export default function Home() {
                     </button>
                   </div>
 
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-white">Työpaikat</h3>
+                  {activeJob && (
+                    <div className="rounded-[28px] border border-blue-900/40 bg-blue-950/20 p-5">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.18em] text-blue-300">
+                            Valittu työpaikka
+                          </p>
+                          <h3 className="mt-2 text-xl font-semibold text-white">
+                            {activeJob.title}
+                          </h3>
+                          <p className="mt-2 text-sm text-zinc-300">
+                            {[activeJob.company, activeJob.location, activeJob.type]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </p>
+                        </div>
 
-                    {jobs.length === 0 ? (
+                        <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
+                          Match {safeMatchScore(activeJob.matchScore)}%
+                        </span>
+                      </div>
+
+                      {activeJob.summary && (
+                        <p className="mt-4 text-sm leading-6 text-zinc-300">
+                          {activeJob.summary}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h3 className="text-lg font-semibold text-white">Työpaikat</h3>
+                      <input
+                        placeholder="Suodata työpaikkoja"
+                        value={jobFilter}
+                        onChange={(e) => setJobFilter(e.target.value)}
+                        className="w-full max-w-xs rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-600"
+                      />
+                    </div>
+
+                    {filteredJobs.length === 0 ? (
                       <div className="rounded-[28px] border border-dashed border-zinc-800 bg-zinc-950 p-8 text-zinc-400">
-                        Ei lisättyjä työpaikkoja vielä.
+                        {jobs.length === 0
+                          ? "Ei lisättyjä työpaikkoja vielä."
+                          : "Suodatuksella ei löytynyt työpaikkoja."}
                       </div>
                     ) : (
-                      jobs.map((job) => {
+                      filteredJobs.map((job) => {
                         const isActive = job.id === activeJobId;
                         const jobLetters = savedLetters.filter(
                           (letter) => letter.jobId === job.id
@@ -1786,6 +1849,49 @@ export default function Home() {
                     ) : (
                       <p className="mt-3 text-zinc-400">Ei valittua työpaikkaa.</p>
                     )}
+
+                    <div className="mt-5">
+                      <p className="mb-2 text-sm font-medium text-zinc-300">
+                        Hakemuksen sävy
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setLetterTone("professional")}
+                          className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+                            letterTone === "professional"
+                              ? "bg-white text-black"
+                              : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+                          }`}
+                        >
+                          Asiallinen
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setLetterTone("warm")}
+                          className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+                            letterTone === "warm"
+                              ? "bg-white text-black"
+                              : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+                          }`}
+                        >
+                          Lämmin
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setLetterTone("sales")}
+                          className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+                            letterTone === "sales"
+                              ? "bg-white text-black"
+                              : "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+                          }`}
+                        >
+                          Myyvä
+                        </button>
+                      </div>
+                    </div>
 
                     <button
                       type="button"

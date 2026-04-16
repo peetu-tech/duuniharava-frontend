@@ -1,181 +1,33 @@
-export function buildImproveCvPrompt(input: {
-  cvText: string;
-  targetJob: string;
-  education?: string;
-  experience?: string;
-  languages?: string;
-  skills?: string;
-  phone?: string;
-  email?: string;
-  location?: string;
-  cards?: string;
-  hobbies?: string;
-  name?: string;
-}) {
-  return `
-Olet ammattimainen suomalaisen työnhaun CV-asiantuntija.
-
-Tehtäväsi on parantaa käyttäjän nykyinen CV selkeämmäksi, uskottavammaksi, realistisemmaksi ja työnhakuun sopivaksi.
-
-Pakolliset säännöt:
-- Älä keksi mitään tietoa, jota käyttäjä ei ole antanut
-- Älä liioittele osaamista, kokemusta tai kielitaitoa
-- Älä käytä liian vahvoja ilmaisuja kuten "ammattilainen", "asiantuntija" tai "sujuva", ellei käyttäjä ole itse antanut niille selvää perustetta
-- Älä muuta annettua nimeä, puhelinnumeroa, sähköpostia tai paikkakuntaa
-- Jos yhteystiedon arvo puuttuu, älä näytä kentän nimeä ollenkaan
-- Jos tieto puuttuu, jätä se pois
-- Älä lisää negatiivisia osioita
-- Kirjoita suomeksi
-- Tee lopputuloksesta tiivis ja realistinen
-- Profiili saa olla korkeintaan 2–3 lausetta
-- Pyri siihen, että CV mahtuu yhdelle sivulle
-- Älä käytä markdownia
-- Älä kirjoita mitään muuta kuin pyydetty lopputulos
-
-Palauta täsmälleen tässä muodossa:
-
-KUNTOTARKASTUS: X/100
-
-MUUTOSRAPORTTI:
-1. ...
-2. ...
-3. ...
-
-CV_BODY:
-[kirjoita valmis CV]
-
-Käyttäjän nykyinen CV:
-${input.cvText || ""}
-
-Lisätiedot:
-- Nimi: ${input.name || ""}
-- Puhelin: ${input.phone || ""}
-- Sähköposti: ${input.email || ""}
-- Paikkakunta: ${input.location || ""}
-- Tavoiteltu työ: ${input.targetJob || ""}
-- Koulutus: ${input.education || ""}
-- Kokemus: ${input.experience || ""}
-- Kielet: ${input.languages || ""}
-- Taidot: ${input.skills || ""}
-- Kortit ja pätevyydet: ${input.cards || ""}
-- Harrastukset: ${input.hobbies || ""}
-`;
-}
-
-export function buildCreateCvPrompt(input: {
-  name: string;
-  phone?: string;
-  email?: string;
-  location?: string;
-  targetJob: string;
-  education?: string;
-  experience?: string;
-  languages?: string;
-  skills?: string;
-  cards?: string;
-  hobbies?: string;
-}) {
-  return `
-Olet ammattimainen suomalaisen työnhaun CV-asiantuntija.
-
-Tehtäväsi on kirjoittaa käyttäjälle täysin uusi CV alusta asti annettujen tietojen perusteella.
-
-Pakolliset säännöt:
-- Älä keksi mitään tietoa
-- Käytä vain annettuja tietoja
-- Älä liioittele osaamista, kokemusta tai kielitaitoa
-- Älä käytä liian vahvoja ilmaisuja kuten "ammattilainen", "asiantuntija" tai "sujuva", ellei käyttäjä ole itse antanut niille selvää perustetta
-- Älä muuta annettua nimeä, puhelinnumeroa, sähköpostia tai paikkakuntaa
-- Jos yhteystiedon arvo puuttuu, älä näytä kentän nimeä ollenkaan
-- Jos tieto puuttuu, jätä se pois
-- Kirjoita suomeksi
-- Tee CV:stä selkeä, uskottava ja realistinen
-- Pidä CV tiiviinä ja yhden sivun mittaisena
-- Profiili korkeintaan 2–3 lausetta
-- Älä käytä markdownia
-- Älä jätä placeholder-tekstejä näkyviin
-- Älä lisää negatiivisia osioita
-- Älä kirjoita mitään muuta kuin pyydetty lopputulos
-
-Palauta täsmälleen tässä muodossa:
-
-CV_BODY:
-[kirjoita valmis CV]
-
-Hakijan tiedot:
-- Nimi: ${input.name || ""}
-- Puhelin: ${input.phone || ""}
-- Sähköposti: ${input.email || ""}
-- Paikkakunta: ${input.location || ""}
-- Tavoiteltu työ: ${input.targetJob || ""}
-- Koulutus: ${input.education || ""}
-- Kokemus: ${input.experience || ""}
-- Kielet: ${input.languages || ""}
-- Taidot: ${input.skills || ""}
-- Kortit ja pätevyydet: ${input.cards || ""}
-- Harrastukset: ${input.hobbies || ""}
-`;
-}
-
-export function buildCoverLetterPrompt(input: {
-  name?: string;
-  phone?: string;
-  email?: string;
-  location?: string;
-  targetJob: string;
-  jobTitle?: string;
-  companyName?: string;
-  jobAd?: string;
-  education?: string;
-  experience?: string;
-  languages?: string;
-  skills?: string;
-  cards?: string;
-  hobbies?: string;
+type CvPromptInput = {
   cvText?: string;
-}) {
-  return `
-Olet ammattimainen suomalaisen työnhaun asiantuntija.
+  targetJob?: string;
+  education?: string;
+  experience?: string;
+  languages?: string;
+  skills?: string;
+  phone?: string;
+  email?: string;
+  location?: string;
+  cards?: string;
+  hobbies?: string;
+  name?: string;
+};
 
-Tehtäväsi on kirjoittaa käyttäjälle realistinen, uskottava ja selkeä työhakemus suomeksi.
+type CreateCvPromptInput = {
+  name?: string;
+  phone?: string;
+  email?: string;
+  location?: string;
+  targetJob?: string;
+  education?: string;
+  experience?: string;
+  languages?: string;
+  skills?: string;
+  cards?: string;
+  hobbies?: string;
+};
 
-Pakolliset säännöt:
-- Älä keksi mitään tietoa
-- Käytä vain annettuja tietoja
-- Älä liioittele osaamista tai kokemusta
-- Älä muuta annettua nimeä, puhelinnumeroa, sähköpostia tai paikkakuntaa
-- Käytä työpaikan otsikkoa, yrityksen nimeä ja työpaikkailmoituksen sisältöä hakemuksen kohdistamiseen, jos ne on annettu
-- Jos jotain tietoa puuttuu, älä keksi sitä
-- Hakemuksen pitää kuulostaa aidolta työnhakijalta
-- Pidä hakemus tiiviinä ja selkeänä
-- Älä käytä markdownia
-- Älä kirjoita mitään muuta kuin valmis hakemus
-
-Palauta täsmälleen tässä muodossa:
-
-HAKEMUS:
-[kirjoita valmis hakemus]
-
-Hakijan tiedot:
-- Nimi: ${input.name || ""}
-- Puhelin: ${input.phone || ""}
-- Sähköposti: ${input.email || ""}
-- Paikkakunta: ${input.location || ""}
-- Tavoiteltu työ: ${input.targetJob || ""}
-- Työpaikan otsikko: ${input.jobTitle || ""}
-- Yritys: ${input.companyName || ""}
-- Työpaikkailmoitus: ${input.jobAd || ""}
-- Koulutus: ${input.education || ""}
-- Kokemus: ${input.experience || ""}
-- Kielet: ${input.languages || ""}
-- Taidot: ${input.skills || ""}
-- Kortit ja pätevyydet: ${input.cards || ""}
-- Harrastukset: ${input.hobbies || ""}
-- Nykyinen CV / pohjatiedot: ${input.cvText || ""}
-`;
-}
-
-export function buildJobSuggestionsPrompt(input: {
+type JobSuggestionsPromptInput = {
   desiredRoles?: string;
   desiredLocation?: string;
   workType?: string;
@@ -186,80 +38,273 @@ export function buildJobSuggestionsPrompt(input: {
   experience?: string;
   skills?: string;
   languages?: string;
-}) {
-  return `
-Olet suomalaisen työnhaun assistentti.
+};
 
-Tehtäväsi on ehdottaa käyttäjälle sopivia esimerkkityöpaikkoja hänen hakuprofiilinsa perusteella.
-
-Säännöt:
-- Älä väitä että nämä ovat oikeasti verkosta haettuja työpaikkoja
-- Tee realistisia esimerkkityöpaikkoja
-- Kirjoita suomeksi
-- Ehdota 4 työpaikkaa
-- Tee niistä uskottavia ja käyttäjän profiiliin sopivia
-- Palauta tulos vain JSON-muodossa
-- Älä kirjoita mitään muuta
-
-Palauta täsmälleen tällainen JSON-taulukko:
-[
-  {
-    "title": "...",
-    "company": "...",
-    "location": "...",
-    "type": "...",
-    "summary": "...",
-    "adText": "...",
-    "whyFit": "..."
-  }
-]
-
-Hakuprofiili:
-- Halutut roolit: ${input.desiredRoles || ""}
-- Alue: ${input.desiredLocation || ""}
-- Työmuoto: ${input.workType || ""}
-- Vuorotoive: ${input.shiftPreference || ""}
-- Palkkatoive: ${input.salaryWish || ""}
-- Avainsanat: ${input.keywords || ""}
-- Tavoiteltu työ: ${input.targetJob || ""}
-- Kokemus: ${input.experience || ""}
-- Taidot: ${input.skills || ""}
-- Kielet: ${input.languages || ""}
-`;
-}
-
-export function buildTailoredCvPrompt(input: {
-  currentCv: string;
+type TailoredCvPromptInput = {
+  currentCv?: string;
   jobTitle?: string;
   companyName?: string;
   jobAd?: string;
-}) {
-  return `
-Olet ammattimainen suomalaisen työnhaun CV-asiantuntija.
+};
 
-Tehtäväsi on muokata käyttäjän nykyisestä CV:stä versio, joka sopii erityisesti annettuun työpaikkaan.
+type CoverLetterTone = "professional" | "warm" | "sales";
+
+type CoverLetterPromptInput = {
+  name?: string;
+  phone?: string;
+  email?: string;
+  location?: string;
+  targetJob?: string;
+  cvText?: string;
+  jobTitle?: string;
+  companyName?: string;
+  jobAd?: string;
+  tone?: CoverLetterTone;
+};
+
+export function buildImproveCvPrompt(input: CvPromptInput) {
+  return `
+Paranna seuraava CV suomen kielellä.
+
+Tavoite:
+- Tee CV:stä selkeä, uskottava ja työhaussa toimiva.
+- Sovita sisältö käyttäjän tavoittelemaan työhön.
+- Säilytä vain tiedot, jotka ovat uskottavia käyttäjän antamien tietojen perusteella.
+- Älä keksi kokemusta, tutkintoja, saavutuksia tai kursseja.
+- Poista turha toisto, ympäripyöreys ja liian heikko ilmaisu.
+- Kirjoita luonnollisella suomen kielellä.
+- Tee sisällöstä napakka, helposti luettava ja käytännöllinen.
+- Korosta vahvuuksia, jotka sopivat haettavaan työhön.
+
+Muoto:
+Palauta vastaus täsmälleen tässä muodossa:
+
+KUNTOTARKASTUS:
+[pisteet muodossa esim. 78/100]
+
+MUUTOSRAPORTTI:
+1. ...
+2. ...
+3. ...
+
+CV_BODY:
+[koko valmis parannettu CV]
+
+Sisältöohje:
+- CV_BODY alkaa henkilön nimellä.
+- Sen jälkeen yhteystiedot omille riveilleen.
+- Käytä osioita:
+Profiili
+Työkokemus
+Koulutus
+Kielitaito
+Taidot
+Kortit ja pätevyydet
+Harrastukset
+
+Käyttäjän nykyinen CV:
+${input.cvText || ""}
+
+Lisätiedot:
+Nimi: ${input.name || ""}
+Puhelin: ${input.phone || ""}
+Sähköposti: ${input.email || ""}
+Paikkakunta: ${input.location || ""}
+Tavoiteltu työ: ${input.targetJob || ""}
+Koulutus: ${input.education || ""}
+Kokemus: ${input.experience || ""}
+Kielet: ${input.languages || ""}
+Taidot: ${input.skills || ""}
+Kortit ja pätevyydet: ${input.cards || ""}
+Harrastukset: ${input.hobbies || ""}
+`.trim();
+}
+
+export function buildCreateCvPrompt(input: CreateCvPromptInput) {
+  return `
+Luo uusi valmis CV suomen kielellä käyttäjän antamien tietojen pohjalta.
+
+Tavoite:
+- Tee uskottava, selkeä ja napakka CV.
+- Kirjoita luonnollista, hyvää suomea.
+- Älä keksi kokemusta, tutkintoja tai saavutuksia, joita käyttäjä ei ole antanut.
+- Muotoile sisältö työnhakuun sopivaksi.
+- Korosta käyttäjän vahvuuksia suhteessa tavoiteltuun työhön.
+- Jos tietoa puuttuu, älä täytä sitä keksityllä sisällöllä.
+
+Muoto:
+Palauta vastaus täsmälleen tässä muodossa:
+
+KUNTOTARKASTUS:
+[pisteet muodossa esim. 84/100]
+
+MUUTOSRAPORTTI:
+1. ...
+2. ...
+3. ...
+
+CV_BODY:
+[koko valmis CV]
+
+CV_BODY-rakenne:
+- Nimi
+- Puhelin
+- Sähköposti
+- Paikkakunta
+
+Sen jälkeen osiot:
+Profiili
+Työkokemus
+Koulutus
+Kielitaito
+Taidot
+Kortit ja pätevyydet
+Harrastukset
+
+Käyttäjän tiedot:
+Nimi: ${input.name || ""}
+Puhelin: ${input.phone || ""}
+Sähköposti: ${input.email || ""}
+Paikkakunta: ${input.location || ""}
+Tavoiteltu työ: ${input.targetJob || ""}
+Koulutus: ${input.education || ""}
+Kokemus: ${input.experience || ""}
+Kielet: ${input.languages || ""}
+Taidot: ${input.skills || ""}
+Kortit ja pätevyydet: ${input.cards || ""}
+Harrastukset: ${input.hobbies || ""}
+`.trim();
+}
+
+export function buildJobSuggestionsPrompt(input: JobSuggestionsPromptInput) {
+  return `
+Ehdota käyttäjälle sopivia työpaikkoja suomen kielellä.
+
+Tavoite:
+- Luo realistisia työpaikkaehdotuksia käyttäjän profiilin pohjalta.
+- Keskity töihin, jotka sopivat osaamiseen, kokemukseen, sijaintiin ja toiveisiin.
+- Älä keksi täysin epärealistisia rooleja.
+- Kirjoita tulos JSON-muodossa.
+- Palauta 4-6 ehdotusta.
+
+Jokaisessa ehdotuksessa pitää olla kentät:
+- title
+- company
+- location
+- type
+- summary
+- adText
+- whyFit
+- source
+- matchScore
 
 Säännöt:
-- Älä keksi mitään uutta faktaa
-- Älä muuta nimeä tai yhteystietoja
-- Korosta vain käyttäjän oikeasti antamia asioita
-- Muokkaa painotuksia työpaikkaan sopiviksi
-- Pidä CV uskottavana ja tiiviinä
-- Kirjoita suomeksi
-- Älä käytä markdownia
-- Älä kirjoita mitään muuta kuin pyydetty lopputulos
+- matchScore on numero välillä 1-100
+- source voi olla esim. "AI-ehdotus"
+- summary on lyhyt kuvaus työstä
+- adText on hieman pidempi työpaikkateksti
+- whyFit kertoo miksi työ sopii hakijalle
+
+Palauta VAIN validi JSON-taulukko.
+Ei markdownia.
+Ei selityksiä.
+Ei muita otsikoita.
+
+Käyttäjän hakuprofiili:
+Halutut roolit: ${input.desiredRoles || ""}
+Sijainti: ${input.desiredLocation || ""}
+Työmuoto: ${input.workType || ""}
+Vuorotoive: ${input.shiftPreference || ""}
+Palkkatoive: ${input.salaryWish || ""}
+Avainsanat: ${input.keywords || ""}
+
+Käyttäjän tausta:
+Tavoiteltu työ: ${input.targetJob || ""}
+Kokemus: ${input.experience || ""}
+Taidot: ${input.skills || ""}
+Kielet: ${input.languages || ""}
+`.trim();
+}
+
+export function buildTailoredCvPrompt(input: TailoredCvPromptInput) {
+  return `
+Muokkaa annettua CV:tä paremmin sopivaksi tiettyyn työpaikkaan.
+
+Tavoite:
+- Säilytä CV:n sisältö uskottavana.
+- Älä keksi uutta kokemusta.
+- Muokkaa painotuksia, profiilia, taitoja ja sanamuotoja työpaikkaan sopivammiksi.
+- Tee CV:stä edelleen selkeä ja napakka.
+- Korosta vain sellaisia asioita, jotka löytyvät nykyisestä CV:stä tai ovat siitä loogisesti pääteltävissä.
 
 Palauta täsmälleen tässä muodossa:
 
 CV_BODY:
-[kirjoita valmis työpaikkaan kohdistettu CV]
+[koko uusi työpaikkaan kohdistettu CV]
+
+Työpaikka:
+Tehtävä: ${input.jobTitle || ""}
+Yritys: ${input.companyName || ""}
+Työpaikkailmoitus:
+${input.jobAd || ""}
 
 Nykyinen CV:
 ${input.currentCv || ""}
+`.trim();
+}
+
+export function buildCoverLetterPrompt(input: CoverLetterPromptInput) {
+  const toneGuide =
+    input.tone === "warm"
+      ? "Sävyn tulee olla lämmin, inhimillinen ja helposti lähestyttävä, mutta edelleen ammattimainen."
+      : input.tone === "sales"
+      ? "Sävyn tulee olla energinen, myyntihenkinen ja vakuuttava, mutta ei ylimielinen tai liian aggressiivinen."
+      : "Sävyn tulee olla asiallinen, ammattimainen ja selkeä.";
+
+  return `
+Kirjoita SUOMEKSI laadukas, uskottava ja napakka työhakemus.
+
+Tavoite:
+- Tee hakemuksesta persoonallinen mutta ammattimainen.
+- Hyödynnä sekä käyttäjän CV:tä että työpaikkailmoitusta.
+- Korosta vain asioita, jotka aidosti sopivat käyttäjän taustaan.
+- Älä keksi työkokemusta, koulutusta tai saavutuksia.
+- Älä kirjoita liian geneerisesti.
+- Älä käytä tekoälymäisiä fraaseja tai liioittelua.
+- Kirjoita luonnollisella suomalaisen työnhaun tyylillä.
+
+Rakenne:
+1. Lyhyt ja vakuuttava avaus, jossa mainitaan haettava tehtävä ja yritys.
+2. Keskiosa, jossa nostetaan esiin 2–4 vahvuutta CV:n perusteella suhteessa työpaikkaan.
+3. Lopetus, jossa ilmaistaan kiinnostus keskustella lisää.
+4. Lopuksi allekirjoitus käyttäjän tiedoilla.
+
+Tyyli:
+- Pituus noin 150–230 sanaa.
+- Ei bullet pointteja.
+- Ei väliotsikoita itse hakemukseen.
+- Tekstin pitää olla helposti luettavaa ja luonnollista.
+- ${toneGuide}
+
+Käyttäjän tiedot:
+Nimi: ${input.name || ""}
+Puhelin: ${input.phone || ""}
+Sähköposti: ${input.email || ""}
+Paikkakunta: ${input.location || ""}
+Tavoiteltu työ: ${input.targetJob || ""}
 
 Työpaikka:
-- Otsikko: ${input.jobTitle || ""}
-- Yritys: ${input.companyName || ""}
-- Ilmoitus: ${input.jobAd || ""}
-`;
+Tehtävä: ${input.jobTitle || ""}
+Yritys: ${input.companyName || ""}
+Työpaikkailmoitus:
+${input.jobAd || ""}
+
+CV:
+${input.cvText || ""}
+
+Palauta täsmälleen tässä muodossa:
+
+HAKEMUS:
+[koko valmis hakemus]
+`.trim();
 }

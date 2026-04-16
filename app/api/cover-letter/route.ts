@@ -15,16 +15,11 @@ export async function POST(req: Request) {
       email: body.email || "",
       location: body.location || "",
       targetJob: body.targetJob || "",
+      cvText: body.cvText || "",
       jobTitle: body.jobTitle || "",
       companyName: body.companyName || "",
       jobAd: body.jobAd || "",
-      education: body.education || "",
-      experience: body.experience || "",
-      languages: body.languages || "",
-      skills: body.skills || "",
-      cards: body.cards || "",
-      hobbies: body.hobbies || "",
-      cvText: body.cvText || "",
+      tone: body.tone || "professional",
     });
 
     const response = await client.responses.create({
@@ -33,13 +28,13 @@ export async function POST(req: Request) {
     });
 
     const output =
-      response.output_text || "Virhe: mallilta ei saatu vastausta.";
+      response.output_text || "HAKEMUS:\nHakemuksen luonti epäonnistui.";
 
     return Response.json({ output });
   } catch (error) {
     console.error(error);
     return Response.json(
-      { error: "Palvelimella tapahtui virhe." },
+      { error: "Hakemuksen luonti epäonnistui." },
       { status: 500 }
     );
   }
