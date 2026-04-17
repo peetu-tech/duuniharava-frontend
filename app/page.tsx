@@ -308,22 +308,24 @@ export default function Home() {
         id="hero"
         className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-20"
       >
-        <div className="grid items-center gap-10 xl:grid-cols-2">
-          <div className="mx-auto flex w-full max-w-3xl flex-col text-left xl:mx-0">
-            <SectionBadge>Duuniharava</SectionBadge>
+        <div className="grid items-center gap-14 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
+          <div className="mx-auto flex w-full max-w-[560px] flex-col xl:mx-0 xl:max-w-[560px]">
+            <div className="mx-auto w-fit xl:mx-0">
+              <SectionBadge>Duuniharava</SectionBadge>
+            </div>
 
-            <h1 className="mt-5 text-4xl font-black leading-[0.92] tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+            <h1 className="mt-5 text-center text-4xl font-black leading-[0.92] tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl xl:text-left xl:text-[78px]">
               Säästä aikaa työnhaussa ja rakenna vahvempi vaikutelma.
             </h1>
 
-            <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-300 md:text-lg">
+            <p className="mt-6 max-w-[560px] text-center text-base leading-8 text-zinc-300 md:text-lg xl:text-left">
               Duuniharava auttaa tekemään paremman CV:n, seuraamaan työpaikkoja
               ja kirjoittamaan kohdistettuja hakemuksia yhdestä selkeästä
               työtilasta. Palvelu on tehty niin, että myös ensikertalainen
               ymmärtää heti mitä tehdä seuraavaksi.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-3 xl:justify-start">
               <Link
                 href="/signup"
                 className="rounded-2xl bg-gradient-to-r from-teal-400 to-orange-400 px-5 py-3 text-sm font-black text-black transition hover:opacity-95"
@@ -339,7 +341,7 @@ export default function Home() {
               </a>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-3 xl:justify-start">
               <FeaturePill>CV-generaattori</FeaturePill>
               <FeaturePill>Työpaikkaseuranta</FeaturePill>
               <FeaturePill>Hakemukset</FeaturePill>
@@ -347,68 +349,70 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mx-auto w-full max-w-3xl">
-            <GlassCard className="min-h-[560px] p-6 md:p-8">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex h-20 w-20 items-center justify-center rounded-[26px] border border-white/10 bg-black/20 shadow-[0_10px_30px_rgba(16,185,129,0.12)]">
-                  <div className="relative flex h-10 w-10 items-center justify-center">
-                    <div className="absolute inset-0 rounded-2xl bg-teal-400/10 blur-xl" />
-                    <svg
-                      viewBox="0 0 64 64"
-                      className="relative z-10 h-9 w-9"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M18 14V46"
-                        stroke="url(#heroGrad)"
-                        strokeWidth="5.5"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M18 30H36C43.732 30 50 36.268 50 44"
-                        stroke="url(#heroGrad)"
-                        strokeWidth="5.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M36 30V50"
-                        stroke="#f8fafc"
-                        strokeWidth="4.5"
-                        strokeLinecap="round"
-                      />
-                      <defs>
-                        <linearGradient
-                          id="heroGrad"
-                          x1="12"
-                          y1="10"
-                          x2="54"
-                          y2="52"
-                        >
-                          <stop stopColor="#2dd4bf" />
-                          <stop offset="0.55" stopColor="#34d399" />
-                          <stop offset="1" stopColor="#fb923c" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
+          <div className="mx-auto flex w-full justify-center xl:justify-end">
+            <div className="w-full max-w-[820px]">
+              <GlassCard className="min-h-[560px] p-6 md:p-8">
+                <div className="flex items-start">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-[26px] border border-white/10 bg-black/20 shadow-[0_10px_30px_rgba(16,185,129,0.12)]">
+                    <div className="relative flex h-10 w-10 items-center justify-center">
+                      <div className="absolute inset-0 rounded-2xl bg-teal-400/10 blur-xl" />
+                      <svg
+                        viewBox="0 0 64 64"
+                        className="relative z-10 h-9 w-9"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18 14V46"
+                          stroke="url(#heroGrad)"
+                          strokeWidth="5.5"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M18 30H36C43.732 30 50 36.268 50 44"
+                          stroke="url(#heroGrad)"
+                          strokeWidth="5.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M36 30V50"
+                          stroke="#f8fafc"
+                          strokeWidth="4.5"
+                          strokeLinecap="round"
+                        />
+                        <defs>
+                          <linearGradient
+                            id="heroGrad"
+                            x1="12"
+                            y1="10"
+                            x2="54"
+                            y2="52"
+                          >
+                            <stop stopColor="#2dd4bf" />
+                            <stop offset="0.55" stopColor="#34d399" />
+                            <stop offset="1" stopColor="#fb923c" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-6 text-center">
-                <h2 className="text-4xl font-black tracking-[-0.05em]">
-                  <span className="text-teal-400">DUUNI</span>
-                  <span className="text-orange-400">HARAVA</span>
-                </h2>
-                <p className="mx-auto mt-4 max-w-xl text-base leading-8 text-zinc-300">
-                  Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
-                  työpaikkaseurannan ja hakemukset yhteen.
-                </p>
-              </div>
+                <div className="mx-auto mt-6 max-w-[620px] text-center">
+                  <h2 className="text-4xl font-black tracking-[-0.05em]">
+                    <span className="text-teal-400">DUUNI</span>
+                    <span className="text-orange-400">HARAVA</span>
+                  </h2>
+                  <p className="mt-4 text-base leading-8 text-zinc-300">
+                    Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
+                    työpaikkaseurannan ja hakemukset yhteen.
+                  </p>
+                </div>
 
-              <HeroChart />
-            </GlassCard>
+                <HeroChart />
+              </GlassCard>
+            </div>
           </div>
         </div>
       </section>
@@ -417,12 +421,12 @@ export default function Home() {
         id="features"
         className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
       >
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
           <SectionBadge>Palvelut</SectionBadge>
-          <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+          <h2 className="mt-4 max-w-[900px] text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Kenelle ja mitä tarjoamme
           </h2>
-          <p className="mt-5 text-base leading-8 text-zinc-300 md:text-lg">
+          <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
             Palvelu on rakennettu niin, että myös ensimmäistä kertaa hakeva
             ymmärtää mitä tehdä seuraavaksi.
           </p>
@@ -455,12 +459,12 @@ export default function Home() {
         className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
       >
         <GlassCard className="p-8 md:p-14">
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
             <SectionBadge>Miksi me</SectionBadge>
-            <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+            <h2 className="mt-4 max-w-[920px] text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
               Enemmän kuin vain yksi työkalu
             </h2>
-            <p className="mt-5 text-base leading-8 text-zinc-300 md:text-lg">
+            <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
               Duuniharava kokoaa työnhaun tärkeimmät osat yhteen. Se ei ole
               pelkkä CV-editori tai pelkkä hakemuspohja, vaan kokonainen
               työnhaun työtila.
@@ -491,12 +495,12 @@ export default function Home() {
         id="pricing"
         className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
       >
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
           <SectionBadge>Hinnasto</SectionBadge>
           <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Hinnasto
           </h2>
-          <p className="mt-5 text-base leading-8 text-zinc-300 md:text-lg">
+          <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
             Voitte myöhemmin säätää nämä lopullisiin hintoihin, mutta rakenne on
             valmiina myyvää esittelyä varten.
           </p>
@@ -538,12 +542,12 @@ export default function Home() {
         id="faq"
         className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-24"
       >
-        <div className="text-center">
+        <div className="flex flex-col items-center text-center">
           <SectionBadge>FAQ</SectionBadge>
           <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Usein kysyttyä
           </h2>
-          <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-zinc-300 md:text-lg">
+          <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
             Tähän voi myöhemmin lisätä lisää kysymyksiä, mutta tässä on hyvä
             myyvän landingin peruspohja.
           </p>
@@ -567,12 +571,12 @@ export default function Home() {
 
       <section className="mx-auto max-w-7xl px-4 pb-16 md:px-6 md:pb-24">
         <GlassCard className="overflow-hidden p-8 md:p-14">
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
             <SectionBadge>Aloita nyt</SectionBadge>
-            <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+            <h2 className="mt-4 max-w-[900px] text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
               Valmis tekemään työnhausta selkeämpää?
             </h2>
-            <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-zinc-300 md:text-lg">
+            <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
               Avaa Duuniharava ja rakenna CV, työpaikkaseuranta ja hakemukset
               yhteen paikkaan.
             </p>
