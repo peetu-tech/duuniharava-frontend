@@ -3,28 +3,23 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-function DuuniharavaLogo({
-  className = "",
-}: {
-  className?: string;
-}) {
+function DuuniharavaLogo({ className = "" }: { className?: string }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <div className="relative">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#00BFA6] to-[#FF6F3C] blur-xl opacity-30" />
-        <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl">
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#00BFA6] to-[#FF6F3C] opacity-25 blur-xl" />
+        <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
           <svg
-            width="26"
-            height="26"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="drop-shadow-[0_0_18px_rgba(0,191,166,0.35)]"
           >
             <path
               d="M5 11V20M12 11V20M19 11V20M5 11H19M12 4V11"
               stroke="#00BFA6"
-              strokeWidth="2.4"
+              strokeWidth="2.3"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -33,14 +28,22 @@ function DuuniharavaLogo({
       </div>
 
       <div className="leading-tight">
-        <div className="text-lg font-black tracking-[-0.04em] text-white">
+        <div className="text-base font-black tracking-[-0.04em] text-white sm:text-lg">
           <span className="text-[#00BFA6]">DUUNI</span>
           <span className="text-[#FF6F3C]">HARAVA</span>
         </div>
-        <div className="text-xs text-zinc-400">
+        <div className="text-[11px] text-zinc-400 sm:text-xs">
           CV:t, työpaikat ja hakemukset yhdessä
         </div>
       </div>
+    </div>
+  );
+}
+
+function Badge({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex rounded-full border border-[#00BFA6]/20 bg-[#00BFA6]/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#00BFA6]">
+      {children}
     </div>
   );
 }
@@ -61,7 +64,7 @@ function GlassCard({
   );
 }
 
-function SectionTitle({
+function SectionHeader({
   eyebrow,
   title,
   description,
@@ -72,13 +75,11 @@ function SectionTitle({
 }) {
   return (
     <div className="mx-auto max-w-3xl text-center">
-      <div className="inline-flex rounded-full border border-[#00BFA6]/20 bg-[#00BFA6]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#00BFA6]">
-        {eyebrow}
-      </div>
-      <h2 className="mt-5 text-3xl font-black tracking-[-0.05em] text-white md:text-5xl">
+      <Badge>{eyebrow}</Badge>
+      <h2 className="mt-4 text-3xl font-black leading-tight tracking-[-0.05em] text-white md:text-5xl">
         {title}
       </h2>
-      <p className="mt-5 text-base leading-8 text-zinc-300 md:text-lg">
+      <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-zinc-300 md:text-base md:leading-8">
         {description}
       </p>
     </div>
@@ -97,7 +98,7 @@ function FeatureCard({
   accent?: "teal" | "orange";
 }) {
   return (
-    <GlassCard className="p-6 transition duration-300 hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+    <GlassCard className="h-full p-6 transition duration-300 hover:-translate-y-1.5 hover:border-white/20">
       <div className="text-3xl">{icon}</div>
       <h3
         className={`mt-4 text-xl font-bold ${
@@ -107,6 +108,28 @@ function FeatureCard({
         {title}
       </h3>
       <p className="mt-3 text-sm leading-7 text-zinc-300">{description}</p>
+    </GlassCard>
+  );
+}
+
+function InfoStat({
+  title,
+  value,
+  description,
+}: {
+  title: string;
+  value: string;
+  description: string;
+}) {
+  return (
+    <GlassCard className="p-6">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+        {title}
+      </p>
+      <p className="mt-3 text-3xl font-black tracking-[-0.04em] text-white">
+        {value}
+      </p>
+      <p className="mt-3 text-sm leading-6 text-zinc-400">{description}</p>
     </GlassCard>
   );
 }
@@ -126,7 +149,7 @@ function PricingCard({
 }) {
   return (
     <div
-      className={`relative rounded-[30px] border p-8 backdrop-blur-xl transition duration-300 hover:-translate-y-2 ${
+      className={`relative flex h-full flex-col rounded-[30px] border p-7 backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 ${
         highlighted
           ? "border-[#00BFA6] bg-white/[0.05] shadow-[0_0_40px_rgba(0,191,166,0.12)]"
           : "border-white/10 bg-white/[0.03]"
@@ -139,19 +162,19 @@ function PricingCard({
       )}
 
       <h3
-        className={`text-xl font-bold ${
+        className={`text-2xl font-bold ${
           highlighted ? "text-[#00BFA6]" : "text-white"
         }`}
       >
         {title}
       </h3>
 
-      <div className="mt-5 text-4xl font-black tracking-[-0.04em] text-white">
+      <div className="mt-4 text-4xl font-black tracking-[-0.04em] text-white">
         {price}
       </div>
-      <p className="mt-2 text-sm text-zinc-400">{subtitle}</p>
+      <p className="mt-1 text-sm text-zinc-400">{subtitle}</p>
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-7 space-y-3">
         {features.map((feature) => (
           <div key={feature} className="flex items-start gap-3 text-sm text-zinc-300">
             <div className="mt-1 h-2.5 w-2.5 rounded-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C]" />
@@ -160,7 +183,7 @@ function PricingCard({
         ))}
       </div>
 
-      <div className="mt-8">
+      <div className="mt-auto pt-8">
         <Link
           href="/signup"
           className={`inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-bold transition ${
@@ -185,7 +208,7 @@ function FaqItem({
 }) {
   return (
     <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition hover:border-[#00BFA6]/30">
-      <summary className="cursor-pointer list-none font-bold text-white">
+      <summary className="cursor-pointer list-none pr-8 text-base font-bold text-white">
         {question}
       </summary>
       <p className="mt-4 text-sm leading-7 text-zinc-300">{answer}</p>
@@ -194,29 +217,27 @@ function FaqItem({
 }
 
 function MiniChart() {
-  const [bars] = useState([68, 72, 79, 85, 74, 62, 55]);
+  const bars = [68, 72, 79, 85, 74, 62, 55];
 
   return (
     <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-bold text-[#00BFA6]">
-            Työttömyyden trendi ja ennuste
-          </p>
-          <p className="mt-1 text-xs text-zinc-500">
-            Visuaalinen esimerkki vanhan sivun hengessä
-          </p>
-        </div>
+      <div>
+        <p className="text-sm font-bold text-[#00BFA6]">
+          Työttömyyden trendi ja ennuste
+        </p>
+        <p className="mt-1 text-xs text-zinc-500">
+          Visuaalinen esimerkki palvelun analytiikasta
+        </p>
       </div>
 
-      <div className="flex h-52 items-end gap-3 md:h-64">
+      <div className="mt-6 flex h-44 items-end gap-2 sm:gap-3 md:h-56">
         {bars.map((bar, index) => {
           const isForecast = index >= 3;
           return (
-            <div key={index} className="flex flex-1 flex-col items-center gap-3">
-              <div className="relative flex h-full w-full items-end">
+            <div key={index} className="flex flex-1 flex-col items-center gap-2">
+              <div className="flex h-full w-full items-end">
                 <div
-                  className={`w-full rounded-t-xl transition-all duration-700 ${
+                  className={`w-full rounded-t-xl ${
                     isForecast
                       ? "bg-gradient-to-t from-[#FF6F3C] to-[#ff9a73]"
                       : "bg-gradient-to-t from-[#00BFA6] to-[#6df0df]"
@@ -224,7 +245,7 @@ function MiniChart() {
                   style={{ height: `${bar}%` }}
                 />
               </div>
-              <span className="text-[11px] text-zinc-500">
+              <span className="text-[10px] text-zinc-500 sm:text-[11px]">
                 {2020 + index * 2}
               </span>
             </div>
@@ -266,13 +287,18 @@ export default function Home() {
         "Duuniharava auttaa tekemään paremman CV:n, seuraamaan työpaikkoja ja kirjoittamaan kohdistettuja hakemuksia yhdestä selkeästä työtilasta.",
       heroCta: "Aloita nyt",
       heroMore: "Katso miten toimii",
-      featuresTitle: "Kenelle ja mitä tarjoamme",
-      featuresDesc:
+      section1Title: "Kenelle ja mitä tarjoamme",
+      section1Desc:
         "Palvelu on rakennettu niin, että myös ensimmäistä kertaa hakeva ymmärtää mitä tehdä seuraavaksi.",
+      whyTitle: "Enemmän kuin vain yksi työkalu",
+      whyDesc:
+        "Duuniharava kokoaa työnhaun tärkeimmät osat yhteen. Se ei ole pelkkä CV-editori tai pelkkä hakemuspohja, vaan kokonainen työnhaun työtila.",
       pricingTitle: "Hinnasto",
       pricingDesc:
         "Voitte myöhemmin säätää nämä lopullisiin hintoihin, mutta rakenne on valmiina myyvää esittelyä varten.",
       faqTitle: "Usein kysyttyä",
+      faqDesc:
+        "Tässä on hyvä ja selkeä FAQ-pohja, jota voi laajentaa myöhemmin.",
       ctaTitle: "Valmis tekemään työnhausta selkeämpää?",
       ctaDesc:
         "Avaa Duuniharava ja rakenna CV, työpaikkaseuranta ja hakemukset yhteen paikkaan.",
@@ -291,13 +317,17 @@ export default function Home() {
         "Duuniharava helps you create a better CV, track jobs, and write tailored applications from one clear workspace.",
       heroCta: "Get started",
       heroMore: "See how it works",
-      featuresTitle: "Who it is for and what we offer",
-      featuresDesc:
+      section1Title: "Who it is for and what we offer",
+      section1Desc:
         "Built so that even first-time job seekers understand what to do next.",
+      whyTitle: "More than just one tool",
+      whyDesc:
+        "Duuniharava combines the key parts of job hunting into one place. It is not just a CV editor or just an application template, but a full job search workspace.",
       pricingTitle: "Pricing",
       pricingDesc:
-        "You can fine-tune these prices later, but the section is ready for a polished sales page.",
+        "You can fine-tune these prices later, but the section is already ready for a polished sales page.",
       faqTitle: "Frequently asked questions",
+      faqDesc: "A clean FAQ base that you can expand later.",
       ctaTitle: "Ready to make job search clearer?",
       ctaDesc:
         "Open Duuniharava and bring your CV, job tracking and applications into one place.",
@@ -310,18 +340,18 @@ export default function Home() {
     <main className="min-h-screen overflow-x-hidden bg-[#0F0F0F] text-white">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.14),transparent_24%),radial-gradient(circle_at_top_right,rgba(255,111,60,0.12),transparent_20%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.04),transparent_28%)]" />
 
-      <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/30 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-          <DuuniharavaLogo />
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/35 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 md:px-6">
+          <DuuniharavaLogo className="shrink-0" />
 
-          <div className="hidden items-center gap-8 text-sm text-zinc-400 lg:flex">
+          <div className="hidden items-center gap-7 text-sm text-zinc-400 lg:flex">
             <a href="#hero" className="transition hover:text-white">
               {t.navHome}
             </a>
             <a href="#features" className="transition hover:text-white">
               {t.navServices}
             </a>
-            <a href="#value" className="transition hover:text-white">
+            <a href="#why" className="transition hover:text-white">
               {t.navWhy}
             </a>
             <a href="#pricing" className="transition hover:text-white">
@@ -339,7 +369,7 @@ export default function Home() {
                 className={`rounded-lg border px-3 py-1.5 text-xs transition ${
                   lang === "fi"
                     ? "border-[#00BFA6] bg-[#00BFA6]/10 text-[#00BFA6]"
-                    : "border-white/10 bg-transparent text-white"
+                    : "border-white/10 text-white"
                 }`}
               >
                 🇫🇮 FI
@@ -349,7 +379,7 @@ export default function Home() {
                 className={`rounded-lg border px-3 py-1.5 text-xs transition ${
                   lang === "en"
                     ? "border-[#00BFA6] bg-[#00BFA6]/10 text-[#00BFA6]"
-                    : "border-white/10 bg-transparent text-white"
+                    : "border-white/10 text-white"
                 }`}
               >
                 🇬🇧 EN
@@ -366,17 +396,12 @@ export default function Home() {
         </div>
       </nav>
 
-      <section
-        id="hero"
-        className="mx-auto flex min-h-screen max-w-7xl items-center px-4 py-16 md:px-6"
-      >
-        <div className="grid w-full gap-10 xl:grid-cols-[1.05fr_0.95fr] xl:items-center">
-          <div>
-            <div className="inline-flex rounded-full border border-[#00BFA6]/20 bg-[#00BFA6]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#00BFA6]">
-              Duuniharava
-            </div>
+      <section id="hero" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.02fr_0.98fr]">
+          <div className="max-w-3xl">
+            <Badge>Duuniharava</Badge>
 
-            <h1 className="mt-6 text-4xl font-black leading-[0.95] tracking-[-0.06em] text-white md:text-6xl">
+            <h1 className="mt-5 text-4xl font-black leading-[0.94] tracking-[-0.06em] text-white sm:text-5xl lg:text-7xl">
               {t.heroTitle}
             </h1>
 
@@ -387,7 +412,7 @@ export default function Home() {
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Link
                 href="/signup"
-                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 text-sm font-black text-white transition hover:scale-[1.03]"
+                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 text-sm font-black text-white transition hover:scale-[1.02]"
               >
                 {t.heroCta}
               </Link>
@@ -401,27 +426,25 @@ export default function Home() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-200">
-                CV-generaattori
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-200">
-                Työpaikkaseuranta
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-200">
-                Hakemukset
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-200">
-                PDF + DOCX
-              </span>
+              {["CV-generaattori", "Työpaikkaseuranta", "Hakemukset", "PDF + DOCX"].map(
+                (item) => (
+                  <span
+                    key={item}
+                    className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-200"
+                  >
+                    {item}
+                  </span>
+                )
+              )}
             </div>
           </div>
 
           <GlassCard className="p-6 md:p-8">
             <div className="text-center">
-              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[28px] border border-white/10 bg-white/[0.04] shadow-[0_0_30px_rgba(0,191,166,0.12)]">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-[26px] border border-white/10 bg-white/[0.04] shadow-[0_0_30px_rgba(0,191,166,0.12)]">
                 <svg
-                  width="54"
-                  height="54"
+                  width="42"
+                  height="42"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -441,9 +464,9 @@ export default function Home() {
                 <span className="text-[#FF6F3C]">HARAVA</span>
               </div>
 
-              <p className="mt-3 text-sm leading-7 text-zinc-400">
-                Sama premium-fiilis kuin vanhassa landingissa, mutta modernina
-                Next.js-versiona.
+              <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-zinc-400">
+                Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
+                työpaikkaseurannan ja hakemukset yhteen.
               </p>
             </div>
 
@@ -452,14 +475,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="features" className="mx-auto max-w-7xl px-4 py-20 md:px-6">
-        <SectionTitle
+      <section id="features" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+        <SectionHeader
           eyebrow="Palvelut"
-          title={t.featuresTitle}
-          description={t.featuresDesc}
+          title={t.section1Title}
+          description={t.section1Desc}
         />
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
           <FeatureCard
             icon="📄"
             title="CV-analyysi ja rakentaminen"
@@ -481,18 +504,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="value" className="mx-auto max-w-7xl px-4 py-20 md:px-6">
-        <GlassCard className="p-8 md:p-14">
-          <SectionTitle
+      <section id="why" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+        <GlassCard className="p-8 md:p-12">
+          <SectionHeader
             eyebrow="Miksi me"
-            title="Enemmän kuin vain yksi työkalu"
-            description="Duuniharava kokoaa työnhaun tärkeimmät osat yhteen. Se ei ole pelkkä CV-editori tai pelkkä hakemuspohja, vaan kokonainen työnhaun työtila."
+            title={t.whyTitle}
+            description={t.whyDesc}
           />
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             <div className="text-center">
               <div className="text-4xl">🇫🇮</div>
-              <h3 className="mt-4 text-xl font-bold text-white">
+              <h3 className="mt-4 text-2xl font-bold text-white">
                 Suomen työnhakuun sopiva
               </h3>
               <p className="mt-3 text-sm leading-7 text-zinc-400">
@@ -503,7 +526,7 @@ export default function Home() {
 
             <div className="text-center">
               <div className="text-4xl">⚙️</div>
-              <h3 className="mt-4 text-xl font-bold text-white">
+              <h3 className="mt-4 text-2xl font-bold text-white">
                 Selkeä prosessi
               </h3>
               <p className="mt-3 text-sm leading-7 text-zinc-400">
@@ -514,7 +537,7 @@ export default function Home() {
 
             <div className="text-center">
               <div className="text-4xl">💎</div>
-              <h3 className="mt-4 text-xl font-bold text-white">
+              <h3 className="mt-4 text-2xl font-bold text-white">
                 Premium-ilme
               </h3>
               <p className="mt-3 text-sm leading-7 text-zinc-400">
@@ -526,14 +549,14 @@ export default function Home() {
         </GlassCard>
       </section>
 
-      <section id="pricing" className="mx-auto max-w-7xl px-4 py-20 md:px-6">
-        <SectionTitle
+      <section id="pricing" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+        <SectionHeader
           eyebrow="Hinnasto"
           title={t.pricingTitle}
           description={t.pricingDesc}
         />
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
           <PricingCard
             title="Starter"
             price="12,49€"
@@ -544,7 +567,6 @@ export default function Home() {
               "Kevyt aloitus työnhakuun",
             ]}
           />
-
           <PricingCard
             title="Pro"
             price="29,99€"
@@ -556,7 +578,6 @@ export default function Home() {
               "Työpaikkaseuranta samassa näkymässä",
             ]}
           />
-
           <PricingCard
             title="Ura-tuki"
             price="99€"
@@ -570,11 +591,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="faq" className="mx-auto max-w-4xl px-4 py-20 md:px-6">
-        <SectionTitle
+      <section id="faq" className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-24">
+        <SectionHeader
           eyebrow="FAQ"
           title={t.faqTitle}
-          description="Tähän voi myöhemmin lisätä lisää kysymyksiä, mutta tässä on hyvä myyvän landingin peruspohja."
+          description={t.faqDesc}
         />
 
         <div className="mt-12 space-y-4">
@@ -593,7 +614,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
         <div className="rounded-[36px] border border-white/10 bg-gradient-to-br from-white/[0.05] via-white/[0.03] to-[#00BFA6]/[0.06] p-8 shadow-[0_20px_80px_rgba(0,0,0,0.3)] backdrop-blur-2xl md:p-12">
           <div className="mx-auto max-w-3xl text-center">
             <div className="inline-flex rounded-full border border-[#FF6F3C]/20 bg-[#FF6F3C]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#FF6F3C]">
@@ -611,7 +632,7 @@ export default function Home() {
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
               <Link
                 href="/signup"
-                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 text-sm font-black text-white transition hover:scale-[1.03]"
+                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 text-sm font-black text-white transition hover:scale-[1.02]"
               >
                 {t.ctaPrimary}
               </Link>
