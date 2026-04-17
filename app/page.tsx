@@ -100,7 +100,7 @@ function HeroChart() {
 
   return (
     <div className="mt-6 rounded-[24px] border border-white/8 bg-black/20 p-5">
-      <div className="mb-4">
+      <div className="mb-4 text-left">
         <p className="text-sm font-semibold text-teal-300">
           Työnhaun näkyvyys ja osuvuus
         </p>
@@ -165,7 +165,7 @@ function BenefitCard({
   description: string;
 }) {
   return (
-    <div className="text-center">
+    <div className="mx-auto max-w-sm text-center">
       <div className="mb-4 text-4xl">{icon}</div>
       <h3 className="text-2xl font-bold tracking-[-0.03em] text-white">
         {title}
@@ -264,7 +264,7 @@ export default function Home() {
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.14),transparent_24%),radial-gradient(circle_at_top_right,rgba(251,146,60,0.10),transparent_20%),radial-gradient(circle_at_bottom,rgba(52,211,153,0.10),transparent_22%)]" />
 
       <header className="sticky top-0 z-50 border-b border-white/6 bg-[#050816]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-4 py-4 md:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 md:px-6">
           <Link href="/" className="shrink-0">
             <DuuniharavaLogo />
           </Link>
@@ -306,13 +306,13 @@ export default function Home() {
 
       <section
         id="hero"
-        className="mx-auto max-w-[1600px] px-4 py-12 md:px-6 md:py-20"
+        className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-20"
       >
-        <div className="grid items-center gap-10 xl:grid-cols-[minmax(0,1.08fr)_minmax(560px,0.92fr)]">
-          <div className="max-w-4xl">
+        <div className="grid items-center gap-10 xl:grid-cols-2">
+          <div className="mx-auto flex w-full max-w-3xl flex-col text-left xl:mx-0">
             <SectionBadge>Duuniharava</SectionBadge>
 
-            <h1 className="mt-5 text-4xl font-black leading-[0.92] tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl xl:text-[88px]">
+            <h1 className="mt-5 text-4xl font-black leading-[0.92] tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl xl:text-7xl">
               Säästä aikaa työnhaussa ja rakenna vahvempi vaikutelma.
             </h1>
 
@@ -347,75 +347,77 @@ export default function Home() {
             </div>
           </div>
 
-          <GlassCard className="w-full min-h-[560px] p-6 md:p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex h-20 w-20 items-center justify-center rounded-[26px] border border-white/10 bg-black/20 shadow-[0_10px_30px_rgba(16,185,129,0.12)]">
-                <div className="relative flex h-10 w-10 items-center justify-center">
-                  <div className="absolute inset-0 rounded-2xl bg-teal-400/10 blur-xl" />
-                  <svg
-                    viewBox="0 0 64 64"
-                    className="relative z-10 h-9 w-9"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M18 14V46"
-                      stroke="url(#heroGrad)"
-                      strokeWidth="5.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M18 30H36C43.732 30 50 36.268 50 44"
-                      stroke="url(#heroGrad)"
-                      strokeWidth="5.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M36 30V50"
-                      stroke="#f8fafc"
-                      strokeWidth="4.5"
-                      strokeLinecap="round"
-                    />
-                    <defs>
-                      <linearGradient
-                        id="heroGrad"
-                        x1="12"
-                        y1="10"
-                        x2="54"
-                        y2="52"
-                      >
-                        <stop stopColor="#2dd4bf" />
-                        <stop offset="0.55" stopColor="#34d399" />
-                        <stop offset="1" stopColor="#fb923c" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
+          <div className="mx-auto w-full max-w-3xl">
+            <GlassCard className="min-h-[560px] p-6 md:p-8">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-20 w-20 items-center justify-center rounded-[26px] border border-white/10 bg-black/20 shadow-[0_10px_30px_rgba(16,185,129,0.12)]">
+                  <div className="relative flex h-10 w-10 items-center justify-center">
+                    <div className="absolute inset-0 rounded-2xl bg-teal-400/10 blur-xl" />
+                    <svg
+                      viewBox="0 0 64 64"
+                      className="relative z-10 h-9 w-9"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M18 14V46"
+                        stroke="url(#heroGrad)"
+                        strokeWidth="5.5"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M18 30H36C43.732 30 50 36.268 50 44"
+                        stroke="url(#heroGrad)"
+                        strokeWidth="5.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M36 30V50"
+                        stroke="#f8fafc"
+                        strokeWidth="4.5"
+                        strokeLinecap="round"
+                      />
+                      <defs>
+                        <linearGradient
+                          id="heroGrad"
+                          x1="12"
+                          y1="10"
+                          x2="54"
+                          y2="52"
+                        >
+                          <stop stopColor="#2dd4bf" />
+                          <stop offset="0.55" stopColor="#34d399" />
+                          <stop offset="1" stopColor="#fb923c" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-6 text-center">
-              <h2 className="text-4xl font-black tracking-[-0.05em]">
-                <span className="text-teal-400">DUUNI</span>
-                <span className="text-orange-400">HARAVA</span>
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-base leading-8 text-zinc-300">
-                Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
-                työpaikkaseurannan ja hakemukset yhteen.
-              </p>
-            </div>
+              <div className="mt-6 text-center">
+                <h2 className="text-4xl font-black tracking-[-0.05em]">
+                  <span className="text-teal-400">DUUNI</span>
+                  <span className="text-orange-400">HARAVA</span>
+                </h2>
+                <p className="mx-auto mt-4 max-w-xl text-base leading-8 text-zinc-300">
+                  Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
+                  työpaikkaseurannan ja hakemukset yhteen.
+                </p>
+              </div>
 
-            <HeroChart />
-          </GlassCard>
+              <HeroChart />
+            </GlassCard>
+          </div>
         </div>
       </section>
 
       <section
         id="features"
-        className="mx-auto max-w-[1600px] px-4 py-16 md:px-6 md:py-24"
+        className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
       >
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-3xl text-center">
           <SectionBadge>Palvelut</SectionBadge>
           <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Kenelle ja mitä tarjoamme
@@ -450,10 +452,10 @@ export default function Home() {
 
       <section
         id="why"
-        className="mx-auto max-w-[1600px] px-4 py-16 md:px-6 md:py-24"
+        className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
       >
         <GlassCard className="p-8 md:p-14">
-          <div className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto max-w-3xl text-center">
             <SectionBadge>Miksi me</SectionBadge>
             <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
               Enemmän kuin vain yksi työkalu
@@ -487,9 +489,9 @@ export default function Home() {
 
       <section
         id="pricing"
-        className="mx-auto max-w-[1600px] px-4 py-16 md:px-6 md:py-24"
+        className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
       >
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-3xl text-center">
           <SectionBadge>Hinnasto</SectionBadge>
           <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Hinnasto
@@ -534,7 +536,7 @@ export default function Home() {
 
       <section
         id="faq"
-        className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24"
+        className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-24"
       >
         <div className="text-center">
           <SectionBadge>FAQ</SectionBadge>
@@ -563,9 +565,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1600px] px-4 pb-16 md:px-6 md:pb-24">
+      <section className="mx-auto max-w-7xl px-4 pb-16 md:px-6 md:pb-24">
         <GlassCard className="overflow-hidden p-8 md:p-14">
-          <div className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto max-w-3xl text-center">
             <SectionBadge>Aloita nyt</SectionBadge>
             <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
               Valmis tekemään työnhausta selkeämpää?
