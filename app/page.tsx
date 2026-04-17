@@ -2,175 +2,131 @@
 
 import Link from "next/link";
 
-function DuuniharavaLogo({
-  compact = false,
-  className = "",
-}: {
-  compact?: boolean;
-  className?: string;
-}) {
+function LogoMark() {
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-400 via-emerald-400 to-orange-400 shadow-[0_12px_35px_rgba(16,185,129,0.28)]">
-        <div className="absolute inset-[2px] rounded-[14px] bg-[#07110f]" />
-        <svg
-          viewBox="0 0 64 64"
-          className="relative z-10 h-7 w-7"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18 14V46"
-            stroke="url(#logoGrad)"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-          />
-          <path
-            d="M18 30H36C43.732 30 50 36.268 50 44"
-            stroke="url(#logoGrad)"
-            strokeWidth="5.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M36 30V50"
-            stroke="#f8fafc"
-            strokeWidth="4.5"
-            strokeLinecap="round"
-          />
-          <defs>
-            <linearGradient id="logoGrad" x1="12" y1="10" x2="54" y2="52">
-              <stop stopColor="#2dd4bf" />
-              <stop offset="0.55" stopColor="#34d399" />
-              <stop offset="1" stopColor="#fb923c" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
-      {!compact && (
-        <div className="leading-tight">
-          <div className="text-lg font-black tracking-[-0.04em] text-white">
-            <span className="text-teal-400">DUUNI</span>
-            <span className="text-orange-400">HARAVA</span>
-          </div>
-          <div className="text-xs text-zinc-400">
-            CV:t, työpaikat ja hakemukset yhdessä
-          </div>
-        </div>
-      )}
+    <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-teal-400/35 bg-zinc-950 shadow-[0_0_30px_rgba(20,184,166,0.18)]">
+      <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_65%)]" />
+      <svg
+        viewBox="0 0 64 64"
+        className="relative z-10 h-8 w-8"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M18 18V46"
+          stroke="#5eead4"
+          strokeWidth="5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M18 18H34C42 18 48 24 48 32C48 40 42 46 34 46H26"
+          stroke="url(#heroGrad)"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M38 38L48 48"
+          stroke="#f8fafc"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <defs>
+          <linearGradient id="heroGrad" x1="18" y1="18" x2="48" y2="46">
+            <stop stopColor="#2dd4bf" />
+            <stop offset="1" stopColor="#f97316" />
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
   );
 }
 
-function SectionBadge({ children }: { children: React.ReactNode }) {
+function Brand() {
   return (
-    <span className="inline-flex rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-300">
+    <div className="flex items-center gap-4">
+      <LogoMark />
+      <div>
+        <div className="text-2xl font-black tracking-[-0.04em]">
+          <span className="text-teal-400">DUUNI</span>
+          <span className="text-orange-500">HARAVA</span>
+        </div>
+        <p className="text-sm text-zinc-400">
+          CV:t, työpaikat ja hakemukset yhdessä
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Badge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-teal-300">
       {children}
     </span>
   );
 }
 
 function GlassCard({
-  className = "",
   children,
+  className = "",
 }: {
-  className?: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <div
-      className={`rounded-[30px] border border-white/10 bg-white/[0.03] shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl ${className}`}
+      className={`rounded-[30px] border border-white/10 bg-white/[0.03] shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl ${className}`}
     >
       {children}
     </div>
   );
 }
 
-function FeaturePill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-zinc-200">
-      {children}
-    </span>
-  );
-}
-
-function HeroChart() {
-  const bars = [42, 58, 54, 68, 74, 61, 82, 76, 88, 79, 91, 96];
-
-  return (
-    <div className="mt-6 rounded-[24px] border border-white/8 bg-black/20 p-5">
-      <div className="mb-4 text-left">
-        <p className="text-sm font-semibold text-teal-300">
-          Työnhaun näkyvyys ja osuvuus
-        </p>
-        <p className="mt-1 text-xs text-zinc-500">
-          Havainnekuva siitä, miltä selkeä työnhaun dashboard voi näyttää
-        </p>
-      </div>
-
-      <div className="flex h-56 items-end gap-2 sm:gap-3 md:h-72">
-        {bars.map((value, index) => (
-          <div key={index} className="flex flex-1 flex-col items-center gap-2">
-            <div
-              className="w-full rounded-t-2xl bg-gradient-to-t from-teal-400 via-emerald-400 to-orange-400 shadow-[0_12px_24px_rgba(16,185,129,0.18)]"
-              style={{ height: `${value}%` }}
-            />
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 flex items-center justify-between text-[11px] text-zinc-500">
-        <span>CV</span>
-        <span>Työpaikat</span>
-        <span>Hakemukset</span>
-        <span>Seuranta</span>
-      </div>
-    </div>
-  );
-}
-
 function FeatureCard({
-  emoji,
+  icon,
   title,
-  description,
+  desc,
   accent = "teal",
 }: {
-  emoji: string;
+  icon: string;
   title: string;
-  description: string;
+  desc: string;
   accent?: "teal" | "orange";
 }) {
-  const titleColor =
-    accent === "orange" ? "text-orange-400" : "text-teal-300";
-
   return (
-    <GlassCard className="h-full p-6 transition duration-300 hover:-translate-y-1 hover:border-white/15">
-      <div className="mb-4 text-2xl">{emoji}</div>
-      <h3 className={`text-2xl font-bold tracking-[-0.03em] ${titleColor}`}>
+    <GlassCard className="h-full p-6 transition duration-300 hover:-translate-y-1 hover:border-white/20">
+      <div className="mb-4 text-2xl">{icon}</div>
+      <h3
+        className={`text-2xl font-bold tracking-[-0.03em] ${
+          accent === "orange" ? "text-orange-400" : "text-teal-300"
+        }`}
+      >
         {title}
       </h3>
-      <p className="mt-3 text-sm leading-7 text-zinc-300">{description}</p>
+      <p className="mt-3 text-base leading-8 text-zinc-300">{desc}</p>
     </GlassCard>
   );
 }
 
-function BenefitCard({
+function ValueItem({
   icon,
   title,
-  description,
+  desc,
 }: {
   icon: string;
   title: string;
-  description: string;
+  desc: string;
 }) {
   return (
-    <div className="mx-auto max-w-sm text-center">
+    <div className="text-center">
       <div className="mb-4 text-4xl">{icon}</div>
       <h3 className="text-2xl font-bold tracking-[-0.03em] text-white">
         {title}
       </h3>
-      <p className="mt-3 text-sm leading-7 text-zinc-400">{description}</p>
+      <p className="mx-auto mt-3 max-w-sm text-base leading-8 text-zinc-400">
+        {desc}
+      </p>
     </div>
   );
 }
@@ -179,47 +135,45 @@ function PriceCard({
   title,
   price,
   featured = false,
-  points,
+  items,
 }: {
   title: string;
   price: string;
   featured?: boolean;
-  points: string[];
+  items: string[];
 }) {
   return (
     <div
-      className={`relative rounded-[30px] border p-7 ${
+      className={`relative rounded-[32px] border p-8 ${
         featured
-          ? "border-teal-400/40 bg-gradient-to-b from-teal-400/10 via-white/[0.03] to-orange-400/10 shadow-[0_20px_80px_rgba(16,185,129,0.18)]"
+          ? "border-teal-400/40 bg-gradient-to-b from-teal-400/10 to-white/[0.03] shadow-[0_0_40px_rgba(20,184,166,0.15)]"
           : "border-white/10 bg-white/[0.03]"
       }`}
     >
       {featured && (
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-teal-400 to-orange-400 px-4 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-black">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-teal-300/40 bg-teal-300/15 px-4 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-teal-200">
           Suosituin
         </div>
       )}
 
       <h3
-        className={`text-3xl font-black tracking-[-0.04em] ${
+        className={`text-3xl font-bold tracking-[-0.03em] ${
           featured ? "text-teal-300" : "text-white"
         }`}
       >
         {title}
       </h3>
 
-      <div className="mt-5">
-        <span className="text-5xl font-black tracking-[-0.05em] text-white">
-          {price}
-        </span>
-        <span className="ml-2 text-zinc-500">/ kk</span>
-      </div>
+      <p className="mt-4 text-5xl font-black tracking-[-0.05em] text-white">
+        {price}
+        <span className="ml-2 text-base font-medium text-zinc-500">/ kk</span>
+      </p>
 
-      <ul className="mt-6 space-y-3 text-sm text-zinc-300">
-        {points.map((point) => (
-          <li key={point} className="flex items-start gap-3">
+      <ul className="mt-8 space-y-3 text-left text-zinc-300">
+        {items.map((item) => (
+          <li key={item} className="flex items-start gap-3">
             <span className="mt-1 h-2.5 w-2.5 rounded-full bg-gradient-to-r from-teal-400 to-orange-400" />
-            <span>{point}</span>
+            <span>{item}</span>
           </li>
         ))}
       </ul>
@@ -227,9 +181,9 @@ function PriceCard({
       <div className="mt-8">
         <Link
           href="/signup"
-          className={`inline-flex w-full items-center justify-center rounded-2xl px-5 py-3.5 text-sm font-bold transition ${
+          className={`inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-bold transition ${
             featured
-              ? "bg-gradient-to-r from-teal-400 to-orange-400 text-black hover:opacity-95"
+              ? "bg-gradient-to-r from-teal-400 to-orange-500 text-black hover:opacity-95"
               : "border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08]"
           }`}
         >
@@ -240,46 +194,26 @@ function PriceCard({
   );
 }
 
-function FaqItem({
-  question,
-  answer,
-}: {
-  question: string;
-  answer: string;
-}) {
-  return (
-    <details className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-white">
-        <span>{question}</span>
-        <span className="text-zinc-500 transition group-open:rotate-180">⌄</span>
-      </summary>
-      <p className="mt-4 text-sm leading-7 text-zinc-400">{answer}</p>
-    </details>
-  );
-}
-
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#050816] text-white">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.14),transparent_24%),radial-gradient(circle_at_top_right,rgba(251,146,60,0.10),transparent_20%),radial-gradient(circle_at_bottom,rgba(52,211,153,0.10),transparent_22%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.09),transparent_24%),radial-gradient(circle_at_bottom,rgba(45,212,191,0.08),transparent_30%)]" />
 
-      <header className="sticky top-0 z-50 border-b border-white/6 bg-[#050816]/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-white/8 bg-[#050816]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 md:px-6">
-          <Link href="/" className="shrink-0">
-            <DuuniharavaLogo />
-          </Link>
+          <Brand />
 
-          <nav className="hidden items-center gap-8 text-sm text-zinc-400 lg:flex">
-            <a href="#hero" className="transition hover:text-white">
+          <nav className="hidden items-center gap-8 text-sm text-zinc-300 lg:flex">
+            <a href="#etusivu" className="transition hover:text-white">
               Etusivu
             </a>
-            <a href="#features" className="transition hover:text-white">
+            <a href="#palvelut" className="transition hover:text-white">
               Palvelut
             </a>
-            <a href="#why" className="transition hover:text-white">
+            <a href="#miksi" className="transition hover:text-white">
               Miksi me
             </a>
-            <a href="#pricing" className="transition hover:text-white">
+            <a href="#hinnasto" className="transition hover:text-white">
               Hinnasto
             </a>
             <a href="#faq" className="transition hover:text-white">
@@ -287,8 +221,8 @@ export default function Home() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-zinc-300 sm:flex">
+          <div className="flex items-center gap-4">
+            <div className="hidden items-center gap-2 text-sm text-zinc-300 md:flex">
               <span className="text-teal-300">FI</span>
               <span className="text-zinc-600">|</span>
               <span>EN</span>
@@ -296,7 +230,7 @@ export default function Home() {
 
             <Link
               href="/signup"
-              className="rounded-full border border-teal-400/30 bg-teal-400/10 px-4 py-2 text-sm font-semibold text-teal-300 transition hover:bg-teal-400/15"
+              className="rounded-2xl border border-teal-400/25 bg-teal-400/10 px-4 py-2 text-sm font-semibold text-teal-300 transition hover:bg-teal-400/20"
             >
               Kirjaudu
             </Link>
@@ -304,129 +238,92 @@ export default function Home() {
         </div>
       </header>
 
-      <section
-        id="hero"
-        className="mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-20"
-      >
-        <div className="grid items-center gap-14 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
-          <div className="mx-auto flex w-full max-w-[560px] flex-col xl:mx-0 xl:max-w-[560px]">
-            <div className="mx-auto w-fit xl:mx-0">
-              <SectionBadge>Duuniharava</SectionBadge>
-            </div>
+      <section id="etusivu" className="mx-auto max-w-7xl px-4 pb-20 pt-10 md:px-6 md:pb-28 md:pt-14">
+        <div className="grid items-center gap-10 xl:grid-cols-2 xl:gap-14">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-start xl:mx-0">
+            <Badge>Duuniharava</Badge>
 
-            <h1 className="mt-5 text-center text-4xl font-black leading-[0.92] tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl xl:text-left xl:text-[78px]">
+            <h1 className="mt-5 max-w-[11ch] text-left text-5xl font-black leading-[0.92] tracking-[-0.06em] text-white sm:text-6xl md:text-7xl xl:text-[88px]">
               Säästä aikaa työnhaussa ja rakenna vahvempi vaikutelma.
             </h1>
 
-            <p className="mt-6 max-w-[560px] text-center text-base leading-8 text-zinc-300 md:text-lg xl:text-left">
+            <p className="mt-6 max-w-2xl text-left text-lg leading-9 text-zinc-300">
               Duuniharava auttaa tekemään paremman CV:n, seuraamaan työpaikkoja
               ja kirjoittamaan kohdistettuja hakemuksia yhdestä selkeästä
               työtilasta. Palvelu on tehty niin, että myös ensikertalainen
               ymmärtää heti mitä tehdä seuraavaksi.
             </p>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-3 xl:justify-start">
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/signup"
-                className="rounded-2xl bg-gradient-to-r from-teal-400 to-orange-400 px-5 py-3 text-sm font-black text-black transition hover:opacity-95"
+                className="rounded-2xl bg-gradient-to-r from-teal-400 to-orange-500 px-5 py-3 text-sm font-black text-black transition hover:scale-[1.02]"
               >
                 Aloita nyt
               </Link>
-
-              <a
-                href="#features"
+              <Link
+                href="/studio"
                 className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
               >
                 Katso miten toimii
-              </a>
+              </Link>
             </div>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-3 xl:justify-start">
-              <FeaturePill>CV-generaattori</FeaturePill>
-              <FeaturePill>Työpaikkaseuranta</FeaturePill>
-              <FeaturePill>Hakemukset</FeaturePill>
-              <FeaturePill>PDF + DOCX</FeaturePill>
+            <div className="mt-7 flex flex-wrap gap-4 text-sm text-zinc-300">
+              <span>CV-generaattori</span>
+              <span>Työpaikkaseuranta</span>
+              <span>Hakemukset</span>
+              <span>PDF + DOCX</span>
             </div>
           </div>
 
-          <div className="mx-auto flex w-full justify-center xl:justify-end">
-            <div className="w-full max-w-[820px]">
-              <GlassCard className="min-h-[560px] p-6 md:p-8">
-                <div className="flex items-start">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-[26px] border border-white/10 bg-black/20 shadow-[0_10px_30px_rgba(16,185,129,0.12)]">
-                    <div className="relative flex h-10 w-10 items-center justify-center">
-                      <div className="absolute inset-0 rounded-2xl bg-teal-400/10 blur-xl" />
-                      <svg
-                        viewBox="0 0 64 64"
-                        className="relative z-10 h-9 w-9"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M18 14V46"
-                          stroke="url(#heroGrad)"
-                          strokeWidth="5.5"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M18 30H36C43.732 30 50 36.268 50 44"
-                          stroke="url(#heroGrad)"
-                          strokeWidth="5.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M36 30V50"
-                          stroke="#f8fafc"
-                          strokeWidth="4.5"
-                          strokeLinecap="round"
-                        />
-                        <defs>
-                          <linearGradient
-                            id="heroGrad"
-                            x1="12"
-                            y1="10"
-                            x2="54"
-                            y2="52"
-                          >
-                            <stop stopColor="#2dd4bf" />
-                            <stop offset="0.55" stopColor="#34d399" />
-                            <stop offset="1" stopColor="#fb923c" />
-                          </linearGradient>
-                        </defs>
-                      </svg>
+          <div className="mx-auto w-full max-w-3xl xl:mx-0">
+            <GlassCard className="overflow-hidden p-5 md:p-7">
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <LogoMark />
+                  <div>
+                    <div className="text-4xl font-black tracking-[-0.04em]">
+                      <span className="text-teal-400">DUUNI</span>
+                      <span className="text-orange-500">HARAVA</span>
                     </div>
+                    <p className="mt-2 max-w-xl text-lg leading-8 text-zinc-300">
+                      Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
+                      työpaikkaseurannan ja hakemukset yhteen.
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div className="mx-auto mt-6 max-w-[620px] text-center">
-                  <h2 className="text-4xl font-black tracking-[-0.05em]">
-                    <span className="text-teal-400">DUUNI</span>
-                    <span className="text-orange-400">HARAVA</span>
-                  </h2>
-                  <p className="mt-4 text-base leading-8 text-zinc-300">
-                    Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
-                    työpaikkaseurannan ja hakemukset yhteen.
-                  </p>
+              <div className="rounded-[28px] border border-white/8 bg-[#040712] p-5">
+                <p className="text-lg font-semibold text-teal-300">
+                  Työnhaun näkyvyys ja osuvuus
+                </p>
+                <p className="mt-1 text-sm text-zinc-500">
+                  Havainnekuva siitä, miltä selkeä työnhaun dashboard voi näyttää
+                </p>
+
+                <div className="mt-6 h-[280px] rounded-[24px] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] md:h-[340px]" />
+
+                <div className="mt-5 grid grid-cols-4 gap-3 text-center text-sm text-zinc-400">
+                  <span>CV</span>
+                  <span>Työpaikat</span>
+                  <span>Hakemukset</span>
+                  <span>Seuranta</span>
                 </div>
-
-                <HeroChart />
-              </GlassCard>
-            </div>
+              </div>
+            </GlassCard>
           </div>
         </div>
       </section>
 
-      <section
-        id="features"
-        className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
-      >
-        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-          <SectionBadge>Palvelut</SectionBadge>
-          <h2 className="mt-4 max-w-[900px] text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+      <section id="palvelut" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <Badge>Palvelut</Badge>
+          <h2 className="mt-5 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Kenelle ja mitä tarjoamme
           </h2>
-          <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-9 text-zinc-300">
             Palvelu on rakennettu niin, että myös ensimmäistä kertaa hakeva
             ymmärtää mitä tehdä seuraavaksi.
           </p>
@@ -434,37 +331,32 @@ export default function Home() {
 
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           <FeatureCard
-            emoji="📄"
+            icon="📄"
             title="CV-analyysi ja rakentaminen"
-            description="Luo uusi CV tai paranna nykyistä. Tee sisällöstä vahvempi ja pidä ulkoasu siistinä ilman turhaa säätöä."
-            accent="teal"
+            desc="Luo uusi CV tai paranna nykyistä. Tee sisällöstä vahvempi ja pidä ulkoasu siistinä ilman turhaa säätöä."
           />
           <FeatureCard
-            emoji="🎯"
+            icon="🎯"
             title="Työpaikkojen kohdistus"
-            description="Seuraa kiinnostavia työpaikkoja, deadlineja ja prioriteetteja yhdestä näkymästä."
+            desc="Seuraa kiinnostavia työpaikkoja, deadlineja ja prioriteetteja yhdestä näkymästä."
             accent="orange"
           />
           <FeatureCard
-            emoji="✍️"
+            icon="✍️"
             title="Hakemukset valmiiksi nopeammin"
-            description="Tee työpaikkaan sopiva hakemus ja tarvittaessa myös erillinen CV-versio samasta työtilasta."
-            accent="teal"
+            desc="Tee työpaikkaan sopiva hakemus ja tarvittaessa myös erillinen CV-versio samasta työtilasta."
           />
         </div>
       </section>
 
-      <section
-        id="why"
-        className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
-      >
+      <section id="miksi" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
         <GlassCard className="p-8 md:p-14">
-          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-            <SectionBadge>Miksi me</SectionBadge>
-            <h2 className="mt-4 max-w-[920px] text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+          <div className="mx-auto max-w-4xl text-center">
+            <Badge>Miksi me</Badge>
+            <h2 className="mt-5 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
               Enemmän kuin vain yksi työkalu
             </h2>
-            <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
+            <p className="mx-auto mt-5 max-w-3xl text-lg leading-9 text-zinc-300">
               Duuniharava kokoaa työnhaun tärkeimmät osat yhteen. Se ei ole
               pelkkä CV-editori tai pelkkä hakemuspohja, vaan kokonainen
               työnhaun työtila.
@@ -472,35 +364,32 @@ export default function Home() {
           </div>
 
           <div className="mt-14 grid gap-10 md:grid-cols-3">
-            <BenefitCard
+            <ValueItem
               icon="🇫🇮"
               title="Suomen työnhakuun sopiva"
-              description="Rakennettu nimenomaan siihen, miltä työnhaku Suomessa tuntuu ja mitä siinä yleensä tarvitaan."
+              desc="Rakennettu nimenomaan siihen, miltä työnhaku Suomessa tuntuu ja mitä siinä yleensä tarvitaan."
             />
-            <BenefitCard
+            <ValueItem
               icon="⚙️"
               title="Selkeä prosessi"
-              description="Käyttäjä ymmärtää vaihe vaiheelta mitä tehdä seuraavaksi, vaikka ei olisi käyttänyt vastaavaa palvelua aiemmin."
+              desc="Käyttäjä ymmärtää vaihe vaiheelta mitä tehdä seuraavaksi, vaikka ei olisi käyttänyt vastaavaa palvelua aiemmin."
             />
-            <BenefitCard
+            <ValueItem
               icon="💎"
               title="Premium-ilme"
-              description="Luottamusta herättävä, moderni ja myyvä käyttöliittymä tekee tuotteesta aidosti valmiin tuntuisen."
+              desc="Luottamusta herättävä, moderni ja myyvä käyttöliittymä tekee tuotteesta aidosti valmiin tuntuisen."
             />
           </div>
         </GlassCard>
       </section>
 
-      <section
-        id="pricing"
-        className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24"
-      >
-        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-          <SectionBadge>Hinnasto</SectionBadge>
-          <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+      <section id="hinnasto" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <Badge>Hinnasto</Badge>
+          <h2 className="mt-5 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Hinnasto
           </h2>
-          <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-9 text-zinc-300">
             Voitte myöhemmin säätää nämä lopullisiin hintoihin, mutta rakenne on
             valmiina myyvää esittelyä varten.
           </p>
@@ -510,7 +399,7 @@ export default function Home() {
           <PriceCard
             title="Starter"
             price="12,49€"
-            points={[
+            items={[
               "CV-analyysi",
               "Perusmuokkaukset",
               "Kevyt aloitus työnhakuun",
@@ -520,7 +409,7 @@ export default function Home() {
             title="Pro"
             price="29,99€"
             featured
-            points={[
+            items={[
               "Rajattomammat työnhakutyökalut",
               "Hakemusten teko nopeammin",
               "Työpaikkaseuranta samassa näkymässä",
@@ -529,7 +418,7 @@ export default function Home() {
           <PriceCard
             title="Ura-tuki"
             price="99€"
-            points={[
+            items={[
               "Kaikki Pro-ominaisuudet",
               "Syvempi sparraus myöhemmin",
               "Laajempi henkilökohtainen tuki",
@@ -538,63 +427,75 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        id="faq"
-        className="mx-auto max-w-4xl px-4 py-16 md:px-6 md:py-24"
-      >
-        <div className="flex flex-col items-center text-center">
-          <SectionBadge>FAQ</SectionBadge>
-          <h2 className="mt-4 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+      <section id="faq" className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <Badge>FAQ</Badge>
+          <h2 className="mt-5 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
             Usein kysyttyä
           </h2>
-          <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-9 text-zinc-300">
             Tähän voi myöhemmin lisätä lisää kysymyksiä, mutta tässä on hyvä
             myyvän landingin peruspohja.
           </p>
         </div>
 
         <div className="mt-10 space-y-4">
-          <FaqItem
-            question="Saanko tällä paremman CV:n?"
-            answer="Kyllä. Palvelun idea on auttaa sekä sisällössä että rakenteessa, jotta CV näyttää siistiltä ja tuntuu uskottavalta."
-          />
-          <FaqItem
-            question="Voinko seurata työpaikkoja samassa paikassa?"
-            answer="Kyllä. Duuniharava yhdistää CV:n, työpaikkalistat, deadlinejen seurannan ja hakemukset samaan työtilaan."
-          />
-          <FaqItem
-            question="Voiko tätä käyttää ilman aiempaa kokemusta?"
-            answer="Voi. Käyttöliittymä on rakennettu erityisesti niin, että työnhaun vaiheet ovat selkeitä myös aloittelijalle."
-          />
+          <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-zinc-200">
+            <summary className="cursor-pointer text-lg font-semibold">
+              Saanko tällä paremman CV:n?
+            </summary>
+            <p className="mt-3 text-base leading-8 text-zinc-400">
+              Kyllä. Tavoitteena on tehdä CV:n kirjoittamisesta, muokkaamisesta
+              ja viimeistelystä huomattavasti helpompaa.
+            </p>
+          </details>
+
+          <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-zinc-200">
+            <summary className="cursor-pointer text-lg font-semibold">
+              Voinko seurata työpaikkoja samassa paikassa?
+            </summary>
+            <p className="mt-3 text-base leading-8 text-zinc-400">
+              Kyllä. Duuniharava yhdistää CV:n, työpaikat ja hakemukset yhden
+              näkymän alle.
+            </p>
+          </details>
+
+          <details className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-zinc-200">
+            <summary className="cursor-pointer text-lg font-semibold">
+              Voiko tätä käyttää ilman aiempaa kokemusta?
+            </summary>
+            <p className="mt-3 text-base leading-8 text-zinc-400">
+              Kyllä. Koko rakenne on tehty niin, että käyttäjä ymmärtää helposti
+              mitä pitää tehdä seuraavaksi.
+            </p>
+          </details>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-16 md:px-6 md:pb-24">
-        <GlassCard className="overflow-hidden p-8 md:p-14">
-          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-            <SectionBadge>Aloita nyt</SectionBadge>
-            <h2 className="mt-4 max-w-[900px] text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
-              Valmis tekemään työnhausta selkeämpää?
-            </h2>
-            <p className="mt-5 max-w-[760px] text-base leading-8 text-zinc-300 md:text-lg">
-              Avaa Duuniharava ja rakenna CV, työpaikkaseuranta ja hakemukset
-              yhteen paikkaan.
-            </p>
+        <GlassCard className="px-6 py-10 text-center md:px-12 md:py-14">
+          <Badge>Aloita nyt</Badge>
+          <h2 className="mx-auto mt-5 max-w-4xl text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
+            Valmis tekemään työnhausta selkeämpää?
+          </h2>
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-9 text-zinc-300">
+            Avaa Duuniharava ja rakenna CV, työpaikkaseuranta ja hakemukset
+            yhteen paikkaan.
+          </p>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/signup"
-                className="rounded-2xl bg-gradient-to-r from-teal-400 to-orange-400 px-5 py-3 text-sm font-black text-black transition hover:opacity-95"
-              >
-                Luo tili
-              </Link>
-              <Link
-                href="/studio"
-                className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
-              >
-                Avaa studio
-              </Link>
-            </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/signup"
+              className="rounded-2xl bg-gradient-to-r from-teal-400 to-orange-500 px-5 py-3 text-sm font-black text-black transition hover:scale-[1.02]"
+            >
+              Luo tili
+            </Link>
+            <Link
+              href="/studio"
+              className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+            >
+              Avaa studio
+            </Link>
           </div>
         </GlassCard>
       </section>
