@@ -21,14 +21,14 @@ const t = {
     svc2Title: "Työpaikkojen kohdistus", svc2Desc: "Seuraa kiinnostavia työpaikkoja, deadlineja ja prioriteetteja yhdestä näkymästä.",
     svc3Title: "Hakemukset valmiiksi nopeammin", svc3Desc: "Tee työpaikkaan sopiva hakemus ja tarvittaessa myös erillinen CV-versio samasta työtilasta.",
     s2Badge: "Miksi me", s2Title: "Enemmän kuin vain yksi työkalu",
-    s2Desc: "Duuniharava kokoaa työnhaun tärkeimmät osat yhteen �?" ei pelkkä CV-editori, vaan kokonainen työtila.",
+    s2Desc: "Duuniharava kokoaa työnhaun tärkeimmät osat yhteen — ei pelkkä CV-editori, vaan kokonainen työtila.",
     why1Title: "Suomen työnhakuun sopiva", why1Desc: "Rakennettu nimenomaan siihen, miltä työnhaku Suomessa tuntuu ja mitä siinä yleensä tarvitaan.",
     why2Title: "Selkeä prosessi", why2Desc: "Käyttäjä ymmärtää vaihe vaiheelta mitä tehdä seuraavaksi, vaikka ei olisi käyttänyt vastaavaa palvelua aiemmin.",
     why3Title: "Premium-ilme", why3Desc: "Luottamusta herättävä, moderni ja myyvä käyttöliittymä tekee tuotteesta aidosti valmiin tuntuisen.",
     s3Badge: "Kokemuksia", s3Title: "Mitä käyttäjät sanovat",
-    t1: '"Sain viisi haastattelukutsua viikossa CV-optimoinnin jälkeen. Uskomaton työkalu!"', t1Author: "�?" Mikko S., Ohjelmistokehittäjä",
-    t2: '"Automaattinen haku säästi minulta kymmeniä tunteja aikaa. Suosittelen kaikille!"', t2Author: "�?" Elena V., Markkinointi",
-    t3: '"LinkedIn-profiilini hionta toi heti rekrytoijia viestittelemään minulle suoraan."', t3Author: "�?" Joonas K., Myyntipäällikkö",
+    t1: '"Sain viisi haastattelukutsua viikossa CV-optimoinnin jälkeen. Uskomaton työkalu!"', t1Author: "— Mikko S., Ohjelmistokehittäjä",
+    t2: '"Automaattinen haku säästi minulta kymmeniä tunteja aikaa. Suosittelen kaikille!"', t2Author: "— Elena V., Markkinointi",
+    t3: '"LinkedIn-profiilini hionta toi heti rekrytoijia viestittelemään minulle suoraan."', t3Author: "— Joonas K., Myyntipäällikkö",
     s4Badge: "Hinnasto", s4Title: "Hinnasto", s4Desc: "Valitse sinulle sopiva paketti ja aloita työnhaku heti.",
     perMonth: "/ kk", popular: "Suosituin", choose: "Valitse",
     p1Name: "Starter", p1f1: "CV-analyysi", p1f2: "Perusmuokkaukset", p1f3: "Kevyt aloitus työnhakuun",
@@ -59,16 +59,16 @@ const t = {
     s1Desc: "Built so that even a first-time job seeker understands exactly what to do next.",
     svc1Title: "CV analysis & building", svc1Desc: "Create a new CV or improve your current one. Make the content stronger and keep the layout clean.",
     svc2Title: "Job targeting", svc2Desc: "Track interesting job listings, deadlines, and priorities from one view.",
-    svc3Title: "Applications ready faster", svc3Desc: "Write a job-specific application and a separate CV version if needed �?" all from the same workspace.",
+    svc3Title: "Applications ready faster", svc3Desc: "Write a job-specific application and a separate CV version if needed — all from the same workspace.",
     s2Badge: "Why us", s2Title: "More than just one tool",
-    s2Desc: "Duuniharava brings the most important parts of job searching together �?" not just a CV editor, but a complete workspace.",
+    s2Desc: "Duuniharava brings the most important parts of job searching together — not just a CV editor, but a complete workspace.",
     why1Title: "Built for Finland", why1Desc: "Designed specifically for what job searching in Finland looks and feels like.",
     why2Title: "Clear process", why2Desc: "Users understand step by step what to do next, even without prior experience with similar tools.",
     why3Title: "Premium feel", why3Desc: "A trustworthy, modern interface that makes the product feel genuinely ready.",
     s3Badge: "Stories", s3Title: "What users say",
-    t1: '"I got five interview invitations per week after CV optimization. Incredible tool!"', t1Author: "�?" Mikko S., Software Developer",
-    t2: '"The automated search saved me dozens of hours. I recommend it to everyone!"', t2Author: "�?" Elena V., Marketing",
-    t3: '"LinkedIn profile polish brought recruiters messaging me directly right away."', t3Author: "�?" Joonas K., Sales Manager",
+    t1: '"I got five interview invitations per week after CV optimization. Incredible tool!"', t1Author: "— Mikko S., Software Developer",
+    t2: '"The automated search saved me dozens of hours. I recommend it to everyone!"', t2Author: "— Elena V., Marketing",
+    t3: '"LinkedIn profile polish brought recruiters messaging me directly right away."', t3Author: "— Joonas K., Sales Manager",
     s4Badge: "Pricing", s4Title: "Pricing", s4Desc: "Choose the plan that fits you and start your job search today.",
     perMonth: "/ mo", popular: "Most popular", choose: "Choose",
     p1Name: "Starter", p1f1: "CV analysis", p1f2: "Basic edits", p1f3: "Light job search start",
@@ -135,7 +135,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden hover:border-teal-400/25 transition-colors">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left">
         <span className="text-sm md:text-base font-semibold text-teal-300">{q}</span>
-        <span className={`text-zinc-500 text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>�-�</span>
+        <span className={`text-zinc-500 text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▼</span>
       </button>
       {open && <p className="px-5 pb-4 text-sm leading-relaxed text-zinc-400">{a}</p>}
     </div>
@@ -179,7 +179,7 @@ export default function Home() {
 
       {/* NAV */}
       <header className="sticky top-0 z-50 border-b border-white/8 bg-[#08090D]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1760px] items-center justify-between gap-4 px-6 md:px-10 py-3">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-4 md:px-6 py-3">
           <a href="#hero" className="flex items-center gap-2.5 flex-shrink-0">
             <LogoIcon />
             <span className="text-lg font-black tracking-tight hidden sm:block">
@@ -198,7 +198,7 @@ export default function Home() {
             <div className="flex items-center gap-1 border-r border-white/10 pr-3">
               {(["fi", "en"] as Lang[]).map((l) => (
                 <button key={l} onClick={() => setLang(l)} className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold transition ${lang === l ? "border-teal-400/40 bg-teal-400/10 text-teal-300" : "border-white/10 text-zinc-400 hover:text-white"}`}>
-                  {l === "fi" ? "�Y?��Y?� FI" : "�Y?��Y?� EN"}
+                  {l === "fi" ? "🇫🇮 FI" : "🇬🇧 EN"}
                 </button>
               ))}
             </div>
@@ -208,14 +208,14 @@ export default function Home() {
       </header>
 
       {/* HERO */}
-      <section id="hero" className="mx-auto max-w-[1760px] px-6 md:px-10 pt-14 pb-20">
+      <section id="hero" className="mx-auto max-w-[1280px] px-4 md:px-6 pt-14 pb-20">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="w-full max-w-[640px] mx-auto lg:mx-0">
             <Badge>{tx.badge}</Badge>
             <h1 className="mt-5 text-[clamp(36px,5.5vw,72px)] font-black leading-[1.0] tracking-[-0.04em] text-white">{tx.heroTitle}</h1>
             <p className="mt-5 text-base md:text-lg leading-relaxed text-zinc-400 max-w-[560px]">{tx.heroDesc}</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/signup" className="rounded-xl bg-gradient-to-r from-teal-400 to-orange-500 px-5 py-3 text-sm font-black text-black transition hover:scale-[1.02]">{tx.heroCta} �?'</Link>
+              <Link href="/signup" className="rounded-xl bg-gradient-to-r from-teal-400 to-orange-500 px-5 py-3 text-sm font-black text-black transition hover:scale-[1.02]">{tx.heroCta} →</Link>
               <a href="#palvelut" className="rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08]">{tx.heroSub}</a>
             </div>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -225,7 +225,7 @@ export default function Home() {
             </div>
           </div>
           {/* Dashboard mockup */}
-          <div className="w-full max-w-[760px] mx-auto lg:mx-0">
+          <div className="w-full max-w-[580px] mx-auto lg:mx-0">
             <GlassCard className="p-5 md:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
               <div className="flex items-center gap-3 mb-5">
                 <LogoIcon />
@@ -261,11 +261,11 @@ export default function Home() {
       </section>
 
       {/* PALVELUT */}
-      <section id="palvelut" className="mx-auto max-w-[1760px] px-6 md:px-10 py-16 md:py-24">
+      <section id="palvelut" className="mx-auto max-w-[1280px] px-4 md:px-6 py-16 md:py-24">
         <div ref={r1} className="opacity-0 translate-y-6 transition-all duration-700">
           <div className="text-center mb-12"><Badge>{tx.s1Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white mt-4">{tx.s1Title}</h2><p className="mx-auto mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-zinc-400">{tx.s1Desc}</p></div>
           <div className="grid gap-5 md:grid-cols-3">
-            {[{ icon: "�Y""", title: tx.svc1Title, desc: tx.svc1Desc, c: "text-teal-300" }, { icon: "�YZ�", title: tx.svc2Title, desc: tx.svc2Desc, c: "text-orange-400" }, { icon: "�o�️", title: tx.svc3Title, desc: tx.svc3Desc, c: "text-teal-300" }].map((s) => (
+            {[{ icon: "📄", title: tx.svc1Title, desc: tx.svc1Desc, c: "text-teal-300" }, { icon: "🎯", title: tx.svc2Title, desc: tx.svc2Desc, c: "text-orange-400" }, { icon: "✍️", title: tx.svc3Title, desc: tx.svc3Desc, c: "text-teal-300" }].map((s) => (
               <GlassCard key={s.title} className="p-6" hover><div className="mb-3 text-2xl">{s.icon}</div><h3 className={`text-xl font-bold tracking-tight ${s.c}`}>{s.title}</h3><p className="mt-3 text-sm leading-relaxed text-zinc-400">{s.desc}</p></GlassCard>
             ))}
           </div>
@@ -273,12 +273,12 @@ export default function Home() {
       </section>
 
       {/* MIKSI ME */}
-      <section id="miksi" className="mx-auto max-w-[1760px] px-6 md:px-10 py-16 md:py-24">
+      <section id="miksi" className="mx-auto max-w-[1280px] px-4 md:px-6 py-16 md:py-24">
         <div ref={r2} className="opacity-0 translate-y-6 transition-all duration-700">
           <GlassCard className="p-8 md:p-14 border-t-2 border-teal-400">
             <div className="text-center mb-12"><Badge>{tx.s2Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white">{tx.s2Title}</h2><p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">{tx.s2Desc}</p></div>
             <div className="grid gap-10 md:grid-cols-3">
-              {[{ icon: "�Y?��Y?�", t: tx.why1Title, d: tx.why1Desc }, { icon: "�sT️", t: tx.why2Title, d: tx.why2Desc }, { icon: "�Y'Z", t: tx.why3Title, d: tx.why3Desc }].map((w) => (
+              {[{ icon: "🇫🇮", t: tx.why1Title, d: tx.why1Desc }, { icon: "⚙️", t: tx.why2Title, d: tx.why2Desc }, { icon: "💎", t: tx.why3Title, d: tx.why3Desc }].map((w) => (
                 <div key={w.t} className="text-center"><div className="mb-3 text-4xl">{w.icon}</div><h3 className="text-xl font-bold text-white">{w.t}</h3><p className="mt-2 text-sm leading-relaxed text-zinc-400">{w.d}</p></div>
               ))}
             </div>
@@ -287,7 +287,7 @@ export default function Home() {
       </section>
 
       {/* KOKEMUKSIA */}
-      <section id="kokemuksia" className="mx-auto max-w-[1760px] px-6 md:px-10 py-16 md:py-24">
+      <section id="kokemuksia" className="mx-auto max-w-[1280px] px-4 md:px-6 py-16 md:py-24">
         <div ref={r3} className="opacity-0 translate-y-6 transition-all duration-700">
           <div className="text-center mb-12"><Badge>{tx.s3Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white">{tx.s3Title}</h2></div>
           <div className="grid gap-5 md:grid-cols-3">
@@ -302,19 +302,19 @@ export default function Home() {
       </section>
 
       {/* HINNASTO */}
-      <section id="hinnasto" className="mx-auto max-w-[1760px] px-6 md:px-10 py-16 md:py-24">
+      <section id="hinnasto" className="mx-auto max-w-[1280px] px-4 md:px-6 py-16 md:py-24">
         <div ref={r4} className="opacity-0 translate-y-6 transition-all duration-700">
           <div className="text-center mb-12"><Badge>{tx.s4Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white">{tx.s4Title}</h2><p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">{tx.s4Desc}</p></div>
-          <div className="grid gap-5 md:grid-cols-3 max-w-[1400px] mx-auto">
-            <PriceCard name={tx.p1Name} price="12,49�,�" features={[tx.p1f1, tx.p1f2, tx.p1f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
-            <PriceCard name={tx.p2Name} price="29,99�,�" features={[tx.p2f1, tx.p2f2, tx.p2f3]} featured popularLabel={tx.popular} chooseLabel={tx.choose} />
-            <PriceCard name={tx.p3Name} price="99�,�" features={[tx.p3f1, tx.p3f2, tx.p3f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
+          <div className="grid gap-5 md:grid-cols-3 max-w-[960px] mx-auto">
+            <PriceCard name={tx.p1Name} price="12,49€" features={[tx.p1f1, tx.p1f2, tx.p1f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
+            <PriceCard name={tx.p2Name} price="29,99€" features={[tx.p2f1, tx.p2f2, tx.p2f3]} featured popularLabel={tx.popular} chooseLabel={tx.choose} />
+            <PriceCard name={tx.p3Name} price="99€" features={[tx.p3f1, tx.p3f2, tx.p3f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="mx-auto max-w-[1400px] px-6 md:px-10 py-16 md:py-24">
+      <section id="faq" className="mx-auto max-w-[720px] px-4 md:px-6 py-16 md:py-24">
         <div ref={r5} className="opacity-0 translate-y-6 transition-all duration-700">
           <div className="text-center mb-12"><Badge>{tx.s5Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white">{tx.s5Title}</h2></div>
           <div className="space-y-3">
@@ -327,7 +327,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="mx-auto max-w-[1760px] px-6 md:px-10 pb-20">
+      <section className="mx-auto max-w-[1280px] px-4 md:px-6 pb-20">
         <div ref={r6} className="opacity-0 translate-y-6 transition-all duration-700">
           <GlassCard className="px-6 py-12 md:px-14 md:py-16 text-center">
             <Badge>{tx.ctaBadge}</Badge>
