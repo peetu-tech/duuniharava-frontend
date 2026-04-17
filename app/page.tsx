@@ -197,10 +197,10 @@ function PriceCard({
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#050816] text-white">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.09),transparent_24%),radial-gradient(circle_at_bottom,rgba(45,212,191,0.08),transparent_30%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.10),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.07),transparent_24%),radial-gradient(circle_at_bottom,rgba(45,212,191,0.06),transparent_30%)]" />
 
-      <header className="sticky top-0 z-50 border-b border-white/8 bg-[#050816]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 md:px-6">
+      <header className="sticky top-0 z-50 border-b border-white/8 bg-[#050816]/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-4">
           <Brand />
 
           <nav className="hidden items-center gap-8 text-sm text-zinc-300 lg:flex">
@@ -238,16 +238,19 @@ export default function Home() {
         </div>
       </header>
 
-      <section id="etusivu" className="mx-auto max-w-7xl px-4 pb-20 pt-10 md:px-6 md:pb-28 md:pt-14">
-        <div className="grid items-center gap-10 xl:grid-cols-2 xl:gap-14">
-          <div className="mx-auto flex w-full max-w-3xl flex-col items-start xl:mx-0">
+      <section
+        id="etusivu"
+        className="mx-auto max-w-[1400px] px-6 pb-20 pt-10 xl:pt-14"
+      >
+        <div className="grid items-start gap-12 xl:grid-cols-[minmax(0,1.02fr)_minmax(560px,0.98fr)]">
+          <div className="mx-auto w-full max-w-[720px] xl:mx-0 xl:max-w-[760px]">
             <Badge>Duuniharava</Badge>
 
-            <h1 className="mt-5 max-w-[11ch] text-left text-5xl font-black leading-[0.92] tracking-[-0.06em] text-white sm:text-6xl md:text-7xl xl:text-[88px]">
+            <h1 className="mt-5 text-left text-[clamp(56px,7vw,112px)] font-black leading-[0.9] tracking-[-0.07em] text-white">
               Säästä aikaa työnhaussa ja rakenna vahvempi vaikutelma.
             </h1>
 
-            <p className="mt-6 max-w-2xl text-left text-lg leading-9 text-zinc-300">
+            <p className="mt-6 max-w-[680px] text-left text-[22px] leading-[1.7] text-zinc-300">
               Duuniharava auttaa tekemään paremman CV:n, seuraamaan työpaikkoja
               ja kirjoittamaan kohdistettuja hakemuksia yhdestä selkeästä
               työtilasta. Palvelu on tehty niin, että myös ensikertalainen
@@ -277,21 +280,19 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mx-auto w-full max-w-3xl xl:mx-0">
+          <div className="mx-auto w-full max-w-[760px] xl:mx-0">
             <GlassCard className="overflow-hidden p-5 md:p-7">
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <LogoMark />
-                  <div>
-                    <div className="text-4xl font-black tracking-[-0.04em]">
-                      <span className="text-teal-400">DUUNI</span>
-                      <span className="text-orange-500">HARAVA</span>
-                    </div>
-                    <p className="mt-2 max-w-xl text-lg leading-8 text-zinc-300">
-                      Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
-                      työpaikkaseurannan ja hakemukset yhteen.
-                    </p>
+              <div className="mb-6 flex items-start gap-4">
+                <LogoMark />
+                <div className="w-full text-center">
+                  <div className="text-4xl font-black tracking-[-0.04em]">
+                    <span className="text-teal-400">DUUNI</span>
+                    <span className="text-orange-500">HARAVA</span>
                   </div>
+                  <p className="mx-auto mt-3 max-w-[540px] text-xl leading-9 text-zinc-300">
+                    Tyylikäs ja selkeä työnhaun työtila, joka kokoaa CV:t,
+                    työpaikkaseurannan ja hakemukset yhteen.
+                  </p>
                 </div>
               </div>
 
@@ -303,7 +304,7 @@ export default function Home() {
                   Havainnekuva siitä, miltä selkeä työnhaun dashboard voi näyttää
                 </p>
 
-                <div className="mt-6 h-[280px] rounded-[24px] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] md:h-[340px]" />
+                <div className="mt-6 h-[300px] rounded-[24px] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] xl:h-[380px]" />
 
                 <div className="mt-5 grid grid-cols-4 gap-3 text-center text-sm text-zinc-400">
                   <span>CV</span>
@@ -317,7 +318,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="palvelut" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+      <section
+        id="palvelut"
+        className="mx-auto max-w-[1400px] px-6 py-16 md:py-24"
+      >
         <div className="mx-auto max-w-4xl text-center">
           <Badge>Palvelut</Badge>
           <h2 className="mt-5 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
@@ -349,7 +353,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="miksi" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+      <section
+        id="miksi"
+        className="mx-auto max-w-[1400px] px-6 py-16 md:py-24"
+      >
         <GlassCard className="p-8 md:p-14">
           <div className="mx-auto max-w-4xl text-center">
             <Badge>Miksi me</Badge>
@@ -383,7 +390,10 @@ export default function Home() {
         </GlassCard>
       </section>
 
-      <section id="hinnasto" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+      <section
+        id="hinnasto"
+        className="mx-auto max-w-[1400px] px-6 py-16 md:py-24"
+      >
         <div className="mx-auto max-w-4xl text-center">
           <Badge>Hinnasto</Badge>
           <h2 className="mt-5 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
@@ -427,7 +437,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="faq" className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
+      <section
+        id="faq"
+        className="mx-auto max-w-[1100px] px-6 py-16 md:py-24"
+      >
         <div className="mx-auto max-w-4xl text-center">
           <Badge>FAQ</Badge>
           <h2 className="mt-5 text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
@@ -472,7 +485,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 md:px-6 md:pb-24">
+      <section className="mx-auto max-w-[1400px] px-6 pb-16 md:pb-24">
         <GlassCard className="px-6 py-10 text-center md:px-12 md:py-14">
           <Badge>Aloita nyt</Badge>
           <h2 className="mx-auto mt-5 max-w-4xl text-4xl font-black tracking-[-0.05em] text-white md:text-6xl">
@@ -500,7 +513,7 @@ export default function Home() {
         </GlassCard>
       </section>
 
-      <footer className="border-t border-white/6 px-4 py-8 text-center text-sm text-zinc-500 md:px-6">
+      <footer className="border-t border-white/6 px-6 py-8 text-center text-sm text-zinc-500">
         © 2026 Duuniharava. Kaikki oikeudet pidätetään.
       </footer>
     </main>
