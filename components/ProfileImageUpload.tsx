@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 type ProfileImageUploadProps = {
   image: string;
   onChange: (value: string) => void;
@@ -48,9 +50,12 @@ export default function ProfileImageUpload({
 
       {image && (
         <div className="mt-4">
-          <img
+          <Image
             src={image}
             alt="Profiilikuva"
+            width={96}
+            height={96}
+            unoptimized
             className="h-24 w-24 rounded-xl object-cover border border-zinc-700"
           />
         </div>

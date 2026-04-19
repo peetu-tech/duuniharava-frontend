@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
 export type CvCustomStyle = {
@@ -314,10 +316,8 @@ export default function CvPreview({
           </div>
 
           {image ? (
-            <img
-              src={image}
-              alt="Profiilikuva"
-              className="mb-7 aspect-square w-full object-cover transition-all duration-300"
+            <div
+              className="relative mb-7 aspect-square w-full overflow-hidden transition-all duration-300"
               style={{
                 borderRadius: `${style.imageRadius}px`,
                 boxShadow:
@@ -329,7 +329,16 @@ export default function CvPreview({
                     ? "1px solid rgba(120,113,108,0.12)"
                     : "1px solid rgba(255,255,255,0.08)",
               }}
-            />
+            >
+              <Image
+                src={image}
+                alt="Profiilikuva"
+                fill
+                unoptimized
+                sizes="(max-width: 900px) 100vw, 255px"
+                className="object-cover"
+              />
+            </div>
           ) : (
             <div
               className="mb-7 flex aspect-square w-full items-center justify-center text-sm font-medium transition-all duration-300"
