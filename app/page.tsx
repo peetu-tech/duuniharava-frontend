@@ -6,43 +6,43 @@ import { useState, useEffect, useRef } from "react";
 const t = {
   fi: {
     badge: "Duuniharava",
-    heroTitle: "SÃ¤Ã¤stÃ¤ aikaa tyÃ¶nhaussa ja rakenna vahvempi vaikutelma.",
-    heroDesc: "Duuniharava auttaa tekemÃ¤Ã¤n paremman CV:n, seuraamaan tyÃ¶paikkoja ja kirjoittamaan kohdistettuja hakemuksia yhdestÃ¤ selkeÃ¤stÃ¤ tyÃ¶tilasta.",
+    heroTitle: "Säästä aikaa työnhaussa ja rakenna vahvempi vaikutelma.",
+    heroDesc: "Duuniharava auttaa tekemään paremman CV:n, seuraamaan työpaikkoja ja kirjoittamaan kohdistettuja hakemuksia yhdestä selkeästä työtilasta.",
     heroCta: "Aloita nyt", heroSub: "Katso miten toimii",
-    tag1: "CV-generaattori", tag2: "TyÃ¶paikkaseuranta", tag3: "Hakemukset", tag4: "PDF + DOCX",
-    dashTitle: "TyÃ¶nhaun tyÃ¶tila", dashSub: "Kaikki yhdessÃ¤ nÃ¤kymÃ¤ssÃ¤",
+    tag1: "CV-generaattori", tag2: "Työpaikkaseuranta", tag3: "Hakemukset", tag4: "PDF + DOCX",
+    dashTitle: "Työnhaun työtila", dashSub: "Kaikki yhdessä näkymässä",
     stat1: "Hakemukset", stat2: "Haastattelut",
     bar1: "CV-laatu", bar2: "Osuvuus", bar3: "Aktiivisuus",
     navHome: "Etusivu", navServices: "Palvelut", navWhy: "Miksi me",
     navTestimonials: "Kokemuksia", navPricing: "Hinnasto", navFaq: "FAQ", navLogin: "Kirjaudu",
-    s1Badge: "Palvelut", s1Title: "Kenelle ja mitÃ¤ tarjoamme",
-    s1Desc: "Palvelu on rakennettu niin, ettÃ¤ myÃ¶s ensimmÃ¤istÃ¤ kertaa hakeva ymmÃ¤rtÃ¤Ã¤ mitÃ¤ tehdÃ¤ seuraavaksi.",
-    svc1Title: "CV-analyysi ja rakentaminen", svc1Desc: "Luo uusi CV tai paranna nykyistÃ¤. Tee sisÃ¤llÃ¶stÃ¤ vahvempi ja pidÃ¤ ulkoasu siistinÃ¤ ilman turhaa sÃ¤Ã¤tÃ¶Ã¤.",
-    svc2Title: "TyÃ¶paikkojen kohdistus", svc2Desc: "Seuraa kiinnostavia tyÃ¶paikkoja, deadlineja ja prioriteetteja yhdestÃ¤ nÃ¤kymÃ¤stÃ¤.",
-    svc3Title: "Hakemukset valmiiksi nopeammin", svc3Desc: "Tee tyÃ¶paikkaan sopiva hakemus ja tarvittaessa myÃ¶s erillinen CV-versio samasta tyÃ¶tilasta.",
-    s2Badge: "Miksi me", s2Title: "EnemmÃ¤n kuin vain yksi tyÃ¶kalu",
-    s2Desc: "Duuniharava kokoaa tyÃ¶nhaun tÃ¤rkeimmÃ¤t osat yhteen â€” ei pelkkÃ¤ CV-editori, vaan kokonainen tyÃ¶tila.",
-    why1Title: "Suomen tyÃ¶nhakuun sopiva", why1Desc: "Rakennettu nimenomaan siihen, miltÃ¤ tyÃ¶nhaku Suomessa tuntuu ja mitÃ¤ siinÃ¤ yleensÃ¤ tarvitaan.",
-    why2Title: "SelkeÃ¤ prosessi", why2Desc: "KÃ¤yttÃ¤jÃ¤ ymmÃ¤rtÃ¤Ã¤ vaihe vaiheelta mitÃ¤ tehdÃ¤ seuraavaksi, vaikka ei olisi kÃ¤yttÃ¤nyt vastaavaa palvelua aiemmin.",
-    why3Title: "Premium-ilme", why3Desc: "Luottamusta herÃ¤ttÃ¤vÃ¤, moderni ja myyvÃ¤ kÃ¤yttÃ¶liittymÃ¤ tekee tuotteesta aidosti valmiin tuntuisen.",
-    s3Badge: "Kokemuksia", s3Title: "MitÃ¤ kÃ¤yttÃ¤jÃ¤t sanovat",
-    t1: '"Sain viisi haastattelukutsua viikossa CV-optimoinnin jÃ¤lkeen. Uskomaton tyÃ¶kalu!"', t1Author: "â€” Mikko S., OhjelmistokehittÃ¤jÃ¤",
-    t2: '"Automaattinen haku sÃ¤Ã¤sti minulta kymmeniÃ¤ tunteja aikaa. Suosittelen kaikille!"', t2Author: "â€” Elena V., Markkinointi",
-    t3: '"LinkedIn-profiilini hionta toi heti rekrytoijia viestittelemÃ¤Ã¤n minulle suoraan."', t3Author: "â€” Joonas K., MyyntipÃ¤Ã¤llikkÃ¶",
-    s4Badge: "Hinnasto", s4Title: "Hinnasto", s4Desc: "Valitse sinulle sopiva paketti ja aloita tyÃ¶nhaku heti.",
+    s1Badge: "Palvelut", s1Title: "Kenelle ja mitä tarjoamme",
+    s1Desc: "Palvelu on rakennettu niin, että myös ensimmäistä kertaa hakeva ymmärtää mitä tehdä seuraavaksi.",
+    svc1Title: "CV-analyysi ja rakentaminen", svc1Desc: "Luo uusi CV tai paranna nykyistä. Tee sisällöstä vahvempi ja pidä ulkoasu siistinä ilman turhaa säätöä.",
+    svc2Title: "Työpaikkojen kohdistus", svc2Desc: "Seuraa kiinnostavia työpaikkoja, deadlineja ja prioriteetteja yhdestä näkymästä.",
+    svc3Title: "Hakemukset valmiiksi nopeammin", svc3Desc: "Tee työpaikkaan sopiva hakemus ja tarvittaessa myös erillinen CV-versio samasta työtilasta.",
+    s2Badge: "Miksi me", s2Title: "Enemmän kuin vain yksi työkalu",
+    s2Desc: "Duuniharava kokoaa työnhaun tärkeimmät osat yhteen — ei pelkkä CV-editori, vaan kokonainen työtila.",
+    why1Title: "Suomen työnhakuun sopiva", why1Desc: "Rakennettu nimenomaan siihen, miltä työnhaku Suomessa tuntuu ja mitä siinä yleensä tarvitaan.",
+    why2Title: "Selkeä prosessi", why2Desc: "Käyttäjä ymmärtää vaihe vaiheelta mitä tehdä seuraavaksi, vaikka ei olisi käyttänyt vastaavaa palvelua aiemmin.",
+    why3Title: "Premium-ilme", why3Desc: "Luottamusta herättävä, moderni ja myyvä käyttöliittymä tekee tuotteesta aidosti valmiin tuntuisen.",
+    s3Badge: "Kokemuksia", s3Title: "Mitä käyttäjät sanovat",
+    t1: '"Sain viisi haastattelukutsua viikossa CV-optimoinnin jälkeen. Uskomaton työkalu!"', t1Author: "— Mikko S., Ohjelmistokehittäjä",
+    t2: '"Automaattinen haku säästi minulta kymmeniä tunteja aikaa. Suosittelen kaikille!"', t2Author: "— Elena V., Markkinointi",
+    t3: '"LinkedIn-profiilini hionta toi heti rekrytoijia viestittelemään minulle suoraan."', t3Author: "— Joonas K., Myyntipäällikkö",
+    s4Badge: "Hinnasto", s4Title: "Hinnasto", s4Desc: "Valitse sinulle sopiva paketti ja aloita työnhaku heti.",
     perMonth: "/ kk", popular: "Suosituin", choose: "Valitse",
-    p1Name: "Starter", p1f1: "CV-analyysi", p1f2: "Perusmuokkaukset", p1f3: "Kevyt aloitus tyÃ¶nhakuun",
-    p2Name: "Pro", p2f1: "Rajattomammat tyÃ¶nhakutyÃ¶kalut", p2f2: "Hakemusten teko nopeammin", p2f3: "TyÃ¶paikkaseuranta samassa nÃ¤kymÃ¤ssÃ¤",
-    p3Name: "Ura-tuki", p3f1: "Kaikki Pro-ominaisuudet", p3f2: "Syvempi sparraus", p3f3: "Laajempi henkilÃ¶kohtainen tuki",
-    s5Badge: "FAQ", s5Title: "Usein kysyttyÃ¤",
-    faq1q: "Saanko tÃ¤llÃ¤ paremman CV:n?", faq1a: "KyllÃ¤. Tavoitteena on tehdÃ¤ CV:n kirjoittamisesta, muokkaamisesta ja viimeistelystÃ¤ huomattavasti helpompaa.",
-    faq2q: "Voinko seurata tyÃ¶paikkoja samassa paikassa?", faq2a: "KyllÃ¤. Duuniharava yhdistÃ¤Ã¤ CV:n, tyÃ¶paikat ja hakemukset yhden nÃ¤kymÃ¤n alle.",
-    faq3q: "Voiko tÃ¤tÃ¤ kÃ¤yttÃ¤Ã¤ ilman aiempaa kokemusta?", faq3a: "KyllÃ¤. Koko rakenne on tehty niin, ettÃ¤ kÃ¤yttÃ¤jÃ¤ ymmÃ¤rtÃ¤Ã¤ helposti mitÃ¤ pitÃ¤Ã¤ tehdÃ¤ seuraavaksi.",
-    faq4q: "MitÃ¤ tiedostomuotoja saan ladattua?", faq4a: "CV:n voi ladata sekÃ¤ PDF- ettÃ¤ DOCX-muodossa, jolloin se sopii kaikkiin hakujÃ¤rjestelmiin.",
-    ctaBadge: "Aloita nyt", ctaTitle: "Valmis tekemÃ¤Ã¤n tyÃ¶nhausta selkeÃ¤mpÃ¤Ã¤?",
-    ctaDesc: "Avaa Duuniharava ja rakenna CV, tyÃ¶paikkaseuranta ja hakemukset yhteen paikkaan.",
+    p1Name: "Starter", p1f1: "CV-analyysi", p1f2: "Perusmuokkaukset", p1f3: "Kevyt aloitus työnhakuun",
+    p2Name: "Pro", p2f1: "Rajattomammat työnhakutyökalut", p2f2: "Hakemusten teko nopeammin", p2f3: "Työpaikkaseuranta samassa näkymässä",
+    p3Name: "Ura-tuki", p3f1: "Kaikki Pro-ominaisuudet", p3f2: "Syvempi sparraus", p3f3: "Laajempi henkilökohtainen tuki",
+    s5Badge: "FAQ", s5Title: "Usein kysyttyä",
+    faq1q: "Saanko tällä paremman CV:n?", faq1a: "Kyllä. Tavoitteena on tehdä CV:n kirjoittamisesta, muokkaamisesta ja viimeistelystä huomattavasti helpompaa.",
+    faq2q: "Voinko seurata työpaikkoja samassa paikassa?", faq2a: "Kyllä. Duuniharava yhdistää CV:n, työpaikat ja hakemukset yhden näkymän alle.",
+    faq3q: "Voiko tätä käyttää ilman aiempaa kokemusta?", faq3a: "Kyllä. Koko rakenne on tehty niin, että käyttäjä ymmärtää helposti mitä pitää tehdä seuraavaksi.",
+    faq4q: "Mitä tiedostomuotoja saan ladattua?", faq4a: "CV:n voi ladata sekä PDF- että DOCX-muodossa, jolloin se sopii kaikkiin hakujärjestelmiin.",
+    ctaBadge: "Aloita nyt", ctaTitle: "Valmis tekemään työnhausta selkeämpää?",
+    ctaDesc: "Avaa Duuniharava ja rakenna CV, työpaikkaseuranta ja hakemukset yhteen paikkaan.",
     ctaBtn1: "Luo tili", ctaBtn2: "Katso miten toimii",
-    footer: "Â© 2026 Duuniharava. Kaikki oikeudet pidÃ¤tetÃ¤Ã¤n.",
+    footer: "© 2026 Duuniharava. Kaikki oikeudet pidätetään.",
   },
   en: {
     badge: "Duuniharava",
@@ -59,16 +59,16 @@ const t = {
     s1Desc: "Built so that even a first-time job seeker understands exactly what to do next.",
     svc1Title: "CV analysis & building", svc1Desc: "Create a new CV or improve your current one. Make the content stronger and keep the layout clean.",
     svc2Title: "Job targeting", svc2Desc: "Track interesting job listings, deadlines, and priorities from one view.",
-    svc3Title: "Applications ready faster", svc3Desc: "Write a job-specific application and a separate CV version if needed â€” all from the same workspace.",
+    svc3Title: "Applications ready faster", svc3Desc: "Write a job-specific application and a separate CV version if needed — all from the same workspace.",
     s2Badge: "Why us", s2Title: "More than just one tool",
-    s2Desc: "Duuniharava brings the most important parts of job searching together â€” not just a CV editor, but a complete workspace.",
+    s2Desc: "Duuniharava brings the most important parts of job searching together — not just a CV editor, but a complete workspace.",
     why1Title: "Built for Finland", why1Desc: "Designed specifically for what job searching in Finland looks and feels like.",
     why2Title: "Clear process", why2Desc: "Users understand step by step what to do next, even without prior experience with similar tools.",
     why3Title: "Premium feel", why3Desc: "A trustworthy, modern interface that makes the product feel genuinely ready.",
     s3Badge: "Stories", s3Title: "What users say",
-    t1: '"I got five interview invitations per week after CV optimization. Incredible tool!"', t1Author: "â€” Mikko S., Software Developer",
-    t2: '"The automated search saved me dozens of hours. I recommend it to everyone!"', t2Author: "â€” Elena V., Marketing",
-    t3: '"LinkedIn profile polish brought recruiters messaging me directly right away."', t3Author: "â€” Joonas K., Sales Manager",
+    t1: '"I got five interview invitations per week after CV optimization. Incredible tool!"', t1Author: "— Mikko S., Software Developer",
+    t2: '"The automated search saved me dozens of hours. I recommend it to everyone!"', t2Author: "— Elena V., Marketing",
+    t3: '"LinkedIn profile polish brought recruiters messaging me directly right away."', t3Author: "— Joonas K., Sales Manager",
     s4Badge: "Pricing", s4Title: "Pricing", s4Desc: "Choose the plan that fits you and start your job search today.",
     perMonth: "/ mo", popular: "Most popular", choose: "Choose",
     p1Name: "Starter", p1f1: "CV analysis", p1f2: "Basic edits", p1f3: "Light job search start",
@@ -82,7 +82,7 @@ const t = {
     ctaBadge: "Get started", ctaTitle: "Ready to make job searching clearer?",
     ctaDesc: "Open Duuniharava and build your CV, job tracker, and applications in one place.",
     ctaBtn1: "Create account", ctaBtn2: "Open studio",
-    footer: "Â© 2026 Duuniharava. All rights reserved.",
+    footer: "© 2026 Duuniharava. All rights reserved.",
   },
 } as const;
 
@@ -135,7 +135,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden hover:border-teal-400/25 transition-colors">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left">
         <span className="text-sm md:text-base font-semibold text-teal-300">{q}</span>
-        <span className={`text-zinc-500 text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>â–¼</span>
+        <span className={`text-zinc-500 text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▼</span>
       </button>
       {open && <p className="px-5 pb-4 text-sm leading-relaxed text-zinc-400">{a}</p>}
     </div>
@@ -198,7 +198,7 @@ export default function Home() {
             <div className="flex items-center gap-1 border-r border-white/10 pr-3">
               {(["fi", "en"] as Lang[]).map((l) => (
                 <button key={l} onClick={() => setLang(l)} className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold transition ${lang === l ? "border-teal-400/40 bg-teal-400/10 text-teal-300" : "border-white/10 text-zinc-400 hover:text-white"}`}>
-                  {l === "fi" ? "ðŸ‡«ðŸ‡® FI" : "ðŸ‡¬ðŸ‡§ EN"}
+                  {l === "fi" ? "🇫🇮 FI" : "🇬🇧 EN"}
                 </button>
               ))}
             </div>
@@ -215,7 +215,7 @@ export default function Home() {
             <h1 className="mt-5 text-[clamp(36px,5.5vw,72px)] font-black leading-[1.0] tracking-[-0.04em] text-white">{tx.heroTitle}</h1>
             <p className="mt-5 text-base md:text-lg leading-relaxed text-zinc-400 max-w-[560px]">{tx.heroDesc}</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/signup" className="rounded-xl bg-gradient-to-r from-teal-400 to-orange-500 px-5 py-3 text-sm font-black text-black transition hover:scale-[1.02]">{tx.heroCta} â†’</Link>
+              <Link href="/signup" className="rounded-xl bg-gradient-to-r from-teal-400 to-orange-500 px-5 py-3 text-sm font-black text-black transition hover:scale-[1.02]">{tx.heroCta} →</Link>
               <a href="#palvelut" className="rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08]">{tx.heroSub}</a>
             </div>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -265,7 +265,7 @@ export default function Home() {
         <div ref={r1} className="opacity-0 translate-y-6 transition-all duration-700">
           <div className="text-center mb-12"><Badge>{tx.s1Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white mt-4">{tx.s1Title}</h2><p className="mx-auto mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-zinc-400">{tx.s1Desc}</p></div>
           <div className="grid gap-5 md:grid-cols-3">
-            {[{ icon: "ðŸ“„", title: tx.svc1Title, desc: tx.svc1Desc, c: "text-teal-300" }, { icon: "ðŸŽ¯", title: tx.svc2Title, desc: tx.svc2Desc, c: "text-orange-400" }, { icon: "âœï¸", title: tx.svc3Title, desc: tx.svc3Desc, c: "text-teal-300" }].map((s) => (
+            {[{ icon: "📄", title: tx.svc1Title, desc: tx.svc1Desc, c: "text-teal-300" }, { icon: "🎯", title: tx.svc2Title, desc: tx.svc2Desc, c: "text-orange-400" }, { icon: "✍️", title: tx.svc3Title, desc: tx.svc3Desc, c: "text-teal-300" }].map((s) => (
               <GlassCard key={s.title} className="p-6" hover><div className="mb-3 text-2xl">{s.icon}</div><h3 className={`text-xl font-bold tracking-tight ${s.c}`}>{s.title}</h3><p className="mt-3 text-sm leading-relaxed text-zinc-400">{s.desc}</p></GlassCard>
             ))}
           </div>
@@ -278,7 +278,7 @@ export default function Home() {
           <GlassCard className="p-8 md:p-14 border-t-2 border-teal-400">
             <div className="text-center mb-12"><Badge>{tx.s2Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white">{tx.s2Title}</h2><p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">{tx.s2Desc}</p></div>
             <div className="grid gap-10 md:grid-cols-3">
-              {[{ icon: "ðŸ‡«ðŸ‡®", t: tx.why1Title, d: tx.why1Desc }, { icon: "âš™ï¸", t: tx.why2Title, d: tx.why2Desc }, { icon: "ðŸ’Ž", t: tx.why3Title, d: tx.why3Desc }].map((w) => (
+              {[{ icon: "🇫🇮", t: tx.why1Title, d: tx.why1Desc }, { icon: "⚙️", t: tx.why2Title, d: tx.why2Desc }, { icon: "💎", t: tx.why3Title, d: tx.why3Desc }].map((w) => (
                 <div key={w.t} className="text-center"><div className="mb-3 text-4xl">{w.icon}</div><h3 className="text-xl font-bold text-white">{w.t}</h3><p className="mt-2 text-sm leading-relaxed text-zinc-400">{w.d}</p></div>
               ))}
             </div>
@@ -306,9 +306,9 @@ export default function Home() {
         <div ref={r4} className="opacity-0 translate-y-6 transition-all duration-700">
           <div className="text-center mb-12"><Badge>{tx.s4Badge}</Badge><h2 className="mt-4 text-3xl md:text-5xl font-black tracking-tight text-white">{tx.s4Title}</h2><p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">{tx.s4Desc}</p></div>
           <div className="grid gap-5 md:grid-cols-3 max-w-[960px] mx-auto">
-            <PriceCard name={tx.p1Name} price="12,49â‚¬" features={[tx.p1f1, tx.p1f2, tx.p1f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
-            <PriceCard name={tx.p2Name} price="29,99â‚¬" features={[tx.p2f1, tx.p2f2, tx.p2f3]} featured popularLabel={tx.popular} chooseLabel={tx.choose} />
-            <PriceCard name={tx.p3Name} price="99â‚¬" features={[tx.p3f1, tx.p3f2, tx.p3f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
+            <PriceCard name={tx.p1Name} price="12,49€" features={[tx.p1f1, tx.p1f2, tx.p1f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
+            <PriceCard name={tx.p2Name} price="29,99€" features={[tx.p2f1, tx.p2f2, tx.p2f3]} featured popularLabel={tx.popular} chooseLabel={tx.choose} />
+            <PriceCard name={tx.p3Name} price="99€" features={[tx.p3f1, tx.p3f2, tx.p3f3]} popularLabel={tx.popular} chooseLabel={tx.choose} />
           </div>
         </div>
       </section>
@@ -345,3 +345,5 @@ export default function Home() {
     </main>
   );
 }
+
+
