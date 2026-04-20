@@ -324,7 +324,7 @@ function priorityRank(priority: JobPriority) {
   }
 }
 
-// --- KOMPONENTIT PÄIVITETYILLÄ MARGINAALEILLA (ILMAA LISÄTTY) ---
+// --- KOMPONENTIT ---
 
 function SectionShell({
   step,
@@ -563,6 +563,9 @@ export default function Home() {
   const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
+
+  // MÄÄRITÄ customStyle-muuttuja tässä!
+  const customStyle = customStyles[cvStyle];
 
   // SUPABASE: Datan lataus alussa
   useEffect(() => {
@@ -853,8 +856,18 @@ export default function Home() {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
       const imgWidth = 210;
+      const pageHeight = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
       pdf.save("duuniharava-cv.pdf");
       setMessage("PDF ladattu.");
     } catch (e) { setErrorMessage("Virhe PDF-luonnissa."); } finally { setDownloadingPdf(false); }
@@ -1131,7 +1144,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32">
       <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-zinc-900/50 to-transparent">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.1),transparent_40%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
+        
         <div className="relative mx-auto max-w-7xl px-8 py-14 md:py-20 lg:px-12">
           <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16">
             <div className="flex items-center gap-4">
@@ -1265,8 +1280,8 @@ export default function Home() {
             </SectionShell>
 
             <SectionShell step="VAIHE 2" title="Hakuprofiili" description="Kerro tekoälylle mitä etsit.">
-               <div className="space-y-6 mt-4">
-                  <textarea className={TextareaClass("min-h-[140px]")} placeholder="Esim. Myynti, Asiakaspalvelu, Helsinki..." value={searchProfile.desiredRoles} onChange={e => updateSearchProfile("desiredRoles", e.target.value)} />
+               <div className="space-y-8 mt-4">
+                  <textarea className={TextareaClass("min-h-[140px]")} placeholder="Esim: Myyntityö, Helsinki, Kokopäiväinen..." value={searchProfile.desiredRoles} onChange={e => updateSearchProfile("desiredRoles", e.target.value)} />
                   <button onClick={suggestJobs} disabled={loadingJobs} className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-6 rounded-[24px] text-xl hover:scale-[1.02] transition-all shadow-xl">
                     {loadingJobs ? "ETSITÄÄN..." : "2. EHDOTA TYÖPAIKKOJA"}
                   </button>
@@ -1344,11 +1359,11 @@ export default function Home() {
                               3. KIRJOITA HAKEMUS ➔
                            </button>
                            {letterDraft && (
-                             <textarea value={letterDraft} onChange={e => setLetterDraft(e.target.value)} className={TextareaClass("min-h-[500px] border-[#00BFA6]/30")} />
+                             <textarea value={letterDraft} onChange={e => setLetterDraft(e.target.value)} className={TextareaClass("min-h-[400px] border-[#00BFA6]/30")} />
                            )}
                         </div>
                       ) : (
-                        <div className="text-center py-32 text-gray-500 border-2 border-dashed border-white/5 rounded-[40px]">Valitse ensin työpaikka listalta.</div>
+                        <div className="text-center py-32 text-gray-500">Valitse ensin työpaikka listalta.</div>
                       )}
                    </div>
                 )}
@@ -1357,6 +1372,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ALERT POPUP */}
       {(message || errorMessage) && (
         <div className={`fixed bottom-10 right-10 z-[100] p-6 rounded-3xl border shadow-2xl animate-in slide-in-from-bottom-10 ${errorMessage ? 'bg-red-950 border-red-500 text-white' : 'bg-[#00BFA6] border-white/20 text-black font-black'}`}>
           {errorMessage || message}
