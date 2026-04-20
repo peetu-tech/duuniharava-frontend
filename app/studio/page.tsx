@@ -17,6 +17,20 @@ import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
+// --- SUPABASE ASETUKSET ---
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+function getSupabaseHeaders() {
+  const session = getSession();
+  return {
+    apikey: supabaseAnonKey,
+    Authorization: `Bearer ${session?.access_token || ""}`,
+    "Content-Type": "application/json",
+  };
+}
+
+// --- TYYPIT JA VAKIOT ---
 type ParsedCvResult = {
   score: string;
   report: string[];
@@ -77,8 +91,6 @@ type SavedCvVariant = {
   content: string;
   createdAt: string;
 };
-
-const STORAGE_KEY = "duuniharava_state_v8";
 
 const emptyForm = {
   cvText: "",
@@ -196,6 +208,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   },
 };
 
+// --- APUFUNKTIOT ---
 function parseCvResult(raw: string): ParsedCvResult {
   const scoreMatch = raw.match(/KUNTOTARKASTUS:\s*([^\n]+)/);
   const reportMatch = raw.match(/MUUTOSRAPORTTI:\s*([\s\S]*?)CV_BODY:/);
@@ -270,77 +283,49 @@ function safeJsonParseJobs(text: string): Partial<JobItem>[] {
   }
 }
 
-function splitPdfLines(text: string) {
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function isPdfHeading(line: string) {
-  return line === line.toUpperCase() || pdfHeadingNames.includes(line);
+function daysUntil(dateString?: string) {
+  if (!dateString) return null;
+  const today = new Date();
+  const target = new Date(dateString);
+  if (Number.isNaN(target.getTime())) return null;
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+  const diff = target.getTime() - today.getTime();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
 function getStatusLabel(status: JobStatus) {
   switch (status) {
-    case "saved":
-      return "Tallennettu";
-    case "interested":
-      return "Kiinnostava";
-    case "applied":
-      return "Haettu";
-    case "interview":
-      return "Haastattelu";
-    case "offer":
-      return "Tarjous";
-    case "rejected":
-      return "Hylätty";
-    default:
-      return status;
+    case "saved": return "Tallennettu";
+    case "interested": return "Kiinnostava";
+    case "applied": return "Haettu";
+    case "interview": return "Haastattelu";
+    case "offer": return "Tarjous";
+    case "rejected": return "Hylätty";
+    default: return status;
   }
 }
 
 function getPriorityLabel(priority: JobPriority) {
   switch (priority) {
-    case "low":
-      return "Matala";
-    case "medium":
-      return "Keskitaso";
-    case "high":
-      return "Korkea";
-    default:
-      return priority;
+    case "low": return "Matala";
+    case "medium": return "Keskitaso";
+    case "high": return "Korkea";
+    default: return priority;
   }
 }
 
 function priorityRank(priority: JobPriority) {
   switch (priority) {
-    case "high":
-      return 3;
-    case "medium":
-      return 2;
-    case "low":
-      return 1;
-    default:
-      return 0;
+    case "high": return 3;
+    case "medium": return 2;
+    case "low": return 1;
+    default: return 0;
   }
 }
 
-function daysUntil(dateString?: string) {
-  if (!dateString) return null;
-  const today = new Date();
-  const target = new Date(dateString);
+// --- KOMPONENTIT PÄIVITETYILLÄ MARGINAALEILLA (ILMAA LISÄTTY) ---
 
-  if (Number.isNaN(target.getTime())) return null;
-
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-
-  const diff = target.getTime() - today.getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
-// MUUTOS: SectionShell sai reilusti ilmaa (p-8 md:p-10) ja selkeän tumman laatikon (bg-zinc-900/80)
 function SectionShell({
   step,
   title,
@@ -355,17 +340,17 @@ function SectionShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-8 rounded-[32px] border border-white/10 bg-zinc-900/80 p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl transition-all duration-300">
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-white/5 pb-6">
+    <div className="mb-10 rounded-[32px] border border-white/10 bg-[#141414] p-8 sm:p-12 shadow-2xl backdrop-blur-xl transition-all duration-300">
+      <div className="mb-10 flex flex-wrap items-start justify-between gap-6 border-b border-white/5 pb-8">
         <div>
-          <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-[#00BFA6]">
+          <p className="text-[13px] font-black uppercase tracking-[0.2em] text-[#00BFA6]">
             {step}
           </p>
-          <h2 className="mt-2 text-2xl sm:text-3xl font-black tracking-tight text-white md:text-[32px]">
+          <h2 className="mt-3 text-3xl sm:text-4xl font-black tracking-tight text-white md:text-[36px]">
             {title}
           </h2>
           {description ? (
-            <p className="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-gray-400">
+            <p className="mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-gray-400">
               {description}
             </p>
           ) : null}
@@ -377,104 +362,70 @@ function SectionShell({
   );
 }
 
-// MUUTOS: StatCardit saivat selkeän pohjan (bg-zinc-900/80)
-function StatCard({
-  title,
-  value,
-  description,
-}: {
-  title: string;
-  value: string;
-  description: string;
-}) {
+function StatCard({ title, value, description }: { title: string; value: string; description: string; }) {
   return (
-    <div className="rounded-[28px] border border-white/10 bg-zinc-900/80 p-6 shadow-xl w-full transition-all duration-300 hover:-translate-y-2 hover:border-[#00BFA6]/50">
+    <div className="rounded-[28px] border border-white/10 bg-[#141414] p-8 shadow-xl w-full transition-all duration-300 hover:-translate-y-2 hover:border-[#00BFA6]/50">
       <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-gray-400">
         {title}
       </p>
-      <p className="mt-3 text-3xl font-black tracking-tight text-white">
+      <p className="mt-4 text-4xl font-black tracking-tight text-white">
         {value}
       </p>
-      <p className="mt-2 text-sm leading-relaxed text-gray-500">{description}</p>
+      <p className="mt-3 text-sm leading-relaxed text-gray-500">{description}</p>
     </div>
   );
 }
 
-// MUUTOS: Inputteihin lisätty pehmeä tumma pohja ja selkeä padding
 function InputClass() {
-  return "w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-white outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6]";
+  return "w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-white text-lg outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6]";
 }
 
 function TextareaClass(minHeight: string) {
-  return `w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-white outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] ${minHeight}`;
+  return `w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-white text-lg outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] ${minHeight}`;
 }
 
-function JobCard({
-  job,
-  isActive,
-  applicationsCount,
-  cvsCount,
-  onSelect,
-  onRemove,
-  onUpdate,
-}: {
-  job: JobItem;
-  isActive: boolean;
-  applicationsCount: number;
-  cvsCount: number;
-  onSelect: () => void;
-  onRemove: () => void;
-  onUpdate: (patch: Partial<JobItem>) => void;
-}) {
+function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate }: any) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
 
   return (
     <div
-      className={`rounded-[30px] border p-6 sm:p-8 transition-all duration-300 ${
+      className={`rounded-[30px] border p-8 sm:p-10 transition-all duration-300 ${
         isActive
           ? "border-[#00BFA6]/50 bg-[#00BFA6]/5 shadow-[0_10px_30px_-10px_rgba(0,191,166,0.2)]"
-          : "border-white/10 bg-zinc-900/50 hover:border-white/20 hover:-translate-y-1"
+          : "border-white/10 bg-[#141414] hover:border-white/20 hover:-translate-y-1"
       }`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-8">
         <div className="min-w-0 flex-1">
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            {job.source && (
-              <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-gray-300">
-                {job.source}
-              </span>
-            )}
-            <span className="rounded-full bg-[#00BFA6]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#00BFA6]">
+          <div className="mb-5 flex flex-wrap items-center gap-3">
+            <span className="rounded-full bg-[#00BFA6]/10 px-4 py-2 text-[12px] font-bold uppercase tracking-[0.15em] text-[#00BFA6]">
               Match {score}%
             </span>
-            <span className="rounded-full bg-white/5 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-gray-300">
+            <span className="rounded-full bg-white/5 px-4 py-2 text-[12px] font-medium uppercase tracking-[0.15em] text-gray-300">
               {getStatusLabel(job.status)}
             </span>
-            <span className="rounded-full bg-white/5 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-gray-300">
-              {getPriorityLabel(job.priority)}
-            </span>
             {job.favorite && (
-              <span className="rounded-full bg-[#FF6F3C]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#FF6F3C]">
+              <span className="rounded-full bg-[#FF6F3C]/10 px-4 py-2 text-[12px] font-bold uppercase tracking-[0.15em] text-[#FF6F3C]">
                 Suosikki
               </span>
             )}
           </div>
 
-          <h4 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+          <h4 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
             {job.title || "Nimetön työpaikka"}
           </h4>
 
-          <p className="mt-3 text-base text-gray-400">
+          <p className="mt-4 text-lg text-gray-400">
             {[job.company, job.location, job.type].filter(Boolean).join(" · ")}
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap gap-4 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => onUpdate({ favorite: !job.favorite })}
-            className={`flex-1 sm:flex-none rounded-2xl px-5 py-3 text-sm font-bold transition-all ${
+            className={`flex-1 sm:flex-none rounded-2xl px-6 py-4 text-base font-bold transition-all ${
               job.favorite
                 ? "bg-[#FF6F3C] text-white hover:bg-[#FF6F3C]/80 shadow-[0_0_15px_rgba(255,111,60,0.4)]"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -486,100 +437,64 @@ function JobCard({
           <button
             type="button"
             onClick={onSelect}
-            className={`flex-1 sm:flex-none rounded-2xl px-5 py-3 text-sm font-bold transition-all ${
+            className={`flex-1 sm:flex-none rounded-2xl px-6 py-4 text-base font-bold transition-all ${
               isActive
                 ? "bg-white text-black"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
             }`}
           >
-            {isActive ? "Valittu" : "Valitse"}
+            {isActive ? "Valittu" : "Valitse paikka"}
           </button>
 
           <button
             type="button"
             onClick={onRemove}
-            className="flex-1 sm:flex-none rounded-2xl border border-red-900/50 bg-red-500/10 px-5 py-3 text-sm font-bold text-red-400 transition hover:bg-red-500 hover:text-white"
+            className="flex-1 sm:flex-none rounded-2xl border border-red-900/50 bg-red-500/10 px-6 py-4 text-base font-bold text-red-400 transition hover:bg-red-500 hover:text-white"
           >
             Poista
           </button>
         </div>
       </div>
 
-      {job.summary && (
-        <p className="mt-6 text-sm sm:text-base leading-relaxed text-gray-300 bg-black/20 p-4 rounded-2xl">{job.summary}</p>
-      )}
-
-      {job.whyFit && (
-        <div className="mt-6 rounded-2xl border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#00BFA6]">
-            Miksi sopii
-          </p>
-          <p className="mt-3 text-sm sm:text-base leading-relaxed text-gray-200">{job.whyFit}</p>
-        </div>
-      )}
-
-      {daysLeft !== null && (
-        <div
-          className={`mt-6 rounded-2xl border p-4 text-sm font-medium ${
-            daysLeft < 0
-              ? "border-red-900/50 bg-red-950/30 text-red-300"
-              : daysLeft <= 7
-              ? "border-[#FF6F3C]/50 bg-[#FF6F3C]/10 text-[#FF6F3C]"
-              : "border-white/10 bg-white/5 text-gray-300"
-          }`}
-        >
-          {daysLeft < 0
-            ? `Deadline meni ${Math.abs(daysLeft)} päivää sitten`
-            : daysLeft === 0
-            ? "Deadline on tänään"
-            : `Deadline ${daysLeft} päivän päästä`}
-        </div>
-      )}
-
-      <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
+      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="rounded-2xl border border-white/10 bg-black/40 p-5">
+          <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-gray-500">
             Yritys
           </p>
-          <p className="mt-2 text-sm sm:text-base font-medium text-white truncate">
+          <p className="mt-3 text-lg font-medium text-white truncate">
             {job.company || "-"}
           </p>
         </div>
-
-        <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
+        <div className="rounded-2xl border border-white/10 bg-black/40 p-5">
+          <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-gray-500">
             Sijainti
           </p>
-          <p className="mt-2 text-sm sm:text-base font-medium text-white truncate">
+          <p className="mt-3 text-lg font-medium text-white truncate">
             {job.location || "-"}
           </p>
         </div>
-
-        <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
+        <div className="rounded-2xl border border-white/10 bg-black/40 p-5">
+          <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-gray-500">
             Hakemukset
           </p>
-          <p className="mt-2 text-sm sm:text-base font-medium text-white">
-            {applicationsCount}
+          <p className="mt-3 text-lg font-medium text-white">
+            {applicationsCount} kpl
           </p>
         </div>
-
-        <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">
-            CV-versiot
+        <div className="rounded-2xl border border-white/10 bg-black/40 p-5">
+          <p className="text-[12px] font-bold uppercase tracking-[0.15em] text-gray-500">
+            Deadline
           </p>
-          <p className="mt-2 text-sm sm:text-base font-medium text-white">{cvsCount}</p>
+          <p className="mt-3 text-lg font-medium text-white">
+            {daysLeft !== null ? (daysLeft < 0 ? "Mennyt" : `${daysLeft} päivää`) : "-"}
+          </p>
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">Status</label>
-          <select
-            value={job.status}
-            onChange={(e) => onUpdate({ status: e.target.value as JobStatus })}
-            className={InputClass()}
-          >
+          <label className="mb-3 block text-sm font-bold text-gray-400 ml-2">Status</label>
+          <select value={job.status} onChange={(e) => onUpdate({ status: e.target.value as JobStatus })} className={InputClass()}>
             <option value="saved">Tallennettu</option>
             <option value="interested">Kiinnostava</option>
             <option value="applied">Haettu</option>
@@ -588,105 +503,15 @@ function JobCard({
             <option value="rejected">Hylätty</option>
           </select>
         </div>
-
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">Prioriteetti</label>
-          <select
-            value={job.priority}
-            onChange={(e) =>
-              onUpdate({ priority: e.target.value as JobPriority })
-            }
-            className={InputClass()}
-          >
-            <option value="low">Matala</option>
-            <option value="medium">Keskitaso</option>
-            <option value="high">Korkea</option>
-          </select>
+          <label className="mb-3 block text-sm font-bold text-gray-400 ml-2">Palkka</label>
+          <input value={job.salary || ""} onChange={(e) => onUpdate({ salary: e.target.value })} placeholder="Esim. 2800–3200 €/kk" className={InputClass()} />
         </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">Hakupäivä</label>
-          <input
-            type="date"
-            value={job.appliedAt || ""}
-            onChange={(e) => onUpdate({ appliedAt: e.target.value })}
-            className={InputClass()}
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">Deadline</label>
-          <input
-            type="date"
-            value={job.deadline || ""}
-            onChange={(e) => onUpdate({ deadline: e.target.value })}
-            className={InputClass()}
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">Palkka</label>
-          <input
-            value={job.salary || ""}
-            onChange={(e) => onUpdate({ salary: e.target.value })}
-            placeholder="Esim. 2800–3200 €/kk"
-            className={InputClass()}
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">
-            Yhteyshenkilö
-          </label>
-          <input
-            value={job.contactPerson || ""}
-            onChange={(e) => onUpdate({ contactPerson: e.target.value })}
-            placeholder="Esim. Rekrytoija"
-            className={InputClass()}
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">
-            Sähköposti
-          </label>
-          <input
-            value={job.contactEmail || ""}
-            onChange={(e) => onUpdate({ contactEmail: e.target.value })}
-            placeholder="esim. rekry@firma.fi"
-            className={InputClass()}
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">Yrityksen sivu</label>
-          <input
-            value={job.companyWebsite || ""}
-            onChange={(e) => onUpdate({ companyWebsite: e.target.value })}
-            placeholder="https://..."
-            className={InputClass()}
-          />
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <label className="mb-2 block text-sm font-medium text-gray-400 ml-1">Muistiinpanot</label>
-        <textarea
-          value={job.notes || ""}
-          onChange={(e) => onUpdate({ notes: e.target.value })}
-          placeholder="Kirjaa tähän mitä pitää tehdä seuraavaksi, yhteydenotot, fiilikset jne."
-          className={TextareaClass("min-h-[140px]")}
-        />
       </div>
 
       {job.url && (
-        <a
-          href={job.url}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-6 inline-flex w-full sm:w-auto justify-center rounded-2xl border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-6 py-4 text-sm font-bold text-[#00BFA6] transition hover:bg-[#00BFA6]/20"
-        >
-          Avaa työpaikkalinkki ➔
+        <a href={job.url} target="_blank" rel="noreferrer" className="mt-8 inline-flex w-full sm:w-auto justify-center rounded-2xl border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-8 py-5 text-base font-bold text-[#00BFA6] transition hover:bg-[#00BFA6]/20">
+          Avaa alkuperäinen ilmoitus ➔
         </a>
       )}
     </div>
@@ -698,20 +523,9 @@ export default function Home() {
   
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [hasSession, setHasSession] = useState(false);
-  
-  // MUUTOS: Ohjemodaalin tila
   const [showHelp, setShowHelp] = useState(false);
 
-  useEffect(() => {
-    const session = getSession();
-    if (!session) {
-      router.replace("/login");
-    } else {
-      setHasSession(true);
-      setIsAuthChecking(false);
-    }
-  }, [router]);
-
+  // Perustilat
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
@@ -732,13 +546,9 @@ export default function Home() {
   const [profileImage, setProfileImage] = useState("");
   const [jobFilter, setJobFilter] = useState("");
 
-  const [jobStatusFilter, setJobStatusFilter] =
-    useState<"all" | JobStatus>("all");
-  const [jobPriorityFilter, setJobPriorityFilter] =
-    useState<"all" | JobPriority>("all");
-  const [jobSort, setJobSort] = useState<
-    "match" | "deadline" | "priority" | "newest" | "company"
-  >("newest");
+  const [jobStatusFilter, setJobStatusFilter] = useState<"all" | JobStatus>("all");
+  const [jobPriorityFilter, setJobPriorityFilter] = useState<"all" | JobPriority>("all");
+  const [jobSort, setJobSort] = useState<"match" | "deadline" | "priority" | "newest" | "company">("newest");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
@@ -750,103 +560,151 @@ export default function Home() {
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
-  const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+  const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
+  // SUPABASE: Datan lataus alussa
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-
-    try {
-      const parsed = JSON.parse(raw);
-      setMode(parsed.mode ?? "improve");
-      setTab(parsed.tab ?? "cv");
-      setCvStyle(parsed.cvStyle ?? "modern");
-      setLetterTone(parsed.letterTone ?? "professional");
-      setCvResult(parsed.cvResult ?? "");
-      setLetterResult(parsed.letterResult ?? "");
-      setLetterDraft(parsed.letterDraft ?? "");
-      setProfileImage(parsed.profileImage ?? "");
-      setForm(parsed.form ?? emptyForm);
-      setSearchProfile(parsed.searchProfile ?? emptySearchProfile);
-      setJobForm({ ...emptyJobForm, ...(parsed.jobForm ?? {}) });
-      setJobs(Array.isArray(parsed.jobs) ? parsed.jobs.map(normalizeJob) : []);
-      setActiveJobId(parsed.activeJobId ?? "");
-      setSavedLetters(parsed.savedLetters ?? []);
-      setSavedCvVariants(parsed.savedCvVariants ?? []);
-      setCustomStyles(parsed.customStyles ?? defaultCustomStyles);
-      setJobStatusFilter(parsed.jobStatusFilter ?? "all");
-      setJobPriorityFilter(parsed.jobPriorityFilter ?? "all");
-      setJobSort(parsed.jobSort ?? "newest");
-      setShowFavoritesOnly(parsed.showFavoritesOnly ?? false);
-    } catch {
-      console.error("Tallennetun tilan lukeminen epäonnistui.");
+    const session = getSession();
+    if (!session) {
+      router.replace("/login");
+      return;
     }
-  }, []);
+    setHasSession(true);
+    setIsAuthChecking(false);
 
+    async function loadDataFromDb() {
+      if (!session) return;
+      const headers = getSupabaseHeaders();
+      const userId = session.user.id;
+
+      try {
+        // Lataa profiili
+        const pRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers });
+        const pData = await pRes.json();
+        if (pData && pData.length > 0) {
+          const p = pData[0];
+          setForm((prev) => ({
+            ...prev,
+            name: p.full_name || "",
+            phone: p.phone || "",
+            email: p.email_address || "",
+            location: p.location || "",
+            targetJob: p.target_job || "",
+            education: p.education || "",
+            experience: p.experience || "",
+            languages: p.languages || "",
+            skills: p.skills || "",
+            cards: p.cards || "",
+            hobbies: p.hobbies || "",
+          }));
+          if (p.profile_image_url) setProfileImage(p.profile_image_url);
+        }
+
+        // Lataa työpaikat
+        const jRes = await fetch(`${supabaseUrl}/rest/v1/jobs?user_id=eq.${userId}&order=created_at.desc`, { headers });
+        const jData = await jRes.json();
+        if (jData && Array.isArray(jData)) {
+          setJobs(jData.map((j: any) => ({
+            id: j.id,
+            title: j.title,
+            company: j.company,
+            location: j.location,
+            type: j.type,
+            summary: j.summary,
+            adText: j.ad_text,
+            url: j.url,
+            whyFit: j.why_fit,
+            source: j.source,
+            matchScore: j.match_score,
+            status: j.status,
+            priority: j.priority,
+            salary: j.salary,
+            appliedAt: j.applied_at,
+            deadline: j.deadline,
+            notes: j.notes,
+            contactPerson: j.contact_person,
+            contactEmail: j.contact_email,
+            companyWebsite: j.company_website,
+            favorite: j.favorite,
+            archived: j.archived
+          })));
+        }
+
+        // Lataa hakemukset
+        const lRes = await fetch(`${supabaseUrl}/rest/v1/saved_letters?user_id=eq.${userId}&order=created_at.desc`, { headers });
+        const lData = await lRes.json();
+        if (lData && Array.isArray(lData)) {
+          setSavedLetters(lData.map((l: any) => ({
+            id: l.id,
+            jobId: l.job_id,
+            jobTitle: l.job_title,
+            companyName: l.company_name,
+            content: l.content,
+            createdAt: l.created_at
+          })));
+        }
+
+        // Lataa CV:t
+        const cRes = await fetch(`${supabaseUrl}/rest/v1/cv_variants?user_id=eq.${userId}&order=created_at.desc`, { headers });
+        const cData = await cRes.json();
+        if (cData && Array.isArray(cData)) {
+          setSavedCvVariants(cData.map((c: any) => ({
+            id: c.id,
+            jobId: c.job_id,
+            jobTitle: c.job_title,
+            companyName: c.company_name,
+            content: c.content,
+            createdAt: c.created_at
+          })));
+        }
+      } catch (err) {
+        console.error("Virhe tietojen latauksessa:", err);
+      }
+    }
+    loadDataFromDb();
+  }, [router]);
+
+  // SUPABASE: Profiilin automaattinen tallennus (Debounce)
   useEffect(() => {
-    if (isAuthChecking) return;
-    const state = {
-      mode,
-      tab,
-      cvStyle,
-      letterTone,
-      cvResult,
-      letterResult,
-      letterDraft,
-      profileImage,
-      form,
-      searchProfile,
-      jobForm,
-      jobs,
-      activeJobId,
-      savedLetters,
-      savedCvVariants,
-      customStyles,
-      jobStatusFilter,
-      jobPriorityFilter,
-      jobSort,
-      showFavoritesOnly,
-    };
+    if (isAuthChecking || !hasSession) return;
+    const session = getSession();
+    if (!session) return;
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [
-    mode,
-    tab,
-    cvStyle,
-    letterTone,
-    cvResult,
-    letterResult,
-    letterDraft,
-    profileImage,
-    form,
-    searchProfile,
-    jobForm,
-    jobs,
-    activeJobId,
-    savedLetters,
-    savedCvVariants,
-    customStyles,
-    jobStatusFilter,
-    jobPriorityFilter,
-    jobSort,
-    showFavoritesOnly,
-    isAuthChecking
-  ]);
+    const timeout = setTimeout(async () => {
+      try {
+        await fetch(`${supabaseUrl}/rest/v1/profiles`, {
+          method: "POST",
+          headers: { ...getSupabaseHeaders(), "Prefer": "resolution=merge-duplicates" },
+          body: JSON.stringify({
+            id: session.user.id,
+            full_name: form.name,
+            phone: form.phone,
+            email_address: form.email,
+            location: form.location,
+            target_job: form.targetJob,
+            education: form.education,
+            experience: form.experience,
+            languages: form.languages,
+            skills: form.skills,
+            cards: form.cards,
+            hobbies: form.hobbies,
+            profile_image_url: profileImage
+          })
+        });
+      } catch (e) {
+        console.error("Profiilin tallennus epäonnistui", e);
+      }
+    }, 2000); // Tallentaa 2 sekunnin kuluttua kirjoittamisen lopettamisesta
+
+    return () => clearTimeout(timeout);
+  }, [form, profileImage, isAuthChecking, hasSession]);
+
 
   const parsedCv = useMemo(() => parseCvResult(cvResult), [cvResult]);
-  const parsedLetter = useMemo(
-    () => parseCoverLetter(letterResult),
-    [letterResult]
-  );
-
-  const activeJob = useMemo(
-    () => jobs.find((job) => job.id === activeJobId) || null,
-    [jobs, activeJobId]
-  );
+  const parsedLetter = useMemo(() => parseCoverLetter(letterResult), [letterResult]);
+  const activeJob = useMemo(() => jobs.find((job) => job.id === activeJobId) || null, [jobs, activeJobId]);
 
   const activeJobLetters = useMemo(() => {
     if (!activeJob) return [];
@@ -860,45 +718,19 @@ export default function Home() {
 
   const filteredJobs = useMemo(() => {
     const q = jobFilter.trim().toLowerCase();
-
     return jobs
       .filter((job) => !job.archived)
       .filter((job) => {
         if (showFavoritesOnly && !job.favorite) return false;
-        if (jobStatusFilter !== "all" && job.status !== jobStatusFilter) {
-          return false;
-        }
-        if (jobPriorityFilter !== "all" && job.priority !== jobPriorityFilter) {
-          return false;
-        }
-
+        if (jobStatusFilter !== "all" && job.status !== jobStatusFilter) return false;
+        if (jobPriorityFilter !== "all" && job.priority !== jobPriorityFilter) return false;
         if (!q) return true;
-
-        return [
-          job.title,
-          job.company,
-          job.location,
-          job.type,
-          job.summary,
-          job.whyFit,
-          job.source,
-          job.notes,
-          job.contactPerson,
-          job.contactEmail,
-          job.companyWebsite,
-          job.salary,
-          job.status,
-          job.priority,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(q);
+        return [job.title, job.company, job.location, job.type, job.summary, job.whyFit, job.source, job.notes, job.contactPerson, job.contactEmail, job.companyWebsite, job.salary, job.status, job.priority]
+          .filter(Boolean).join(" ").toLowerCase().includes(q);
       })
       .sort((a, b) => {
         switch (jobSort) {
-          case "match":
-            return safeMatchScore(b.matchScore) - safeMatchScore(a.matchScore);
+          case "match": return safeMatchScore(b.matchScore) - safeMatchScore(a.matchScore);
           case "deadline": {
             const aDays = daysUntil(a.deadline);
             const bDays = daysUntil(b.deadline);
@@ -907,74 +739,58 @@ export default function Home() {
             if (bDays === null) return -1;
             return aDays - bDays;
           }
-          case "priority":
-            return priorityRank(b.priority) - priorityRank(a.priority);
-          case "company":
-            return a.company.localeCompare(b.company, "fi");
-          case "newest":
-          default:
-            return b.id.localeCompare(a.id);
+          case "priority": return priorityRank(b.priority) - priorityRank(a.priority);
+          case "company": return a.company.localeCompare(b.company, "fi");
+          case "newest": default: return b.id.localeCompare(a.id);
         }
       });
-  }, [
-    jobs,
-    jobFilter,
-    jobStatusFilter,
-    jobPriorityFilter,
-    jobSort,
-    showFavoritesOnly,
-  ]);
+  }, [jobs, jobFilter, jobStatusFilter, jobPriorityFilter, jobSort, showFavoritesOnly]);
 
   const dashboardStats = useMemo(() => {
     const total = jobs.length;
     const applied = jobs.filter((job) => job.status === "applied").length;
     const interview = jobs.filter((job) => job.status === "interview").length;
     const favorites = jobs.filter((job) => job.favorite).length;
-
     return { total, applied, interview, favorites };
   }, [jobs]);
 
-  function updateField(key: keyof typeof emptyForm, value: string) {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  }
+  function updateField(key: keyof typeof emptyForm, value: string) { setForm((prev) => ({ ...prev, [key]: value })); }
+  function updateSearchProfile(key: keyof typeof emptySearchProfile, value: string) { setSearchProfile((prev) => ({ ...prev, [key]: value })); }
+  function updateJobForm(key: keyof typeof emptyJobForm, value: string) { setJobForm((prev) => ({ ...prev, [key]: value })); }
 
-  function updateSearchProfile(
-    key: keyof typeof emptySearchProfile,
-    value: string
-  ) {
-    setSearchProfile((prev) => ({ ...prev, [key]: value }));
-  }
-
-  function updateJobForm(key: keyof typeof emptyJobForm, value: string) {
-    setJobForm((prev) => ({ ...prev, [key]: value }));
-  }
-
+  // SUPABASE: Päivitä työpaikka
   function updateJob(id: string, patch: Partial<JobItem>) {
-    setJobs((prev) =>
-      prev.map((job) =>
-        job.id === id ? normalizeJob({ ...job, ...patch }) : job
-      )
-    );
+    setJobs((prev) => prev.map((job) => job.id === id ? normalizeJob({ ...job, ...patch }) : job));
+    
+    const session = getSession();
+    if (!session) return;
+    
+    const dbPatch: any = {};
+    if (patch.title !== undefined) dbPatch.title = patch.title;
+    if (patch.company !== undefined) dbPatch.company = patch.company;
+    if (patch.location !== undefined) dbPatch.location = patch.location;
+    if (patch.type !== undefined) dbPatch.type = patch.type;
+    if (patch.status !== undefined) dbPatch.status = patch.status;
+    if (patch.priority !== undefined) dbPatch.priority = patch.priority;
+    if (patch.favorite !== undefined) dbPatch.favorite = patch.favorite;
+    if (patch.salary !== undefined) dbPatch.salary = patch.salary;
+    if (patch.deadline !== undefined) dbPatch.deadline = patch.deadline || null;
+    if (patch.appliedAt !== undefined) dbPatch.applied_at = patch.appliedAt || null;
+    if (patch.notes !== undefined) dbPatch.notes = patch.notes;
+    
+    fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, {
+      method: "PATCH",
+      headers: getSupabaseHeaders(),
+      body: JSON.stringify(dbPatch)
+    });
   }
 
-  function updateCustomStyle<K extends keyof CvCustomStyle>(
-    key: K,
-    value: CvCustomStyle[K]
-  ) {
-    setCustomStyles((prev) => ({
-      ...prev,
-      [cvStyle]: {
-        ...prev[cvStyle],
-        [key]: value,
-      },
-    }));
+  function updateCustomStyle<K extends keyof CvCustomStyle>(key: K, value: CvCustomStyle[K]) {
+    setCustomStyles((prev) => ({ ...prev, [cvStyle]: { ...prev[cvStyle], [key]: value } }));
   }
 
   function resetCurrentStyle() {
-    setCustomStyles((prev) => ({
-      ...prev,
-      [cvStyle]: defaultCustomStyles[cvStyle],
-    }));
+    setCustomStyles((prev) => ({ ...prev, [cvStyle]: defaultCustomStyles[cvStyle] }));
     setMessage("CV-tyylin asetukset palautettu.");
     setTimeout(() => setMessage(""), 2500);
   }
@@ -983,98 +799,50 @@ export default function Home() {
     setForm(emptyForm);
     setSearchProfile(emptySearchProfile);
     setJobForm(emptyJobForm);
-    setJobs([]);
-    setActiveJobId("");
-    setCvResult("");
-    setLetterResult("");
-    setLetterDraft("");
-    setSavedLetters([]);
-    setSavedCvVariants([]);
-    setMessage("");
-    setErrorMessage("");
-    setProfileImage("");
-    setTab("cv");
-    setMode("improve");
-    setCvStyle("modern");
-    setLetterTone("professional");
-    setJobFilter("");
-    setJobStatusFilter("all");
-    setJobPriorityFilter("all");
-    setJobSort("newest");
-    setShowFavoritesOnly(false);
-    setCustomStyles(defaultCustomStyles);
-    localStorage.removeItem(STORAGE_KEY);
+    setMessage("Lomakkeet tyhjennetty.");
+    setTimeout(() => setMessage(""), 2500);
   }
 
   function fillExample() {
     setForm({
-      cvText: "",
-      cvFile: "",
-      cvFileName: "",
-      name: "Peetu Salminen",
-      phone: "0449776494",
-      email: "peetu.salminen1@gmail.com",
-      location: "Vantaa",
-      targetJob: "Myyjä",
+      cvText: "", cvFile: "", cvFileName: "",
+      name: "Peetu Salminen", phone: "0449776494", email: "peetu.salminen1@gmail.com",
+      location: "Vantaa", targetJob: "Myyjä",
       education: "Sotungin lukio, Vantaa",
-      experience:
-        "Marjojen myynti, asiakaspalvelu, asiakkaiden kohtaaminen ja tuotteiden myynti. Lisäksi kokemusta varasto- ja logistiikkatehtävistä sekä keikkaluonteisista töistä.",
+      experience: "Marjojen myynti, asiakaspalvelu, asiakkaiden kohtaaminen ja tuotteiden myynti. Lisäksi kokemusta varasto- ja logistiikkatehtävistä sekä keikkaluonteisista töistä.",
       languages: "Suomi, englanti, ruotsi",
       skills: "Viestintä, asiakaspalvelu, myynti, oma-aloitteisuus",
       cards: "B-ajokortti, hygieniapassi, EA1",
       hobbies: "Kuntosali, jääkiekko",
     });
-
     setSearchProfile({
-      desiredRoles: "Myyjä, asiakaspalvelija, varastotyöntekijä",
-      desiredLocation: "Uusimaa",
-      workType: "Kokoaikainen tai osa-aikainen",
-      shiftPreference: "Päivävuoro",
-      salaryWish: "3000 kk",
-      keywords: "myynti, asiakaspalvelu, varasto",
+      desiredRoles: "Myyjä, asiakaspalvelija, varastotyöntekijä", desiredLocation: "Uusimaa",
+      workType: "Kokoaikainen tai osa-aikainen", shiftPreference: "Päivävuoro",
+      salaryWish: "3000 kk", keywords: "myynti, asiakaspalvelu, varasto",
     });
-
     setMessage("Esimerkkidata lisätty.");
-    setErrorMessage("");
     setTimeout(() => setMessage(""), 2500);
   }
 
   function applyQuickTarget(type: "sales" | "warehouse" | "shorter") {
-    setErrorMessage("");
-    setMessage("");
-
     if (type === "sales") {
       updateField("targetJob", "Myyjä");
       updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
       setMessage("Tavoitetta suunnattu myyntityöhön.");
     }
-
     if (type === "warehouse") {
       updateField("targetJob", "Varastotyöntekijä");
       updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
       setMessage("Tavoitetta suunnattu varastotyöhön.");
     }
-
     if (type === "shorter") {
-      const shorten = (text: string) =>
-        text
-          .split(/[.!?\n]+/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .slice(0, 2)
-          .join(". ");
-
+      const shorten = (text: string) => text.split(/[.!?\n]+/).map((s) => s.trim()).filter(Boolean).slice(0, 2).join(". ");
       setForm((prev) => ({
-        ...prev,
-        education: shorten(prev.education),
-        experience: shorten(prev.experience),
-        skills: shorten(prev.skills),
-        cards: shorten(prev.cards),
-        hobbies: shorten(prev.hobbies),
+        ...prev, education: shorten(prev.education), experience: shorten(prev.experience),
+        skills: shorten(prev.skills), cards: shorten(prev.cards), hobbies: shorten(prev.hobbies),
       }));
       setMessage("Kenttiä tiivistetty.");
     }
-
     setTimeout(() => setMessage(""), 2500);
   }
 
@@ -1084,55 +852,35 @@ export default function Home() {
       setMessage(successMessage);
       setTimeout(() => setMessage(""), 2500);
     } catch {
-      setMessage("Kopiointi epäonnistui.");
-      setTimeout(() => setMessage(""), 2500);
+      setErrorMessage("Kopiointi epäonnistui.");
+      setTimeout(() => setErrorMessage(""), 2500);
     }
   }
 
   async function downloadPdf() {
     if (!pdfRef.current) return;
-
     try {
       setDownloadingPdf(true);
-      setMessage("");
-      setErrorMessage("");
-
-      const canvas = await html2canvas(pdfRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
-
+      const canvas = await html2canvas(pdfRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
       const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "p",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const pageWidth = 210;
+      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+      const imgWidth = 210;
       const pageHeight = 297;
-      const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
       let heightLeft = imgHeight;
       let position = 0;
-
       pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
-
       while (heightLeft > 0) {
         position -= pageHeight;
         pdf.addPage();
         pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
-
       pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
       setMessage("PDF ladattu.");
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
-      console.error(error);
       setErrorMessage("PDF:n luonti epäonnistui.");
     } finally {
       setDownloadingPdf(false);
@@ -1146,62 +894,27 @@ export default function Home() {
         setErrorMessage("Generoi ensin CV ennen DOCX-latausta.");
         return;
       }
-
       setDownloadingDocx(true);
-      setMessage("");
-      setErrorMessage("");
-
-      const lines = cvText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean);
-
+      const lines = cvText.split("\n").map((line) => line.trim()).filter(Boolean);
       const doc = new Document({
         sections: [
           {
             properties: {},
             children: lines.map((line, index) => {
               const isMainTitle = index === 0;
-              const isSectionTitle =
-                line === line.toUpperCase() ||
-                [
-                  "Profiili",
-                  "Työkokemus",
-                  "Koulutus",
-                  "Kielitaito",
-                  "Taidot",
-                  "Kortit ja pätevyydet",
-                  "Harrastukset",
-                ].includes(line);
-
-              if (isMainTitle) {
-                return new Paragraph({
-                  heading: HeadingLevel.TITLE,
-                  children: [new TextRun({ text: line, bold: true })],
-                });
-              }
-
-              if (isSectionTitle) {
-                return new Paragraph({
-                  heading: HeadingLevel.HEADING_2,
-                  children: [new TextRun({ text: line, bold: true })],
-                });
-              }
-
-              return new Paragraph({
-                children: [new TextRun(line)],
-              });
+              const isSectionTitle = line === line.toUpperCase() || pdfHeadingNames.includes(line);
+              if (isMainTitle) return new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun({ text: line, bold: true })] });
+              if (isSectionTitle) return new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun({ text: line, bold: true })] });
+              return new Paragraph({ children: [new TextRun(line)] });
             }),
           },
         ],
       });
-
       const blob = await Packer.toBlob(doc);
       saveAs(blob, "duuniharava-cv.docx");
       setMessage("DOCX ladattu.");
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
-      console.error(error);
       setErrorMessage("DOCX:n luonti epäonnistui.");
     } finally {
       setDownloadingDocx(false);
@@ -1218,11 +931,7 @@ export default function Home() {
     }
     const reader = new FileReader();
     reader.onload = (event) => {
-      setForm((prev) => ({
-        ...prev,
-        cvFile: event.target?.result as string,
-        cvFileName: file.name,
-      }));
+      setForm((prev) => ({ ...prev, cvFile: event.target?.result as string, cvFileName: file.name }));
       setMessage(`Tiedosto ${file.name} ladattu. Voit nyt parannella sitä.`);
       setTimeout(() => setMessage(""), 3000);
     };
@@ -1230,211 +939,139 @@ export default function Home() {
   }
 
   function validateCvForm() {
-    if (!form.targetJob.trim()) {
-      setErrorMessage("Lisää tavoiteltu työ ennen CV:n generointia.");
-      return false;
-    }
-
-    if (mode === "improve" && !form.cvFile && !form.cvText.trim()) {
-      setErrorMessage("Liitä nykyinen CV (esim. PDF) ennen parannusta.");
-      return false;
-    }
-
-    if (mode === "create" && !form.name.trim()) {
-      setErrorMessage("Lisää nimi ennen uuden CV:n luontia.");
-      return false;
-    }
-
+    if (!form.targetJob.trim()) { setErrorMessage("Lisää tavoiteltu työ ennen CV:n generointia."); return false; }
+    if (mode === "improve" && !form.cvFile && !form.cvText.trim()) { setErrorMessage("Liitä nykyinen CV (esim. PDF) ennen parannusta."); return false; }
+    if (mode === "create" && !form.name.trim()) { setErrorMessage("Lisää nimi ennen uuden CV:n luontia."); return false; }
     return true;
   }
 
   function validateJobForm() {
-    if (
-      !jobForm.title.trim() &&
-      !jobForm.company.trim() &&
-      !jobForm.adText.trim()
-    ) {
-      setErrorMessage(
-        "Lisää vähintään työpaikan otsikko, yritys tai ilmoituksen teksti."
-      );
+    if (!jobForm.title.trim() && !jobForm.company.trim() && !jobForm.adText.trim()) {
+      setErrorMessage("Lisää vähintään työpaikan otsikko, yritys tai ilmoituksen teksti.");
       return false;
     }
     return true;
   }
 
-  function validateLetterForm() {
-    if (!form.targetJob.trim()) {
-      setErrorMessage("Lisää tavoiteltu työ ennen hakemuksen generointia.");
-      return false;
-    }
-
-    if (!activeJob) {
-      setErrorMessage("Valitse työpaikka ennen hakemuksen generointia.");
-      return false;
-    }
-
-    return true;
-  }
-
+  // SUPABASE: Lisää työpaikka
   function addJob() {
-    setMessage("");
-    setErrorMessage("");
-
     if (!validateJobForm()) return;
-
     const job = normalizeJob({
-      id: makeId(),
-      title: jobForm.title.trim(),
-      company: jobForm.company.trim(),
-      location: jobForm.location.trim(),
-      type: jobForm.type.trim(),
-      summary: jobForm.summary.trim(),
-      adText: jobForm.adText.trim(),
-      url: jobForm.url.trim(),
-      whyFit:
-        form.targetJob || searchProfile.desiredRoles
-          ? `Sopii profiiliin: ${form.targetJob || searchProfile.desiredRoles}`
-          : "",
-      source: "Lisätty käsin",
-      matchScore: safeMatchScore(82),
-      status: "saved",
-      priority: "medium",
-      salary: jobForm.salary.trim(),
-      appliedAt: jobForm.appliedAt.trim(),
-      deadline: jobForm.deadline.trim(),
-      notes: jobForm.notes.trim(),
-      contactPerson: jobForm.contactPerson.trim(),
-      contactEmail: jobForm.contactEmail.trim(),
-      companyWebsite: jobForm.companyWebsite.trim(),
-      favorite: false,
-      archived: false,
+      id: makeId(), title: jobForm.title.trim(), company: jobForm.company.trim(),
+      location: jobForm.location.trim(), type: jobForm.type.trim(), summary: jobForm.summary.trim(),
+      adText: jobForm.adText.trim(), url: jobForm.url.trim(),
+      whyFit: form.targetJob || searchProfile.desiredRoles ? `Sopii profiiliin: ${form.targetJob || searchProfile.desiredRoles}` : "",
+      source: "Lisätty käsin", matchScore: safeMatchScore(82), status: "saved", priority: "medium",
+      salary: jobForm.salary.trim(), appliedAt: jobForm.appliedAt.trim(), deadline: jobForm.deadline.trim(),
+      notes: jobForm.notes.trim(), contactPerson: jobForm.contactPerson.trim(), contactEmail: jobForm.contactEmail.trim(),
+      companyWebsite: jobForm.companyWebsite.trim(), favorite: false, archived: false,
     });
 
     setJobs((prev) => [job, ...prev]);
     setActiveJobId(job.id);
     setJobForm(emptyJobForm);
-    setMessage("Työpaikka lisätty listaan.");
     setTab("job");
+    setMessage("Työpaikka lisätty listaan.");
     setTimeout(() => setMessage(""), 2500);
+
+    const session = getSession();
+    if (session) {
+      fetch(`${supabaseUrl}/rest/v1/jobs`, {
+        method: "POST",
+        headers: getSupabaseHeaders(),
+        body: JSON.stringify({
+          id: job.id, user_id: session.user.id, title: job.title, company: job.company, location: job.location,
+          type: job.type, summary: job.summary, ad_text: job.adText, url: job.url, why_fit: job.whyFit,
+          source: job.source, match_score: job.matchScore, status: job.status, priority: job.priority,
+          salary: job.salary, applied_at: job.appliedAt || null, deadline: job.deadline || null, notes: job.notes,
+          contact_person: job.contactPerson, contact_email: job.contactEmail, company_website: job.companyWebsite,
+          favorite: job.favorite, archived: job.archived
+        })
+      });
+    }
   }
 
+  // SUPABASE: Poista työpaikka
   function removeJob(id: string) {
     const filtered = jobs.filter((job) => job.id !== id);
     setJobs(filtered);
-
-    if (activeJobId === id) {
-      setActiveJobId(filtered[0]?.id || "");
-    }
-
+    if (activeJobId === id) setActiveJobId(filtered[0]?.id || "");
     setSavedLetters((prev) => prev.filter((letter) => letter.jobId !== id));
     setSavedCvVariants((prev) => prev.filter((cv) => cv.jobId !== id));
+
+    const session = getSession();
+    if (session) {
+      fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, { method: "DELETE", headers: getSupabaseHeaders() });
+    }
   }
 
   async function suggestJobs() {
     setLoadingJobs(true);
-    setMessage("");
-    setErrorMessage("");
-
     try {
       const res = await fetch("/api/jobs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...searchProfile,
-          targetJob: form.targetJob,
-          experience: form.experience,
-          skills: form.skills,
-          languages: form.languages,
-          onlyActive: true, // Pyydetään vain voimassa olevia työpaikkoja
-        }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...searchProfile, targetJob: form.targetJob, experience: form.experience, skills: form.skills, languages: form.languages, onlyActive: true }),
       });
-
       const data = await res.json();
       const parsed = safeJsonParseJobs(data.output || "[]");
-
-      if (!parsed.length) {
-        setErrorMessage("Työpaikkaehdotuksia ei saatu muodostettua.");
-        return;
-      }
-
-      const newJobs: JobItem[] = parsed.map((job) =>
-        normalizeJob({
-          ...job,
-          id: makeId(),
-          source: job.source || "AI-ehdotus",
-          status: (job.status as JobStatus) || "interested",
-          priority: (job.priority as JobPriority) || "medium",
-          favorite: Boolean(job.favorite),
-          archived: false,
-        })
-      );
-
+      if (!parsed.length) { setErrorMessage("Työpaikkaehdotuksia ei saatu muodostettua."); return; }
+      
+      const newJobs: JobItem[] = parsed.map((job) => normalizeJob({ ...job, id: makeId(), source: job.source || "AI-ehdotus", status: (job.status as JobStatus) || "interested", priority: (job.priority as JobPriority) || "medium", favorite: Boolean(job.favorite), archived: false }));
+      
       setJobs((prev) => [...newJobs, ...prev]);
-      if (!activeJobId && newJobs[0]) {
-        setActiveJobId(newJobs[0].id);
-      }
+      if (!activeJobId && newJobs[0]) setActiveJobId(newJobs[0].id);
       setTab("job");
       setMessage("Työpaikkaehdotukset lisätty.");
+      
+      // Tallenna kaikki kerralla tietokantaan
+      const session = getSession();
+      if(session) {
+        newJobs.forEach(job => {
+          fetch(`${supabaseUrl}/rest/v1/jobs`, {
+            method: "POST", headers: getSupabaseHeaders(),
+            body: JSON.stringify({
+              id: job.id, user_id: session.user.id, title: job.title, company: job.company, location: job.location, type: job.type, summary: job.summary, ad_text: job.adText, url: job.url, why_fit: job.whyFit, source: job.source, match_score: job.matchScore, status: job.status, priority: job.priority, salary: job.salary, applied_at: job.appliedAt || null, deadline: job.deadline || null, notes: job.notes, contact_person: job.contactPerson, contact_email: job.contactEmail, company_website: job.companyWebsite, favorite: job.favorite, archived: job.archived
+            })
+          });
+        });
+      }
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
-      console.error(error);
       setErrorMessage("Työpaikkaehdotusten haku epäonnistui.");
     } finally {
       setLoadingJobs(false);
     }
   }
 
+  // SUPABASE: Tallenna räätälöity CV
   async function createTailoredCv() {
-    if (!activeJob) {
-      setErrorMessage("Valitse työpaikka ennen kohdistetun CV:n luontia.");
-      return;
-    }
-
-    const currentCv = parsedCv.cvBody;
-    if (!currentCv) {
-      setErrorMessage("Generoi ensin normaali CV.");
-      return;
-    }
-
+    if (!activeJob) { setErrorMessage("Valitse työpaikka ennen kohdistetun CV:n luontia."); return; }
+    if (!parsedCv.cvBody) { setErrorMessage("Generoi ensin normaali CV."); return; }
     setLoadingTailoredCv(true);
-    setMessage("");
-    setErrorMessage("");
 
     try {
       const res = await fetch("/api/cv-tailored", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          currentCv,
-          jobTitle: activeJob.title,
-          companyName: activeJob.company,
-          jobAd: activeJob.adText,
-        }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentCv: parsedCv.cvBody, jobTitle: activeJob.title, companyName: activeJob.company, jobAd: activeJob.adText }),
       });
-
       const data = await res.json();
       const parsed = parseTailoredCv(data.output || "");
 
-      const item: SavedCvVariant = {
-        id: makeId(),
-        jobId: activeJob.id,
-        jobTitle: activeJob.title,
-        companyName: activeJob.company,
-        content: parsed,
-        createdAt: new Date().toISOString(),
-      };
-
+      const item: SavedCvVariant = { id: makeId(), jobId: activeJob.id, jobTitle: activeJob.title, companyName: activeJob.company, content: parsed, createdAt: new Date().toISOString() };
       setSavedCvVariants((prev) => [item, ...prev]);
       setCvResult(`CV_BODY:\n${parsed}`);
       setTab("cv");
       setMessage("Työpaikkaan sopiva CV-versio luotu.");
       setTimeout(() => setMessage(""), 2500);
+
+      const session = getSession();
+      if(session) {
+        fetch(`${supabaseUrl}/rest/v1/cv_variants`, {
+          method: "POST", headers: getSupabaseHeaders(),
+          body: JSON.stringify({ id: item.id, user_id: session.user.id, job_id: item.jobId, job_title: item.jobTitle, company_name: item.companyName, content: item.content })
+        });
+      }
     } catch (error) {
-      console.error(error);
       setErrorMessage("Työpaikkaan sopivan CV-version luonti epäonnistui.");
     } finally {
       setLoadingTailoredCv(false);
@@ -1443,107 +1080,75 @@ export default function Home() {
 
   async function handleCvSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setMessage("");
-    setErrorMessage("");
-
     if (!validateCvForm()) return;
-
     setLoadingCv(true);
-    setCvResult("");
-
     try {
       const res = await fetch("/api/cv", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          mode,
-          ...form,
-        }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, ...form }),
       });
-
       const data = await res.json();
-      const output = data.output || data.error || "Jokin meni pieleen.";
-      setCvResult(output);
+      setCvResult(data.output || data.error || "Jokin meni pieleen.");
       setTab("cv");
     } catch (error) {
-      console.error(error);
       setErrorMessage("Virhe yhteydessä palvelimeen.");
     } finally {
       setLoadingCv(false);
     }
   }
 
+  // SUPABASE: Tallenna generoitu hakemus
   async function handleCoverLetterSubmit() {
-    setMessage("");
-    setErrorMessage("");
-
     if (!validateLetterForm() || !activeJob) return;
-
     setLoadingLetter(true);
-    setLetterResult("");
 
     try {
       const res = await fetch("/api/cover-letter", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...form,
-          cvText: parsedCv.cvBody || form.cvText,
-          jobTitle: activeJob.title,
-          companyName: activeJob.company,
-          jobAd: activeJob.adText,
-          tone: letterTone,
-        }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, cvText: parsedCv.cvBody || form.cvText, jobTitle: activeJob.title, companyName: activeJob.company, jobAd: activeJob.adText, tone: letterTone }),
       });
-
       const data = await res.json();
-      const output = data.output || data.error || "Jokin meni pieleen.";
-      const parsed = parseCoverLetter(output);
+      const parsed = parseCoverLetter(data.output || data.error || "Jokin meni pieleen.");
 
-      setLetterResult(output);
+      setLetterResult(data.output);
       setLetterDraft(parsed);
 
-      const savedLetter: SavedLetter = {
-        id: makeId(),
-        jobId: activeJob.id,
-        jobTitle: activeJob.title,
-        companyName: activeJob.company,
-        content: parsed,
-        createdAt: new Date().toISOString(),
-      };
-
+      const savedLetter: SavedLetter = { id: makeId(), jobId: activeJob.id, jobTitle: activeJob.title, companyName: activeJob.company, content: parsed, createdAt: new Date().toISOString() };
       setSavedLetters((prev) => [savedLetter, ...prev]);
       setTab("letter");
       setMessage("Hakemus luotu valittuun työpaikkaan.");
       setTimeout(() => setMessage(""), 2500);
+
+      const session = getSession();
+      if(session) {
+        fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
+          method: "POST", headers: getSupabaseHeaders(),
+          body: JSON.stringify({ id: savedLetter.id, user_id: session.user.id, job_id: savedLetter.jobId, job_title: savedLetter.jobTitle, company_name: savedLetter.companyName, content: savedLetter.content })
+        });
+      }
     } catch (error) {
-      console.error(error);
       setErrorMessage("Virhe yhteydessä palvelimeen.");
     } finally {
       setLoadingLetter(false);
     }
   }
 
+  // SUPABASE: Tallenna oma muokattu hakemus
   function saveEditedLetter() {
     if (!activeJob || !letterDraft.trim()) return;
-
-    const savedLetter: SavedLetter = {
-      id: makeId(),
-      jobId: activeJob.id,
-      jobTitle: activeJob.title,
-      companyName: activeJob.company,
-      content: letterDraft.trim(),
-      createdAt: new Date().toISOString(),
-    };
-
+    const savedLetter: SavedLetter = { id: makeId(), jobId: activeJob.id, jobTitle: activeJob.title, companyName: activeJob.company, content: letterDraft.trim(), createdAt: new Date().toISOString() };
     setSavedLetters((prev) => [savedLetter, ...prev]);
     setLetterResult(`HAKEMUS:\n${letterDraft.trim()}`);
     setMessage("Muokattu hakemus tallennettu.");
     setTimeout(() => setMessage(""), 2500);
+
+    const session = getSession();
+    if(session) {
+      fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
+        method: "POST", headers: getSupabaseHeaders(),
+        body: JSON.stringify({ id: savedLetter.id, user_id: session.user.id, job_id: savedLetter.jobId, job_title: savedLetter.jobTitle, company_name: savedLetter.companyName, content: savedLetter.content })
+      });
+    }
   }
 
   const customStyle = customStyles[cvStyle];
@@ -1551,13 +1156,13 @@ export default function Home() {
   if (isAuthChecking) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#0F0F0F] text-white">
-        <p className="text-gray-400 font-bold">Ladataan studiota...</p>
+        <p className="text-gray-400 font-bold text-xl animate-pulse">Ladataan studiota...</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-20">
+    <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-24">
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
@@ -1565,7 +1170,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-6 sm:px-8 py-10 md:py-14 lg:py-16 xl:px-12">
           
           <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-12">
-            <div className="mb-2 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-[#00BFA6] backdrop-blur-sm">
+            <div className="mb-2 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.24em] text-[#00BFA6] backdrop-blur-sm">
               Studio · Hakuprofiili · Työpaikat · Hakemukset
             </div>
             <button
@@ -1573,7 +1178,7 @@ export default function Home() {
                 clearSession();
                 router.push("/login");
               }}
-              className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-bold text-gray-400 transition-all hover:bg-white/5 hover:text-white whitespace-nowrap"
+              className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-bold text-gray-400 transition-all hover:bg-white/5 hover:text-white whitespace-nowrap"
             >
               Kirjaudu ulos
             </button>
@@ -1585,15 +1190,15 @@ export default function Home() {
                 Kaikki työnhakuun <span className="text-[#00BFA6]">yhdestä paikasta.</span>
               </h1>
 
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-gray-400 md:text-lg">
+              <p className="mt-8 max-w-2xl text-lg leading-relaxed text-gray-400">
                 Tekoäly tekee työt: Se luo sinulle loistavan CV:n, etsii avoimet työpaikat ja laatii hakemukset valmiiksi.
               </p>
 
-              <div className="mt-10 flex flex-wrap gap-4">
+              <div className="mt-12 flex flex-wrap gap-4">
                 <button
                   type="button"
                   onClick={fillExample}
-                  className="rounded-2xl bg-white px-6 py-3.5 text-sm font-black text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex-1 sm:flex-none text-center whitespace-nowrap"
+                  className="rounded-2xl bg-white px-8 py-4 text-sm font-black text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex-1 sm:flex-none text-center whitespace-nowrap"
                 >
                   Täytä esimerkki
                 </button>
@@ -1601,7 +1206,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => applyQuickTarget("sales")}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
                 >
                   Myyntityö
                 </button>
@@ -1609,7 +1214,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => applyQuickTarget("warehouse")}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
                 >
                   Varastotyö
                 </button>
@@ -1617,14 +1222,14 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => applyQuickTarget("shorter")}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
                 >
                   Tee tiiviimpi
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-5 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-6 w-full">
               <StatCard
                 title="CV"
                 value="Muokattava"
@@ -1645,72 +1250,72 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-6 sm:px-8 py-10 md:py-14 xl:px-12">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 py-12 md:py-16 xl:px-12">
         
-        {/* MUUTOS: Ohjeet-nappi & Modal (Käyttäjäystävällinen senior-apu) */}
-        <div className="mb-8 flex justify-center sm:justify-start">
+        {/* SELKEÄ OHJEMODAALI VANHUKSILLE YMS. */}
+        <div className="mb-12 flex justify-center sm:justify-start">
           <button 
             onClick={() => setShowHelp(!showHelp)}
-            className="flex items-center gap-3 rounded-2xl bg-[#00BFA6]/10 border border-[#00BFA6]/40 px-6 py-3.5 text-sm sm:text-base font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6]/20 hover:scale-[1.02]"
+            className="flex items-center gap-4 rounded-[24px] bg-[#00BFA6]/10 border border-[#00BFA6]/40 px-8 py-4 text-base font-black text-[#00BFA6] transition-all hover:bg-[#00BFA6]/20 hover:scale-[1.02] shadow-[0_0_20px_rgba(0,191,166,0.15)]"
           >
-            <span className="text-xl">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
+            <span className="text-2xl">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
           </button>
         </div>
 
         {showHelp && (
-          <div className="mb-12 rounded-[32px] border border-[#00BFA6]/30 bg-zinc-900/90 p-6 sm:p-10 shadow-[0_10px_40px_rgba(0,191,166,0.15)] backdrop-blur-xl animate-in fade-in slide-in-from-top-4">
-            <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-5">
-              <h2 className="text-2xl sm:text-3xl font-black text-white">Näin käytät Duuniharavaa</h2>
+          <div className="mb-16 rounded-[40px] border-2 border-[#00BFA6]/40 bg-[#141414] p-8 sm:p-14 shadow-[0_20px_60px_rgba(0,191,166,0.15)] animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
               <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-white font-bold p-2 text-xl transition">✕ Sulje</button>
             </div>
             
-            <div className="space-y-8 text-gray-300 text-base sm:text-lg leading-relaxed">
-              <div className="flex gap-5 items-start">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-xl mt-1">1</div>
-                <div>
-                  <strong className="text-white block text-xl mb-2">Täytä omat tietosi</strong>
-                  Aloita alla olevasta laatikosta (Vaihe 1). Kirjoita nimesi, työkokemuksesi ja koulutuksesi. Voit myös vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoäly lukee sen puolestasi.
+            <div className="space-y-10 text-gray-300 text-lg leading-relaxed">
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">1</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Täytä omat tietosi</strong>
+                  Aloita alempaa laatikosta nimeltä "Vaihe 1: Hakijan tiedot". Kirjoita nimesi, työkokemuksesi ja koulutuksesi. Voit myös vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoäly lukee sen puolestasi.
                 </div>
               </div>
 
-              <div className="flex gap-5 items-start">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-xl mt-1">2</div>
-                <div>
-                  <strong className="text-white block text-xl mb-2">Paina "Generoi CV"</strong>
-                  Rullaa Vaihe 1 -laatikon loppuun ja paina vihreää nappia. Tekoäly muotoilee sinulle uuden, hienon CV:n. Voit ladata sen koneellesi PDF-napista.
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">2</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Paina "Generoi CV"</strong>
+                  Rullaa Vaihe 1 -laatikon loppuun ja paina vihreää nappia. Tekoäly muotoilee sinulle uuden, hienon CV:n. Näet esikatselun sivun oikeassa laidassa (tai mobiilissa alhaalla). Voit ladata sen suoraan koneellesi PDF-napista.
                 </div>
               </div>
 
-              <div className="flex gap-5 items-start">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-xl mt-1">3</div>
-                <div>
-                  <strong className="text-white block text-xl mb-2">Etsi työpaikkoja</strong>
-                  Kerro alempana (Vaihe 2), millaista työtä etsit (esim. "Myyjä, Uusimaa"). Paina "Ehdota työpaikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia avoimia tehtäviä.
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">3</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Etsi työpaikkoja</strong>
+                  Siirry "Vaihe 2: Hakuprofiili" -laatikkoon. Kerro siellä, millaista työtä etsit (esim. "Myyjä, Uusimaa"). Paina "Ehdota työpaikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia, voimassa olevia avoimia tehtäviä ja tuo ne näkyviin.
                 </div>
               </div>
 
-              <div className="flex gap-5 items-start">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-xl mt-1">4</div>
-                <div>
-                  <strong className="text-white block text-xl mb-2">Tee hakemus napin painalluksella</strong>
-                  Sivun oikeassa reunassa on välilehdet "CV", "Työpaikat" ja "Hakemukset". Valitse kiinnostava työpaikka ja pyydä tekoälyä kirjoittamaan siihen valmis, räätälöity työhakemus.
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">4</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Tee hakemus napin painalluksella</strong>
+                  Sivun oikeassa reunassa (tai mobiilissa alempana) on välilehdet: "CV", "Työpaikat" ja "Hakemukset". Valitse listalta kiinnostava työpaikka ja pyydä tekoälyä kirjoittamaan siihen valmis, räätälöity työhakemus yhdellä klikkauksella.
                 </div>
               </div>
             </div>
 
-            <div className="mt-10 pt-8 border-t border-white/10 text-center sm:text-left">
-              <button onClick={() => setShowHelp(false)} className="rounded-2xl bg-white px-8 py-4 text-base sm:text-lg font-black text-black transition-all hover:bg-gray-200 hover:scale-[1.02] shadow-lg w-full sm:w-auto">
-                Selvä, ymmärsin! Piilota tämä ohje
+            <div className="mt-12 pt-10 border-t border-white/10 text-center sm:text-left">
+              <button onClick={() => setShowHelp(false)} className="rounded-2xl bg-white px-10 py-5 text-lg font-black text-black transition-all hover:bg-gray-200 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.2)] w-full sm:w-auto">
+                Selvä, ymmärsin! Aloitetaan!
               </button>
             </div>
           </div>
         )}
 
-        <div className="mb-10 flex flex-wrap items-center gap-4">
+        <div className="mb-10 flex flex-wrap items-center gap-5">
           <button
             type="button"
             onClick={() => setMode("improve")}
-            className={`rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-300 flex-1 sm:flex-none ${
+            className={`rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${
               mode === "improve"
                 ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
@@ -1722,7 +1327,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setMode("create")}
-            className={`rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-300 flex-1 sm:flex-none ${
+            className={`rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${
               mode === "create"
                 ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
@@ -1731,8 +1336,8 @@ export default function Home() {
             Luo uusi CV
           </button>
 
-          <div className="ml-auto hidden text-sm font-medium text-gray-500 lg:block">
-            Muutokset tallentuvat selaimen muistiin automaattisesti.
+          <div className="ml-auto hidden text-base font-medium text-gray-500 lg:block">
+            Pilvitallennus aktiivinen (Supabase) ☁️
           </div>
         </div>
 
@@ -1747,21 +1352,21 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={clearForm}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-gray-300 transition-all hover:bg-white/10 hover:border-red-500/50"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-gray-300 transition-all hover:bg-white/10 hover:border-red-500/50"
                 >
                   Tyhjennä
                 </button>
               }
             >
-              <form onSubmit={handleCvSubmit} className="space-y-6 mt-6">
+              <form onSubmit={handleCvSubmit} className="space-y-8 mt-6">
                 {mode === "improve" && (
                   <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-400">
+                    <label className="mb-4 block text-sm font-bold text-gray-400">
                       Nykyinen CV (PDF)
                     </label>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <label className="cursor-pointer rounded-2xl bg-white/[0.03] border border-white/10 px-6 py-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none">
-                        <span className="text-sm font-bold text-white">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                      <label className="cursor-pointer rounded-2xl bg-white/[0.03] border border-white/10 px-8 py-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none">
+                        <span className="text-base font-bold text-white">
                           Lataa laitteelta PDF-tiedosto
                         </span>
                         <input
@@ -1772,7 +1377,7 @@ export default function Home() {
                         />
                       </label>
                       {form.cvFileName && (
-                        <span className="text-sm font-medium text-[#00BFA6] break-words px-2">
+                        <span className="text-base font-medium text-[#00BFA6] break-words px-2">
                           ✓ {form.cvFileName} valittu
                         </span>
                       )}
@@ -1780,9 +1385,9 @@ export default function Home() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 pt-2">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-2">
                   <div>
-                     <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Koko nimi</label>
+                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Koko nimi</label>
                      <input
                        placeholder="Esim. Matti Meikäläinen"
                        value={form.name}
@@ -1791,7 +1396,7 @@ export default function Home() {
                      />
                   </div>
                   <div>
-                     <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Puhelin</label>
+                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Puhelin</label>
                      <input
                        placeholder="040 123 4567"
                        value={form.phone}
@@ -1800,7 +1405,7 @@ export default function Home() {
                      />
                   </div>
                   <div>
-                     <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Sähköposti</label>
+                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Sähköposti</label>
                      <input
                        placeholder="oma@email.com"
                        value={form.email}
@@ -1809,7 +1414,7 @@ export default function Home() {
                      />
                   </div>
                   <div>
-                     <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Paikkakunta</label>
+                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Paikkakunta</label>
                      <input
                        placeholder="Esim. Helsinki"
                        value={form.location}
@@ -1819,8 +1424,8 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Tavoiteltu rooli / ammatti</label>
+                <div className="pt-4">
+                  <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Tavoiteltu rooli / ammatti</label>
                   <input
                     placeholder="Mitä työtä haluat hakea? (esim. Myyjä, Koodari)"
                     value={form.targetJob}
@@ -1829,99 +1434,99 @@ export default function Home() {
                   />
                 </div>
 
-                <div className="pt-2">
-                  <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Koulutus</label>
+                <div className="pt-4">
+                  <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Koulutus</label>
                   <textarea
                     placeholder="Kirjaa tänne oppilaitokset ja tutkinnot..."
                     value={form.education}
                     onChange={(e) => updateField("education", e.target.value)}
-                    className={TextareaClass("min-h-[120px]")}
+                    className={TextareaClass("min-h-[140px]")}
                   />
                 </div>
 
-                <div className="pt-2">
-                  <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Työkokemus</label>
+                <div className="pt-4">
+                  <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Työkokemus</label>
                   <textarea
                     placeholder="Missä olet ollut töissä ja mitä teit?"
                     value={form.experience}
                     onChange={(e) => updateField("experience", e.target.value)}
-                    className={TextareaClass("min-h-[160px]")}
+                    className={TextareaClass("min-h-[180px]")}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 pt-2">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
                   <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Kielitaito</label>
+                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Kielitaito</label>
                     <textarea
                       placeholder="Suomi (äidinkieli), Englanti (sujuva)..."
                       value={form.languages}
                       onChange={(e) => updateField("languages", e.target.value)}
-                      className={TextareaClass("min-h-[120px]")}
+                      className={TextareaClass("min-h-[140px]")}
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Osaaminen & Taidot</label>
+                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Osaaminen & Taidot</label>
                     <textarea
                       placeholder="Mitä taitoja sinulla on? (esim. asiakaspalvelu)"
                       value={form.skills}
                       onChange={(e) => updateField("skills", e.target.value)}
+                      className={TextareaClass("min-h-[140px]")}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
+                  <div>
+                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Kortit & Pätevyydet</label>
+                    <textarea
+                      placeholder="Työturvallisuuskortti, B-ajokortti..."
+                      value={form.cards}
+                      onChange={(e) => updateField("cards", e.target.value)}
+                      className={TextareaClass("min-h-[120px]")}
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Harrastukset</label>
+                    <textarea
+                      placeholder="Mitä teet vapaa-ajalla?"
+                      value={form.hobbies}
+                      onChange={(e) => updateField("hobbies", e.target.value)}
                       className={TextareaClass("min-h-[120px]")}
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 pt-2">
-                  <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Kortit & Pätevyydet</label>
-                    <textarea
-                      placeholder="Työturvallisuuskortti, B-ajokortti..."
-                      value={form.cards}
-                      onChange={(e) => updateField("cards", e.target.value)}
-                      className={TextareaClass("min-h-[100px]")}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Harrastukset</label>
-                    <textarea
-                      placeholder="Mitä teet vapaa-ajalla?"
-                      value={form.hobbies}
-                      onChange={(e) => updateField("hobbies", e.target.value)}
-                      className={TextareaClass("min-h-[100px]")}
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-2">
+                <div className="pt-4">
                   <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
                 </div>
 
-                <div className="rounded-[28px] border border-white/10 bg-white/[0.02] p-6 sm:p-8 mt-4">
-                  <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 md:p-10 mt-8">
+                  <div className="flex flex-wrap items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
                     <div>
-                      <p className="text-base font-bold text-white">Ulkoasun säädöt (CV)</p>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="text-xl font-black text-white tracking-tight">Ulkoasun säädöt (CV)</p>
+                      <p className="mt-2 text-base text-gray-400">
                         Hienosäädä dokumenttia ennen latausta.
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={resetCurrentStyle}
-                      className="rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50"
+                      className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50"
                     >
                       Palauta oletukset
                     </button>
                   </div>
 
-                  <div className="mt-8 flex flex-wrap gap-3">
+                  <div className="mt-8 flex flex-wrap gap-4">
                     {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map(
                       (variant) => (
                         <button
                           key={variant}
                           type="button"
                           onClick={() => setCvStyle(variant)}
-                          className={`rounded-2xl px-5 py-3 text-sm font-bold transition-all duration-300 flex-1 sm:flex-none ${
+                          className={`rounded-2xl px-6 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${
                             cvStyle === variant
-                              ? "bg-[#00BFA6] text-black shadow-[0_0_15px_rgba(0,191,166,0.4)] scale-105"
+                              ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105"
                               : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
                           }`}
                         >
@@ -1934,9 +1539,9 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Sivupalkin väri
                       </label>
                       <input
@@ -1945,12 +1550,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("sidebarBg", e.target.value)
                         }
-                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Sivupalkin tekstiväri
                       </label>
                       <input
@@ -1959,12 +1564,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("sidebarText", e.target.value)
                         }
-                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Pääalueen tausta
                       </label>
                       <input
@@ -1973,12 +1578,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("mainBg", e.target.value)
                         }
-                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Tekstin väri
                       </label>
                       <input
@@ -1987,12 +1592,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("mainText", e.target.value)
                         }
-                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Otsikon väri
                       </label>
                       <input
@@ -2001,12 +1606,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("headingColor", e.target.value)
                         }
-                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Korosteväri
                       </label>
                       <input
@@ -2015,12 +1620,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("accentColor", e.target.value)
                         }
-                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Sivupalkin leveys ({customStyle.sidebarWidth}px)
                       </label>
                       <input
@@ -2031,12 +1636,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("sidebarWidth", Number(e.target.value))
                         }
-                        className="w-full accent-[#00BFA6] mt-2"
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Nimen koko ({customStyle.nameSize}px)
                       </label>
                       <input
@@ -2047,12 +1652,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("nameSize", Number(e.target.value))
                         }
-                        className="w-full accent-[#00BFA6] mt-2"
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Tekstin koko ({customStyle.bodySize}px)
                       </label>
                       <input
@@ -2063,12 +1668,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("bodySize", Number(e.target.value))
                         }
-                        className="w-full accent-[#00BFA6] mt-2"
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Kulmien pyöreys ({customStyle.borderRadius}px)
                       </label>
                       <input
@@ -2079,12 +1684,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("borderRadius", Number(e.target.value))
                         }
-                        className="w-full accent-[#00BFA6] mt-2"
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Riviväli ({customStyle.lineHeight})
                       </label>
                       <input
@@ -2096,12 +1701,12 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("lineHeight", Number(e.target.value))
                         }
-                        className="w-full accent-[#00BFA6] mt-2"
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Osioiden väli ({customStyle.sectionSpacing}px)
                       </label>
                       <input
@@ -2115,12 +1720,12 @@ export default function Home() {
                             Number(e.target.value)
                           )
                         }
-                        className="w-full accent-[#00BFA6] mt-2"
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="mb-2 block text-sm font-medium text-gray-400">
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
                         Kuvan kulmat ({customStyle.imageRadius}px)
                       </label>
                       <input
@@ -2131,17 +1736,17 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("imageRadius", Number(e.target.value))
                         }
-                        className="w-full accent-[#00BFA6] mt-2"
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 pt-8 pb-2">
+                <div className="flex flex-col sm:flex-row gap-5 pt-8 pb-4">
                   <button
                     type="submit"
                     disabled={loadingCv}
-                    className="w-full sm:w-auto rounded-2xl bg-[#00BFA6] px-8 py-5 text-lg font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_10px_30px_-10px_rgba(0,191,166,0.5)]"
+                    className="w-full sm:w-auto rounded-2xl bg-[#00BFA6] px-10 py-5 text-xl font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)]"
                   >
                     {loadingCv ? "Luodaan CV:tä..." : "1. GENEROI CV"}
                   </button>
@@ -2153,7 +1758,7 @@ export default function Home() {
                         onClick={() =>
                           copyText(parsedCv.cvBody, "CV kopioitu leikepöydälle.")
                         }
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-6 py-4 font-bold text-white transition-all hover:bg-white/10"
+                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10"
                       >
                         Kopioi leikepöydälle
                       </button>
@@ -2162,7 +1767,7 @@ export default function Home() {
                         type="button"
                         onClick={downloadPdf}
                         disabled={downloadingPdf}
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-6 py-4 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
+                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
                       >
                         {downloadingPdf ? "Luodaan PDF..." : "Lataa PDF"}
                       </button>
@@ -2171,7 +1776,7 @@ export default function Home() {
                         type="button"
                         onClick={downloadDocx}
                         disabled={downloadingDocx}
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-6 py-4 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
+                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
                       >
                         {downloadingDocx ? "Luodaan DOCX..." : "Lataa DOCX"}
                       </button>
@@ -2190,27 +1795,27 @@ export default function Home() {
                   type="button"
                   onClick={suggestJobs}
                   disabled={loadingJobs}
-                  className="rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-3.5 text-base font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(0,191,166,0.3)] mt-2 sm:mt-0"
+                  className="rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 text-base font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_0_25px_rgba(0,191,166,0.3)] mt-2 sm:mt-0"
                 >
                   {loadingJobs ? "Etsitään..." : "2. EHDOTA TYÖPAIKKOJA"}
                 </button>
               }
             >
-              <div className="space-y-6 mt-6">
+              <div className="space-y-8 mt-8">
                 <div>
-                  <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Minkä alan töitä etsit?</label>
+                  <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Minkä alan töitä etsit?</label>
                   <textarea
                     placeholder="Esim. Myyntineuvottelija, Koodari, Siivooja..."
                     value={searchProfile.desiredRoles}
                     onChange={(e) =>
                       updateSearchProfile("desiredRoles", e.target.value)
                     }
-                    className={TextareaClass("min-h-[120px]")}
+                    className={TextareaClass("min-h-[140px]")}
                   />
                 </div>
                 
                 <div>
-                   <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Miltä alueelta?</label>
+                   <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Miltä alueelta?</label>
                    <input
                      placeholder="Esim. Uusimaa, Etätyö"
                      value={searchProfile.desiredLocation}
@@ -2221,9 +1826,9 @@ export default function Home() {
                    />
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Kokoaikainen vai Osa-aikainen?</label>
+                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Kokoaikainen vai Osa-aikainen?</label>
                     <input
                       placeholder="Esim. Kokoaikainen"
                       value={searchProfile.workType}
@@ -2234,7 +1839,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Vuorotoive</label>
+                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Vuorotoive</label>
                     <input
                       placeholder="Esim. Päivätyö"
                       value={searchProfile.shiftPreference}
@@ -2246,9 +1851,9 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Palkkatoive</label>
+                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Palkkatoive</label>
                     <input
                       placeholder="Esim. 3000€ / kk"
                       value={searchProfile.salaryWish}
@@ -2259,7 +1864,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Muita avainsanoja (erota pilkulla)</label>
+                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Muita avainsanoja (erota pilkulla)</label>
                     <input
                       placeholder="Esim. englanti, joustava"
                       value={searchProfile.keywords}
@@ -2275,17 +1880,17 @@ export default function Home() {
           </section>
 
           {/* OIKEA SARAKE: VÄLILEHDET */}
-          <section className="space-y-8 lg:sticky lg:top-8 lg:self-start">
-            <div className="rounded-[32px] border border-white/10 bg-zinc-900/80 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+          <section className="space-y-10 lg:sticky lg:top-8 lg:self-start">
+            <div className="rounded-[32px] border border-white/10 bg-[#141414] p-8 sm:p-10 shadow-2xl backdrop-blur-xl transition-all">
               
               {/* VÄLILEHTINAPIT */}
-              <div className="mb-8 flex overflow-x-auto whitespace-nowrap pb-3 gap-4 snap-x border-b border-white/5">
+              <div className="mb-10 flex overflow-x-auto whitespace-nowrap pb-4 gap-5 snap-x border-b border-white/5 custom-scrollbar">
                 <button
                   type="button"
                   onClick={() => setTab("cv")}
-                  className={`rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-300 snap-start ${
+                  className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start ${
                     tab === "cv"
-                      ? "bg-[#00BFA6] text-black shadow-[0_0_15px_rgba(0,191,166,0.4)]"
+                      ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                       : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
                   }`}
                 >
@@ -2294,9 +1899,9 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setTab("job")}
-                  className={`rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-300 snap-start ${
+                  className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start ${
                     tab === "job"
-                      ? "bg-[#00BFA6] text-black shadow-[0_0_15px_rgba(0,191,166,0.4)]"
+                      ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                       : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
                   }`}
                 >
@@ -2305,9 +1910,9 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setTab("letter")}
-                  className={`rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-300 snap-start ${
+                  className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start ${
                     tab === "letter"
-                      ? "bg-[#00BFA6] text-black shadow-[0_0_15px_rgba(0,191,166,0.4)]"
+                      ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                       : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
                   }`}
                 >
@@ -2316,16 +1921,16 @@ export default function Home() {
               </div>
 
               {tab === "cv" && (
-                <div className="space-y-8 overflow-hidden">
+                <div className="space-y-10 overflow-hidden">
                   {parsedCv.cvBody && activeJob && (
-                    <div className="flex flex-col sm:flex-row gap-4 bg-[#0F0F0F] p-5 rounded-3xl border border-white/10">
+                    <div className="flex flex-col sm:flex-row gap-5 bg-black/40 p-6 rounded-3xl border border-white/10">
                       <div className="flex-1">
-                        <p className="text-sm text-gray-400 mb-2">Valittu työpaikka: <strong>{activeJob.title}</strong></p>
+                        <p className="text-base text-gray-400 mb-3">Valittu työpaikka: <strong className="text-white text-lg">{activeJob.title}</strong></p>
                         <button
                           type="button"
                           onClick={createTailoredCv}
                           disabled={loadingTailoredCv}
-                          className="w-full rounded-2xl border border-[#FF6F3C]/50 bg-[#FF6F3C]/10 px-6 py-4 font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/20 disabled:opacity-50"
+                          className="w-full rounded-2xl border border-[#FF6F3C]/50 bg-[#FF6F3C]/10 px-8 py-5 font-black text-xl text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/20 disabled:opacity-50"
                         >
                           {loadingTailoredCv
                             ? "Muokataan tekoälyllä..."
@@ -2336,25 +1941,25 @@ export default function Home() {
                   )}
 
                   {activeJobCvVariants.length > 0 && (
-                    <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-                      <h3 className="mb-4 text-lg font-bold text-white">
+                    <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+                      <h3 className="mb-5 text-xl font-bold text-white">
                         Tallennetut CV-versiot
                       </h3>
-                      <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                      <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                         {activeJobCvVariants.map((cv) => (
                           <button
                             key={cv.id}
                             type="button"
                             onClick={() => setCvResult(`CV_BODY:\n${cv.content}`)}
-                            className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.2)]"
+                            className="w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.2)]"
                           >
-                            <p className="font-bold text-[#00BFA6] truncate">
+                            <p className="font-bold text-lg text-[#00BFA6] truncate">
                               {cv.jobTitle}
                             </p>
-                            <p className="text-sm font-medium text-white truncate">
+                            <p className="text-base font-medium text-white truncate mt-1">
                               {cv.companyName}
                             </p>
-                            <p className="mt-1 text-xs text-gray-500">
+                            <p className="mt-2 text-xs text-gray-500">
                               {new Date(cv.createdAt).toLocaleString("fi-FI")}
                             </p>
                           </button>
@@ -2366,22 +1971,22 @@ export default function Home() {
                   {cvResult ? (
                     <>
                       {parsedCv.score && (
-                        <div className="rounded-[28px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 text-center">
-                          <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[#00BFA6]">
+                        <div className="rounded-[32px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-8 text-center shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
+                          <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#00BFA6]">
                             Kuntotarkastus arvosana
                           </h2>
-                          <p className="mt-2 text-5xl font-black text-white">
+                          <p className="mt-3 text-6xl font-black text-white">
                             {parsedCv.score}
                           </p>
                         </div>
                       )}
 
                       {parsedCv.report.length > 0 && (
-                        <div className="rounded-[28px] border border-[#FF6F3C]/20 bg-[#FF6F3C]/5 p-6 sm:p-8">
-                          <h2 className="mb-5 text-sm font-bold uppercase tracking-widest text-[#FF6F3C]">
+                        <div className="rounded-[32px] border border-[#FF6F3C]/30 bg-[#FF6F3C]/5 p-8 sm:p-10 shadow-[0_10px_30px_rgba(255,111,60,0.1)]">
+                          <h2 className="mb-6 text-sm font-black uppercase tracking-widest text-[#FF6F3C]">
                             Muutosraportti / Parannukset
                           </h2>
-                          <ul className="space-y-4 pl-5 text-base text-gray-200">
+                          <ul className="space-y-4 pl-6 text-lg text-gray-200">
                             {parsedCv.report.map((item, index) => (
                               <li key={index} className="list-disc break-words leading-relaxed">
                                 {item}
@@ -2391,7 +1996,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className="rounded-[32px] border border-white/10 bg-white p-3 sm:p-6 overflow-x-auto shadow-xl">
+                      <div className="rounded-[40px] border border-white/10 bg-white p-4 sm:p-8 overflow-x-auto shadow-2xl">
                         <div className="min-w-[600px] lg:min-w-0">
                           <CvPreview
                             cvText={parsedCv.cvBody}
@@ -2425,59 +2030,59 @@ export default function Home() {
                       </div>
                     </>
                   ) : (
-                    <div className="rounded-[32px] border-2 border-dashed border-white/10 bg-[#0F0F0F] p-10 sm:p-16 text-center text-gray-500">
-                      <div className="text-4xl mb-4">📄</div>
-                      <p className="text-base font-medium">Ei esikatselua vielä.</p>
-                      <p className="text-sm mt-2">Täytä tiedot vasemmalla ja paina "Generoi CV".</p>
+                    <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center text-gray-500">
+                      <div className="text-5xl mb-6">📄</div>
+                      <p className="text-xl font-bold text-white mb-2">Ei esikatselua vielä</p>
+                      <p className="text-base text-gray-400">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
                     </div>
                   )}
                 </div>
               )}
 
               {tab === "job" && (
-                <div className="space-y-8">
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div className="rounded-2xl border border-white/10 bg-[#0F0F0F] p-4 text-center hover:-translate-y-1 transition-transform">
-                      <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500 truncate">
+                <div className="space-y-10">
+                  <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
+                    <div className="rounded-[24px] border border-white/10 bg-black/50 p-6 text-center hover:-translate-y-1 transition-transform">
+                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 truncate">
                         Työpaikat
                       </p>
-                      <p className="mt-2 text-2xl sm:text-3xl font-black text-white">
+                      <p className="mt-3 text-3xl sm:text-4xl font-black text-white">
                         {dashboardStats.total}
                       </p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-[#0F0F0F] p-4 text-center hover:-translate-y-1 transition-transform">
-                      <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500 truncate">
+                    <div className="rounded-[24px] border border-white/10 bg-black/50 p-6 text-center hover:-translate-y-1 transition-transform">
+                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 truncate">
                         Haettu
                       </p>
-                      <p className="mt-2 text-2xl sm:text-3xl font-black text-white">
+                      <p className="mt-3 text-3xl sm:text-4xl font-black text-white">
                         {dashboardStats.applied}
                       </p>
                     </div>
-                    <div className="rounded-2xl border border-[#00BFA6]/30 bg-[#00BFA6]/10 p-4 text-center hover:-translate-y-1 transition-transform">
-                      <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] text-[#00BFA6] truncate">
+                    <div className="rounded-[24px] border border-[#00BFA6]/40 bg-[#00BFA6]/10 p-6 text-center hover:-translate-y-1 transition-transform shadow-[0_0_20px_rgba(0,191,166,0.1)]">
+                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#00BFA6] truncate">
                         Haastattelu
                       </p>
-                      <p className="mt-2 text-2xl sm:text-3xl font-black text-[#00BFA6]">
+                      <p className="mt-3 text-3xl sm:text-4xl font-black text-[#00BFA6]">
                         {dashboardStats.interview}
                       </p>
                     </div>
-                    <div className="rounded-2xl border border-[#FF6F3C]/30 bg-[#FF6F3C]/10 p-4 text-center hover:-translate-y-1 transition-transform">
-                      <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] text-[#FF6F3C] truncate">
+                    <div className="rounded-[24px] border border-[#FF6F3C]/40 bg-[#FF6F3C]/10 p-6 text-center hover:-translate-y-1 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.1)]">
+                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#FF6F3C] truncate">
                         Suosikit
                       </p>
-                      <p className="mt-2 text-2xl sm:text-3xl font-black text-[#FF6F3C]">
+                      <p className="mt-3 text-3xl sm:text-4xl font-black text-[#FF6F3C]">
                         {dashboardStats.favorites}
                       </p>
                     </div>
                   </div>
 
-                  <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-6 sm:p-8 space-y-6">
-                    <h3 className="text-xl font-bold text-white border-b border-white/10 pb-4">
+                  <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 sm:p-10 space-y-8">
+                    <h3 className="text-2xl font-black text-white border-b border-white/10 pb-5">
                       Lisää oma työpaikka seurantaan
                     </h3>
 
                     <div>
-                       <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Otsikko</label>
+                       <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Otsikko</label>
                        <input
                          placeholder="Esim. Myyntipäällikkö"
                          value={jobForm.title}
@@ -2486,9 +2091,9 @@ export default function Home() {
                        />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Yritys</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Yritys</label>
                          <input
                            placeholder="Esim. Nokia"
                            value={jobForm.company}
@@ -2499,7 +2104,7 @@ export default function Home() {
                          />
                       </div>
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Sijainti</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Sijainti</label>
                          <input
                            placeholder="Esim. Helsinki"
                            value={jobForm.location}
@@ -2511,9 +2116,9 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Työsuhde</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Työsuhde</label>
                          <input
                            placeholder="Vakituinen"
                            value={jobForm.type}
@@ -2522,7 +2127,7 @@ export default function Home() {
                          />
                       </div>
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Linkki</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Linkki</label>
                          <input
                            placeholder="https://..."
                            value={jobForm.url}
@@ -2532,9 +2137,9 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Palkka</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Palkka</label>
                          <input
                            placeholder="3000 €/kk"
                            value={jobForm.salary}
@@ -2543,7 +2148,7 @@ export default function Home() {
                          />
                       </div>
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Deadline</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Deadline</label>
                          <input
                            type="date"
                            value={jobForm.deadline}
@@ -2555,9 +2160,9 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Yhteyshenkilö</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Yhteyshenkilö</label>
                          <input
                            placeholder="Matti Rekrytoija"
                            value={jobForm.contactPerson}
@@ -2568,7 +2173,7 @@ export default function Home() {
                          />
                       </div>
                       <div>
-                         <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Sähköposti</label>
+                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Sähköposti</label>
                          <input
                            placeholder="matti@yritys.fi"
                            value={jobForm.contactEmail}
@@ -2581,54 +2186,54 @@ export default function Home() {
                     </div>
 
                     <div>
-                       <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Lyhyt kuvaus / muistiinpanot</label>
+                       <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Lyhyt kuvaus / muistiinpanot</label>
                        <textarea
                          placeholder="Mikä tässä kiinnostaa?"
                          value={jobForm.summary}
                          onChange={(e) => updateJobForm("summary", e.target.value)}
-                         className={TextareaClass("min-h-[100px]")}
+                         className={TextareaClass("min-h-[120px]")}
                        />
                     </div>
 
                     <div>
-                       <label className="mb-2 block text-xs font-bold text-gray-500 ml-1">Kopioi ilmoitusteksti (Tärkeä tekoälylle)</label>
+                       <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Kopioi ilmoitusteksti (Tärkeä tekoälylle)</label>
                        <textarea
                          placeholder="Liitä koko ilmoituksen teksti tähän. Tekoäly käyttää tätä räätälöidessään hakemustasi..."
                          value={jobForm.adText}
                          onChange={(e) => updateJobForm("adText", e.target.value)}
-                         className={TextareaClass("min-h-[220px]")}
+                         className={TextareaClass("min-h-[250px]")}
                        />
                     </div>
 
                     <button
                       type="button"
                       onClick={addJob}
-                      className="w-full rounded-2xl bg-white px-6 py-4 text-base font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-lg"
+                      className="w-full rounded-2xl bg-white px-8 py-5 text-lg font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-xl"
                     >
                       + Tallenna seurantaan
                     </button>
                   </div>
 
-                  <div className="space-y-6 pt-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <h3 className="text-2xl font-black text-white">
+                  <div className="space-y-8 pt-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                      <h3 className="text-3xl font-black text-white">
                         Omat työpaikat
                       </h3>
                       <input
                         value={jobFilter}
                         onChange={(e) => setJobFilter(e.target.value)}
                         placeholder="Suodata listaa..."
-                        className="w-full sm:max-w-xs rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-3.5 text-sm text-white outline-none transition-all focus:border-[#00BFA6]/50"
+                        className="w-full sm:max-w-md rounded-2xl border border-white/10 bg-black/50 px-6 py-4 text-base text-white outline-none transition-all focus:border-[#00BFA6]/50 focus:ring-1 focus:ring-[#00BFA6]"
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
                       <select
                         value={jobStatusFilter}
                         onChange={(e) =>
                           setJobStatusFilter(e.target.value as "all" | JobStatus)
                         }
-                        className="w-full rounded-xl border border-white/10 bg-[#0F0F0F] px-4 py-3 text-sm font-bold text-white outline-none focus:border-[#00BFA6]/50 cursor-pointer"
+                        className="w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-sm font-bold text-white outline-none focus:border-[#00BFA6] cursor-pointer transition-all"
                       >
                         <option value="all">Kaikki tilat</option>
                         <option value="saved">Tallennettu</option>
@@ -2646,7 +2251,7 @@ export default function Home() {
                             e.target.value as "all" | JobPriority
                           )
                         }
-                        className="w-full rounded-xl border border-white/10 bg-[#0F0F0F] px-4 py-3 text-sm font-bold text-white outline-none focus:border-[#00BFA6]/50 cursor-pointer"
+                        className="w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-sm font-bold text-white outline-none focus:border-[#00BFA6] cursor-pointer transition-all"
                       >
                         <option value="all">Kaikki prio</option>
                         <option value="low">Matala</option>
@@ -2666,7 +2271,7 @@ export default function Home() {
                               | "company"
                           )
                         }
-                        className="w-full rounded-xl border border-white/10 bg-[#0F0F0F] px-4 py-3 text-sm font-bold text-white outline-none focus:border-[#00BFA6]/50 cursor-pointer"
+                        className="w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-sm font-bold text-white outline-none focus:border-[#00BFA6] cursor-pointer transition-all"
                       >
                         <option value="newest">Uusimmat</option>
                         <option value="match">Match</option>
@@ -2678,10 +2283,10 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={() => setShowFavoritesOnly((prev) => !prev)}
-                        className={`w-full rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                        className={`w-full rounded-2xl px-5 py-4 text-sm font-black transition-all ${
                           showFavoritesOnly
-                            ? "bg-[#FF6F3C] text-white shadow-[0_0_15px_rgba(255,111,60,0.4)]"
-                            : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
+                            ? "bg-[#FF6F3C] text-white shadow-[0_0_20px_rgba(255,111,60,0.5)] scale-[1.02]"
+                            : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
                         }`}
                       >
                         {showFavoritesOnly ? "★ Vain suosikit" : "Näytä suosikit"}
@@ -2689,13 +2294,12 @@ export default function Home() {
                     </div>
 
                     {filteredJobs.length === 0 ? (
-                      <div className="rounded-[32px] border-2 border-dashed border-white/10 bg-[#0F0F0F] p-10 text-center text-gray-500">
-                        {jobs.length === 0
-                          ? "Sinulla ei ole vielä yhtään työpaikkaa seurannassa."
-                          : "Suodattimilla ei löytynyt tuloksia."}
+                      <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center text-gray-500">
+                        <p className="text-xl font-bold text-white mb-2">Ei tuloksia</p>
+                        <p className="text-base">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
                       </div>
                     ) : (
-                      <div className="space-y-5">
+                      <div className="space-y-6">
                         {filteredJobs.map((job) => {
                           const isActive = job.id === activeJobId;
                           const jobLetters = savedLetters.filter(
@@ -2725,42 +2329,43 @@ export default function Home() {
               )}
 
               {tab === "letter" && (
-                <div className="space-y-8">
-                  <div className="rounded-[32px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-8 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none">”</div>
-                    <h3 className="text-2xl font-black text-white mb-6">
+                <div className="space-y-10">
+                  <div className="rounded-[40px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-8 sm:p-12 relative overflow-hidden shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
+                    <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none leading-none">”</div>
+                    <h3 className="text-3xl font-black text-white mb-8">
                       Rakenna Hakemus
                     </h3>
 
                     {activeJob ? (
-                      <div className="mb-8 space-y-2 text-base text-gray-300 bg-black/40 p-6 rounded-2xl border border-white/5 relative z-10">
+                      <div className="mb-10 space-y-3 text-lg text-gray-300 bg-black/50 p-8 rounded-3xl border border-white/10 relative z-10">
                         <p className="flex flex-col sm:flex-row sm:gap-4">
-                          <span className="font-bold text-[#00BFA6] w-24">Kohde:</span>
-                          <span className="text-white font-medium text-lg">{activeJob.title}</span>
+                          <span className="font-black text-[#00BFA6] w-28 uppercase tracking-widest text-sm pt-1">Kohde:</span>
+                          <span className="text-white font-bold text-2xl">{activeJob.title}</span>
                         </p>
                         <p className="flex flex-col sm:flex-row sm:gap-4">
-                          <span className="font-bold text-[#00BFA6] w-24">Yritys:</span>
-                          <span className="text-white">{activeJob.company || "-"}</span>
+                          <span className="font-black text-[#00BFA6] w-28 uppercase tracking-widest text-sm pt-1">Yritys:</span>
+                          <span className="text-white font-medium">{activeJob.company || "-"}</span>
                         </p>
                       </div>
                     ) : (
-                      <div className="mb-8 p-6 bg-red-950/30 border border-red-900/50 rounded-2xl text-red-300">
-                        Palaa <strong>Työpaikat</strong> -välilehdelle ja valitse (klikkaa) ensin jokin työpaikka.
+                      <div className="mb-10 p-8 bg-red-950/40 border-2 border-red-900/50 rounded-3xl text-red-300 text-lg">
+                        <span className="text-3xl block mb-2">⚠️</span>
+                        Palaa <strong>Työpaikat</strong> -välilehdelle ja valitse (klikkaa) ensin jokin työpaikka listalta.
                       </div>
                     )}
 
                     <div className="relative z-10">
-                      <p className="mb-3 text-sm font-bold text-gray-400">
+                      <p className="mb-4 text-base font-bold text-gray-400">
                         Valitse sävy, jolla hakemus kirjoitetaan:
                       </p>
-                      <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         <button
                           type="button"
                           onClick={() => setLetterTone("professional")}
-                          className={`flex-1 rounded-2xl px-6 py-4 text-base font-bold transition-all ${
+                          className={`flex-1 rounded-2xl px-6 py-5 text-lg font-black transition-all ${
                             letterTone === "professional"
-                              ? "border border-[#00BFA6] bg-[#00BFA6] text-black shadow-[0_0_15px_rgba(0,191,166,0.3)]"
-                              : "border border-white/10 bg-black/50 text-white hover:bg-white/5"
+                              ? "border-2 border-[#00BFA6] bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105"
+                              : "border border-white/10 bg-black/60 text-white hover:bg-white/10"
                           }`}
                         >
                           💼 Asiallinen
@@ -2768,10 +2373,10 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => setLetterTone("warm")}
-                          className={`flex-1 rounded-2xl px-6 py-4 text-base font-bold transition-all ${
+                          className={`flex-1 rounded-2xl px-6 py-5 text-lg font-black transition-all ${
                             letterTone === "warm"
-                              ? "border border-[#00BFA6] bg-[#00BFA6] text-black shadow-[0_0_15px_rgba(0,191,166,0.3)]"
-                              : "border border-white/10 bg-black/50 text-white hover:bg-white/5"
+                              ? "border-2 border-[#00BFA6] bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105"
+                              : "border border-white/10 bg-black/60 text-white hover:bg-white/10"
                           }`}
                         >
                           🤝 Lämmin
@@ -2779,10 +2384,10 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => setLetterTone("sales")}
-                          className={`flex-1 rounded-2xl px-6 py-4 text-base font-bold transition-all ${
+                          className={`flex-1 rounded-2xl px-6 py-5 text-lg font-black transition-all ${
                             letterTone === "sales"
-                              ? "border border-[#FF6F3C] bg-[#FF6F3C] text-black shadow-[0_0_15px_rgba(255,111,60,0.3)]"
-                              : "border border-white/10 bg-black/50 text-white hover:bg-white/5"
+                              ? "border-2 border-[#FF6F3C] bg-[#FF6F3C] text-black shadow-[0_0_20px_rgba(255,111,60,0.4)] scale-105"
+                              : "border border-white/10 bg-black/60 text-white hover:bg-white/10"
                           }`}
                         >
                           🚀 Myyvä
@@ -2794,7 +2399,7 @@ export default function Home() {
                       type="button"
                       onClick={handleCoverLetterSubmit}
                       disabled={loadingLetter || !activeJob}
-                      className="mt-8 w-full rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-5 text-lg font-black text-black transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_10px_30px_-10px_rgba(0,191,166,0.4)] relative z-10"
+                      className="mt-10 w-full rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-6 text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_15px_40px_-10px_rgba(0,191,166,0.5)] relative z-10"
                     >
                       {loadingLetter
                         ? "Tekoäly kirjoittaa..."
@@ -2803,11 +2408,11 @@ export default function Home() {
                   </div>
 
                   {activeJobLetters.length > 0 && (
-                    <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-                      <h3 className="mb-4 text-lg font-bold text-white">
+                    <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-6 sm:p-8">
+                      <h3 className="mb-5 text-xl font-bold text-white">
                         Aiemmat hakemukset tähän paikkaan
                       </h3>
-                      <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                      <div className="space-y-4 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                         {activeJobLetters.map((letter) => (
                           <button
                             key={letter.id}
@@ -2816,15 +2421,15 @@ export default function Home() {
                               setLetterResult(`HAKEMUS:\n${letter.content}`);
                               setLetterDraft(letter.content);
                             }}
-                            className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_5px_15px_-5px_rgba(0,191,166,0.2)]"
+                            className="w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.3)]"
                           >
-                            <p className="font-bold text-[#00BFA6] truncate">
+                            <p className="font-bold text-lg text-[#00BFA6] truncate">
                               {letter.jobTitle}
                             </p>
-                            <p className="text-sm font-medium text-white truncate">
+                            <p className="text-base font-medium text-white truncate mt-1">
                               {letter.companyName}
                             </p>
-                            <p className="mt-1 text-xs text-gray-500">
+                            <p className="mt-2 text-sm text-gray-500">
                               Luotu: {new Date(letter.createdAt).toLocaleString("fi-FI")}
                             </p>
                           </button>
@@ -2835,15 +2440,15 @@ export default function Home() {
 
                   {letterResult ? (
                     <>
-                      <div className="rounded-[32px] border border-[#00BFA6]/30 bg-[#0F0F0F] p-6 sm:p-8 shadow-[0_10px_40px_rgba(0,191,166,0.1)]">
-                        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                          <h2 className="text-2xl font-black text-white">
+                      <div className="rounded-[40px] border border-[#00BFA6]/40 bg-[#0F0F0F] p-8 sm:p-12 shadow-[0_15px_50px_rgba(0,191,166,0.15)]">
+                        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 border-b border-white/10 pb-6">
+                          <h2 className="text-3xl font-black text-white">
                             Valmis hakemus
                           </h2>
                           <button
                             type="button"
                             onClick={saveEditedLetter}
-                            className="w-full sm:w-auto rounded-xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-5 py-2.5 text-sm font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6] hover:text-black"
+                            className="w-full sm:w-auto rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-3.5 text-base font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6] hover:text-black"
                           >
                             Tallenna omat muokkaukset
                           </button>
@@ -2852,7 +2457,7 @@ export default function Home() {
                         <textarea
                           value={letterDraft}
                           onChange={(e) => setLetterDraft(e.target.value)}
-                          className="min-h-[450px] w-full rounded-2xl border-none bg-transparent p-2 font-sans text-base leading-relaxed text-gray-200 outline-none resize-y"
+                          className="min-h-[500px] w-full rounded-3xl border-none bg-transparent p-2 font-sans text-lg leading-relaxed text-gray-200 outline-none resize-y"
                         />
                       </div>
 
@@ -2864,28 +2469,29 @@ export default function Home() {
                             "Hakemus kopioitu leikepöydälle!"
                           )
                         }
-                        className="w-full rounded-2xl border border-white/20 bg-white px-8 py-5 text-lg font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-xl"
+                        className="w-full rounded-2xl border border-white/20 bg-white px-8 py-6 text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl"
                       >
                         Kopioi hakemus leikepöydälle 📋
                       </button>
                     </>
                   ) : (
-                    <div className="rounded-[32px] border-2 border-dashed border-white/10 bg-[#0F0F0F] p-10 sm:p-16 text-center font-medium text-gray-500">
-                      <div className="text-4xl mb-4">✍️</div>
-                      <p>Hakemuksen teksti ilmestyy tähän.</p>
+                    <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center font-medium text-gray-500">
+                      <div className="text-5xl mb-6">✍️</div>
+                      <p className="text-xl font-bold text-white mb-2">Hakemus puuttuu</p>
+                      <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            {/* Ponnahdusilmoitukset (Alerts) */}
+            {/* Ponnahdusilmoitukset (Alerts) - Isompi ja selkeämpi fontti */}
             {(message || errorMessage) && (
               <div
-                className={`fixed bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[24px] border p-6 text-base font-bold shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all animate-in slide-in-from-bottom-5 ${
+                className={`fixed bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[28px] border-2 p-8 text-lg font-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all animate-in slide-in-from-bottom-5 ${
                   errorMessage
-                    ? "border-red-900/50 bg-red-950/90 text-red-300 backdrop-blur-xl"
-                    : "border-[#00BFA6]/50 bg-[#00BFA6]/90 text-black backdrop-blur-xl"
+                    ? "border-red-900 bg-red-950/95 text-red-300 backdrop-blur-xl"
+                    : "border-[#00BFA6] bg-[#00BFA6]/95 text-black backdrop-blur-xl"
                 }`}
               >
                 {errorMessage || message}
