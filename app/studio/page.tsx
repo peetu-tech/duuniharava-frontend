@@ -580,7 +580,6 @@ export default function Home() {
       const userId = session.user.id;
 
       try {
-        // Lataa profiili
         const pRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers });
         const pData = await pRes.json();
         if (pData && pData.length > 0) {
@@ -602,11 +601,10 @@ export default function Home() {
           if (p.profile_image_url) setProfileImage(p.profile_image_url);
         }
 
-        // Lataa työpaikat
         const jRes = await fetch(`${supabaseUrl}/rest/v1/jobs?user_id=eq.${userId}&order=created_at.desc`, { headers });
         const jData = await jRes.json();
         if (jData && Array.isArray(jData)) {
-          setJobs(jData.map((j: any) => ({
+          setJobs(jData.map((j: any) => normalizeJob({
             id: j.id,
             title: j.title,
             company: j.company,
@@ -632,7 +630,6 @@ export default function Home() {
           })));
         }
 
-        // Lataa hakemukset
         const lRes = await fetch(`${supabaseUrl}/rest/v1/saved_letters?user_id=eq.${userId}&order=created_at.desc`, { headers });
         const lData = await lRes.json();
         if (lData && Array.isArray(lData)) {
@@ -646,7 +643,6 @@ export default function Home() {
           })));
         }
 
-        // Lataa CV:t
         const cRes = await fetch(`${supabaseUrl}/rest/v1/cv_variants?user_id=eq.${userId}&order=created_at.desc`, { headers });
         const cData = await cRes.json();
         if (cData && Array.isArray(cData)) {
@@ -696,11 +692,10 @@ export default function Home() {
       } catch (e) {
         console.error("Profiilin tallennus epäonnistui", e);
       }
-    }, 2000); // Tallentaa 2 sekunnin kuluttua kirjoittamisen lopettamisesta
+    }, 2000);
 
     return () => clearTimeout(timeout);
   }, [form, profileImage, isAuthChecking, hasSession]);
-
 
   const parsedCv = useMemo(() => parseCvResult(cvResult), [cvResult]);
   const parsedLetter = useMemo(() => parseCoverLetter(letterResult), [letterResult]);
@@ -758,31 +753,29 @@ export default function Home() {
   function updateSearchProfile(key: keyof typeof emptySearchProfile, value: string) { setSearchProfile((prev) => ({ ...prev, [key]: value })); }
   function updateJobForm(key: keyof typeof emptyJobForm, value: string) { setJobForm((prev) => ({ ...prev, [key]: value })); }
 
-  // SUPABASE: Päivitä työpaikka
   function updateJob(id: string, patch: Partial<JobItem>) {
     setJobs((prev) => prev.map((job) => job.id === id ? normalizeJob({ ...job, ...patch }) : job));
-    
     const session = getSession();
-    if (!session) return;
-    
-    const dbPatch: any = {};
-    if (patch.title !== undefined) dbPatch.title = patch.title;
-    if (patch.company !== undefined) dbPatch.company = patch.company;
-    if (patch.location !== undefined) dbPatch.location = patch.location;
-    if (patch.type !== undefined) dbPatch.type = patch.type;
-    if (patch.status !== undefined) dbPatch.status = patch.status;
-    if (patch.priority !== undefined) dbPatch.priority = patch.priority;
-    if (patch.favorite !== undefined) dbPatch.favorite = patch.favorite;
-    if (patch.salary !== undefined) dbPatch.salary = patch.salary;
-    if (patch.deadline !== undefined) dbPatch.deadline = patch.deadline || null;
-    if (patch.appliedAt !== undefined) dbPatch.applied_at = patch.appliedAt || null;
-    if (patch.notes !== undefined) dbPatch.notes = patch.notes;
-    
-    fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, {
-      method: "PATCH",
-      headers: getSupabaseHeaders(),
-      body: JSON.stringify(dbPatch)
-    });
+    if (session) {
+      const dbPatch: any = {};
+      if (patch.title !== undefined) dbPatch.title = patch.title;
+      if (patch.company !== undefined) dbPatch.company = patch.company;
+      if (patch.location !== undefined) dbPatch.location = patch.location;
+      if (patch.type !== undefined) dbPatch.type = patch.type;
+      if (patch.status !== undefined) dbPatch.status = patch.status;
+      if (patch.priority !== undefined) dbPatch.priority = patch.priority;
+      if (patch.favorite !== undefined) dbPatch.favorite = patch.favorite;
+      if (patch.salary !== undefined) dbPatch.salary = patch.salary;
+      if (patch.deadline !== undefined) dbPatch.deadline = patch.deadline || null;
+      if (patch.appliedAt !== undefined) dbPatch.applied_at = patch.appliedAt || null;
+      if (patch.notes !== undefined) dbPatch.notes = patch.notes;
+
+      fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, {
+        method: "PATCH",
+        headers: getSupabaseHeaders(),
+        body: JSON.stringify(dbPatch)
+      });
+    }
   }
 
   function updateCustomStyle<K extends keyof CvCustomStyle>(key: K, value: CvCustomStyle[K]) {
@@ -828,21 +821,16 @@ export default function Home() {
     if (type === "sales") {
       updateField("targetJob", "Myyjä");
       updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
-      setMessage("Tavoitetta suunnattu myyntityöhön.");
     }
     if (type === "warehouse") {
       updateField("targetJob", "Varastotyöntekijä");
       updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
-      setMessage("Tavoitetta suunnattu varastotyöhön.");
     }
     if (type === "shorter") {
       const shorten = (text: string) => text.split(/[.!?\n]+/).map((s) => s.trim()).filter(Boolean).slice(0, 2).join(". ");
-      setForm((prev) => ({
-        ...prev, education: shorten(prev.education), experience: shorten(prev.experience),
-        skills: shorten(prev.skills), cards: shorten(prev.cards), hobbies: shorten(prev.hobbies),
-      }));
-      setMessage("Kenttiä tiivistetty.");
+      setForm((prev) => ({ ...prev, education: shorten(prev.education), experience: shorten(prev.experience), skills: shorten(prev.skills), cards: shorten(prev.cards), hobbies: shorten(prev.hobbies) }));
     }
+    setMessage("Kentät päivitetty.");
     setTimeout(() => setMessage(""), 2500);
   }
 
@@ -865,26 +853,11 @@ export default function Home() {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
       const imgWidth = 210;
-      const pageHeight = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      while (heightLeft > 0) {
-        position -= pageHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-      pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      pdf.save("duuniharava-cv.pdf");
       setMessage("PDF ladattu.");
-      setTimeout(() => setMessage(""), 2500);
-    } catch (error) {
-      setErrorMessage("PDF:n luonti epäonnistui.");
-    } finally {
-      setDownloadingPdf(false);
-    }
+    } catch (e) { setErrorMessage("Virhe PDF-luonnissa."); } finally { setDownloadingPdf(false); }
   }
 
   async function downloadDocx() {
@@ -913,7 +886,6 @@ export default function Home() {
       const blob = await Packer.toBlob(doc);
       saveAs(blob, "duuniharava-cv.docx");
       setMessage("DOCX ladattu.");
-      setTimeout(() => setMessage(""), 2500);
     } catch (error) {
       setErrorMessage("DOCX:n luonti epäonnistui.");
     } finally {
@@ -953,7 +925,18 @@ export default function Home() {
     return true;
   }
 
-  // SUPABASE: Lisää työpaikka
+  function validateLetterForm() {
+    if (!form.targetJob.trim()) {
+      setErrorMessage("Lisää tavoiteltu työ ennen hakemuksen generointia.");
+      return false;
+    }
+    if (!activeJob) {
+      setErrorMessage("Valitse työpaikka ennen hakemuksen generointia.");
+      return false;
+    }
+    return true;
+  }
+
   function addJob() {
     if (!validateJobForm()) return;
     const job = normalizeJob({
@@ -991,7 +974,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Poista työpaikka
   function removeJob(id: string) {
     const filtered = jobs.filter((job) => job.id !== id);
     setJobs(filtered);
@@ -1008,10 +990,7 @@ export default function Home() {
   async function suggestJobs() {
     setLoadingJobs(true);
     try {
-      const res = await fetch("/api/jobs", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...searchProfile, targetJob: form.targetJob, experience: form.experience, skills: form.skills, languages: form.languages, onlyActive: true }),
-      });
+      const res = await fetch("/api/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...searchProfile, targetJob: form.targetJob, experience: form.experience, skills: form.skills, languages: form.languages, onlyActive: true }) });
       const data = await res.json();
       const parsed = safeJsonParseJobs(data.output || "[]");
       if (!parsed.length) { setErrorMessage("Työpaikkaehdotuksia ei saatu muodostettua."); return; }
@@ -1023,7 +1002,6 @@ export default function Home() {
       setTab("job");
       setMessage("Työpaikkaehdotukset lisätty.");
       
-      // Tallenna kaikki kerralla tietokantaan
       const session = getSession();
       if(session) {
         newJobs.forEach(job => {
@@ -1043,7 +1021,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna räätälöity CV
   async function createTailoredCv() {
     if (!activeJob) { setErrorMessage("Valitse työpaikka ennen kohdistetun CV:n luontia."); return; }
     if (!parsedCv.cvBody) { setErrorMessage("Generoi ensin normaali CV."); return; }
@@ -1097,7 +1074,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna generoitu hakemus
   async function handleCoverLetterSubmit() {
     if (!validateLetterForm() || !activeJob) return;
     setLoadingLetter(true);
@@ -1133,7 +1109,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna oma muokattu hakemus
   function saveEditedLetter() {
     if (!activeJob || !letterDraft.trim()) return;
     const savedLetter: SavedLetter = { id: makeId(), jobId: activeJob.id, jobTitle: activeJob.title, companyName: activeJob.company, content: letterDraft.trim(), createdAt: new Date().toISOString() };
@@ -1151,1355 +1126,242 @@ export default function Home() {
     }
   }
 
-  const customStyle = customStyles[cvStyle];
-
-  if (isAuthChecking) {
-    return (
-      <main className="grid min-h-screen place-items-center bg-[#0F0F0F] text-white">
-        <p className="text-gray-400 font-bold text-xl animate-pulse">Ladataan studiota...</p>
-      </main>
-    );
-  }
+  if (isAuthChecking) return <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center text-[#00BFA6] font-black text-2xl animate-pulse">LADATAAN...</div>;
 
   return (
-    <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-24">
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
-        
-        <div className="relative mx-auto max-w-7xl px-6 sm:px-8 py-10 md:py-14 lg:py-16 xl:px-12">
-          
-          <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-12">
-            <div className="mb-2 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.24em] text-[#00BFA6] backdrop-blur-sm">
-              Studio · Hakuprofiili · Työpaikat · Hakemukset
+    <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32">
+      <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-zinc-900/50 to-transparent">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.1),transparent_40%)]" />
+        <div className="relative mx-auto max-w-7xl px-8 py-14 md:py-20 lg:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16">
+            <div className="flex items-center gap-4">
+              <span className="font-black text-3xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
+              <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest">Studio</div>
             </div>
-            <button
-              onClick={() => {
-                clearSession();
-                router.push("/login");
-              }}
-              className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-bold text-gray-400 transition-all hover:bg-white/5 hover:text-white whitespace-nowrap"
-            >
-              Kirjaudu ulos
-            </button>
+            <button onClick={() => { clearSession(); router.push("/login"); }} className="rounded-2xl border border-white/10 px-8 py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all">KIRJAUDU ULOS</button>
           </div>
-
-          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div className="grid gap-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
-              <h1 className="max-w-4xl text-4xl sm:text-5xl font-black tracking-tight text-white lg:text-6xl lg:leading-[1.1]">
-                Kaikki työnhakuun <span className="text-[#00BFA6]">yhdestä paikasta.</span>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-8">
+                Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
               </h1>
-
-              <p className="mt-8 max-w-2xl text-lg leading-relaxed text-gray-400">
-                Tekoäly tekee työt: Se luo sinulle loistavan CV:n, etsii avoimet työpaikat ja laatii hakemukset valmiiksi.
+              <p className="text-xl text-gray-400 max-w-xl leading-relaxed mb-12">
+                Luo upea CV, löydä avoimet työpaikat ja anna tekoälyn kirjoittaa hakemukset puolestasi.
               </p>
-
-              <div className="mt-12 flex flex-wrap gap-4">
-                <button
-                  type="button"
-                  onClick={fillExample}
-                  className="rounded-2xl bg-white px-8 py-4 text-sm font-black text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex-1 sm:flex-none text-center whitespace-nowrap"
-                >
+              <div className="flex flex-col sm:flex-row gap-5">
+                <button onClick={() => setShowHelp(!showHelp)} className="bg-[#00BFA6]/10 border border-[#00BFA6]/40 text-[#00BFA6] px-10 py-5 rounded-[24px] text-lg font-black hover:bg-[#00BFA6]/20 transition-all shadow-xl flex items-center justify-center gap-3">
+                  <span className="text-2xl">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
+                </button>
+                <button onClick={fillExample} className="bg-white text-black px-10 py-5 rounded-[24px] text-lg font-black hover:bg-gray-200 transition-all shadow-xl">
                   Täytä esimerkki
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => applyQuickTarget("sales")}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
-                >
-                  Myyntityö
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => applyQuickTarget("warehouse")}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
-                >
-                  Varastotyö
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => applyQuickTarget("shorter")}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none text-center whitespace-nowrap"
-                >
-                  Tee tiiviimpi
                 </button>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-6 w-full">
-              <StatCard
-                title="CV"
-                value="Muokattava"
-                description="Säädä värejä, fonttikokoja, kulmia ja rakennetta."
-              />
-              <StatCard
-                title="Hakemukset"
-                value="3 sävyä"
-                description="Asiallinen, lämmin tai myyvä työpaikan mukaan."
-              />
-              <StatCard
-                title="Työpaikat"
-                value="Seuranta"
-                description="Status, deadline, muistiinpanot ja prioriteetti."
-              />
+            <div className="grid gap-6">
+              <StatCard title="TYÖPAIKAT" value={jobs.length.toString()} description="Seurannassa olevat paikat" />
+              <div className="grid grid-cols-2 gap-6">
+                <StatCard title="CV-TYYLIT" value="4" description="Valmista pohjaa" />
+                <StatCard title="SÄVYT" value="3" description="Hakemuksiin" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-6 sm:px-8 py-12 md:py-16 xl:px-12">
-        
-        {/* SELKEÄ OHJEMODAALI VANHUKSILLE YMS. */}
-        <div className="mb-12 flex justify-center sm:justify-start">
-          <button 
-            onClick={() => setShowHelp(!showHelp)}
-            className="flex items-center gap-4 rounded-[24px] bg-[#00BFA6]/10 border border-[#00BFA6]/40 px-8 py-4 text-base font-black text-[#00BFA6] transition-all hover:bg-[#00BFA6]/20 hover:scale-[1.02] shadow-[0_0_20px_rgba(0,191,166,0.15)]"
-          >
-            <span className="text-2xl">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
-          </button>
-        </div>
-
-        {showHelp && (
-          <div className="mb-16 rounded-[40px] border-2 border-[#00BFA6]/40 bg-[#141414] p-8 sm:p-14 shadow-[0_20px_60px_rgba(0,191,166,0.15)] animate-in fade-in slide-in-from-top-4">
-            <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
-              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
-              <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-white font-bold p-2 text-xl transition">✕ Sulje</button>
-            </div>
-            
-            <div className="space-y-10 text-gray-300 text-lg leading-relaxed">
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">1</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Täytä omat tietosi</strong>
-                  Aloita alempaa laatikosta nimeltä "Vaihe 1: Hakijan tiedot". Kirjoita nimesi, työkokemuksesi ja koulutuksesi. Voit myös vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoäly lukee sen puolestasi.
-                </div>
+      {showHelp && (
+        <section className="max-w-7xl mx-auto px-8 mt-12 animate-in fade-in slide-in-from-top-6">
+          <div className="rounded-[40px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-10 sm:p-16 shadow-2xl backdrop-blur-xl">
+            <h2 className="text-3xl font-black mb-10 border-b border-white/5 pb-6">Näin käytät ohjelmaa:</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 text-lg">
+              <div className="space-y-4">
+                <div className="w-14 h-14 rounded-full bg-[#00BFA6] text-black flex items-center justify-center font-black text-2xl">1</div>
+                <p className="font-bold text-white text-xl">Kirjoita tiedot</p>
+                <p className="text-gray-400">Täytä nimesi ja kokemuksesi vasemman puolen "Vaihe 1" -laatikkoon. Voit myös ladata vanhan PDF-CV:n.</p>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">2</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Paina "Generoi CV"</strong>
-                  Rullaa Vaihe 1 -laatikon loppuun ja paina vihreää nappia. Tekoäly muotoilee sinulle uuden, hienon CV:n. Näet esikatselun sivun oikeassa laidassa (tai mobiilissa alhaalla). Voit ladata sen suoraan koneellesi PDF-napista.
-                </div>
+              <div className="space-y-4">
+                <div className="w-14 h-14 rounded-full bg-[#00BFA6] text-black flex items-center justify-center font-black text-2xl">2</div>
+                <p className="font-bold text-white text-xl">Luo uusi CV</p>
+                <p className="text-gray-400">Paina vihreää "Generoi CV" -nappia. Tekoäly tekee sinulle hienon tekstin, jonka näet oikealla "Esikatselu"-välilehdellä.</p>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">3</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Etsi työpaikkoja</strong>
-                  Siirry "Vaihe 2: Hakuprofiili" -laatikkoon. Kerro siellä, millaista työtä etsit (esim. "Myyjä, Uusimaa"). Paina "Ehdota työpaikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia, voimassa olevia avoimia tehtäviä ja tuo ne näkyviin.
-                </div>
+              <div className="space-y-4">
+                <div className="w-14 h-14 rounded-full bg-[#FF6F3C] text-black flex items-center justify-center font-black text-2xl">3</div>
+                <p className="font-bold text-white text-xl">Etsi töitä</p>
+                <p className="text-gray-400">Kerro "Vaihe 2" -kohdassa mitä työtä etsit ja paina nappia. Saat listan aidoista avoimista paikoista.</p>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">4</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Tee hakemus napin painalluksella</strong>
-                  Sivun oikeassa reunassa (tai mobiilissa alempana) on välilehdet: "CV", "Työpaikat" ja "Hakemukset". Valitse listalta kiinnostava työpaikka ja pyydä tekoälyä kirjoittamaan siihen valmis, räätälöity työhakemus yhdellä klikkauksella.
-                </div>
+              <div className="space-y-4">
+                <div className="w-14 h-14 rounded-full bg-[#FF6F3C] text-black flex items-center justify-center font-black text-2xl">4</div>
+                <p className="font-bold text-white text-xl">Tee hakemus</p>
+                <p className="text-gray-400">Valitse paikka listalta, mene "Hakemukset"-välilehdelle ja paina "Kirjoita hakemus". Valmista tuli!</p>
               </div>
-            </div>
-
-            <div className="mt-12 pt-10 border-t border-white/10 text-center sm:text-left">
-              <button onClick={() => setShowHelp(false)} className="rounded-2xl bg-white px-10 py-5 text-lg font-black text-black transition-all hover:bg-gray-200 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.2)] w-full sm:w-auto">
-                Selvä, ymmärsin! Aloitetaan!
-              </button>
             </div>
           </div>
-        )}
+        </section>
+      )}
 
-        <div className="mb-10 flex flex-wrap items-center gap-5">
-          <button
-            type="button"
-            onClick={() => setMode("improve")}
-            className={`rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${
-              mode === "improve"
-                ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
-                : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-            }`}
-          >
-            Paranna CV
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMode("create")}
-            className={`rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${
-              mode === "create"
-                ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
-                : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-            }`}
-          >
-            Luo uusi CV
-          </button>
-
-          <div className="ml-auto hidden text-base font-medium text-gray-500 lg:block">
-            Pilvitallennus aktiivinen (Supabase) ☁️
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1fr]">
-          
-          <section className="space-y-10">
-            <SectionShell
-              step="Vaihe 1"
-              title="Hakijan tiedot"
-              description="Täytä tietosi huolellisesti tai lataa vanha CV:si. Näitä käytetään pohjana kaikessa tekoälyn tekemässä työssä."
-              action={
-                <button
-                  type="button"
-                  onClick={clearForm}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-gray-300 transition-all hover:bg-white/10 hover:border-red-500/50"
-                >
-                  Tyhjennä
-                </button>
-              }
-            >
-              <form onSubmit={handleCvSubmit} className="space-y-8 mt-6">
-                {mode === "improve" && (
-                  <div>
-                    <label className="mb-4 block text-sm font-bold text-gray-400">
-                      Nykyinen CV (PDF)
-                    </label>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-                      <label className="cursor-pointer rounded-2xl bg-white/[0.03] border border-white/10 px-8 py-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-[#00BFA6]/50 flex-1 sm:flex-none">
-                        <span className="text-base font-bold text-white">
-                          Lataa laitteelta PDF-tiedosto
-                        </span>
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          className="hidden"
-                          onChange={handleCvFileUpload}
-                        />
-                      </label>
-                      {form.cvFileName && (
-                        <span className="text-base font-medium text-[#00BFA6] break-words px-2">
-                          ✓ {form.cvFileName} valittu
-                        </span>
-                      )}
+      <div className="mx-auto max-w-7xl px-8 py-16 md:py-20 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12">
+          <div className="space-y-12">
+            <SectionShell step="VAIHE 1" title="Hakijan tiedot" description="Täytä tietosi tai lataa olemassa oleva CV." action={<button onClick={clearForm} className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-gray-300 hover:bg-white/10 hover:border-red-500/50">Tyhjennä</button>}>
+               <form onSubmit={handleCvSubmit} className="space-y-8 mt-4">
+                  {mode === "improve" && (
+                    <div className="mb-10 p-10 bg-black/40 rounded-3xl border border-white/5">
+                      <label className="mb-4 block text-sm font-bold text-gray-500 uppercase tracking-widest">Vanha CV (PDF)</label>
+                      <div className="flex flex-col sm:flex-row items-center gap-6">
+                        <label className="cursor-pointer rounded-2xl bg-white/[0.05] border border-white/10 px-8 py-5 text-center transition-all hover:bg-white/10 hover:border-[#00BFA6]/50 flex-1">
+                          <span className="font-bold text-white">VALITSE PDF-TIEDOSTO</span>
+                          <input type="file" accept="application/pdf" className="hidden" onChange={handleCvFileUpload} />
+                        </label>
+                        {form.cvFileName && <span className="text-[#00BFA6] font-bold">✓ {form.cvFileName}</span>}
+                      </div>
                     </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <input className={InputClass()} placeholder="Koko nimi" value={form.name} onChange={e => updateField("name", e.target.value)} />
+                    <input className={InputClass()} placeholder="Puhelinnumero" value={form.phone} onChange={e => updateField("phone", e.target.value)} />
+                    <input className={InputClass()} placeholder="Sähköpostiosoite" value={form.email} onChange={e => updateField("email", e.target.value)} />
+                    <input className={InputClass()} placeholder="Paikkakunta" value={form.location} onChange={e => updateField("location", e.target.value)} />
+                  </div>
+
+                  <input className={InputClass()} placeholder="Mitä työtä haet? (esim. Myyjä)" value={form.targetJob} onChange={e => updateField("targetJob", e.target.value)} />
+                  <textarea className={TextareaClass("min-h-[120px]")} placeholder="Koulutuksesi..." value={form.education} onChange={e => updateField("education", e.target.value)} />
+                  <textarea className={TextareaClass("min-h-[180px]")} placeholder="Työkokemuksesi lyhyesti..." value={form.experience} onChange={e => updateField("experience", e.target.value)} />
+                  <textarea className={TextareaClass("min-h-[120px]")} placeholder="Tärkeimmät taitosi..." value={form.skills} onChange={e => updateField("skills", e.target.value)} />
+
+                  <div className="py-6">
+                    <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
+                  </div>
+
+                  <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 mt-4">
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-white/5 pb-4">
+                      <div>
+                        <p className="text-lg font-black text-white">Ulkoasun säädöt</p>
+                        <p className="text-sm text-gray-500">Hienosäädä dokumentin ulkoasua.</p>
+                      </div>
+                      <button type="button" onClick={resetCurrentStyle} className="rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-white hover:bg-white/10">Palauta</button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map(v => (
+                        <button key={v} type="button" onClick={() => setCvStyle(v)} className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${cvStyle === v ? "bg-[#00BFA6] text-black shadow-md" : "bg-white/5 text-white hover:bg-white/10"}`}>
+                          {v.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><label className="text-xs text-gray-400">Palkin väri</label><input type="color" value={customStyle.sidebarBg} onChange={e => updateCustomStyle("sidebarBg", e.target.value)} className="h-10 w-full rounded-xl bg-black/50 p-1" /></div>
+                      <div><label className="text-xs text-gray-400">Palkin teksti</label><input type="color" value={customStyle.sidebarText} onChange={e => updateCustomStyle("sidebarText", e.target.value)} className="h-10 w-full rounded-xl bg-black/50 p-1" /></div>
+                      <div><label className="text-xs text-gray-400">Tausta</label><input type="color" value={customStyle.mainBg} onChange={e => updateCustomStyle("mainBg", e.target.value)} className="h-10 w-full rounded-xl bg-black/50 p-1" /></div>
+                      <div><label className="text-xs text-gray-400">Pääteksti</label><input type="color" value={customStyle.mainText} onChange={e => updateCustomStyle("mainText", e.target.value)} className="h-10 w-full rounded-xl bg-black/50 p-1" /></div>
+                      <div className="col-span-2"><label className="text-xs text-gray-400">Korosteväri</label><input type="color" value={customStyle.accentColor} onChange={e => updateCustomStyle("accentColor", e.target.value)} className="h-10 w-full rounded-xl bg-black/50 p-1" /></div>
+                    </div>
+                  </div>
+
+                  <button type="submit" disabled={loadingCv} className="w-full bg-[#00BFA6] text-black font-black py-6 rounded-[24px] text-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)] mt-4">
+                    {loadingCv ? "LUODAAN..." : "1. GENEROI CV TEKOÄLYLLÄ"}
+                  </button>
+               </form>
+            </SectionShell>
+
+            <SectionShell step="VAIHE 2" title="Hakuprofiili" description="Kerro tekoälylle mitä etsit.">
+               <div className="space-y-6 mt-4">
+                  <textarea className={TextareaClass("min-h-[140px]")} placeholder="Esim. Myynti, Asiakaspalvelu, Helsinki..." value={searchProfile.desiredRoles} onChange={e => updateSearchProfile("desiredRoles", e.target.value)} />
+                  <button onClick={suggestJobs} disabled={loadingJobs} className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-6 rounded-[24px] text-xl hover:scale-[1.02] transition-all shadow-xl">
+                    {loadingJobs ? "ETSITÄÄN..." : "2. EHDOTA TYÖPAIKKOJA"}
+                  </button>
+               </div>
+            </SectionShell>
+          </div>
+
+          <div className="space-y-12 lg:sticky lg:top-32 self-start">
+             <div className="rounded-[40px] border border-white/10 bg-[#141414] p-8 sm:p-12 shadow-2xl backdrop-blur-xl min-h-[850px]">
+                
+                <div className="flex overflow-x-auto gap-5 border-b border-white/5 pb-8 mb-12 custom-scrollbar">
+                   <button onClick={() => setTab("cv")} className={`px-10 py-5 rounded-2xl font-black text-lg transition-all ${tab === "cv" ? "bg-[#00BFA6] text-black shadow-lg" : "bg-white/5 text-gray-500 hover:text-white"}`}>ESIKATSELU</button>
+                   <button onClick={() => setTab("job")} className={`px-10 py-5 rounded-2xl font-black text-lg transition-all ${tab === "job" ? "bg-[#00BFA6] text-black shadow-lg" : "bg-white/5 text-gray-500 hover:text-white"}`}>TYÖPAIKAT</button>
+                   <button onClick={() => setTab("letter")} className={`px-10 py-5 rounded-2xl font-black text-lg transition-all ${tab === "letter" ? "bg-[#00BFA6] text-black shadow-lg" : "bg-white/5 text-gray-500 hover:text-white"}`}>HAKEMUKSET</button>
+                </div>
+
+                {tab === "cv" && (
+                  <div className="animate-in fade-in duration-500">
+                    {cvResult ? (
+                      <div className="space-y-10">
+                        <div className="bg-white rounded-[32px] p-8 sm:p-12 shadow-inner overflow-hidden">
+                           <div className="min-w-[600px] lg:min-w-0">
+                              <CvPreview cvText={parsedCv.cvBody} image={profileImage} styleVariant={cvStyle} customStyle={customStyles[cvStyle]} />
+                           </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-5">
+                            <button onClick={downloadPdf} className="flex-1 bg-black text-white py-5 rounded-2xl font-black text-lg hover:bg-zinc-800 transition-all">LATAA PDF</button>
+                            <button onClick={downloadDocx} className="flex-1 border-2 border-zinc-800 text-zinc-400 py-5 rounded-2xl font-black text-lg hover:border-white hover:text-white transition-all">LATAA DOCX</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-40 border-2 border-dashed border-white/5 rounded-[40px] text-gray-600">
+                         <p className="text-6xl mb-8">✍️</p>
+                         <p className="font-black text-2xl text-white">Ei esikatselua vielä</p>
+                         <p className="mt-4 text-lg">Paina "Generoi CV" vasemmalta.</p>
+                      </div>
+                    )}
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-2">
-                  <div>
-                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Koko nimi</label>
-                     <input
-                       placeholder="Esim. Matti Meikäläinen"
-                       value={form.name}
-                       onChange={(e) => updateField("name", e.target.value)}
-                       className={InputClass()}
-                     />
-                  </div>
-                  <div>
-                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Puhelin</label>
-                     <input
-                       placeholder="040 123 4567"
-                       value={form.phone}
-                       onChange={(e) => updateField("phone", e.target.value)}
-                       className={InputClass()}
-                     />
-                  </div>
-                  <div>
-                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Sähköposti</label>
-                     <input
-                       placeholder="oma@email.com"
-                       value={form.email}
-                       onChange={(e) => updateField("email", e.target.value)}
-                       className={InputClass()}
-                     />
-                  </div>
-                  <div>
-                     <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Paikkakunta</label>
-                     <input
-                       placeholder="Esim. Helsinki"
-                       value={form.location}
-                       onChange={(e) => updateField("location", e.target.value)}
-                       className={InputClass()}
-                     />
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Tavoiteltu rooli / ammatti</label>
-                  <input
-                    placeholder="Mitä työtä haluat hakea? (esim. Myyjä, Koodari)"
-                    value={form.targetJob}
-                    onChange={(e) => updateField("targetJob", e.target.value)}
-                    className={InputClass()}
-                  />
-                </div>
-
-                <div className="pt-4">
-                  <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Koulutus</label>
-                  <textarea
-                    placeholder="Kirjaa tänne oppilaitokset ja tutkinnot..."
-                    value={form.education}
-                    onChange={(e) => updateField("education", e.target.value)}
-                    className={TextareaClass("min-h-[140px]")}
-                  />
-                </div>
-
-                <div className="pt-4">
-                  <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Työkokemus</label>
-                  <textarea
-                    placeholder="Missä olet ollut töissä ja mitä teit?"
-                    value={form.experience}
-                    onChange={(e) => updateField("experience", e.target.value)}
-                    className={TextareaClass("min-h-[180px]")}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Kielitaito</label>
-                    <textarea
-                      placeholder="Suomi (äidinkieli), Englanti (sujuva)..."
-                      value={form.languages}
-                      onChange={(e) => updateField("languages", e.target.value)}
-                      className={TextareaClass("min-h-[140px]")}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Osaaminen & Taidot</label>
-                    <textarea
-                      placeholder="Mitä taitoja sinulla on? (esim. asiakaspalvelu)"
-                      value={form.skills}
-                      onChange={(e) => updateField("skills", e.target.value)}
-                      className={TextareaClass("min-h-[140px]")}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Kortit & Pätevyydet</label>
-                    <textarea
-                      placeholder="Työturvallisuuskortti, B-ajokortti..."
-                      value={form.cards}
-                      onChange={(e) => updateField("cards", e.target.value)}
-                      className={TextareaClass("min-h-[120px]")}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Harrastukset</label>
-                    <textarea
-                      placeholder="Mitä teet vapaa-ajalla?"
-                      value={form.hobbies}
-                      onChange={(e) => updateField("hobbies", e.target.value)}
-                      className={TextareaClass("min-h-[120px]")}
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
-                </div>
-
-                <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 md:p-10 mt-8">
-                  <div className="flex flex-wrap items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
-                    <div>
-                      <p className="text-xl font-black text-white tracking-tight">Ulkoasun säädöt (CV)</p>
-                      <p className="mt-2 text-base text-gray-400">
-                        Hienosäädä dokumenttia ennen latausta.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={resetCurrentStyle}
-                      className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50"
-                    >
-                      Palauta oletukset
-                    </button>
-                  </div>
-
-                  <div className="mt-8 flex flex-wrap gap-4">
-                    {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map(
-                      (variant) => (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={() => setCvStyle(variant)}
-                          className={`rounded-2xl px-6 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${
-                            cvStyle === variant
-                              ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105"
-                              : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-                          }`}
-                        >
-                          {variant === "modern" && "Moderni"}
-                          {variant === "classic" && "Klassinen"}
-                          {variant === "compact" && "Tiivis"}
-                          {variant === "bold" && "Näyttävä"}
-                        </button>
-                      )
-                    )}
-                  </div>
-
-                  <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Sivupalkin väri
-                      </label>
-                      <input
-                        type="color"
-                        value={customStyle.sidebarBg}
-                        onChange={(e) =>
-                          updateCustomStyle("sidebarBg", e.target.value)
-                        }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Sivupalkin tekstiväri
-                      </label>
-                      <input
-                        type="color"
-                        value={customStyle.sidebarText}
-                        onChange={(e) =>
-                          updateCustomStyle("sidebarText", e.target.value)
-                        }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Pääalueen tausta
-                      </label>
-                      <input
-                        type="color"
-                        value={customStyle.mainBg}
-                        onChange={(e) =>
-                          updateCustomStyle("mainBg", e.target.value)
-                        }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Tekstin väri
-                      </label>
-                      <input
-                        type="color"
-                        value={customStyle.mainText}
-                        onChange={(e) =>
-                          updateCustomStyle("mainText", e.target.value)
-                        }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Otsikon väri
-                      </label>
-                      <input
-                        type="color"
-                        value={customStyle.headingColor}
-                        onChange={(e) =>
-                          updateCustomStyle("headingColor", e.target.value)
-                        }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Korosteväri
-                      </label>
-                      <input
-                        type="color"
-                        value={customStyle.accentColor}
-                        onChange={(e) =>
-                          updateCustomStyle("accentColor", e.target.value)
-                        }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Sivupalkin leveys ({customStyle.sidebarWidth}px)
-                      </label>
-                      <input
-                        type="range"
-                        min={180}
-                        max={340}
-                        value={customStyle.sidebarWidth}
-                        onChange={(e) =>
-                          updateCustomStyle("sidebarWidth", Number(e.target.value))
-                        }
-                        className="w-full accent-[#00BFA6] mt-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Nimen koko ({customStyle.nameSize}px)
-                      </label>
-                      <input
-                        type="range"
-                        min={28}
-                        max={64}
-                        value={customStyle.nameSize}
-                        onChange={(e) =>
-                          updateCustomStyle("nameSize", Number(e.target.value))
-                        }
-                        className="w-full accent-[#00BFA6] mt-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Tekstin koko ({customStyle.bodySize}px)
-                      </label>
-                      <input
-                        type="range"
-                        min={12}
-                        max={20}
-                        value={customStyle.bodySize}
-                        onChange={(e) =>
-                          updateCustomStyle("bodySize", Number(e.target.value))
-                        }
-                        className="w-full accent-[#00BFA6] mt-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Kulmien pyöreys ({customStyle.borderRadius}px)
-                      </label>
-                      <input
-                        type="range"
-                        min={0}
-                        max={40}
-                        value={customStyle.borderRadius}
-                        onChange={(e) =>
-                          updateCustomStyle("borderRadius", Number(e.target.value))
-                        }
-                        className="w-full accent-[#00BFA6] mt-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Riviväli ({customStyle.lineHeight})
-                      </label>
-                      <input
-                        type="range"
-                        min={1.2}
-                        max={2}
-                        step={0.05}
-                        value={customStyle.lineHeight}
-                        onChange={(e) =>
-                          updateCustomStyle("lineHeight", Number(e.target.value))
-                        }
-                        className="w-full accent-[#00BFA6] mt-3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Osioiden väli ({customStyle.sectionSpacing}px)
-                      </label>
-                      <input
-                        type="range"
-                        min={8}
-                        max={36}
-                        value={customStyle.sectionSpacing}
-                        onChange={(e) =>
-                          updateCustomStyle(
-                            "sectionSpacing",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-full accent-[#00BFA6] mt-3"
-                      />
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Kuvan kulmat ({customStyle.imageRadius}px)
-                      </label>
-                      <input
-                        type="range"
-                        min={0}
-                        max={40}
-                        value={customStyle.imageRadius}
-                        onChange={(e) =>
-                          updateCustomStyle("imageRadius", Number(e.target.value))
-                        }
-                        className="w-full accent-[#00BFA6] mt-3"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-5 pt-8 pb-4">
-                  <button
-                    type="submit"
-                    disabled={loadingCv}
-                    className="w-full sm:w-auto rounded-2xl bg-[#00BFA6] px-10 py-5 text-xl font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)]"
-                  >
-                    {loadingCv ? "Luodaan CV:tä..." : "1. GENEROI CV"}
-                  </button>
-
-                  {parsedCv.cvBody && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          copyText(parsedCv.cvBody, "CV kopioitu leikepöydälle.")
-                        }
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10"
-                      >
-                        Kopioi leikepöydälle
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={downloadPdf}
-                        disabled={downloadingPdf}
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
-                      >
-                        {downloadingPdf ? "Luodaan PDF..." : "Lataa PDF"}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={downloadDocx}
-                        disabled={downloadingDocx}
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
-                      >
-                        {downloadingDocx ? "Luodaan DOCX..." : "Lataa DOCX"}
-                      </button>
-                    </>
-                  )}
-                </div>
-              </form>
-            </SectionShell>
-
-            <SectionShell
-              step="Vaihe 2"
-              title="Hakuprofiili & Työnhaku"
-              description="Kerro tekoälylle, millaista työtä haluat. Se hakee voimassa olevat paikat puolestasi."
-              action={
-                <button
-                  type="button"
-                  onClick={suggestJobs}
-                  disabled={loadingJobs}
-                  className="rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 text-base font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_0_25px_rgba(0,191,166,0.3)] mt-2 sm:mt-0"
-                >
-                  {loadingJobs ? "Etsitään..." : "2. EHDOTA TYÖPAIKKOJA"}
-                </button>
-              }
-            >
-              <div className="space-y-8 mt-8">
-                <div>
-                  <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Minkä alan töitä etsit?</label>
-                  <textarea
-                    placeholder="Esim. Myyntineuvottelija, Koodari, Siivooja..."
-                    value={searchProfile.desiredRoles}
-                    onChange={(e) =>
-                      updateSearchProfile("desiredRoles", e.target.value)
-                    }
-                    className={TextareaClass("min-h-[140px]")}
-                  />
-                </div>
-                
-                <div>
-                   <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Miltä alueelta?</label>
-                   <input
-                     placeholder="Esim. Uusimaa, Etätyö"
-                     value={searchProfile.desiredLocation}
-                     onChange={(e) =>
-                       updateSearchProfile("desiredLocation", e.target.value)
-                     }
-                     className={InputClass()}
-                   />
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Kokoaikainen vai Osa-aikainen?</label>
-                    <input
-                      placeholder="Esim. Kokoaikainen"
-                      value={searchProfile.workType}
-                      onChange={(e) =>
-                        updateSearchProfile("workType", e.target.value)
-                      }
-                      className={InputClass()}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Vuorotoive</label>
-                    <input
-                      placeholder="Esim. Päivätyö"
-                      value={searchProfile.shiftPreference}
-                      onChange={(e) =>
-                        updateSearchProfile("shiftPreference", e.target.value)
-                      }
-                      className={InputClass()}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Palkkatoive</label>
-                    <input
-                      placeholder="Esim. 3000€ / kk"
-                      value={searchProfile.salaryWish}
-                      onChange={(e) =>
-                        updateSearchProfile("salaryWish", e.target.value)
-                      }
-                      className={InputClass()}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Muita avainsanoja (erota pilkulla)</label>
-                    <input
-                      placeholder="Esim. englanti, joustava"
-                      value={searchProfile.keywords}
-                      onChange={(e) =>
-                        updateSearchProfile("keywords", e.target.value)
-                      }
-                      className={InputClass()}
-                    />
-                  </div>
-                </div>
-              </div>
-            </SectionShell>
-          </section>
-
-          {/* OIKEA SARAKE: VÄLILEHDET */}
-          <section className="space-y-10 lg:sticky lg:top-8 lg:self-start">
-            <div className="rounded-[32px] border border-white/10 bg-[#141414] p-8 sm:p-10 shadow-2xl backdrop-blur-xl transition-all">
-              
-              {/* VÄLILEHTINAPIT */}
-              <div className="mb-10 flex overflow-x-auto whitespace-nowrap pb-4 gap-5 snap-x border-b border-white/5 custom-scrollbar">
-                <button
-                  type="button"
-                  onClick={() => setTab("cv")}
-                  className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start ${
-                    tab === "cv"
-                      ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
-                      : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-                  }`}
-                >
-                  Oma CV (Esikatselu)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTab("job")}
-                  className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start ${
-                    tab === "job"
-                      ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
-                      : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-                  }`}
-                >
-                  Työpaikat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTab("letter")}
-                  className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start ${
-                    tab === "letter"
-                      ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
-                      : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-                  }`}
-                >
-                  Hakemukset
-                </button>
-              </div>
-
-              {tab === "cv" && (
-                <div className="space-y-10 overflow-hidden">
-                  {parsedCv.cvBody && activeJob && (
-                    <div className="flex flex-col sm:flex-row gap-5 bg-black/40 p-6 rounded-3xl border border-white/10">
-                      <div className="flex-1">
-                        <p className="text-base text-gray-400 mb-3">Valittu työpaikka: <strong className="text-white text-lg">{activeJob.title}</strong></p>
-                        <button
-                          type="button"
-                          onClick={createTailoredCv}
-                          disabled={loadingTailoredCv}
-                          className="w-full rounded-2xl border border-[#FF6F3C]/50 bg-[#FF6F3C]/10 px-8 py-5 font-black text-xl text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/20 disabled:opacity-50"
-                        >
-                          {loadingTailoredCv
-                            ? "Muokataan tekoälyllä..."
-                            : "Räätälöi CV tähän työpaikkaan"}
-                        </button>
+                {tab === "job" && (
+                   <div className="space-y-8 animate-in fade-in duration-500">
+                      <div className="p-8 bg-black/40 rounded-[32px] border border-white/5 space-y-4">
+                         <h3 className="font-bold text-[#00BFA6]">LISÄÄ TYÖPAIKKA MANUAALISESTI</h3>
+                         <input className={InputClass()} placeholder="Tehtävänimike" value={jobForm.title} onChange={e => setJobForm({...jobForm, title: e.target.value})} />
+                         <input className={InputClass()} placeholder="Yritys" value={jobForm.company} onChange={e => setJobForm({...jobForm, company: e.target.value})} />
+                         <button onClick={addJob} className="w-full bg-white/10 text-white border border-white/20 font-black py-4 rounded-2xl hover:bg-white/20 transition-all">+ Tallenna</button>
                       </div>
-                    </div>
-                  )}
-
-                  {activeJobCvVariants.length > 0 && (
-                    <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-                      <h3 className="mb-5 text-xl font-bold text-white">
-                        Tallennetut CV-versiot
-                      </h3>
-                      <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                        {activeJobCvVariants.map((cv) => (
-                          <button
-                            key={cv.id}
-                            type="button"
-                            onClick={() => setCvResult(`CV_BODY:\n${cv.content}`)}
-                            className="w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.2)]"
-                          >
-                            <p className="font-bold text-lg text-[#00BFA6] truncate">
-                              {cv.jobTitle}
-                            </p>
-                            <p className="text-base font-medium text-white truncate mt-1">
-                              {cv.companyName}
-                            </p>
-                            <p className="mt-2 text-xs text-gray-500">
-                              {new Date(cv.createdAt).toLocaleString("fi-FI")}
-                            </p>
-                          </button>
-                        ))}
+                      <div className="flex items-center gap-4">
+                        <input value={jobFilter} onChange={e => setJobFilter(e.target.value)} placeholder="Hae listasta..." className="w-full rounded-2xl bg-black/50 border border-white/10 px-5 py-4 text-sm outline-none focus:border-[#00BFA6]" />
+                        <button onClick={() => setShowFavoritesOnly(!showFavoritesOnly)} className={`px-4 py-4 rounded-2xl text-sm font-bold whitespace-nowrap transition-all ${showFavoritesOnly ? "bg-[#FF6F3C] text-white" : "bg-white/5 text-gray-400"}`}>★ Vain suosikit</button>
                       </div>
-                    </div>
-                  )}
-
-                  {cvResult ? (
-                    <>
-                      {parsedCv.score && (
-                        <div className="rounded-[32px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-8 text-center shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
-                          <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#00BFA6]">
-                            Kuntotarkastus arvosana
-                          </h2>
-                          <p className="mt-3 text-6xl font-black text-white">
-                            {parsedCv.score}
-                          </p>
-                        </div>
-                      )}
-
-                      {parsedCv.report.length > 0 && (
-                        <div className="rounded-[32px] border border-[#FF6F3C]/30 bg-[#FF6F3C]/5 p-8 sm:p-10 shadow-[0_10px_30px_rgba(255,111,60,0.1)]">
-                          <h2 className="mb-6 text-sm font-black uppercase tracking-widest text-[#FF6F3C]">
-                            Muutosraportti / Parannukset
-                          </h2>
-                          <ul className="space-y-4 pl-6 text-lg text-gray-200">
-                            {parsedCv.report.map((item, index) => (
-                              <li key={index} className="list-disc break-words leading-relaxed">
-                                {item}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      <div className="rounded-[40px] border border-white/10 bg-white p-4 sm:p-8 overflow-x-auto shadow-2xl">
-                        <div className="min-w-[600px] lg:min-w-0">
-                          <CvPreview
-                            cvText={parsedCv.cvBody}
-                            image={profileImage}
-                            styleVariant={cvStyle}
-                            customStyle={customStyle}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Piilotettu div PDF renderöintiin */}
-                      <div
-                        style={{
-                          position: "fixed",
-                          left: "-99999px",
-                          top: 0,
-                          width: "794px",
-                          pointerEvents: "none",
-                          opacity: 1,
-                          zIndex: -1,
-                        }}
-                      >
-                        <div ref={pdfRef}>
-                          <CvPreview
-                            cvText={parsedCv.cvBody}
-                            image={profileImage}
-                            styleVariant={cvStyle}
-                            customStyle={customStyle}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center text-gray-500">
-                      <div className="text-5xl mb-6">📄</div>
-                      <p className="text-xl font-bold text-white mb-2">Ei esikatselua vielä</p>
-                      <p className="text-base text-gray-400">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {tab === "job" && (
-                <div className="space-y-10">
-                  <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
-                    <div className="rounded-[24px] border border-white/10 bg-black/50 p-6 text-center hover:-translate-y-1 transition-transform">
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 truncate">
-                        Työpaikat
-                      </p>
-                      <p className="mt-3 text-3xl sm:text-4xl font-black text-white">
-                        {dashboardStats.total}
-                      </p>
-                    </div>
-                    <div className="rounded-[24px] border border-white/10 bg-black/50 p-6 text-center hover:-translate-y-1 transition-transform">
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 truncate">
-                        Haettu
-                      </p>
-                      <p className="mt-3 text-3xl sm:text-4xl font-black text-white">
-                        {dashboardStats.applied}
-                      </p>
-                    </div>
-                    <div className="rounded-[24px] border border-[#00BFA6]/40 bg-[#00BFA6]/10 p-6 text-center hover:-translate-y-1 transition-transform shadow-[0_0_20px_rgba(0,191,166,0.1)]">
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#00BFA6] truncate">
-                        Haastattelu
-                      </p>
-                      <p className="mt-3 text-3xl sm:text-4xl font-black text-[#00BFA6]">
-                        {dashboardStats.interview}
-                      </p>
-                    </div>
-                    <div className="rounded-[24px] border border-[#FF6F3C]/40 bg-[#FF6F3C]/10 p-6 text-center hover:-translate-y-1 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.1)]">
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#FF6F3C] truncate">
-                        Suosikit
-                      </p>
-                      <p className="mt-3 text-3xl sm:text-4xl font-black text-[#FF6F3C]">
-                        {dashboardStats.favorites}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 sm:p-10 space-y-8">
-                    <h3 className="text-2xl font-black text-white border-b border-white/10 pb-5">
-                      Lisää oma työpaikka seurantaan
-                    </h3>
-
-                    <div>
-                       <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Otsikko</label>
-                       <input
-                         placeholder="Esim. Myyntipäällikkö"
-                         value={jobForm.title}
-                         onChange={(e) => updateJobForm("title", e.target.value)}
-                         className={InputClass()}
-                       />
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Yritys</label>
-                         <input
-                           placeholder="Esim. Nokia"
-                           value={jobForm.company}
-                           onChange={(e) =>
-                             updateJobForm("company", e.target.value)
-                           }
-                           className={InputClass()}
-                         />
-                      </div>
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Sijainti</label>
-                         <input
-                           placeholder="Esim. Helsinki"
-                           value={jobForm.location}
-                           onChange={(e) =>
-                             updateJobForm("location", e.target.value)
-                           }
-                           className={InputClass()}
-                         />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Työsuhde</label>
-                         <input
-                           placeholder="Vakituinen"
-                           value={jobForm.type}
-                           onChange={(e) => updateJobForm("type", e.target.value)}
-                           className={InputClass()}
-                         />
-                      </div>
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Linkki</label>
-                         <input
-                           placeholder="https://..."
-                           value={jobForm.url}
-                           onChange={(e) => updateJobForm("url", e.target.value)}
-                           className={InputClass()}
-                         />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Palkka</label>
-                         <input
-                           placeholder="3000 €/kk"
-                           value={jobForm.salary}
-                           onChange={(e) => updateJobForm("salary", e.target.value)}
-                           className={InputClass()}
-                         />
-                      </div>
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Deadline</label>
-                         <input
-                           type="date"
-                           value={jobForm.deadline}
-                           onChange={(e) =>
-                             updateJobForm("deadline", e.target.value)
-                           }
-                           className={InputClass()}
-                         />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Yhteyshenkilö</label>
-                         <input
-                           placeholder="Matti Rekrytoija"
-                           value={jobForm.contactPerson}
-                           onChange={(e) =>
-                             updateJobForm("contactPerson", e.target.value)
-                           }
-                           className={InputClass()}
-                         />
-                      </div>
-                      <div>
-                         <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Sähköposti</label>
-                         <input
-                           placeholder="matti@yritys.fi"
-                           value={jobForm.contactEmail}
-                           onChange={(e) =>
-                             updateJobForm("contactEmail", e.target.value)
-                           }
-                           className={InputClass()}
-                         />
-                      </div>
-                    </div>
-
-                    <div>
-                       <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Lyhyt kuvaus / muistiinpanot</label>
-                       <textarea
-                         placeholder="Mikä tässä kiinnostaa?"
-                         value={jobForm.summary}
-                         onChange={(e) => updateJobForm("summary", e.target.value)}
-                         className={TextareaClass("min-h-[120px]")}
-                       />
-                    </div>
-
-                    <div>
-                       <label className="mb-3 block text-sm font-bold text-gray-400 ml-1">Kopioi ilmoitusteksti (Tärkeä tekoälylle)</label>
-                       <textarea
-                         placeholder="Liitä koko ilmoituksen teksti tähän. Tekoäly käyttää tätä räätälöidessään hakemustasi..."
-                         value={jobForm.adText}
-                         onChange={(e) => updateJobForm("adText", e.target.value)}
-                         className={TextareaClass("min-h-[250px]")}
-                       />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={addJob}
-                      className="w-full rounded-2xl bg-white px-8 py-5 text-lg font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-xl"
-                    >
-                      + Tallenna seurantaan
-                    </button>
-                  </div>
-
-                  <div className="space-y-8 pt-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-                      <h3 className="text-3xl font-black text-white">
-                        Omat työpaikat
-                      </h3>
-                      <input
-                        value={jobFilter}
-                        onChange={(e) => setJobFilter(e.target.value)}
-                        placeholder="Suodata listaa..."
-                        className="w-full sm:max-w-md rounded-2xl border border-white/10 bg-black/50 px-6 py-4 text-base text-white outline-none transition-all focus:border-[#00BFA6]/50 focus:ring-1 focus:ring-[#00BFA6]"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-                      <select
-                        value={jobStatusFilter}
-                        onChange={(e) =>
-                          setJobStatusFilter(e.target.value as "all" | JobStatus)
-                        }
-                        className="w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-sm font-bold text-white outline-none focus:border-[#00BFA6] cursor-pointer transition-all"
-                      >
-                        <option value="all">Kaikki tilat</option>
-                        <option value="saved">Tallennettu</option>
-                        <option value="interested">Kiinnostava</option>
-                        <option value="applied">Haettu</option>
-                        <option value="interview">Haastattelu</option>
-                        <option value="offer">Tarjous</option>
-                        <option value="rejected">Hylätty</option>
-                      </select>
-
-                      <select
-                        value={jobPriorityFilter}
-                        onChange={(e) =>
-                          setJobPriorityFilter(
-                            e.target.value as "all" | JobPriority
-                          )
-                        }
-                        className="w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-sm font-bold text-white outline-none focus:border-[#00BFA6] cursor-pointer transition-all"
-                      >
-                        <option value="all">Kaikki prio</option>
-                        <option value="low">Matala</option>
-                        <option value="medium">Keskitaso</option>
-                        <option value="high">Korkea</option>
-                      </select>
-
-                      <select
-                        value={jobSort}
-                        onChange={(e) =>
-                          setJobSort(
-                            e.target.value as
-                              | "match"
-                              | "deadline"
-                              | "priority"
-                              | "newest"
-                              | "company"
-                          )
-                        }
-                        className="w-full rounded-2xl border border-white/10 bg-black/50 px-5 py-4 text-sm font-bold text-white outline-none focus:border-[#00BFA6] cursor-pointer transition-all"
-                      >
-                        <option value="newest">Uusimmat</option>
-                        <option value="match">Match</option>
-                        <option value="deadline">Deadline</option>
-                        <option value="priority">Prio</option>
-                        <option value="company">Yritys</option>
-                      </select>
-
-                      <button
-                        type="button"
-                        onClick={() => setShowFavoritesOnly((prev) => !prev)}
-                        className={`w-full rounded-2xl px-5 py-4 text-sm font-black transition-all ${
-                          showFavoritesOnly
-                            ? "bg-[#FF6F3C] text-white shadow-[0_0_20px_rgba(255,111,60,0.5)] scale-[1.02]"
-                            : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-                        }`}
-                      >
-                        {showFavoritesOnly ? "★ Vain suosikit" : "Näytä suosikit"}
-                      </button>
-                    </div>
-
-                    {filteredJobs.length === 0 ? (
-                      <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center text-gray-500">
-                        <p className="text-xl font-bold text-white mb-2">Ei tuloksia</p>
-                        <p className="text-base">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
-                      </div>
-                    ) : (
                       <div className="space-y-6">
-                        {filteredJobs.map((job) => {
-                          const isActive = job.id === activeJobId;
-                          const jobLetters = savedLetters.filter(
-                            (letter) => letter.jobId === job.id
-                          );
-                          const jobCvs = savedCvVariants.filter(
-                            (cv) => cv.jobId === job.id
-                          );
-
-                          return (
-                            <JobCard
-                              key={job.id}
-                              job={job}
-                              isActive={isActive}
-                              applicationsCount={jobLetters.length}
-                              cvsCount={jobCvs.length}
-                              onSelect={() => setActiveJobId(job.id)}
-                              onRemove={() => removeJob(job.id)}
-                              onUpdate={(patch) => updateJob(job.id, patch)}
-                            />
-                          );
-                        })}
+                        {filteredJobs.length === 0 ? (
+                          <div className="text-center py-32 text-gray-500 text-sm font-medium">Ei työpaikkoja näytettäväksi.</div>
+                        ) : (
+                          filteredJobs.map(job => (
+                            <JobCard key={job.id} job={job} isActive={activeJobId === job.id} onSelect={() => setActiveJobId(job.id)} onRemove={() => removeJob(job.id)} onUpdate={(p:any) => updateJob(job.id, p)} />
+                          ))
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                   </div>
+                )}
 
-              {tab === "letter" && (
-                <div className="space-y-10">
-                  <div className="rounded-[40px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-8 sm:p-12 relative overflow-hidden shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
-                    <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none leading-none">”</div>
-                    <h3 className="text-3xl font-black text-white mb-8">
-                      Rakenna Hakemus
-                    </h3>
-
-                    {activeJob ? (
-                      <div className="mb-10 space-y-3 text-lg text-gray-300 bg-black/50 p-8 rounded-3xl border border-white/10 relative z-10">
-                        <p className="flex flex-col sm:flex-row sm:gap-4">
-                          <span className="font-black text-[#00BFA6] w-28 uppercase tracking-widest text-sm pt-1">Kohde:</span>
-                          <span className="text-white font-bold text-2xl">{activeJob.title}</span>
-                        </p>
-                        <p className="flex flex-col sm:flex-row sm:gap-4">
-                          <span className="font-black text-[#00BFA6] w-28 uppercase tracking-widest text-sm pt-1">Yritys:</span>
-                          <span className="text-white font-medium">{activeJob.company || "-"}</span>
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="mb-10 p-8 bg-red-950/40 border-2 border-red-900/50 rounded-3xl text-red-300 text-lg">
-                        <span className="text-3xl block mb-2">⚠️</span>
-                        Palaa <strong>Työpaikat</strong> -välilehdelle ja valitse (klikkaa) ensin jokin työpaikka listalta.
-                      </div>
-                    )}
-
-                    <div className="relative z-10">
-                      <p className="mb-4 text-base font-bold text-gray-400">
-                        Valitse sävy, jolla hakemus kirjoitetaan:
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <button
-                          type="button"
-                          onClick={() => setLetterTone("professional")}
-                          className={`flex-1 rounded-2xl px-6 py-5 text-lg font-black transition-all ${
-                            letterTone === "professional"
-                              ? "border-2 border-[#00BFA6] bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105"
-                              : "border border-white/10 bg-black/60 text-white hover:bg-white/10"
-                          }`}
-                        >
-                          💼 Asiallinen
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setLetterTone("warm")}
-                          className={`flex-1 rounded-2xl px-6 py-5 text-lg font-black transition-all ${
-                            letterTone === "warm"
-                              ? "border-2 border-[#00BFA6] bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105"
-                              : "border border-white/10 bg-black/60 text-white hover:bg-white/10"
-                          }`}
-                        >
-                          🤝 Lämmin
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setLetterTone("sales")}
-                          className={`flex-1 rounded-2xl px-6 py-5 text-lg font-black transition-all ${
-                            letterTone === "sales"
-                              ? "border-2 border-[#FF6F3C] bg-[#FF6F3C] text-black shadow-[0_0_20px_rgba(255,111,60,0.4)] scale-105"
-                              : "border border-white/10 bg-black/60 text-white hover:bg-white/10"
-                          }`}
-                        >
-                          🚀 Myyvä
-                        </button>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleCoverLetterSubmit}
-                      disabled={loadingLetter || !activeJob}
-                      className="mt-10 w-full rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-6 text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_15px_40px_-10px_rgba(0,191,166,0.5)] relative z-10"
-                    >
-                      {loadingLetter
-                        ? "Tekoäly kirjoittaa..."
-                        : "3. KIRJOITA HAKEMUS TÄHÄN PAIKKAAN"}
-                    </button>
-                  </div>
-
-                  {activeJobLetters.length > 0 && (
-                    <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-6 sm:p-8">
-                      <h3 className="mb-5 text-xl font-bold text-white">
-                        Aiemmat hakemukset tähän paikkaan
-                      </h3>
-                      <div className="space-y-4 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
-                        {activeJobLetters.map((letter) => (
-                          <button
-                            key={letter.id}
-                            type="button"
-                            onClick={() => {
-                              setLetterResult(`HAKEMUS:\n${letter.content}`);
-                              setLetterDraft(letter.content);
-                            }}
-                            className="w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.3)]"
-                          >
-                            <p className="font-bold text-lg text-[#00BFA6] truncate">
-                              {letter.jobTitle}
-                            </p>
-                            <p className="text-base font-medium text-white truncate mt-1">
-                              {letter.companyName}
-                            </p>
-                            <p className="mt-2 text-sm text-gray-500">
-                              Luotu: {new Date(letter.createdAt).toLocaleString("fi-FI")}
-                            </p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {letterResult ? (
-                    <>
-                      <div className="rounded-[40px] border border-[#00BFA6]/40 bg-[#0F0F0F] p-8 sm:p-12 shadow-[0_15px_50px_rgba(0,191,166,0.15)]">
-                        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 border-b border-white/10 pb-6">
-                          <h2 className="text-3xl font-black text-white">
-                            Valmis hakemus
-                          </h2>
-                          <button
-                            type="button"
-                            onClick={saveEditedLetter}
-                            className="w-full sm:w-auto rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-3.5 text-base font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6] hover:text-black"
-                          >
-                            Tallenna omat muokkaukset
-                          </button>
+                {tab === "letter" && (
+                   <div className="space-y-8 animate-in fade-in duration-500">
+                      {activeJob ? (
+                        <div className="space-y-6">
+                           <div className="p-8 bg-[#00BFA6]/5 border border-[#00BFA6]/20 rounded-3xl">
+                              <p className="text-sm text-gray-400 uppercase tracking-widest font-bold">Valittu kohde:</p>
+                              <p className="text-2xl font-black mt-1 text-[#00BFA6]">{activeJob.title}</p>
+                              <p className="text-white font-bold">{activeJob.company}</p>
+                           </div>
+                           <button onClick={handleCoverLetterSubmit} disabled={loadingLetter} className="w-full bg-[#FF6F3C] text-white font-black py-6 rounded-[24px] text-xl shadow-[0_10px_30px_-10px_rgba(255,111,60,0.5)]">
+                              3. KIRJOITA HAKEMUS ➔
+                           </button>
+                           {letterDraft && (
+                             <textarea value={letterDraft} onChange={e => setLetterDraft(e.target.value)} className={TextareaClass("min-h-[500px] border-[#00BFA6]/30")} />
+                           )}
                         </div>
-
-                        <textarea
-                          value={letterDraft}
-                          onChange={(e) => setLetterDraft(e.target.value)}
-                          className="min-h-[500px] w-full rounded-3xl border-none bg-transparent p-2 font-sans text-lg leading-relaxed text-gray-200 outline-none resize-y"
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          copyText(
-                            letterDraft || parsedLetter,
-                            "Hakemus kopioitu leikepöydälle!"
-                          )
-                        }
-                        className="w-full rounded-2xl border border-white/20 bg-white px-8 py-6 text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl"
-                      >
-                        Kopioi hakemus leikepöydälle 📋
-                      </button>
-                    </>
-                  ) : (
-                    <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center font-medium text-gray-500">
-                      <div className="text-5xl mb-6">✍️</div>
-                      <p className="text-xl font-bold text-white mb-2">Hakemus puuttuu</p>
-                      <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Ponnahdusilmoitukset (Alerts) - Isompi ja selkeämpi fontti */}
-            {(message || errorMessage) && (
-              <div
-                className={`fixed bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[28px] border-2 p-8 text-lg font-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all animate-in slide-in-from-bottom-5 ${
-                  errorMessage
-                    ? "border-red-900 bg-red-950/95 text-red-300 backdrop-blur-xl"
-                    : "border-[#00BFA6] bg-[#00BFA6]/95 text-black backdrop-blur-xl"
-                }`}
-              >
-                {errorMessage || message}
-              </div>
-            )}
-          </section>
+                      ) : (
+                        <div className="text-center py-32 text-gray-500 border-2 border-dashed border-white/5 rounded-[40px]">Valitse ensin työpaikka listalta.</div>
+                      )}
+                   </div>
+                )}
+             </div>
+          </div>
         </div>
       </div>
+
+      {(message || errorMessage) && (
+        <div className={`fixed bottom-10 right-10 z-[100] p-6 rounded-3xl border shadow-2xl animate-in slide-in-from-bottom-10 ${errorMessage ? 'bg-red-950 border-red-500 text-white' : 'bg-[#00BFA6] border-white/20 text-black font-black'}`}>
+          {errorMessage || message}
+        </div>
+      )}
     </main>
   );
 }
