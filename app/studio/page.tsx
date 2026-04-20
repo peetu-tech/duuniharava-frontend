@@ -82,6 +82,8 @@ const STORAGE_KEY = "duuniharava_state_v8";
 
 const emptyForm = {
   cvText: "",
+  cvFile: "",
+  cvFileName: "",
   name: "",
   phone: "",
   email: "",
@@ -352,13 +354,13 @@ function SectionShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[32px] border border-white/10 bg-white/[0.045] p-5 shadow-[0_20px_70px_rgba(0,0,0,0.35)] backdrop-blur-xl md:p-7">
+    <div className="rounded-[32px] border border-white/10 bg-white/[0.045] p-4 sm:p-5 shadow-[0_20px_70px_rgba(0,0,0,0.35)] backdrop-blur-xl md:p-7">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-[11px] uppercase tracking-[0.24em] text-zinc-500">
             {step}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-[28px]">
+          <h2 className="mt-2 text-xl sm:text-2xl font-semibold tracking-tight text-white md:text-[28px]">
             {title}
           </h2>
           {description ? (
@@ -384,7 +386,7 @@ function StatCard({
   description: string;
 }) {
   return (
-    <div className="rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+    <div className="rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur-xl w-full">
       <p className="text-[11px] uppercase tracking-[0.24em] text-zinc-400">
         {title}
       </p>
@@ -426,37 +428,37 @@ function JobCard({
 
   return (
     <div
-      className={`rounded-[30px] border p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition ${
+      className={`rounded-[30px] border p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition ${
         isActive
           ? "border-blue-500/60 bg-gradient-to-br from-blue-950/35 via-zinc-950 to-zinc-950"
           : "border-white/10 bg-white/[0.03] hover:border-white/15"
       }`}
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {job.source && (
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
                 {job.source}
               </span>
             )}
-            <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+            <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
               Match {score}%
             </span>
-            <span className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
+            <span className="rounded-full bg-white/5 px-3 py-1 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
               {getStatusLabel(job.status)}
             </span>
-            <span className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
+            <span className="rounded-full bg-white/5 px-3 py-1 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-300">
               {getPriorityLabel(job.priority)}
             </span>
             {job.favorite && (
-              <span className="rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
+              <span className="rounded-full bg-amber-500/15 px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
                 Suosikki
               </span>
             )}
           </div>
 
-          <h4 className="text-xl font-semibold tracking-tight text-white">
+          <h4 className="text-lg sm:text-xl font-semibold tracking-tight text-white">
             {job.title || "Nimetön työpaikka"}
           </h4>
 
@@ -465,11 +467,11 @@ function JobCard({
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => onUpdate({ favorite: !job.favorite })}
-            className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+            className={`flex-1 sm:flex-none rounded-2xl px-4 py-2 text-sm font-medium transition ${
               job.favorite
                 ? "bg-amber-400 text-black hover:bg-amber-300"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -481,7 +483,7 @@ function JobCard({
           <button
             type="button"
             onClick={onSelect}
-            className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+            className={`flex-1 sm:flex-none rounded-2xl px-4 py-2 text-sm font-medium transition ${
               isActive
                 ? "bg-white text-black"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -493,7 +495,7 @@ function JobCard({
           <button
             type="button"
             onClick={onRemove}
-            className="rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500"
+            className="flex-1 sm:flex-none rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500"
           >
             Poista
           </button>
@@ -531,12 +533,12 @@ function JobCard({
         </div>
       )}
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
           <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
             Yritys
           </p>
-          <p className="mt-2 text-sm font-medium text-white">
+          <p className="mt-2 text-sm font-medium text-white truncate">
             {job.company || "-"}
           </p>
         </div>
@@ -545,7 +547,7 @@ function JobCard({
           <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
             Sijainti
           </p>
-          <p className="mt-2 text-sm font-medium text-white">
+          <p className="mt-2 text-sm font-medium text-white truncate">
             {job.location || "-"}
           </p>
         </div>
@@ -679,7 +681,7 @@ function JobCard({
           href={job.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex rounded-2xl border border-blue-900/60 bg-blue-950/30 px-4 py-2 text-sm font-medium text-blue-300 transition hover:bg-blue-950/50"
+          className="mt-4 inline-flex w-full sm:w-auto justify-center rounded-2xl border border-blue-900/60 bg-blue-950/30 px-4 py-3 sm:py-2 text-sm font-medium text-blue-300 transition hover:bg-blue-950/50"
         >
           Avaa työpaikkalinkki
         </a>
@@ -1001,6 +1003,8 @@ export default function Home() {
   function fillExample() {
     setForm({
       cvText: "",
+      cvFile: "",
+      cvFileName: "",
       name: "Peetu Salminen",
       phone: "0449776494",
       email: "peetu.salminen1@gmail.com",
@@ -1198,14 +1202,35 @@ export default function Home() {
     }
   }
 
+  function handleCvFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      setErrorMessage("Vain PDF-tiedostot ovat sallittuja.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setForm((prev) => ({
+        ...prev,
+        cvFile: event.target?.result as string,
+        cvFileName: file.name,
+      }));
+      setMessage(`Tiedosto ${file.name} ladattu. Voit nyt parannella sitä.`);
+      setTimeout(() => setMessage(""), 3000);
+    };
+    reader.readAsDataURL(file);
+  }
+
   function validateCvForm() {
     if (!form.targetJob.trim()) {
       setErrorMessage("Lisää tavoiteltu työ ennen CV:n generointia.");
       return false;
     }
 
-    if (mode === "improve" && !form.cvText.trim()) {
-      setErrorMessage("Liitä nykyinen CV ennen parannusta.");
+    if (mode === "improve" && !form.cvFile && !form.cvText.trim()) {
+      setErrorMessage("Liitä nykyinen CV (esim. PDF) ennen parannusta.");
       return false;
     }
 
@@ -1316,6 +1341,7 @@ export default function Home() {
           experience: form.experience,
           skills: form.skills,
           languages: form.languages,
+          onlyActive: true, // Pyydetään vain voimassa olevia työpaikkoja
         }),
       });
 
@@ -1525,92 +1551,91 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
+    <main className="min-h-screen bg-zinc-950 text-white overflow-x-hidden">
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_26%),radial-gradient(circle_at_bottom,rgba(16,185,129,0.12),transparent_24%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_35%,rgba(0,0,0,0.15))]" />
-        <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-20 xl:px-8">
-          <div className="flex justify-between items-start">
-            <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
-              <div>
-                <div className="mb-5 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-zinc-300 backdrop-blur-sm">
-                  CV Studio · Hakuprofiili · Työpaikat · Hakemukset
-                </div>
-
-                <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white md:text-6xl md:leading-[1.02]">
-                  Rakenna parempi CV, löydä sopivat työt ja tee personoidut
-                  hakemukset samassa näkymässä.
-                </h1>
-
-                <p className="mt-6 max-w-2xl text-base leading-7 text-zinc-300 md:text-lg">
-                  Duuniharava auttaa luomaan tai parantamaan CV:n, suuntaamaan sen
-                  oikeaan rooliin, ehdottamaan sopivia työpaikkoja ja
-                  kirjoittamaan hakemuksia, jotka tukevat CV:täsi.
-                </p>
-
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={fillExample}
-                    className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
-                  >
-                    Täytä esimerkki
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => applyQuickTarget("sales")}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-                  >
-                    Suuntaa myyntityöhön
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => applyQuickTarget("warehouse")}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-                  >
-                    Suuntaa varastotyöhön
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => applyQuickTarget("shorter")}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-                  >
-                    Tee tiiviimpi
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-                <StatCard
-                  title="CV"
-                  value="Muokattava"
-                  description="Säädä värejä, fonttikokoja, kulmia ja rakennetta."
-                />
-                <StatCard
-                  title="Hakemukset"
-                  value="3 sävyä"
-                  description="Asiallinen, lämmin tai myyvä työpaikan mukaan."
-                />
-                <StatCard
-                  title="Työpaikat"
-                  value="Seuranta"
-                  description="Status, deadline, muistiinpanot ja prioriteetti."
-                />
-              </div>
+        <div className="relative mx-auto max-w-7xl px-4 py-10 md:py-14 lg:py-20 xl:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-10">
+            <div className="mb-2 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] sm:text-[11px] uppercase tracking-[0.24em] text-zinc-300 backdrop-blur-sm">
+              CV Studio · Hakuprofiili · Työpaikat · Hakemukset
             </div>
-            
             <button
               onClick={() => {
                 clearSession();
                 router.push("/login");
               }}
-              className="rounded-xl border border-white/15 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition"
+              className="rounded-xl border border-white/15 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition whitespace-nowrap"
             >
               Kirjaudu ulos
             </button>
+          </div>
+
+          <div className="grid gap-10 lg:grid-cols-[1fr_minmax(auto,350px)] lg:items-end">
+            <div>
+              <h1 className="max-w-4xl text-3xl sm:text-4xl font-semibold tracking-tight text-white md:text-5xl lg:text-6xl lg:leading-[1.02]">
+                Rakenna parempi CV, löydä sopivat työt ja tee personoidut
+                hakemukset samassa näkymässä.
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-base leading-7 text-zinc-300 md:text-lg">
+                Duuniharava auttaa luomaan tai parantamaan CV:n, suuntaamaan sen
+                oikeaan rooliin, ehdottamaan sopivia työpaikkoja ja
+                kirjoittamaan hakemuksia, jotka tukevat CV:täsi.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={fillExample}
+                  className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200 flex-1 sm:flex-none text-center"
+                >
+                  Täytä esimerkki
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyQuickTarget("sales")}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10 flex-1 sm:flex-none text-center whitespace-nowrap"
+                >
+                  Myyntityö
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyQuickTarget("warehouse")}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10 flex-1 sm:flex-none text-center whitespace-nowrap"
+                >
+                  Varastotyö
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyQuickTarget("shorter")}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10 flex-1 sm:flex-none text-center whitespace-nowrap"
+                >
+                  Tee tiiviimpi
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 w-full">
+              <StatCard
+                title="CV"
+                value="Muokattava"
+                description="Säädä värejä, fonttikokoja, kulmia ja rakennetta."
+              />
+              <StatCard
+                title="Hakemukset"
+                value="3 sävyä"
+                description="Asiallinen, lämmin tai myyvä työpaikan mukaan."
+              />
+              <StatCard
+                title="Työpaikat"
+                value="Seuranta"
+                description="Status, deadline, muistiinpanot ja prioriteetti."
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -1620,7 +1645,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setMode("improve")}
-            className={`rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            className={`rounded-2xl px-5 py-3 text-sm font-semibold transition flex-1 sm:flex-none ${
               mode === "improve"
                 ? "bg-white text-black"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -1632,7 +1657,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setMode("create")}
-            className={`rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            className={`rounded-2xl px-5 py-3 text-sm font-semibold transition flex-1 sm:flex-none ${
               mode === "create"
                 ? "bg-white text-black"
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -1646,7 +1671,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1.04fr_0.96fr]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr]">
           <section className="space-y-6">
             <SectionShell
               step="Vaihe 1"
@@ -1666,18 +1691,30 @@ export default function Home() {
                 {mode === "improve" && (
                   <div>
                     <label className="mb-2 block text-sm text-zinc-400">
-                      Nykyinen CV
+                      Nykyinen CV (PDF)
                     </label>
-                    <textarea
-                      placeholder="Liitä nykyinen CV tähän"
-                      value={form.cvText}
-                      onChange={(e) => updateField("cvText", e.target.value)}
-                      className={TextareaClass("min-h-[220px] rounded-3xl px-4 py-4")}
-                    />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                      <label className="cursor-pointer rounded-2xl bg-white/5 border border-white/10 px-5 py-3.5 text-center transition hover:bg-white/10 flex-1 sm:flex-none">
+                        <span className="text-sm font-medium text-white">
+                          Valitse PDF-tiedosto
+                        </span>
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          className="hidden"
+                          onChange={handleCvFileUpload}
+                        />
+                      </label>
+                      {form.cvFileName && (
+                        <span className="text-sm text-emerald-400 break-words">
+                          {form.cvFileName}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <input
                     placeholder="Nimi"
                     value={form.name}
@@ -1724,7 +1761,7 @@ export default function Home() {
                   className={TextareaClass("min-h-[124px]")}
                 />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <textarea
                     placeholder="Kielet"
                     value={form.languages}
@@ -1739,7 +1776,7 @@ export default function Home() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <textarea
                     placeholder="Kortit ja pätevyydet"
                     value={form.cards}
@@ -1756,18 +1793,18 @@ export default function Home() {
 
                 <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
 
-                <div className="rounded-[28px] border border-white/10 bg-black/25 p-5">
+                <div className="rounded-[28px] border border-white/10 bg-black/25 p-4 sm:p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium text-zinc-200">CV-tyyli</p>
-                      <p className="mt-1 text-sm text-zinc-500">
+                      <p className="mt-1 text-xs sm:text-sm text-zinc-500">
                         Hienosäädä ulkoasua ennen PDF- tai DOCX-vientiä.
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={resetCurrentStyle}
-                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
                     >
                       Palauta oletukset
                     </button>
@@ -1780,7 +1817,7 @@ export default function Home() {
                           key={variant}
                           type="button"
                           onClick={() => setCvStyle(variant)}
-                          className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
+                          className={`rounded-2xl px-4 py-2 text-sm font-medium transition flex-1 sm:flex-none ${
                             cvStyle === variant
                               ? "bg-white text-black"
                               : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -1795,7 +1832,7 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm text-zinc-400">
                         Sivupalkin väri
@@ -1980,7 +2017,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div>
+                    <div className="sm:col-span-2">
                       <label className="mb-2 block text-sm text-zinc-400">
                         Kuvan kulmat ({customStyle.imageRadius}px)
                       </label>
@@ -1998,11 +2035,11 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3 pt-1">
+                <div className="flex flex-col sm:flex-row gap-3 pt-1">
                   <button
                     type="submit"
                     disabled={loadingCv}
-                    className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                    className="w-full sm:w-auto rounded-2xl bg-blue-600 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
                   >
                     {loadingCv ? "Luodaan CV..." : "Generoi CV"}
                   </button>
@@ -2014,7 +2051,7 @@ export default function Home() {
                         onClick={() =>
                           copyText(parsedCv.cvBody, "CV kopioitu leikepöydälle.")
                         }
-                        className="rounded-2xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
+                        className="w-full sm:w-auto rounded-2xl bg-emerald-600 px-5 py-3.5 font-semibold text-white transition hover:bg-emerald-500"
                       >
                         Kopioi CV
                       </button>
@@ -2023,7 +2060,7 @@ export default function Home() {
                         type="button"
                         onClick={downloadPdf}
                         disabled={downloadingPdf}
-                        className="rounded-2xl bg-fuchsia-600 px-5 py-3 font-semibold text-white transition hover:bg-fuchsia-500 disabled:opacity-50"
+                        className="w-full sm:w-auto rounded-2xl bg-fuchsia-600 px-5 py-3.5 font-semibold text-white transition hover:bg-fuchsia-500 disabled:opacity-50"
                       >
                         {downloadingPdf ? "Luodaan PDF..." : "Lataa PDF"}
                       </button>
@@ -2032,7 +2069,7 @@ export default function Home() {
                         type="button"
                         onClick={downloadDocx}
                         disabled={downloadingDocx}
-                        className="rounded-2xl bg-cyan-600 px-5 py-3 font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50"
+                        className="w-full sm:w-auto rounded-2xl bg-cyan-600 px-5 py-3.5 font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50"
                       >
                         {downloadingDocx ? "Luodaan DOCX..." : "Lataa DOCX"}
                       </button>
@@ -2051,7 +2088,7 @@ export default function Home() {
                   type="button"
                   onClick={suggestJobs}
                   disabled={loadingJobs}
-                  className="rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+                  className="rounded-2xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
                 >
                   {loadingJobs ? "Ehdotetaan..." : "Ehdota työpaikkoja"}
                 </button>
@@ -2075,7 +2112,7 @@ export default function Home() {
                   className={InputClass()}
                 />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <input
                     placeholder="Työmuoto"
                     value={searchProfile.workType}
@@ -2094,7 +2131,7 @@ export default function Home() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <input
                     placeholder="Palkkatoive"
                     value={searchProfile.salaryWish}
@@ -2116,13 +2153,13 @@ export default function Home() {
             </SectionShell>
           </section>
 
-          <section className="space-y-6 xl:sticky xl:top-6 xl:self-start">
-            <div className="rounded-[32px] border border-white/10 bg-white/[0.045] p-5 shadow-[0_20px_70px_rgba(0,0,0,0.35)] backdrop-blur-xl md:p-7">
-              <div className="mb-6 flex flex-wrap items-center gap-3">
+          <section className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+            <div className="rounded-[32px] border border-white/10 bg-white/[0.045] p-4 sm:p-5 shadow-[0_20px_70px_rgba(0,0,0,0.35)] backdrop-blur-xl md:p-7">
+              <div className="mb-6 flex overflow-x-auto whitespace-nowrap pb-2 gap-3 snap-x">
                 <button
                   type="button"
                   onClick={() => setTab("cv")}
-                  className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
+                  className={`rounded-2xl px-5 py-2.5 text-sm font-medium transition snap-start ${
                     tab === "cv"
                       ? "bg-white text-black"
                       : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -2133,7 +2170,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setTab("job")}
-                  className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
+                  className={`rounded-2xl px-5 py-2.5 text-sm font-medium transition snap-start ${
                     tab === "job"
                       ? "bg-white text-black"
                       : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -2144,7 +2181,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setTab("letter")}
-                  className={`rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
+                  className={`rounded-2xl px-5 py-2.5 text-sm font-medium transition snap-start ${
                     tab === "letter"
                       ? "bg-white text-black"
                       : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -2155,14 +2192,14 @@ export default function Home() {
               </div>
 
               {tab === "cv" && (
-                <div className="space-y-5">
+                <div className="space-y-5 overflow-hidden">
                   {parsedCv.cvBody && activeJob && (
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <button
                         type="button"
                         onClick={createTailoredCv}
                         disabled={loadingTailoredCv}
-                        className="rounded-2xl bg-violet-600 px-5 py-3 font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50"
+                        className="w-full rounded-2xl bg-violet-600 px-5 py-3.5 font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50"
                       >
                         {loadingTailoredCv
                           ? "Luodaan kohdistettua CV:tä..."
@@ -2176,7 +2213,7 @@ export default function Home() {
                       <h3 className="mb-3 text-lg font-semibold text-white">
                         Tallennetut CV-versiot
                       </h3>
-                      <div className="space-y-3">
+                      <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                         {activeJobCvVariants.map((cv) => (
                           <button
                             key={cv.id}
@@ -2184,7 +2221,7 @@ export default function Home() {
                             onClick={() => setCvResult(`CV_BODY:\n${cv.content}`)}
                             className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left transition hover:bg-white/[0.07]"
                           >
-                            <p className="font-medium text-white">
+                            <p className="font-medium text-white truncate">
                               {cv.jobTitle} · {cv.companyName}
                             </p>
                             <p className="text-xs text-zinc-400">
@@ -2216,7 +2253,7 @@ export default function Home() {
                           </h2>
                           <ul className="space-y-2 pl-5 text-sm text-zinc-300">
                             {parsedCv.report.map((item, index) => (
-                              <li key={index} className="list-disc">
+                              <li key={index} className="list-disc break-words">
                                 {item}
                               </li>
                             ))}
@@ -2224,13 +2261,15 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className="rounded-[28px] border border-white/10 bg-black/20 p-3 md:p-5">
-                        <CvPreview
-                          cvText={parsedCv.cvBody}
-                          image={profileImage}
-                          styleVariant={cvStyle}
-                          customStyle={customStyle}
-                        />
+                      <div className="rounded-[28px] border border-white/10 bg-black/20 p-2 sm:p-5 overflow-x-auto">
+                        <div className="min-w-[600px] lg:min-w-0">
+                          <CvPreview
+                            cvText={parsedCv.cvBody}
+                            image={profileImage}
+                            styleVariant={cvStyle}
+                            customStyle={customStyle}
+                          />
+                        </div>
                       </div>
 
                       <div
@@ -2255,7 +2294,7 @@ export default function Home() {
                       </div>
                     </>
                   ) : (
-                    <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-10 text-zinc-400">
+                    <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-6 sm:p-10 text-center text-sm sm:text-base text-zinc-400">
                       Generoitu CV-esikatselu näkyy täällä.
                     </div>
                   )}
@@ -2264,42 +2303,42 @@ export default function Home() {
 
               {tab === "job" && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                      <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-zinc-500 truncate">
                         Työpaikat
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl sm:text-2xl font-semibold text-white">
                         {dashboardStats.total}
                       </p>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                      <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-zinc-500 truncate">
                         Haettu
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl sm:text-2xl font-semibold text-white">
                         {dashboardStats.applied}
                       </p>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                      <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-zinc-500 truncate">
                         Haastattelu
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl sm:text-2xl font-semibold text-white">
                         {dashboardStats.interview}
                       </p>
                     </div>
                     <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                      <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-zinc-500 truncate">
                         Suosikit
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl sm:text-2xl font-semibold text-white">
                         {dashboardStats.favorites}
                       </p>
                     </div>
                   </div>
 
-                  <div className="rounded-[28px] border border-white/10 bg-black/25 p-4 space-y-4">
+                  <div className="rounded-[28px] border border-white/10 bg-black/25 p-4 sm:p-5 space-y-4">
                     <h3 className="text-lg font-semibold text-white">
                       Lisää työpaikka
                     </h3>
@@ -2311,7 +2350,7 @@ export default function Home() {
                       className={InputClass()}
                     />
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <input
                         placeholder="Yrityksen nimi"
                         value={jobForm.company}
@@ -2330,7 +2369,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <input
                         placeholder="Työsuhde"
                         value={jobForm.type}
@@ -2345,7 +2384,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <input
                         placeholder="Palkka"
                         value={jobForm.salary}
@@ -2362,7 +2401,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <input
                         placeholder="Yhteyshenkilö"
                         value={jobForm.contactPerson}
@@ -2414,14 +2453,14 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={addJob}
-                      className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500"
+                      className="w-full sm:w-auto rounded-2xl bg-blue-600 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-500"
                     >
                       Lisää työpaikka listaan
                     </button>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <h3 className="text-lg font-semibold text-white">
                         Työpaikat
                       </h3>
@@ -2429,17 +2468,17 @@ export default function Home() {
                         value={jobFilter}
                         onChange={(e) => setJobFilter(e.target.value)}
                         placeholder="Suodata työpaikkoja"
-                        className="w-full max-w-xs rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-zinc-500"
+                        className="w-full sm:max-w-xs rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-zinc-500"
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       <select
                         value={jobStatusFilter}
                         onChange={(e) =>
                           setJobStatusFilter(e.target.value as "all" | JobStatus)
                         }
-                        className={InputClass()}
+                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none"
                       >
                         <option value="all">Kaikki statukset</option>
                         <option value="saved">Tallennettu</option>
@@ -2457,9 +2496,9 @@ export default function Home() {
                             e.target.value as "all" | JobPriority
                           )
                         }
-                        className={InputClass()}
+                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none"
                       >
-                        <option value="all">Kaikki prioriteetit</option>
+                        <option value="all">Kaikki prio</option>
                         <option value="low">Matala</option>
                         <option value="medium">Keskitaso</option>
                         <option value="high">Korkea</option>
@@ -2477,57 +2516,59 @@ export default function Home() {
                               | "company"
                           )
                         }
-                        className={InputClass()}
+                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none"
                       >
-                        <option value="newest">Uusimmat ensin</option>
-                        <option value="match">Paras match</option>
-                        <option value="deadline">Lähin deadline</option>
-                        <option value="priority">Korkein prioriteetti</option>
-                        <option value="company">Yritys A–Ö</option>
+                        <option value="newest">Uusimmat</option>
+                        <option value="match">Match</option>
+                        <option value="deadline">Deadline</option>
+                        <option value="priority">Prio</option>
+                        <option value="company">Yritys</option>
                       </select>
 
                       <button
                         type="button"
                         onClick={() => setShowFavoritesOnly((prev) => !prev)}
-                        className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                        className={`w-full rounded-xl px-3 py-2 text-sm font-medium transition ${
                           showFavoritesOnly
                             ? "bg-amber-400 text-black hover:bg-amber-300"
                             : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
                         }`}
                       >
-                        {showFavoritesOnly ? "Näytetään suosikit" : "Vain suosikit"}
+                        {showFavoritesOnly ? "Näytä suosikit" : "Vain suosikit"}
                       </button>
                     </div>
 
                     {filteredJobs.length === 0 ? (
-                      <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-10 text-zinc-400">
+                      <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-6 sm:p-10 text-center text-sm sm:text-base text-zinc-400">
                         {jobs.length === 0
                           ? "Ei lisättyjä työpaikkoja vielä."
                           : "Suodatuksella ei löytynyt työpaikkoja."}
                       </div>
                     ) : (
-                      filteredJobs.map((job) => {
-                        const isActive = job.id === activeJobId;
-                        const jobLetters = savedLetters.filter(
-                          (letter) => letter.jobId === job.id
-                        );
-                        const jobCvs = savedCvVariants.filter(
-                          (cv) => cv.jobId === job.id
-                        );
+                      <div className="space-y-4">
+                        {filteredJobs.map((job) => {
+                          const isActive = job.id === activeJobId;
+                          const jobLetters = savedLetters.filter(
+                            (letter) => letter.jobId === job.id
+                          );
+                          const jobCvs = savedCvVariants.filter(
+                            (cv) => cv.jobId === job.id
+                          );
 
-                        return (
-                          <JobCard
-                            key={job.id}
-                            job={job}
-                            isActive={isActive}
-                            applicationsCount={jobLetters.length}
-                            cvsCount={jobCvs.length}
-                            onSelect={() => setActiveJobId(job.id)}
-                            onRemove={() => removeJob(job.id)}
-                            onUpdate={(patch) => updateJob(job.id, patch)}
-                          />
-                        );
-                      })
+                          return (
+                            <JobCard
+                              key={job.id}
+                              job={job}
+                              isActive={isActive}
+                              applicationsCount={jobLetters.length}
+                              cvsCount={jobCvs.length}
+                              onSelect={() => setActiveJobId(job.id)}
+                              onRemove={() => removeJob(job.id)}
+                              onUpdate={(patch) => updateJob(job.id, patch)}
+                            />
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -2535,7 +2576,7 @@ export default function Home() {
 
               {tab === "letter" && (
                 <div className="space-y-4">
-                  <div className="rounded-[28px] border border-white/10 bg-black/25 p-5">
+                  <div className="rounded-[28px] border border-white/10 bg-black/25 p-4 sm:p-5">
                     <h3 className="text-lg font-semibold text-white">
                       Valittu työpaikka
                     </h3>
@@ -2556,7 +2597,7 @@ export default function Home() {
                         </p>
                       </div>
                     ) : (
-                      <p className="mt-3 text-zinc-400">Ei valittua työpaikkaa.</p>
+                      <p className="mt-3 text-zinc-400 text-sm">Ei valittua työpaikkaa.</p>
                     )}
 
                     <div className="mt-5">
@@ -2567,7 +2608,7 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => setLetterTone("professional")}
-                          className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+                          className={`flex-1 sm:flex-none rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
                             letterTone === "professional"
                               ? "bg-white text-black"
                               : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -2578,7 +2619,7 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => setLetterTone("warm")}
-                          className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+                          className={`flex-1 sm:flex-none rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
                             letterTone === "warm"
                               ? "bg-white text-black"
                               : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -2589,7 +2630,7 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => setLetterTone("sales")}
-                          className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+                          className={`flex-1 sm:flex-none rounded-2xl px-4 py-2.5 text-sm font-medium transition ${
                             letterTone === "sales"
                               ? "bg-white text-black"
                               : "border border-white/10 bg-white/5 text-white hover:bg-white/10"
@@ -2604,7 +2645,7 @@ export default function Home() {
                       type="button"
                       onClick={handleCoverLetterSubmit}
                       disabled={loadingLetter || !activeJob}
-                      className="mt-5 rounded-2xl bg-purple-600 px-5 py-3 font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50"
+                      className="mt-5 w-full sm:w-auto rounded-2xl bg-purple-600 px-5 py-3.5 font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50"
                     >
                       {loadingLetter
                         ? "Luodaan hakemus..."
@@ -2617,7 +2658,7 @@ export default function Home() {
                       <h3 className="mb-3 text-lg font-semibold text-white">
                         Tallennetut hakemukset
                       </h3>
-                      <div className="space-y-3">
+                      <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                         {activeJobLetters.map((letter) => (
                           <button
                             key={letter.id}
@@ -2628,7 +2669,7 @@ export default function Home() {
                             }}
                             className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left transition hover:bg-white/[0.07]"
                           >
-                            <p className="font-medium text-white">
+                            <p className="font-medium text-white truncate">
                               {letter.jobTitle} · {letter.companyName}
                             </p>
                             <p className="text-xs text-zinc-400">
@@ -2642,15 +2683,15 @@ export default function Home() {
 
                   {letterResult ? (
                     <>
-                      <div className="rounded-[28px] border border-white/10 bg-black/25 p-5">
-                        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                      <div className="rounded-[28px] border border-white/10 bg-black/25 p-4 sm:p-5">
+                        <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <h2 className="text-xl font-semibold text-white">
                             Hakemus
                           </h2>
                           <button
                             type="button"
                             onClick={saveEditedLetter}
-                            className="rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                            className="w-full sm:w-auto rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500"
                           >
                             Tallenna muokattu versio
                           </button>
@@ -2671,13 +2712,13 @@ export default function Home() {
                             "Hakemus kopioitu leikepöydälle."
                           )
                         }
-                        className="rounded-2xl bg-amber-600 px-5 py-3 font-semibold text-white transition hover:bg-amber-500"
+                        className="w-full sm:w-auto rounded-2xl bg-amber-600 px-5 py-3.5 font-semibold text-white transition hover:bg-amber-500"
                       >
                         Kopioi hakemus
                       </button>
                     </>
                   ) : (
-                    <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-10 text-zinc-400">
+                    <div className="rounded-[28px] border border-dashed border-white/10 bg-black/20 p-6 sm:p-10 text-center text-sm sm:text-base text-zinc-400">
                       Generoitu hakemus näkyy täällä, kun valitset työpaikan ja
                       luot hakemuksen.
                     </div>
@@ -2688,7 +2729,7 @@ export default function Home() {
 
             {(message || errorMessage) && (
               <div
-                className={`rounded-[28px] border p-4 text-sm shadow-[0_12px_35px_rgba(0,0,0,0.25)] ${
+                className={`fixed bottom-6 right-6 left-6 sm:left-auto sm:max-w-md z-50 rounded-[28px] border p-4 text-sm shadow-[0_12px_35px_rgba(0,0,0,0.5)] ${
                   errorMessage
                     ? "border-red-900 bg-red-950 text-red-300"
                     : "border-emerald-900 bg-emerald-950 text-emerald-300"
