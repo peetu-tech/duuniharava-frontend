@@ -36,9 +36,7 @@ export default function LoginPage() {
             <p className="inline-flex rounded-full border border-teal-400/30 bg-teal-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-300">
               Kirjaudu sisään
             </p>
-            <h1 className="mt-4 text-4xl font-black tracking-tight">
-              Tervetuloa takaisin Duuniharavaan
-            </h1>
+            <h1 className="mt-4 text-4xl font-black tracking-tight">Tervetuloa takaisin Duuniharavaan</h1>
             <p className="mt-4 text-zinc-300">
               Jatka CV:n muokkausta, työpaikkaseurantaa ja hakemuksia samasta työtilasta.
             </p>
@@ -71,12 +69,11 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-teal-400 px-4 py-2.5 font-bold text-black transition hover:bg-teal-300 disabled:opacity-70"
+                className="w-full rounded-xl bg-teal-400 px-4 py-2.5 font-bold text-black transition hover:bg-teal-300"
               >
                 {loading ? "Kirjaudutaan..." : "Kirjaudu"}
               </button>
             </form>
-
             {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
 
             <p className="mt-4 text-sm text-zinc-400">
