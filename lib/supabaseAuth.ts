@@ -21,10 +21,13 @@ export type AuthSession = {
 const SESSION_KEY = "duuniharava.auth.session";
 
 export function saveSession(session: AuthSession) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  if (typeof window !== "undefined") {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  }
 }
 
-export function getSession() {
+export function getSession(): AuthSession | null {
+  if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
@@ -35,17 +38,20 @@ export function getSession() {
 }
 
 export function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(SESSION_KEY);
+  }
 }
 
 export async function signInWithPassword(email: string, password: string) {
   assertEnv();
 
+  // Käytetään as string -määritystä, jotta TypeScript tietää näiden olevan olemassa
   const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: SUPABASE_ANON_KEY,
+      apikey: SUPABASE_ANON_KEY as string,
     },
     body: JSON.stringify({ email, password }),
   });
@@ -67,7 +73,7 @@ export async function signUp(email: string, password: string, name?: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: SUPABASE_ANON_KEY,
+      apikey: SUPABASE_ANON_KEY as string,
     },
     body: JSON.stringify({
       email,
@@ -81,7 +87,6 @@ export async function signUp(email: string, password: string, name?: string) {
     throw new Error(data?.msg || data?.error_description || "Tilin luonti epäonnistui.");
   }
 
-  // Jos email confirmation ei ole pakollinen, kirjaudutaan heti sisään:
   if (data?.user?.email_confirmed_at || data?.session) {
     return signInWithPassword(email, password);
   }
