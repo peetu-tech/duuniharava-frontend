@@ -430,7 +430,7 @@ function JobCard({
     <div
       className={`rounded-[30px] border p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition ${
         isActive
-          ? "border-blue-500/60 bg-gradient-to-br from-blue-950/35 via-zinc-950 to-zinc-950"
+          ? "border-white/30 bg-white/[0.08]"
           : "border-white/10 bg-white/[0.03] hover:border-white/15"
       }`}
     >
@@ -495,7 +495,7 @@ function JobCard({
           <button
             type="button"
             onClick={onRemove}
-            className="flex-1 sm:flex-none rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500"
+            className="flex-1 sm:flex-none rounded-2xl border border-red-900/50 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/20"
           >
             Poista
           </button>
@@ -681,7 +681,7 @@ function JobCard({
           href={job.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex w-full sm:w-auto justify-center rounded-2xl border border-blue-900/60 bg-blue-950/30 px-4 py-3 sm:py-2 text-sm font-medium text-blue-300 transition hover:bg-blue-950/50"
+          className="mt-4 inline-flex w-full sm:w-auto justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:py-2 text-sm font-medium text-white transition hover:bg-white/10"
         >
           Avaa työpaikkalinkki
         </a>
@@ -2039,7 +2039,7 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={loadingCv}
-                    className="w-full sm:w-auto rounded-2xl bg-blue-600 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                    className="w-full sm:w-auto rounded-2xl bg-white px-5 py-3.5 font-semibold text-black transition hover:bg-zinc-200 disabled:opacity-50"
                   >
                     {loadingCv ? "Luodaan CV..." : "Generoi CV"}
                   </button>
@@ -2051,7 +2051,7 @@ export default function Home() {
                         onClick={() =>
                           copyText(parsedCv.cvBody, "CV kopioitu leikepöydälle.")
                         }
-                        className="w-full sm:w-auto rounded-2xl bg-emerald-600 px-5 py-3.5 font-semibold text-white transition hover:bg-emerald-500"
+                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 font-medium text-white transition hover:bg-white/10"
                       >
                         Kopioi CV
                       </button>
@@ -2060,7 +2060,7 @@ export default function Home() {
                         type="button"
                         onClick={downloadPdf}
                         disabled={downloadingPdf}
-                        className="w-full sm:w-auto rounded-2xl bg-fuchsia-600 px-5 py-3.5 font-semibold text-white transition hover:bg-fuchsia-500 disabled:opacity-50"
+                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
                       >
                         {downloadingPdf ? "Luodaan PDF..." : "Lataa PDF"}
                       </button>
@@ -2069,7 +2069,7 @@ export default function Home() {
                         type="button"
                         onClick={downloadDocx}
                         disabled={downloadingDocx}
-                        className="w-full sm:w-auto rounded-2xl bg-cyan-600 px-5 py-3.5 font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-50"
+                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
                       >
                         {downloadingDocx ? "Luodaan DOCX..." : "Lataa DOCX"}
                       </button>
@@ -2088,7 +2088,7 @@ export default function Home() {
                   type="button"
                   onClick={suggestJobs}
                   disabled={loadingJobs}
-                  className="rounded-2xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+                  className="rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200 disabled:opacity-50"
                 >
                   {loadingJobs ? "Ehdotetaan..." : "Ehdota työpaikkoja"}
                 </button>
@@ -2199,7 +2199,7 @@ export default function Home() {
                         type="button"
                         onClick={createTailoredCv}
                         disabled={loadingTailoredCv}
-                        className="w-full rounded-2xl bg-violet-600 px-5 py-3.5 font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50"
+                        className="w-full rounded-2xl bg-white px-5 py-3.5 font-semibold text-black transition hover:bg-zinc-200 disabled:opacity-50"
                       >
                         {loadingTailoredCv
                           ? "Luodaan kohdistettua CV:tä..."
@@ -2453,7 +2453,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={addJob}
-                      className="w-full sm:w-auto rounded-2xl bg-blue-600 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-500"
+                      className="w-full sm:w-auto rounded-2xl bg-white px-5 py-3.5 font-semibold text-black transition hover:bg-zinc-200"
                     >
                       Lisää työpaikka listaan
                     </button>
@@ -2645,7 +2645,7 @@ export default function Home() {
                       type="button"
                       onClick={handleCoverLetterSubmit}
                       disabled={loadingLetter || !activeJob}
-                      className="mt-5 w-full sm:w-auto rounded-2xl bg-purple-600 px-5 py-3.5 font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50"
+                      className="mt-5 w-full sm:w-auto rounded-2xl bg-white px-5 py-3.5 font-semibold text-black transition hover:bg-zinc-200 disabled:opacity-50"
                     >
                       {loadingLetter
                         ? "Luodaan hakemus..."
@@ -2691,7 +2691,7 @@ export default function Home() {
                           <button
                             type="button"
                             onClick={saveEditedLetter}
-                            className="w-full sm:w-auto rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                            className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
                           >
                             Tallenna muokattu versio
                           </button>
@@ -2712,7 +2712,7 @@ export default function Home() {
                             "Hakemus kopioitu leikepöydälle."
                           )
                         }
-                        className="w-full sm:w-auto rounded-2xl bg-amber-600 px-5 py-3.5 font-semibold text-white transition hover:bg-amber-500"
+                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-5 py-3.5 font-medium text-white transition hover:bg-white/10"
                       >
                         Kopioi hakemus
                       </button>
