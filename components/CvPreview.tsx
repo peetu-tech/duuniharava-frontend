@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
 export type CvCustomStyle = {
@@ -25,191 +27,65 @@ type CvPreviewProps = {
   customStyle?: CvCustomStyle;
 };
 
+// Yleiset ikonit SVG-muodossa
+const Icons = {
+  Phone: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+  ),
+  Mail: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+  ),
+  MapPin: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+  )
+};
+
 function splitLines(text: string) {
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  return text.split("\n").map((line) => line.trim()).filter(Boolean);
 }
 
 const headingNames = [
-  "Profiili",
-  "Työkokemus",
-  "Koulutus",
-  "Kielitaito",
-  "Taidot",
-  "Kortit ja pätevyydet",
-  "Harrastukset",
+  "PROFIILI",
+  "TYÖKOKEMUS",
+  "KOULUTUS",
+  "KIELITAITO",
+  "TAIDOT",
+  "KORTIT JA PÄTEVYYDET",
+  "HARRASTUKSET",
 ];
 
 function isHeading(line: string) {
-  return line === line.toUpperCase() || headingNames.includes(line);
+  return line === line.toUpperCase() || headingNames.includes(line.toUpperCase());
 }
 
 function getDefaultCustomStyle(styleVariant: CvStyleVariant): CvCustomStyle {
   switch (styleVariant) {
     case "classic":
       return {
-        sidebarBg: "#f5f5f4",
-        sidebarText: "#111827",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#78716c",
-        accentColor: "#a16207",
-        borderRadius: 30,
-        sidebarWidth: 255,
-        nameSize: 40,
-        bodySize: 15,
-        lineHeight: 1.7,
-        sectionSpacing: 24,
-        imageRadius: 24,
+        sidebarBg: "#f4f4f5", sidebarText: "#292524", mainBg: "#ffffff", mainText: "#292524",
+        headingColor: "#57534e", accentColor: "#9a3412", borderRadius: 0, sidebarWidth: 260,
+        nameSize: 42, bodySize: 14, lineHeight: 1.6, sectionSpacing: 28, imageRadius: 0,
       };
     case "compact":
       return {
-        sidebarBg: "#f8fafc",
-        sidebarText: "#111827",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#64748b",
-        accentColor: "#0f766e",
-        borderRadius: 30,
-        sidebarWidth: 220,
-        nameSize: 32,
-        bodySize: 14,
-        lineHeight: 1.6,
-        sectionSpacing: 18,
-        imageRadius: 20,
+        sidebarBg: "#f8fafc", sidebarText: "#1e293b", mainBg: "#ffffff", mainText: "#334155",
+        headingColor: "#475569", accentColor: "#0d9488", borderRadius: 16, sidebarWidth: 230,
+        nameSize: 34, bodySize: 13, lineHeight: 1.5, sectionSpacing: 20, imageRadius: 16,
       };
     case "bold":
       return {
-        sidebarBg: "#1e1b4b",
-        sidebarText: "#ffffff",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#4338ca",
-        accentColor: "#4f46e5",
-        borderRadius: 30,
-        sidebarWidth: 255,
-        nameSize: 48,
-        bodySize: 15,
-        lineHeight: 1.7,
-        sectionSpacing: 24,
-        imageRadius: 24,
+        sidebarBg: "#ffffff", sidebarText: "#111827", mainBg: "#ffffff", mainText: "#1f2937",
+        headingColor: "#111827", accentColor: "#4f46e5", borderRadius: 24, sidebarWidth: 0, // Bold käyttää 1-sarakkeista leiskaa
+        nameSize: 52, bodySize: 15, lineHeight: 1.7, sectionSpacing: 32, imageRadius: 24,
       };
     case "modern":
     default:
       return {
-        sidebarBg: "#0f172a",
-        sidebarText: "#ffffff",
-        mainBg: "#ffffff",
-        mainText: "#111827",
-        headingColor: "#475569",
-        accentColor: "#0ea5a4",
-        borderRadius: 30,
-        sidebarWidth: 255,
-        nameSize: 40,
-        bodySize: 15,
-        lineHeight: 1.7,
-        sectionSpacing: 24,
-        imageRadius: 24,
+        sidebarBg: "#0f172a", sidebarText: "#f8fafc", mainBg: "#ffffff", mainText: "#334155",
+        headingColor: "#1e293b", accentColor: "#0ea5a4", borderRadius: 30, sidebarWidth: 280,
+        nameSize: 44, bodySize: 14, lineHeight: 1.7, sectionSpacing: 26, imageRadius: 30,
       };
   }
-}
-
-function DuuniharavaMiniLogo({
-  styleVariant,
-  sidebarText,
-  accentColor,
-}: {
-  styleVariant: CvStyleVariant;
-  sidebarText: string;
-  accentColor: string;
-}) {
-  const softBg =
-    styleVariant === "classic"
-      ? "rgba(161,98,7,0.10)"
-      : styleVariant === "compact"
-      ? "rgba(15,118,110,0.10)"
-      : styleVariant === "bold"
-      ? "rgba(99,102,241,0.16)"
-      : "rgba(14,165,164,0.14)";
-
-  const borderColor =
-    styleVariant === "classic"
-      ? "rgba(161,98,7,0.18)"
-      : styleVariant === "compact"
-      ? "rgba(15,118,110,0.18)"
-      : styleVariant === "bold"
-      ? "rgba(129,140,248,0.18)"
-      : "rgba(45,212,191,0.18)";
-
-  return (
-    <div
-      className="inline-flex items-center gap-3 rounded-2xl px-3 py-3"
-      style={{
-        background: softBg,
-        border: `1px solid ${borderColor}`,
-      }}
-    >
-      <div
-        className="relative flex h-11 w-11 items-center justify-center rounded-2xl shadow-[0_10px_24px_rgba(15,23,42,0.16)]"
-        style={{
-          background: `linear-gradient(135deg, ${accentColor}, ${
-            styleVariant === "classic"
-              ? "#d97706"
-              : styleVariant === "compact"
-              ? "#14b8a6"
-              : styleVariant === "bold"
-              ? "#6366f1"
-              : "#22d3ee"
-          })`,
-        }}
-      >
-        <div className="absolute inset-[2px] rounded-[14px] bg-white/90" />
-        <svg
-          viewBox="0 0 64 64"
-          className="relative z-10 h-7 w-7"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M14 18h18c10 0 18 8 18 18s-8 18-18 18H22"
-            stroke={accentColor}
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M18 14v36"
-            stroke={accentColor}
-            strokeWidth="6"
-            strokeLinecap="round"
-          />
-          <path
-            d="M39 39l11 11"
-            stroke="#0f172a"
-            strokeWidth="5"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-
-      <div className="leading-tight">
-        <p
-          className="text-[11px] font-semibold uppercase tracking-[0.24em]"
-          style={{ color: sidebarText, opacity: 0.68 }}
-        >
-          Duuniharava
-        </p>
-        <p
-          className="text-sm font-semibold"
-          style={{ color: sidebarText, opacity: 0.96 }}
-        >
-          CV Studio
-        </p>
-      </div>
-    </div>
-  );
 }
 
 export default function CvPreview({
@@ -223,301 +99,202 @@ export default function CvPreview({
 
   if (!lines.length) {
     return (
-      <div className="rounded-[32px] border border-dashed border-white/10 bg-zinc-950/70 p-12 text-zinc-400">
-        CV-esikatselu näkyy täällä.
+      <div className="rounded-[32px] border border-dashed border-white/10 bg-zinc-950/70 p-12 text-zinc-400 text-center font-medium">
+        CV-esikatselu muodostuu tähän.
       </div>
     );
   }
 
+  // --- ÄLYKÄS PARSERI ---
+  // Puretaan tekoälyn teksti palikoiksi, jotta voimme tehdä hienoja UI-elementtejä
   const name = lines[0] || "";
-  const contactLines = lines.slice(1, 4);
+  const phone = lines[1] || "";
+  const email = lines[2] || "";
+  const location = lines[3] || "";
   const contentLines = lines.slice(4);
-  const roleLine = contentLines[0]?.toLowerCase().startsWith("tavoiteltu työ:")
-    ? contentLines[0]
-    : "";
+  
+  let roleLine = "";
+  if (contentLines[0] && !isHeading(contentLines[0])) {
+    roleLine = contentLines[0];
+    contentLines.shift();
+  }
 
-  const remainingContent = roleLine ? contentLines.slice(1) : contentLines;
-  const isCompact = styleVariant === "compact";
+  const sections: { title: string; items: string[] }[] = [];
+  let currentSection = { title: "", items: [] as string[] };
 
-  const softChipBg =
-    styleVariant === "bold"
-      ? "rgba(99,102,241,0.18)"
-      : styleVariant === "classic"
-      ? "#e7e5e4"
-      : styleVariant === "compact"
-      ? "#dbeafe"
-      : "rgba(255,255,255,0.10)";
+  contentLines.forEach((line) => {
+    if (isHeading(line)) {
+      if (currentSection.title || currentSection.items.length > 0) {
+        sections.push(currentSection);
+      }
+      currentSection = { title: line, items: [] };
+    } else {
+      currentSection.items.push(line);
+    }
+  });
+  if (currentSection.title || currentSection.items.length > 0) {
+    sections.push(currentSection);
+  }
 
-  const softChipText =
-    styleVariant === "bold"
-      ? "#c7d2fe"
-      : styleVariant === "classic"
-      ? "#57534e"
-      : styleVariant === "compact"
-      ? "#334155"
-      : "#e2e8f0";
+  // Erotellaan osiot tyypin mukaan
+  const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET", "HARRASTUKSET"].includes(title.toUpperCase());
+  const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS"].includes(title.toUpperCase());
 
-  const cardShadow =
-    styleVariant === "bold"
-      ? "0 36px 90px rgba(79,70,229,0.16)"
-      : styleVariant === "classic"
-      ? "0 30px 80px rgba(120,113,108,0.12)"
-      : styleVariant === "compact"
-      ? "0 30px 80px rgba(15,23,42,0.10)"
-      : "0 36px 90px rgba(15,23,42,0.16)";
+  // Komponentti tageille (Canva-style pillerit)
+  const renderTags = (items: string[]) => {
+    // Jos tekoäly laittoi taidot yhdelle riville pilkulla erotettuna, rikotaan ne tag-arrayksi
+    const tags = items.flatMap(i => i.split(',')).map(t => t.trim().replace(/^- /g, '')).filter(Boolean);
+    return (
+      <div className="flex flex-wrap gap-2 mt-3">
+        {tags.map((tag, idx) => (
+          <span key={idx} className="px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide" style={{ backgroundColor: `${style.accentColor}15`, color: style.accentColor, border: `1px solid ${style.accentColor}30` }}>
+            {tag}
+          </span>
+        ))}
+      </div>
+    );
+  };
 
-  return (
-    <div
-      id="cv-preview"
-      className="mx-auto w-full max-w-[900px] overflow-hidden border transition-all duration-300"
-      style={{
-        backgroundColor: style.mainBg,
-        color: style.mainText,
-        borderRadius: `${style.borderRadius}px`,
-        borderColor:
-          styleVariant === "classic"
-            ? "#e7e5e4"
-            : styleVariant === "bold"
-            ? "rgba(99,102,241,0.18)"
-            : "#e2e8f0",
-        boxShadow: cardShadow,
-      }}
-    >
-      <div
-        className="grid min-h-[1120px]"
-        style={{
-          gridTemplateColumns: `${style.sidebarWidth}px 1fr`,
-        }}
-      >
-        <aside
-          className="flex flex-col p-8"
-          style={{
-            background:
-              styleVariant === "modern"
-                ? `linear-gradient(180deg, ${style.sidebarBg} 0%, #111827 100%)`
-                : styleVariant === "bold"
-                ? `linear-gradient(180deg, ${style.sidebarBg} 0%, #312e81 100%)`
-                : style.sidebarBg,
-            color: style.sidebarText,
-            borderRight:
-              styleVariant === "bold"
-                ? "none"
-                : "1px solid rgba(148,163,184,0.18)",
-          }}
-        >
-          <div className="mb-7">
-            <DuuniharavaMiniLogo
-              styleVariant={styleVariant}
-              sidebarText={style.sidebarText}
-              accentColor={style.accentColor}
-            />
+  // Komponentti aikajanalle (Työ/Koulu)
+  const renderTimeline = (items: string[]) => {
+    return (
+      <div className="mt-4 space-y-4 pl-3 border-l-2" style={{ borderColor: `${style.accentColor}30` }}>
+        {items.map((item, idx) => {
+          const isMainPoint = !item.startsWith("-") && item.length > 10;
+          return (
+            <div key={idx} className={`relative ${isMainPoint ? 'mt-6 first:mt-2' : 'mt-1 pl-4'}`}>
+              {isMainPoint && (
+                <div className="absolute -left-[17px] top-1.5 w-3 h-3 rounded-full border-2 bg-white" style={{ borderColor: style.accentColor }} />
+              )}
+              <p style={{ fontWeight: isMainPoint ? 700 : 400, fontSize: isMainPoint ? style.bodySize : style.bodySize - 1, color: isMainPoint ? style.headingColor : style.mainText, opacity: isMainPoint ? 1 : 0.85 }}>
+                {item}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // --- BOLD-TYYLI (1-sarakkeinen, iso visuaalinen yläosa, Canva-tyylinen grid) ---
+  if (styleVariant === "bold") {
+    return (
+      <div id="cv-preview" className="mx-auto w-full max-w-[900px] overflow-hidden transition-all duration-300 relative shadow-2xl" style={{ backgroundColor: style.mainBg, color: style.mainText, borderRadius: `${style.borderRadius}px` }}>
+        <header className="relative px-12 py-16 overflow-hidden" style={{ backgroundColor: style.accentColor, color: "#fff" }}>
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_top_right,white,transparent_50%)]"></div>
+          <div className="relative z-10 flex gap-8 items-center">
+            {image && (
+              <img src={image} alt="Profiilikuva" className="w-40 h-40 object-cover shadow-2xl border-4 border-white/20" style={{ borderRadius: `${style.imageRadius}px` }} />
+            )}
+            <div>
+              <h1 style={{ fontSize: `${style.nameSize}px`, lineHeight: 1, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
+              {roleLine && <p className="mt-3 text-xl font-bold text-white/90 tracking-wide">{roleLine}</p>}
+              <div className="flex flex-wrap gap-5 mt-6 text-sm font-medium text-white/80">
+                {phone && <span className="flex items-center gap-2"><Icons.Phone /> {phone}</span>}
+                {email && <span className="flex items-center gap-2"><Icons.Mail /> {email}</span>}
+                {location && <span className="flex items-center gap-2"><Icons.MapPin /> {location}</span>}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="p-12 grid grid-cols-[1fr_300px] gap-12 items-start">
+          <div className="space-y-10">
+            {sections.filter(s => !isTagSection(s.title)).map((section, i) => (
+              <section key={i}>
+                <h2 className="uppercase tracking-[0.2em] font-black mb-4 border-b-2 pb-2" style={{ fontSize: "14px", color: style.headingColor, borderColor: `${style.accentColor}20` }}>{section.title}</h2>
+                {isTimelineSection(section.title) ? renderTimeline(section.items) : (
+                  <div className="space-y-2" style={{ fontSize: `${style.bodySize}px`, lineHeight: style.lineHeight }}>
+                    {section.items.map((line, j) => <p key={j}>{line}</p>)}
+                  </div>
+                )}
+              </section>
+            ))}
           </div>
 
-          {image ? (
-            <img
-              src={image}
-              alt="Profiilikuva"
-              className="mb-7 aspect-square w-full object-cover transition-all duration-300"
-              style={{
-                borderRadius: `${style.imageRadius}px`,
-                boxShadow:
-                  styleVariant === "classic"
-                    ? "0 12px 28px rgba(120,113,108,0.12)"
-                    : "0 18px 36px rgba(15,23,42,0.20)",
-                border:
-                  styleVariant === "classic"
-                    ? "1px solid rgba(120,113,108,0.12)"
-                    : "1px solid rgba(255,255,255,0.08)",
-              }}
-            />
-          ) : (
-            <div
-              className="mb-7 flex aspect-square w-full items-center justify-center text-sm font-medium transition-all duration-300"
-              style={{
-                borderRadius: `${style.imageRadius}px`,
-                border:
-                  styleVariant === "classic"
-                    ? "1px solid rgba(120,113,108,0.12)"
-                    : "1px solid rgba(255,255,255,0.12)",
-                background:
-                  styleVariant === "classic"
-                    ? "rgba(255,255,255,0.6)"
-                    : "rgba(255,255,255,0.05)",
-                opacity: 0.86,
-              }}
-            >
-              Ei kuvaa
-            </div>
+          <div className="space-y-10 p-8 rounded-3xl" style={{ backgroundColor: `${style.accentColor}08` }}>
+            {sections.filter(s => isTagSection(s.title)).map((section, i) => (
+              <section key={i}>
+                <h2 className="uppercase tracking-[0.2em] font-black mb-4" style={{ fontSize: "12px", color: style.headingColor }}>{section.title}</h2>
+                {renderTags(section.items)}
+              </section>
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // --- MODERN, CLASSIC, COMPACT -TYYLIT (2-sarakkeiset leiskat) ---
+  return (
+    <div id="cv-preview" className="mx-auto w-full max-w-[900px] overflow-hidden border shadow-xl transition-all duration-300" style={{ backgroundColor: style.mainBg, color: style.mainText, borderRadius: `${style.borderRadius}px`, borderColor: styleVariant === "classic" ? "#e7e5e4" : "#e2e8f0" }}>
+      <div className="grid min-h-[1050px]" style={{ gridTemplateColumns: `${style.sidebarWidth}px 1fr` }}>
+        
+        {/* SIVUPALKKI */}
+        <aside className="flex flex-col p-8 md:p-10" style={{ background: style.sidebarBg, color: style.sidebarText, borderRight: styleVariant === "classic" ? "1px solid rgba(0,0,0,0.05)" : "none" }}>
+          {image && (
+            <img src={image} alt="Profiili" className="mb-8 aspect-square w-full object-cover shadow-lg" style={{ borderRadius: `${style.imageRadius}px` }} />
           )}
 
-          <div className="space-y-7">
-            <div
-              className="rounded-[24px] px-4 py-4"
-              style={{
-                background:
-                  styleVariant === "classic"
-                    ? "rgba(255,255,255,0.65)"
-                    : "rgba(255,255,255,0.05)",
-                border:
-                  styleVariant === "classic"
-                    ? "1px solid rgba(120,113,108,0.08)"
-                    : "1px solid rgba(255,255,255,0.08)",
-              }}
-            >
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">
-                Yhteystiedot
-              </p>
-              <div className="space-y-2.5 text-sm leading-6">
-                {contactLines.map((line, index) => (
-                  <p key={index} className="break-words">
-                    {line}
-                  </p>
-                ))}
-              </div>
-            </div>
-
-            <div
-              className="rounded-[24px] px-4 py-4"
-              style={{
-                background:
-                  styleVariant === "classic"
-                    ? "rgba(255,255,255,0.65)"
-                    : "rgba(255,255,255,0.05)",
-                border:
-                  styleVariant === "classic"
-                    ? "1px solid rgba(120,113,108,0.08)"
-                    : "1px solid rgba(255,255,255,0.08)",
-              }}
-            >
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">
-                Profiili
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-                <span
-                  className="rounded-full px-3 py-1.5 text-xs font-semibold"
-                  style={{
-                    backgroundColor: softChipBg,
-                    color: softChipText,
-                  }}
-                >
-                  Työnhaku
-                </span>
-
-                <span
-                  className="rounded-full px-3 py-1.5 text-xs font-semibold"
-                  style={{
-                    backgroundColor: softChipBg,
-                    color: softChipText,
-                  }}
-                >
-                  Duuniharava
-                </span>
-              </div>
+          <div className="mb-10">
+            <h2 className="uppercase tracking-[0.2em] font-black mb-4 opacity-50 text-[11px]">Yhteystiedot</h2>
+            <div className="space-y-4 text-sm font-medium opacity-90">
+              {phone && <div className="flex items-center gap-3"><span style={{ color: style.accentColor }}><Icons.Phone /></span> {phone}</div>}
+              {email && <div className="flex items-center gap-3"><span style={{ color: style.accentColor }}><Icons.Mail /></span> <span className="break-all">{email}</span></div>}
+              {location && <div className="flex items-center gap-3"><span style={{ color: style.accentColor }}><Icons.MapPin /></span> {location}</div>}
             </div>
           </div>
 
-          <div className="mt-auto pt-10 text-[11px] uppercase tracking-[0.22em] opacity-45">
-            {styleVariant === "modern" && "Moderni pohja"}
-            {styleVariant === "classic" && "Klassinen pohja"}
-            {styleVariant === "compact" && "Tiivis pohja"}
-            {styleVariant === "bold" && "Näyttävä pohja"}
+          {/* Sijoitetaan tägit/pienet asiat sivupalkkiin jos 2-sarakkeinen */}
+          <div className="space-y-8 mt-auto">
+            {sections.filter(s => isTagSection(s.title)).map((section, i) => (
+              <div key={i}>
+                <h2 className="uppercase tracking-[0.2em] font-black mb-3 opacity-50 text-[11px]">{section.title}</h2>
+                <div className="flex flex-wrap gap-2">
+                  {section.items.flatMap(i => i.split(',')).map(t => t.trim().replace(/^- /g, '')).filter(Boolean).map((tag, idx) => (
+                    <span key={idx} className="px-2.5 py-1 rounded bg-black/10 text-xs font-semibold backdrop-blur-sm border border-white/5">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </aside>
 
-        <main className={isCompact ? "p-8" : "p-10 md:p-12"}>
-          <header
-            className="mb-9 pb-7"
-            style={{
-              borderBottom:
-                styleVariant === "bold"
-                  ? "1px solid rgba(67,56,202,0.15)"
-                  : styleVariant === "classic"
-                  ? "1px solid #e7e5e4"
-                  : "1px solid #e2e8f0",
-            }}
-          >
-            <h1
-              style={{
-                fontSize: `${style.nameSize}px`,
-                lineHeight: 1.02,
-                fontWeight: styleVariant === "bold" ? 900 : 800,
-                letterSpacing: "-0.04em",
-                color: style.mainText,
-                fontFamily:
-                  styleVariant === "classic"
-                    ? "Georgia, serif"
-                    : "inherit",
-              }}
-            >
+        {/* PÄÄALUE */}
+        <main className={styleVariant === "compact" ? "p-8" : "p-10 md:p-14"}>
+          <header className="mb-10 pb-8" style={{ borderBottom: `2px solid ${style.accentColor}20` }}>
+            <h1 style={{ fontSize: `${style.nameSize}px`, lineHeight: 1.1, fontWeight: styleVariant === "classic" ? 700 : 900, letterSpacing: "-0.03em", color: style.headingColor, fontFamily: styleVariant === "classic" ? "Georgia, serif" : "inherit" }}>
               {name}
             </h1>
-
             {roleLine && (
-              <p
-                className="mt-3 text-sm"
-                style={{
-                  color: style.accentColor,
-                  fontWeight:
-                    styleVariant === "bold" || styleVariant === "modern"
-                      ? 700
-                      : 600,
-                  letterSpacing: "-0.01em",
-                }}
-              >
+              <p className="mt-3 text-lg font-bold tracking-wide uppercase" style={{ color: style.accentColor }}>
                 {roleLine}
               </p>
             )}
           </header>
 
-          <div
-            className="whitespace-pre-wrap"
-            style={{
-              fontSize: `${style.bodySize}px`,
-              lineHeight: style.lineHeight,
-              color: style.mainText,
-            }}
-          >
-            {remainingContent.map((line, index) => {
-              if (isHeading(line)) {
-                return (
-                  <h2
-                    key={index}
-                    style={{
-                      fontSize: styleVariant === "compact" ? "10px" : "11px",
-                      fontWeight: styleVariant === "bold" ? 900 : 800,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.24em",
-                      color: style.headingColor,
-                      borderTop:
-                        styleVariant === "bold"
-                          ? "1px solid rgba(67,56,202,0.15)"
-                          : styleVariant === "classic"
-                          ? "1px solid #ece7e3"
-                          : "1px solid #e2e8f0",
-                      paddingTop: styleVariant === "compact" ? "12px" : "16px",
-                      marginTop: `${style.sectionSpacing}px`,
-                      marginBottom: "12px",
-                    }}
-                  >
-                    {line}
-                  </h2>
-                );
-              }
-
-              return (
-                <p
-                  key={index}
-                  style={{
-                    marginBottom: "10px",
-                  }}
-                >
-                  {line}
-                </p>
-              );
-            })}
+          <div className="space-y-10" style={{ fontSize: `${style.bodySize}px`, lineHeight: style.lineHeight }}>
+            {sections.filter(s => !isTagSection(s.title)).map((section, index) => (
+              <section key={index}>
+                <h2 className="uppercase tracking-[0.2em] font-black mb-5 flex items-center gap-3" style={{ fontSize: "14px", color: style.headingColor }}>
+                  <span className="w-6 h-6 rounded flex items-center justify-center text-white" style={{ backgroundColor: style.accentColor }}>✦</span>
+                  {section.title}
+                </h2>
+                
+                {isTimelineSection(section.title) ? (
+                  renderTimeline(section.items)
+                ) : (
+                  <div className="space-y-3 opacity-80">
+                    {section.items.map((line, j) => <p key={j}>{line}</p>)}
+                  </div>
+                )}
+              </section>
+            ))}
           </div>
         </main>
+
       </div>
     </div>
   );
