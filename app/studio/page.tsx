@@ -402,6 +402,7 @@ function JobCard({
   onSelect,
   onRemove,
   onUpdate,
+  onSparring,
 }: {
   job: JobItem;
   isActive: boolean;
@@ -410,6 +411,7 @@ function JobCard({
   onSelect: () => void;
   onRemove: () => void;
   onUpdate: (patch: Partial<JobItem>) => void;
+  onSparring: () => void;
 }) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
@@ -478,6 +480,15 @@ function JobCard({
             }`}
           >
             {isActive ? "Valittu" : "Valitse paikka"}
+          </button>
+
+          {/* SPARRING NAPPI */}
+          <button
+            type="button"
+            onClick={onSparring}
+            className="flex-1 sm:flex-none rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-4 text-base font-bold text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black shadow-[0_0_15px_rgba(0,191,166,0.2)]"
+          >
+            🎤 Treenaa
           </button>
 
           <button
@@ -729,6 +740,14 @@ export default function Home() {
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
+  // Sparraus (Haastattelusimulaattori) tilat
+  const [sparringJob, setSparringJob] = useState<JobItem | null>(null);
+  const [sparringMessage, setSparringMessage] = useState("");
+  const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
+  const [isSparringTyping, setIsSparringTyping] = useState(false); // Uusi lataustila haastattelulle
+
+  const customStyle = customStyles[cvStyle];
+
   // SUPABASE: Datan lataus alussa
   useEffect(() => {
     const session = getSession();
@@ -745,7 +764,6 @@ export default function Home() {
       const userId = session.user.id;
 
       try {
-        // Lataa profiili
         const pRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers });
         const pData = await pRes.json();
         if (pData && pData.length > 0) {
@@ -767,11 +785,10 @@ export default function Home() {
           if (p.profile_image_url) setProfileImage(p.profile_image_url);
         }
 
-        // Lataa työpaikat
         const jRes = await fetch(`${supabaseUrl}/rest/v1/jobs?user_id=eq.${userId}&order=created_at.desc`, { headers });
         const jData = await jRes.json();
         if (jData && Array.isArray(jData)) {
-          setJobs(jData.map((j: any) => ({
+          setJobs(jData.map((j: any) => normalizeJob({
             id: j.id,
             title: j.title,
             company: j.company,
@@ -797,7 +814,6 @@ export default function Home() {
           })));
         }
 
-        // Lataa hakemukset
         const lRes = await fetch(`${supabaseUrl}/rest/v1/saved_letters?user_id=eq.${userId}&order=created_at.desc`, { headers });
         const lData = await lRes.json();
         if (lData && Array.isArray(lData)) {
@@ -811,7 +827,6 @@ export default function Home() {
           })));
         }
 
-        // Lataa CV:t
         const cRes = await fetch(`${supabaseUrl}/rest/v1/cv_variants?user_id=eq.${userId}&order=created_at.desc`, { headers });
         const cData = await cRes.json();
         if (cData && Array.isArray(cData)) {
@@ -1152,6 +1167,7 @@ export default function Home() {
       const canvas = await html2canvas(pdfRef.current, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         backgroundColor: "#ffffff",
       });
 
@@ -1181,11 +1197,11 @@ export default function Home() {
       }
 
       pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
-      setMessage("PDF ladattu.");
+      setMessage("PDF ladattu onnistuneesti.");
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
       console.error(error);
-      setErrorMessage("PDF:n luonti epäonnistui.");
+      setErrorMessage("Virhe PDF-luonnissa. Yritä päivittää sivu.");
     } finally {
       setDownloadingPdf(false);
     }
@@ -1411,6 +1427,7 @@ export default function Home() {
     setErrorMessage("");
 
     try {
+      const currentDate = new Date().toLocaleDateString("fi-FI");
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: {
@@ -1422,7 +1439,11 @@ export default function Home() {
           experience: form.experience,
           skills: form.skills,
           languages: form.languages,
-          onlyActive: true, // Pyydetään vain voimassa olevia työpaikkoja
+          onlyActive: true,
+          currentDate: currentDate,
+          sources: ["Duunitori", "Oikotie", "LinkedIn", "Työmarkkinatori"],
+          strictFreshness: true,
+          instructions: "Hae vain oikeasti NYT avoinna olevia, aitoja työpaikkoja useista lähteistä. Älä keksi ilmoituksia äläkä palauta vanhoja (esim. vuodelta 2024 tai 2025)."
         }),
       });
 
@@ -1662,12 +1683,34 @@ export default function Home() {
     }
   }
 
-  const customStyle = customStyles[cvStyle];
+  // --- HAASTATTELUSIMULAATTORIN FUNKTIOT ---
+  function startSparring(job: JobItem) {
+    setSparringJob(job);
+    setSparringChat([
+      { role: "ai", text: `Hei! Olen tekoälyrekrytoija yrityksestä ${job.company || "täältä"}. Huomasin, että haet meiltä tehtävää "${job.title}". Kertoisitko alkuun hieman itsestäsi ja miksi juuri tämä paikka kiinnostaa sinua?` }
+    ]);
+  }
+
+  function sendSparringMessage(e: React.FormEvent) {
+    e.preventDefault();
+    if (!sparringMessage.trim()) return;
+    
+    const newChat = [...sparringChat, { role: "user" as const, text: sparringMessage }];
+    setSparringChat(newChat);
+    setSparringMessage("");
+    setIsSparringTyping(true);
+
+    // Demo-vastaus tekoälyltä animoidulla viiveellä
+    setTimeout(() => {
+      setSparringChat([...newChat, { role: "ai", text: "Kiitos vastauksestasi! Se kuulostaa erittäin mielenkiintoiselta. Miten yleensä reagoit tilanteisiin, joissa kohtaat yllättäviä ongelmia tai aikataulupainetta? Voitko antaa jonkin konkreettisen esimerkin aiemmasta työkokemuksestasi?" }]);
+      setIsSparringTyping(false);
+    }, 1800);
+  }
 
   if (isAuthChecking) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#0F0F0F] text-white">
-        <p className="text-gray-400 font-bold text-xl animate-pulse">Ladataan studiota...</p>
+        <p className="text-[#00BFA6] font-black text-2xl animate-pulse tracking-widest uppercase">Ladataan studiota...</p>
       </main>
     );
   }
@@ -2511,6 +2554,24 @@ export default function Home() {
                         </div>
                       )}
 
+                      {/* VAPAA CV-TEKSTIN MUOKKAUS */}
+                      <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-8 sm:p-12 shadow-xl">
+                        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                          <div>
+                            <h3 className="text-2xl font-black text-white">Muokkaa CV-tekstiä</h3>
+                            <p className="text-sm text-gray-400 mt-1">Tekoälyn tuottama luonnos. Voit muokata tekstiä täysin vapaasti tässä ennen latausta.</p>
+                          </div>
+                        </div>
+                        <textarea
+                          value={parsedCv.cvBody}
+                          onChange={(e) => {
+                            const prefix = cvResult.split("CV_BODY:")[0] || "";
+                            setCvResult(prefix + "CV_BODY:\n" + e.target.value);
+                          }}
+                          className="min-h-[400px] w-full rounded-3xl border border-white/10 bg-black/50 p-6 font-mono text-sm leading-relaxed text-gray-200 outline-none transition focus:border-[#00BFA6]"
+                        />
+                      </div>
+
                       <div className="rounded-[40px] border border-white/10 bg-white p-4 sm:p-8 overflow-x-auto shadow-2xl">
                         <div className="min-w-[600px] lg:min-w-0">
                           <CvPreview
@@ -2834,6 +2895,7 @@ export default function Home() {
                               onSelect={() => setActiveJobId(job.id)}
                               onRemove={() => removeJob(job.id)}
                               onUpdate={(patch) => updateJob(job.id, patch)}
+                              onSparring={() => startSparring(job)}
                             />
                           );
                         })}
@@ -3015,6 +3077,64 @@ export default function Home() {
           </section>
         </div>
       </div>
+
+      {/* HAASTATTELUSIMULAATTORI MODAALI */}
+      {sparringJob && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#141414] border border-white/10 rounded-[32px] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col h-[80vh] animate-in zoom-in-95 duration-300">
+            <div className="p-6 sm:p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+              <div>
+                <h3 className="font-black text-2xl text-white tracking-tight">🎤 Haastattelusimulaattori</h3>
+                <p className="text-sm text-[#00BFA6] mt-1 font-bold">{sparringJob.title} @ {sparringJob.company || "Yritys"}</p>
+              </div>
+              <button onClick={() => setSparringJob(null)} className="text-gray-500 hover:text-white font-black text-2xl bg-white/5 w-12 h-12 rounded-full flex items-center justify-center transition-colors">✕</button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 custom-scrollbar">
+              {sparringChat.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
+                  <div className={`max-w-[85%] rounded-3xl p-6 ${msg.role === 'ai' ? 'bg-[#00BFA6]/10 border border-[#00BFA6]/20 text-gray-200 rounded-tl-sm' : 'bg-white/10 text-white rounded-tr-sm'}`}>
+                    <p className={`text-xs font-black mb-3 tracking-widest uppercase ${msg.role === 'ai' ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
+                      {msg.role === 'ai' ? '🤖 Rekrytoija' : '👤 Sinä'}
+                    </p>
+                    <p className="leading-relaxed text-[15px]">{msg.text}</p>
+                  </div>
+                </div>
+              ))}
+              
+              {/* UUSI KIRJOITTAA-ANIMAATIO */}
+              {isSparringTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-[#00BFA6]/10 border border-[#00BFA6]/20 rounded-3xl p-4 text-[#00BFA6] text-xl font-black flex gap-1 rounded-tl-sm">
+                    <span className="animate-bounce" style={{animationDelay: "0s"}}>.</span>
+                    <span className="animate-bounce" style={{animationDelay: "0.2s"}}>.</span>
+                    <span className="animate-bounce" style={{animationDelay: "0.4s"}}>.</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 sm:p-8 border-t border-white/5 bg-black/50">
+              <form onSubmit={sendSparringMessage} className="flex gap-4">
+                <input 
+                  value={sparringMessage} 
+                  onChange={e => setSparringMessage(e.target.value)} 
+                  placeholder="Kirjoita vastauksesi tähän..." 
+                  className="flex-1 rounded-2xl bg-white/5 border border-white/10 px-6 py-4 text-white outline-none focus:border-[#00BFA6] transition-colors" 
+                  disabled={isSparringTyping}
+                />
+                <button 
+                  type="submit" 
+                  disabled={!sparringMessage.trim() || isSparringTyping} 
+                  className="bg-[#00BFA6] text-black font-black px-8 rounded-2xl disabled:opacity-50 hover:scale-[1.05] active:scale-95 transition-transform"
+                >
+                  LÄHETÄ
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
