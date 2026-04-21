@@ -744,7 +744,8 @@ export default function Home() {
   const [sparringJob, setSparringJob] = useState<JobItem | null>(null);
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
-  const [isSparringTyping, setIsSparringTyping] = useState(false); // Uusi lataustila haastattelulle
+  const [isSparringTyping, setIsSparringTyping] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement | null>(null); // Automaattista scrollausta varten
 
   const customStyle = customStyles[cvStyle];
 
@@ -880,6 +881,11 @@ export default function Home() {
 
     return () => clearTimeout(timeout);
   }, [form, profileImage, isAuthChecking, hasSession]);
+
+  // Automaattinen scrollaus chattiin
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [sparringChat, isSparringTyping]);
 
   const parsedCv = useMemo(() => parseCvResult(cvResult), [cvResult]);
   const parsedLetter = useMemo(
@@ -2606,7 +2612,7 @@ export default function Home() {
                       </div>
                     </>
                   ) : (
-                    <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center text-gray-500">
+                    <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center font-medium text-gray-500">
                       <div className="text-5xl mb-6">📄</div>
                       <p className="text-xl font-bold text-white mb-2">Ei esikatselua vielä</p>
                       <p className="text-base text-gray-400">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
@@ -2870,7 +2876,7 @@ export default function Home() {
                     </div>
 
                     {filteredJobs.length === 0 ? (
-                      <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center text-gray-500">
+                      <div className="rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center font-medium text-gray-500">
                         <p className="text-xl font-bold text-white mb-2">Ei tuloksia</p>
                         <p className="text-base">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
                       </div>
@@ -3112,6 +3118,9 @@ export default function Home() {
                   </div>
                 </div>
               )}
+              
+              {/* Näkymätön div automaattista vieritystä varten */}
+              <div ref={chatEndRef} />
             </div>
 
             <div className="p-6 sm:p-8 border-t border-white/5 bg-black/50">
