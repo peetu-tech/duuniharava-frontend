@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { buildCoverLetterPrompt } from "@/lib/prompts";
 
-const client = new OpenAI({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -38,21 +38,31 @@ export async function POST(req: Request) {
       tone: safeTone(body.tone),
     });
 
-    const response = await client.responses.create({
-      model: "gpt-4.1-mini",
-      input: prompt,
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // Käytetään OpenAI:n lippulaivamallia laadun takaamiseksi
+      messages: [
+        {
+          role: "system",
+          content: "Olet huipputason suomalainen rekrytointikonsultti ja uravalmentaja. Kirjoitat täydellistä, inhimillistä ja vaikuttavaa suomea. Et koskaan käytä tekoälylle tyypillisiä kliseitä tai ylisanoja (esim. 'innovatiivinen', 'dynaaminen', 'synergia'). Tekstisi on uskottavaa ja kohdistuu suoraan suomalaiseen työkulttuuriin.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7, // 0.7 antaa luonnollisen ja luovan, mutta ammattimaisen sävyn
     });
 
     const output =
-      response.output_text?.trim() ||
-      "HAKEMUS:\nHakemuksen luonti epäonnistui.";
+      response.choices[0]?.message?.content?.trim() ||
+      "HAKEMUS:\nHakemuksen luonti epäonnistui. Kokeile uudelleen.";
 
     return Response.json({ output });
   } catch (error) {
     console.error("cover-letter route error:", error);
 
     return Response.json(
-      { error: "Hakemuksen luonti epäonnistui." },
+      { error: "Hakemuksen luonti epäonnistui teknisen virheen vuoksi." },
       { status: 500 }
     );
   }
