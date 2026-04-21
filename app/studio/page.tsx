@@ -162,6 +162,9 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     lineHeight: 1.7,
     sectionSpacing: 24,
     imageRadius: 24,
+    pattern: "none",
+    patternOpacity: 5,
+    showSeparators: true,
   },
   classic: {
     sidebarBg: "#f5f5f4",
@@ -177,6 +180,9 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     lineHeight: 1.7,
     sectionSpacing: 24,
     imageRadius: 24,
+    pattern: "lines",
+    patternOpacity: 3,
+    showSeparators: true,
   },
   compact: {
     sidebarBg: "#f8fafc",
@@ -192,6 +198,9 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     lineHeight: 1.6,
     sectionSpacing: 18,
     imageRadius: 20,
+    pattern: "dots",
+    patternOpacity: 4,
+    showSeparators: false,
   },
   bold: {
     sidebarBg: "#1e1b4b",
@@ -207,6 +216,9 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     lineHeight: 1.7,
     sectionSpacing: 24,
     imageRadius: 24,
+    pattern: "grid",
+    patternOpacity: 8,
+    showSeparators: true,
   },
 };
 
@@ -482,7 +494,6 @@ function JobCard({
             {isActive ? "Valittu" : "Valitse paikka"}
           </button>
 
-          {/* SPARRING NAPPI */}
           <button
             type="button"
             onClick={onSparring}
@@ -2001,7 +2012,7 @@ export default function Home() {
                 <div className="pt-4">
                   <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Koulutus</label>
                   <textarea
-                    placeholder="Kirjaa tänne oppilaitokset ja tutkinnot..."
+                    placeholder="Oppilaitos, Tutkinto, Valmistumisvuosi&#10;Esim. Helsingin Yliopisto, Kauppatieteiden maisteri, 2024"
                     value={form.education}
                     onChange={(e) => updateField("education", e.target.value)}
                     className={TextareaClass("min-h-[140px]")}
@@ -2011,7 +2022,7 @@ export default function Home() {
                 <div className="pt-4">
                   <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Työkokemus</label>
                   <textarea
-                    placeholder="Missä olet ollut töissä ja mitä teit?"
+                    placeholder="Työnantaja | Työtehtävä | 01/2020 - 05/2022 (tai 'Nykyinen')&#10;Lyhyt kuvaus työtehtävistäsi..."
                     value={form.experience}
                     onChange={(e) => updateField("experience", e.target.value)}
                     className={TextareaClass("min-h-[180px]")}
@@ -2185,6 +2196,52 @@ export default function Home() {
                           updateCustomStyle("accentColor", e.target.value)
                         }
                         className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Taustakuviointi
+                      </label>
+                      <select
+                        value={customStyle.pattern || "none"}
+                        onChange={(e) => updateCustomStyle("pattern", e.target.value as any)}
+                        className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="none">Ei kuviointia</option>
+                        <option value="dots">Pisteet (Dots)</option>
+                        <option value="lines">Viivat (Lines)</option>
+                        <option value="grid">Ruudukko (Grid)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Erotinviivat osioiden välissä
+                      </label>
+                      <select
+                        value={customStyle.showSeparators ? "yes" : "no"}
+                        onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")}
+                        className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="yes">Kyllä, näytä viivat</option>
+                        <option value="no">Ei, piilota viivat</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Kuvioinnin vahvuus ({customStyle.patternOpacity || 5}%)
+                      </label>
+                      <input
+                        type="range"
+                        min={1}
+                        max={30}
+                        value={customStyle.patternOpacity || 5}
+                        onChange={(e) =>
+                          updateCustomStyle("patternOpacity", Number(e.target.value))
+                        }
+                        className="w-full accent-[#00BFA6] mt-3"
                       />
                     </div>
 
