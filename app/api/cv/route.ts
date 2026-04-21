@@ -1,12 +1,21 @@
 import OpenAI from "openai";
 import { buildCreateCvPrompt, buildImproveCvPrompt } from "@/lib/prompts";
 
-const client = new OpenAI({
+// Huom! Ei "use client" -tunnistetta, koska tämä on backend/API-reitti.
+
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return Response.json(
+        { error: "OPENAI_API_KEY puuttuu palvelimen ympäristömuuttujista." },
+        { status: 500 }
+      );
+    }
+
     const body = await req.json();
     const mode = body.mode as "improve" | "create";
 
@@ -40,13 +49,24 @@ export async function POST(req: Request) {
             hobbies: body.hobbies,
           });
 
-    const response = await client.responses.create({
-      model: "gpt-4.1-mini",
-      input: prompt,
+    // Korjattu OpenAI kutsun syntaksi ja vaihdettu tehokkaaseen gpt-4o malliin
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "Olet huipputason suomalainen ura-asiantuntija ja rekrytoija. Tehtäväsi on luoda tai parantaa suomalaisia ansioluetteloita (CV). Kirjoitat erinomaista, ytimekästä ja ammattimaista suomea. Et koskaan keksi työkokemusta, taitoja tai saavutuksia, joita hakija ei ole itse antanut. Vältät tekoälylle tyypillisiä ylisanoja (esim. 'innovatiivinen', 'dynaaminen'). Noudatat annettua vastausformaattia kirjaimellisesti.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.5, // 0.5 pitää CV:n faktoissa kiinni, mutta sallii sujuvan kielen
     });
 
     const output =
-      response.output_text || "Virhe: mallilta ei saatu vastausta.";
+      response.choices[0]?.message?.content?.trim() || "Virhe: mallilta ei saatu vastausta.";
 
     return Response.json({ output });
   } catch (error) {
