@@ -774,7 +774,7 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null); 
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const session = getSession();
@@ -1190,6 +1190,8 @@ export default function Home() {
     }
   }
 
+  const customStyle = customStyles[cvStyle];
+
   const downloadNativePdf = async () => {
     const printContent = document.getElementById("cv-preview");
     if (!printContent) return;
@@ -1264,7 +1266,6 @@ export default function Home() {
   };
 
   const downloadPdf = async () => {
-    // Varajärjestelmä
     await downloadNativePdf();
   };
 
