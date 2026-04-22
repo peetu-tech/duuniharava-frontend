@@ -240,9 +240,7 @@ export default function CvPreview({
     return (
       <div className={`mt-4 space-y-6 ${customStyle.headingAlign === 'center' ? '' : (isMinimalist ? '' : 'pl-4 border-l-2')}`} style={{ borderColor: `${customStyle.accentColor}40` }}>
         {items.map((item, idx) => {
-          // Tunnistetaan pääkohdat (esim: "Nokia | Insinööri | 2020-2022" tai "Nokia, Insinööri, 2020-2022")
           const isMainPoint = !item.startsWith("-") && (item.includes("|") || item.includes(","));
-          // Splitataan pystyviivalla tai pilkulla
           const parts = item.includes("|") ? item.split("|").map(s => s.trim()) : item.split(",").map(s => s.trim());
 
           if (isMainPoint && parts.length >= 2) {
@@ -307,7 +305,7 @@ export default function CvPreview({
   return (
     <div 
       id="cv-preview" 
-      className={`mx-auto w-full max-w-[900px] overflow-hidden shadow-2xl transition-all duration-300 ${fontClass}`} 
+      className={`mx-auto w-full max-w-[900px] overflow-hidden shadow-2xl transition-all duration-300`} 
       style={{ backgroundColor: customStyle.mainBg, color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
     >
       
