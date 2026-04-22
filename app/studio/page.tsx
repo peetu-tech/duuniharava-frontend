@@ -12,7 +12,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview, { type ExtendedCvCustomStyle } from "@/components/CvPreview";
+import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
@@ -136,7 +136,7 @@ const emptyJobForm = {
   companyWebsite: "",
 };
 
-const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
+const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
     sidebarBg2: "#1e293b",
@@ -766,7 +766,7 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, ExtendedCvCustomStyle>>(defaultCustomStyles);
+    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -775,8 +775,6 @@ export default function Home() {
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null); 
-
-  const customStyle = customStyles[cvStyle];
 
   useEffect(() => {
     const session = getSession();
@@ -1061,9 +1059,9 @@ export default function Home() {
     });
   }
 
-  function updateCustomStyle<K extends keyof ExtendedCvCustomStyle>(
+  function updateCustomStyle<K extends keyof CvCustomStyle>(
     key: K,
-    value: ExtendedCvCustomStyle[K]
+    value: CvCustomStyle[K]
   ) {
     setCustomStyles((prev) => ({
       ...prev,
