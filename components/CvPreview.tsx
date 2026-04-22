@@ -158,12 +158,10 @@ export default function CvPreview({
     return 'left';
   };
 
-  // BACKGROUND PATTERNS
   const getPatternStyle = (type: "main" | "sidebar"): React.CSSProperties => {
     const patternType = type === "main" ? customStyle.pattern : customStyle.sidebarPattern;
     const opacityVal = type === "main" ? customStyle.patternOpacity : customStyle.sidebarPatternOpacity;
     
-    // Gradient backgrounds
     const bg1 = type === "main" ? customStyle.mainBg : customStyle.sidebarBg;
     const bg2 = type === "main" ? (customStyle.mainBg2 || customStyle.mainBg) : (customStyle.sidebarBg2 || customStyle.sidebarBg);
     const gradientDir = type === "main" ? customStyle.mainGradientDirection : customStyle.sidebarGradientDirection;
@@ -241,7 +239,7 @@ export default function CvPreview({
     const tags = items.flatMap(i => i.split(/,|•|-/)).map(t => t.trim()).filter(Boolean);
     
     return (
-      <div className="flex flex-wrap gap-2 mt-3" style={{ justifyContent: customStyle.headingAlign === 'center' ? 'center' : (customStyle.headingAlign === 'right' ? 'flex-end' : 'flex-start') }}>
+      <div className="flex flex-wrap mt-3" style={{ gap: '8px', justifyContent: customStyle.headingAlign === 'center' ? 'center' : (customStyle.headingAlign === 'right' ? 'flex-end' : 'flex-start') }}>
         {tags.map((tag, idx) => {
           let tagCss: React.CSSProperties = {};
           
@@ -348,7 +346,7 @@ export default function CvPreview({
   const padding = customStyle.pagePadding || 48;
 
   const ContactInfo = ({ isDarkBg }: { isDarkBg: boolean }) => (
-    <div className={`space-y-4 text-sm font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`}>
+    <div className={`text-sm font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {phone && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.Phone /></span> {phone}</div>}
       {email && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.Mail /></span> <span className="break-all">{email}</span></div>}
       {location && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.MapPin /></span> {location}</div>}
@@ -418,6 +416,11 @@ export default function CvPreview({
               <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}>
                 
                 {renderHeading(section.title)}
+                
+                {/* Valinnainen erotinviiva otsikon alle */}
+                {customStyle.showSeparators && (
+                  <div className={`h-[3px] mb-8 rounded-full`} style={{ backgroundColor: customStyle.accentColor, width: '50px', opacity: 0.6, marginLeft: customStyle.headingAlign === 'center' ? 'auto' : (customStyle.headingAlign === 'right' ? 'auto' : '0'), marginRight: customStyle.headingAlign === 'center' ? 'auto' : '0' }} />
+                )}
                 
                 {isProfileSection(section.title) ? (
                   renderProfileHook(section.items)
