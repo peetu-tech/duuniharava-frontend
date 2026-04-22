@@ -719,6 +719,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   );
 }
 
+// --- PÄÄKOMPONENTTI ---
 export default function Home() {
   const router = useRouter();
   
@@ -726,7 +727,6 @@ export default function Home() {
   const [hasSession, setHasSession] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
-  // Perustilat
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
@@ -747,13 +747,9 @@ export default function Home() {
   const [profileImage, setProfileImage] = useState("");
   const [jobFilter, setJobFilter] = useState("");
 
-  const [jobStatusFilter, setJobStatusFilter] =
-    useState<"all" | JobStatus>("all");
-  const [jobPriorityFilter, setJobPriorityFilter] =
-    useState<"all" | JobPriority>("all");
-  const [jobSort, setJobSort] = useState<
-    "match" | "deadline" | "priority" | "newest" | "company"
-  >("newest");
+  const [jobStatusFilter, setJobStatusFilter] = useState<"all" | JobStatus>("all");
+  const [jobPriorityFilter, setJobPriorityFilter] = useState<"all" | JobPriority>("all");
+  const [jobSort, setJobSort] = useState<"match" | "deadline" | "priority" | "newest" | "company">("newest");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
@@ -765,8 +761,7 @@ export default function Home() {
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
-  const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+  const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -774,7 +769,9 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null); 
+
+  const customStyle = customStyles[cvStyle];
 
   useEffect(() => {
     const session = getSession();
@@ -2607,10 +2604,11 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row gap-5">
                         <button
                           type="button"
-                          onClick={downloadNativePdf}
-                          className="flex-1 rounded-2xl bg-black text-white px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-2xl border border-white/20"
+                          onClick={downloadPdf}
+                          disabled={downloadingPdf}
+                          className="flex-1 rounded-2xl bg-[#00BFA6] text-black px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,191,166,0.3)] disabled:opacity-50"
                         >
-                          LATAA PDF (Suositeltu)
+                          {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF"}
                         </button>
 
                         <button
@@ -2620,16 +2618,6 @@ export default function Home() {
                           className="flex-1 rounded-2xl border-2 border-zinc-800 bg-transparent px-8 py-5 font-black text-zinc-400 transition-all hover:border-white hover:text-white disabled:opacity-50"
                         >
                           {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
-                        </button>
-                      </div>
-                      <div className="flex justify-center mt-2">
-                        <button
-                          type="button"
-                          onClick={downloadPdf}
-                          disabled={downloadingPdf}
-                          className="text-sm text-gray-500 font-bold hover:text-white transition-colors"
-                        >
-                          {downloadingPdf ? "Luodaan kuvaa..." : "Tarvitsetko PNG-kuvan? Lataa tästä"}
                         </button>
                       </div>
                     </>
