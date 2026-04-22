@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CSSProperties } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { saveAs } from "file-saver";
@@ -13,7 +12,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
+import CvPreview, { type ExtendedCvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
@@ -137,7 +136,7 @@ const emptyJobForm = {
   companyWebsite: "",
 };
 
-const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
+const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
     sidebarBg2: "#1e293b",
@@ -422,15 +421,7 @@ function SectionShell({
   );
 }
 
-function StatCard({
-  title,
-  value,
-  description,
-}: {
-  title: string;
-  value: string;
-  description: string;
-}) {
+function StatCard({ title, value, description }: { title: string; value: string; description: string; }) {
   return (
     <div className="rounded-[30px] border border-white/10 bg-[#141414] p-10 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-[#00BFA6]/50 w-full">
       <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-gray-500">
@@ -452,25 +443,7 @@ function TextareaClass(minHeight: string) {
   return `w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-white text-base outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] ${minHeight}`;
 }
 
-function JobCard({
-  job,
-  isActive,
-  applicationsCount,
-  cvsCount,
-  onSelect,
-  onRemove,
-  onUpdate,
-  onSparring,
-}: {
-  job: JobItem;
-  isActive: boolean;
-  applicationsCount: number;
-  cvsCount: number;
-  onSelect: () => void;
-  onRemove: () => void;
-  onUpdate: (patch: Partial<JobItem>) => void;
-  onSparring: () => void;
-}) {
+function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring }: any) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
 
@@ -793,7 +766,7 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+    useState<Record<CvStyleVariant, ExtendedCvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -801,7 +774,9 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null); 
+
+  const customStyle = customStyles[cvStyle];
 
   useEffect(() => {
     const session = getSession();
@@ -1086,9 +1061,9 @@ export default function Home() {
     });
   }
 
-  function updateCustomStyle<K extends keyof CvCustomStyle>(
+  function updateCustomStyle<K extends keyof ExtendedCvCustomStyle>(
     key: K,
-    value: CvCustomStyle[K]
+    value: ExtendedCvCustomStyle[K]
   ) {
     setCustomStyles((prev) => ({
       ...prev,
@@ -1291,7 +1266,7 @@ export default function Home() {
   };
 
   const downloadPdf = async () => {
-    // Varajärjestelmä napille
+    // Varajärjestelmä
     await downloadNativePdf();
   };
 
