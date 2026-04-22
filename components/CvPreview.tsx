@@ -2,19 +2,15 @@
 
 import React from "react";
 
-export type CvStyleVariant = "modern" | "classic" | "compact" | "bold" | "minimal" | "split";
+export type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
-// Päivitetty tyyppi, johon on lisätty rutkasti uusia ominaisuuksia
 export type CvCustomStyle = {
-  // Värit
   sidebarBg: string;
   sidebarText: string;
   mainBg: string;
   mainText: string;
   headingColor: string;
   accentColor: string;
-  
-  // Koot ja välit
   borderRadius: number;
   sidebarWidth: number;
   nameSize: number;
@@ -22,22 +18,15 @@ export type CvCustomStyle = {
   lineHeight: number;
   sectionSpacing: number;
   imageRadius: number;
-  
-  // Visuaaliset elementit
-  pattern?: "none" | "dots" | "lines" | "grid" | "waves" | "zigzag" | "diagonal";
+  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal";
   patternOpacity?: number;
   showSeparators?: boolean;
-  separatorStyle?: "solid" | "dashed" | "dotted";
-  
-  // Typografia ja asettelu
-  fontFamily?: "sans" | "serif" | "mono" | "inter" | "playfair" | "roboto";
-  layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column" | "minimal-center";
+  fontFamily?: "modern" | "classic" | "mono" | "elegant" | "clean" | "tech";
+  layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column" | "minimalist";
+  headerStyle?: "solid" | "transparent" | "gradient";
   headingAlign?: "left" | "center" | "right";
-  tagStyle?: "solid" | "outline" | "minimal" | "pill" | "badge";
-  imageShape?: "square" | "circle" | "rounded" | "hexagon";
-  
-  // Varjostukset ja efektit
-  boxShadow?: "none" | "sm" | "md" | "lg" | "xl";
+  tagStyle?: "solid" | "outline" | "minimal" | "pill" | "sharp";
+  imageShape?: "square" | "circle" | "rounded" | "blob";
 };
 
 type CvPreviewProps = {
@@ -85,6 +74,7 @@ export default function CvPreview({
 }: CvPreviewProps) {
   const lines = splitLines(cvText);
 
+  // Varmistetaan että tyyli on olemassa, jottei kaadu
   if (!customStyle) return null;
 
   if (!lines.length) {
@@ -128,85 +118,95 @@ export default function CvPreview({
   const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET", "HARRASTUKSET"].includes(title.toUpperCase());
   const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS"].includes(title.toUpperCase());
 
-  // Dynaamiset luokat
-  let fontClass = 'font-sans';
-  switch(customStyle.fontFamily) {
-    case 'serif': fontClass = 'font-serif'; break;
-    case 'mono': fontClass = 'font-mono'; break;
-    case 'inter': fontClass = 'font-inter'; break; // Varmista, että nämä on määritetty CSS:ssä jos haluat täyden tuen
-    case 'playfair': fontClass = 'font-playfair'; break;
-    case 'roboto': fontClass = 'font-roboto'; break;
-  }
-
-  const textAlign = customStyle.headingAlign === 'center' ? 'text-center' : customStyle.headingAlign === 'right' ? 'text-right' : 'text-left';
+  // --- DYNAAMISET TYYLIT (CANVA-OMINAISUUDET) ---
   
-  let imgBorderRadius = `${customStyle.imageRadius}px`;
-  if (customStyle.imageShape === 'circle') imgBorderRadius = '50%';
-  if (customStyle.imageShape === 'square') imgBorderRadius = '0px';
-  // Hexagon vaatii yleensä clip-pathin, mutta käytetään tässä vahvaa pyöristystä approximaationa
-  if (customStyle.imageShape === 'hexagon') imgBorderRadius = '25%';
+  // 1. Fonttiperhe
+  const getFontFamily = () => {
+    switch(customStyle.fontFamily) {
+      case 'classic': return '"Times New Roman", Times, serif';
+      case 'elegant': return 'Georgia, serif';
+      case 'mono': return '"Courier New", Courier, monospace';
+      case 'clean': return 'Arial, Helvetica, sans-serif';
+      case 'tech': return '"Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", sans-serif';
+      case 'modern':
+      default: return 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    }
+  };
 
-  // Taustakuviointi logiikka laajennettu
+  // 2. Kuvan muoto
+  const getImageBorderRadius = () => {
+    switch(customStyle.imageShape) {
+      case 'circle': return '50%';
+      case 'square': return '0px';
+      case 'blob': return '40% 60% 70% 30% / 40% 50% 60% 50%'; // Orgaaninen muoto
+      case 'rounded':
+      default: return `${customStyle.imageRadius}px`;
+    }
+  };
+
+  // 3. Tekstin tasaus
+  const getTextAlign = () => {
+    if (customStyle.headingAlign === 'center') return 'center';
+    if (customStyle.headingAlign === 'right') return 'right';
+    return 'left';
+  };
+
+  // 4. Taustakuviointi
   const getPatternStyle = (): React.CSSProperties => {
     if (!customStyle.pattern || customStyle.pattern === "none") return {};
     const opacity = (customStyle.patternOpacity || 5) / 100;
     const color = `rgba(0, 0, 0, ${opacity})`;
     
-    switch (customStyle.pattern) {
-      case "dots":
-        return { backgroundImage: `radial-gradient(${color} 2px, transparent 2px)`, backgroundSize: "20px 20px" };
-      case "lines":
-        return { backgroundImage: `repeating-linear-gradient(45deg, ${color} 0, ${color} 2px, transparent 0, transparent 50%)`, backgroundSize: "14px 14px" };
-      case "grid":
-        return { backgroundImage: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`, backgroundSize: "20px 20px" };
-      case "diagonal":
-        return { backgroundImage: `repeating-linear-gradient(-45deg, ${color} 0, ${color} 1px, transparent 1px, transparent 10px)`, backgroundSize: "20px 20px" };
-      default:
-        return {};
+    if (customStyle.pattern === "dots") {
+      return { backgroundImage: `radial-gradient(${color} 2px, transparent 2px)`, backgroundSize: "20px 20px" };
     }
+    if (customStyle.pattern === "lines") {
+      return { backgroundImage: `repeating-linear-gradient(180deg, ${color} 0, ${color} 1px, transparent 1px, transparent 20px)` };
+    }
+    if (customStyle.pattern === "diagonal") {
+      return { backgroundImage: `repeating-linear-gradient(45deg, ${color} 0, ${color} 2px, transparent 2px, transparent 15px)` };
+    }
+    if (customStyle.pattern === "grid") {
+      return { backgroundImage: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`, backgroundSize: "20px 20px" };
+    }
+    return {};
   };
 
-  // Erotinviivan tyyli
-  const separatorBorderStyle = customStyle.separatorStyle || "solid";
+  // 5. Yläpalkin tyyli
+  const getHeaderStyle = (): React.CSSProperties => {
+    if (customStyle.headerStyle === "gradient") {
+      return { background: `linear-gradient(135deg, ${customStyle.sidebarBg}, ${customStyle.accentColor})`, color: customStyle.sidebarText };
+    }
+    if (customStyle.headerStyle === "transparent") {
+      return { background: "transparent", color: customStyle.mainText, borderBottom: `2px solid ${customStyle.accentColor}40` };
+    }
+    return { background: customStyle.sidebarBg, color: customStyle.sidebarText };
+  };
 
-  // Tagien renderöinti
+  // Renderöidään Taidot / Kielet / Harrastukset tyylikkäinä pillereinä
   const renderTags = (items: string[]) => {
     const tags = items.flatMap(i => i.split(/,|•|-/)).map(t => t.trim()).filter(Boolean);
     
-    const alignClass = customStyle.headingAlign === 'center' ? 'justify-center' : customStyle.headingAlign === 'right' ? 'justify-end' : '';
-    
     return (
-      <div className={`flex flex-wrap gap-2 mt-3 ${alignClass}`}>
+      <div className="flex flex-wrap gap-2 mt-3" style={{ justifyContent: customStyle.headingAlign === 'center' ? 'center' : (customStyle.headingAlign === 'right' ? 'flex-end' : 'flex-start') }}>
         {tags.map((tag, idx) => {
           let tagCss: React.CSSProperties = {};
-          let tagClasses = "px-3 py-1.5 text-xs font-bold tracking-wide";
-
-          switch (customStyle.tagStyle) {
-            case 'solid':
-              tagCss = { backgroundColor: customStyle.accentColor, color: '#fff' };
-              tagClasses += " rounded-md";
-              break;
-            case 'outline':
-              tagCss = { backgroundColor: 'transparent', color: customStyle.accentColor, border: `1.5px solid ${customStyle.accentColor}` };
-              tagClasses += " rounded-md";
-              break;
-            case 'pill':
-              tagCss = { backgroundColor: `${customStyle.accentColor}15`, color: customStyle.accentColor };
-              tagClasses += " rounded-full";
-              break;
-            case 'badge':
-              tagCss = { backgroundColor: customStyle.accentColor, color: '#fff', borderLeft: `4px solid ${customStyle.headingColor}` };
-              tagClasses += " rounded-sm";
-              break;
-            case 'minimal':
-            default:
-              tagCss = { color: customStyle.accentColor, borderBottom: `1px solid ${customStyle.accentColor}` };
-              tagClasses = "px-1 py-1 text-sm font-semibold mr-2";
-              break;
+          
+          if (customStyle.tagStyle === 'outline') {
+            tagCss = { backgroundColor: 'transparent', color: customStyle.accentColor, border: `1.5px solid ${customStyle.accentColor}`, borderRadius: '6px' };
+          } else if (customStyle.tagStyle === 'pill') {
+            tagCss = { backgroundColor: `${customStyle.accentColor}15`, color: customStyle.accentColor, border: 'none', borderRadius: '9999px' };
+          } else if (customStyle.tagStyle === 'sharp') {
+            tagCss = { backgroundColor: customStyle.accentColor, color: '#fff', border: 'none', borderRadius: '0px' };
+          } else if (customStyle.tagStyle === 'minimal') {
+            tagCss = { backgroundColor: 'transparent', color: customStyle.mainText, borderBottom: `2px solid ${customStyle.accentColor}`, borderRadius: '0px', paddingLeft: '4px', paddingRight: '4px' };
+          } else {
+            // Solid
+            tagCss = { backgroundColor: customStyle.accentColor, color: '#fff', border: 'none', borderRadius: '6px' };
           }
 
           return (
-            <span key={idx} className={tagClasses} style={tagCss}>
+            <span key={idx} className="px-3 py-1.5 text-[11.5px] font-bold tracking-wide" style={tagCss}>
               {tag}
             </span>
           );
@@ -217,30 +217,27 @@ export default function CvPreview({
 
   // Renderöidään Työkokemus / Koulutus aikajanana
   const renderTimeline = (items: string[]) => {
-    const alignCenter = customStyle.headingAlign === 'center';
-    const alignRight = customStyle.headingAlign === 'right';
-
+    const isMinimalist = customStyle.layout === "minimalist";
+    
     return (
-      <div className={`mt-4 space-y-6 ${alignCenter ? '' : alignRight ? 'pr-4 border-r-2 text-right' : 'pl-4 border-l-2'}`} style={{ borderColor: `${customStyle.accentColor}40` }}>
+      <div className={`mt-4 space-y-6 ${customStyle.headingAlign === 'center' ? '' : (isMinimalist ? '' : 'pl-4 border-l-2')}`} style={{ borderColor: `${customStyle.accentColor}40` }}>
         {items.map((item, idx) => {
           const isMainPoint = !item.startsWith("-") && item.includes("|");
           const parts = item.split("|").map(s => s.trim());
 
           if (isMainPoint && parts.length >= 2) {
             return (
-              <div key={idx} className={`relative mt-8 first:mt-2 ${alignCenter ? 'text-center' : alignRight ? 'text-right' : ''}`}>
-                {!alignCenter && !alignRight && (
-                  <div className="absolute -left-[23px] top-1.5 w-4 h-4 rounded-full border-[3px] bg-white" style={{ borderColor: customStyle.accentColor }} />
-                )}
-                {!alignCenter && alignRight && (
-                  <div className="absolute -right-[23px] top-1.5 w-4 h-4 rounded-full border-[3px] bg-white" style={{ borderColor: customStyle.accentColor }} />
+              <div key={idx} className={`relative mt-6 first:mt-2`} style={{ textAlign: getTextAlign() }}>
+                {customStyle.headingAlign !== 'center' && !isMinimalist && (
+                  <div className="absolute -left-[23px] top-1.5 w-4 h-4 rounded-full border-4 bg-white" style={{ borderColor: customStyle.accentColor }} />
                 )}
                 
-                <div className="font-bold text-lg mb-1" style={{ color: customStyle.headingColor }}>
-                  {parts[0]} <span className="opacity-40 font-normal px-1">|</span> {parts[1]}
+                {/* Asettelutyylin mukainen tittelin esitys */}
+                <div className="font-bold" style={{ fontSize: `${customStyle.bodySize + 2}px`, color: customStyle.headingColor }}>
+                  {parts[0]} <span className="opacity-40 font-normal mx-1">|</span> <span style={{ color: customStyle.accentColor }}>{parts[1]}</span>
                 </div>
                 {parts[2] && (
-                  <div className="text-[13px] font-bold uppercase tracking-widest inline-block px-2 py-0.5 rounded" style={{ color: customStyle.accentColor, backgroundColor: `${customStyle.accentColor}10` }}>
+                  <div className="text-[11px] font-bold mt-1.5 uppercase tracking-widest opacity-60" style={{ color: customStyle.mainText }}>
                     {parts[2]}
                   </div>
                 )}
@@ -248,13 +245,10 @@ export default function CvPreview({
             );
           }
 
-          // Normaalit selitystekstit ja bulletit
-          const bulletPosition = alignRight ? 'right-0' : 'left-0';
-          const paddingClass = item.startsWith("-") ? (alignRight ? 'pr-5' : 'pl-5') : 'mt-2';
-          
+          // Normaalit selitystekstit
           return (
-            <p key={idx} className={`relative leading-relaxed opacity-85 ${paddingClass}`} style={{ fontSize: `${customStyle.bodySize}px`, color: customStyle.mainText }}>
-              {item.startsWith("-") && <span className={`absolute ${bulletPosition} top-0 font-bold`} style={{ color: customStyle.accentColor }}>•</span>}
+            <p key={idx} className={`relative leading-relaxed opacity-80 ${item.startsWith("-") ? 'pl-5' : 'mt-2'}`} style={{ fontSize: `${customStyle.bodySize}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
+              {item.startsWith("-") && <span className="absolute left-0 top-0 font-bold" style={{ color: customStyle.accentColor }}>•</span>}
               {item.replace(/^- /, '')}
             </p>
           );
@@ -263,129 +257,69 @@ export default function CvPreview({
     );
   };
 
-  const getShadowClass = () => {
-    switch(customStyle.boxShadow) {
-      case 'sm': return 'shadow-sm';
-      case 'md': return 'shadow-md';
-      case 'lg': return 'shadow-lg';
-      case 'xl': return 'shadow-xl';
-      case 'none':
-      default: return '';
-    }
-  };
-
   // Layoutin määritys
   const isTopHeader = customStyle.layout === "top-header";
   const isRightSidebar = customStyle.layout === "right-sidebar";
-  const isTwoColumn = customStyle.layout === "two-column";
-  const isMinimalCenter = customStyle.layout === "minimal-center";
+  const isTwoColumn = customStyle.layout === "two-column"; 
+  const isMinimalist = customStyle.layout === "minimalist";
 
-  // --- MINIMAL CENTER LAYOUT (Keskitetty, ylhäältä alas) ---
-  if (isMinimalCenter) {
-    return (
-       <div 
-        id="cv-preview" 
-        className={`mx-auto w-full max-w-[850px] overflow-hidden transition-all duration-300 ${fontClass} ${getShadowClass()}`} 
-        style={{ backgroundColor: customStyle.mainBg, color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, ...getPatternStyle() }}
-      >
-        <div className="p-16 flex flex-col items-center text-center">
-          {image && (
-            <img src={image} alt="Profiili" className="w-32 h-32 object-cover mb-8" style={{ borderRadius: imgBorderRadius, border: `2px solid ${customStyle.accentColor}50` }} />
-          )}
-          <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.1, fontWeight: 900, letterSpacing: "-0.02em", color: customStyle.headingColor }}>{name}</h1>
-          {roleLine && <p className="mt-4 text-xl font-medium tracking-widest uppercase" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
-          
-          <div className="flex flex-wrap gap-x-6 gap-y-2 mt-6 text-sm font-medium opacity-80 justify-center">
-            {phone && <span>{phone}</span>}
-            {email && <span>{email}</span>}
-            {location && <span>{location}</span>}
-          </div>
+  // Yhteystiedot lohko
+  const ContactInfo = ({ isDarkBg }: { isDarkBg: boolean }) => (
+    <div className={`space-y-4 text-sm font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`}>
+      {phone && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.Phone /></span> {phone}</div>}
+      {email && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.Mail /></span> <span className="break-all">{email}</span></div>}
+      {location && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.MapPin /></span> {location}</div>}
+    </div>
+  );
 
-          <div className="w-16 h-1 mt-10 rounded-full" style={{ backgroundColor: customStyle.accentColor, opacity: 0.3 }} />
-
-          <div className="w-full mt-12 space-y-14 text-left">
-            {sections.map((section, index) => (
-              <section key={index} className="max-w-2xl mx-auto">
-                <h2 className="uppercase tracking-[0.15em] font-bold mb-6 text-center" style={{ fontSize: "16px", color: customStyle.headingColor }}>
-                  {section.title}
-                </h2>
-                
-                {isTimelineSection(section.title) ? (
-                  renderTimeline(section.items)
-                ) : isTagSection(section.title) ? (
-                  <div className="flex justify-center">{renderTags(section.items)}</div>
-                ) : (
-                  <div className="space-y-3 opacity-85 text-center leading-relaxed" style={{ fontSize: `${customStyle.bodySize}px`, lineHeight: customStyle.lineHeight }}>
-                    {section.items.map((line, j) => <p key={j}>{line}</p>)}
-                  </div>
-                )}
-              </section>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // --- STANDARD LAYOUTS ---
   return (
     <div 
       id="cv-preview" 
-      className={`mx-auto w-full max-w-[900px] overflow-hidden border transition-all duration-300 ${fontClass} ${getShadowClass()}`} 
-      style={{ backgroundColor: customStyle.mainBg, color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, borderColor: "#e2e8f0", ...getPatternStyle() }}
+      className="mx-auto w-full max-w-[900px] overflow-hidden shadow-xl transition-all duration-300" 
+      style={{ backgroundColor: customStyle.mainBg, color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, fontFamily: getFontFamily(), ...getPatternStyle() }}
     >
       
-      {isTopHeader && (
-        <header className="px-12 py-16 flex flex-col sm:flex-row items-center gap-10 text-center sm:text-left" style={{ backgroundColor: customStyle.sidebarBg, color: customStyle.sidebarText }}>
+      {/* 1. YLÄPALKKI / MINIMALISTINEN LAYOUT */}
+      {(isTopHeader || isMinimalist) && (
+        <header className="px-14 py-16 flex flex-col sm:flex-row items-center gap-10" style={isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()}>
           {image && (
-            <img src={image} alt="Profiili" className="w-36 h-36 object-cover shadow-2xl border-4 border-white/10" style={{ borderRadius: imgBorderRadius }} />
+            <img src={image} alt="Profiili" className="w-44 h-44 object-cover shadow-2xl border-4 border-white/20" style={{ borderRadius: getImageBorderRadius() }} />
           )}
-          <div className={`flex-1 ${!image ? 'text-center' : ''}`}>
-            <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.1, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
-            {roleLine && <p className="mt-3 text-xl font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
-            <div className={`flex flex-wrap gap-5 mt-6 text-sm font-medium opacity-90 justify-center sm:justify-start ${!image ? 'justify-center w-full' : ''}`}>
-              {phone && <span className="flex items-center gap-2"><Icons.Phone /> {phone}</span>}
-              {email && <span className="flex items-center gap-2"><Icons.Mail /> {email}</span>}
-              {location && <span className="flex items-center gap-2"><Icons.MapPin /> {location}</span>}
+          <div className={`flex-1 ${(!image || customStyle.headingAlign === 'center') ? 'text-center w-full' : ''}`} style={{ textAlign: getTextAlign() }}>
+            <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.05, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
+            {roleLine && <p className="mt-4 text-xl font-bold tracking-widest uppercase" style={{ color: customStyle.accentColor, opacity: 0.9 }}>{roleLine}</p>}
+            <div className="mt-8 flex flex-wrap gap-6 justify-center sm:justify-start" style={{ justifyContent: getTextAlign() }}>
+               <ContactInfo isDarkBg={!isMinimalist && customStyle.headerStyle !== "transparent"} />
             </div>
           </div>
         </header>
       )}
 
-      <div className={`flex flex-col ${isTopHeader ? '' : (isRightSidebar ? 'md:flex-row-reverse' : 'md:flex-row')} min-h-[1050px]`}>
+      <div className={`flex flex-col ${isTopHeader || isMinimalist ? '' : (isRightSidebar ? 'md:flex-row-reverse' : 'md:flex-row')} min-h-[1050px]`}>
         
-        {/* SIVUPALKKI */}
-        {!isTopHeader && (
-          <aside className="flex flex-col p-8 md:p-10 shrink-0" style={{ background: customStyle.sidebarBg, color: customStyle.sidebarText, width: isTwoColumn ? '50%' : `${customStyle.sidebarWidth}px` }}>
+        {/* SIVUPALKKI (Jos ei yläpalkki-leiskaa) */}
+        {(!isTopHeader && !isMinimalist) && (
+          <aside className="flex flex-col p-10 shrink-0" style={{ background: customStyle.sidebarBg, color: customStyle.sidebarText, width: isTwoColumn ? '50%' : `${customStyle.sidebarWidth}px` }}>
             {image && (
-              <img src={image} alt="Profiili" className="mb-10 aspect-square w-full object-cover shadow-xl" style={{ borderRadius: imgBorderRadius }} />
+              <img src={image} alt="Profiili" className="mb-12 aspect-square w-full object-cover shadow-2xl border-2 border-white/10" style={{ borderRadius: getImageBorderRadius() }} />
             )}
 
-            <div className="mb-12">
-              <h1 style={{ fontSize: `${customStyle.nameSize * 0.8}px`, lineHeight: 1.1, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
-              {roleLine && <p className="mt-3 text-base font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
+            <div className="mb-14" style={{ textAlign: getTextAlign() }}>
+              <h1 style={{ fontSize: `${customStyle.nameSize * 0.75}px`, lineHeight: 1.1, fontWeight: 900, letterSpacing: "-0.02em" }}>{name}</h1>
+              {roleLine && <p className="mt-4 text-sm font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
             </div>
 
-            <div className="mb-12">
-              <h2 className="uppercase tracking-[0.2em] font-black mb-6 opacity-50 text-[11px]">Yhteystiedot</h2>
-              <div className="space-y-5 text-sm font-medium opacity-90">
-                {phone && <div className="flex items-center gap-4"><span style={{ color: customStyle.accentColor }}><Icons.Phone /></span> {phone}</div>}
-                {email && <div className="flex items-center gap-4"><span style={{ color: customStyle.accentColor }}><Icons.Mail /></span> <span className="break-all">{email}</span></div>}
-                {location && <div className="flex items-center gap-4"><span style={{ color: customStyle.accentColor }}><Icons.MapPin /></span> {location}</div>}
-              </div>
+            <div className="mb-14">
+              <h2 className="uppercase tracking-[0.2em] font-black mb-6 opacity-40 text-[10px]" style={{ textAlign: getTextAlign() }}>Yhteystiedot</h2>
+              <ContactInfo isDarkBg={true} />
             </div>
 
-            <div className="space-y-10 mt-auto">
+            {/* Tägit sivupalkkiin jos ei olla Top-header moodissa */}
+            <div className="space-y-12 mt-auto">
               {sections.filter(s => isTagSection(s.title)).map((section, i) => (
                 <div key={i}>
-                  <h2 className="uppercase tracking-[0.2em] font-black mb-4 opacity-50 text-[11px]">{section.title}</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {section.items.flatMap(i => i.split(/,|•|-/)).map(t => t.trim()).filter(Boolean).map((tag, idx) => (
-                      <span key={idx} className="px-3 py-1.5 rounded bg-black/20 text-xs font-semibold border border-white/10">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  <h2 className="uppercase tracking-[0.2em] font-black mb-5 opacity-40 text-[10px]" style={{ textAlign: getTextAlign() }}>{section.title}</h2>
+                  {renderTags(section.items)}
                 </div>
               ))}
             </div>
@@ -393,17 +327,19 @@ export default function CvPreview({
         )}
 
         {/* PÄÄALUE */}
-        <main className={`p-10 md:p-14 flex-1 ${isTwoColumn && isTopHeader ? 'grid grid-cols-2 gap-12' : ''}`}>
-          <div className="space-y-12" style={{ fontSize: `${customStyle.bodySize}px`, lineHeight: customStyle.lineHeight }}>
+        <main className={`flex-1 ${isMinimalist ? 'p-16 max-w-4xl mx-auto' : 'p-12 md:p-16'}`}>
+          <div className={`space-y-12 ${isTwoColumn && (isTopHeader || isMinimalist) ? 'columns-1 md:columns-2 gap-12 space-y-0' : ''}`} style={{ fontSize: `${customStyle.bodySize}px`, lineHeight: customStyle.lineHeight }}>
             
-            {sections.filter(s => isTopHeader ? true : !isTagSection(s.title)).map((section, index) => (
-              <section key={index}>
-                <h2 className={`uppercase tracking-[0.2em] font-black mb-5 ${textAlign}`} style={{ fontSize: "16px", color: customStyle.headingColor }}>
+            {/* Piirretään joko kaikki (TopHeader/Minimalist) tai vain tekstit (Sidebar moodi) */}
+            {sections.filter(s => (isTopHeader || isMinimalist) ? true : !isTagSection(s.title)).map((section, index) => (
+              <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid mb-12' : ''}>
+                <h2 className="uppercase tracking-[0.2em] font-black mb-6" style={{ fontSize: "16px", color: customStyle.headingColor, textAlign: getTextAlign() }}>
                   {section.title}
                 </h2>
                 
+                {/* Valinnainen erotinviiva otsikon alle */}
                 {customStyle.showSeparators && (
-                  <div className={`mb-6 border-b-2 ${textAlign === 'center' ? 'mx-auto' : textAlign === 'right' ? 'ml-auto' : ''}`} style={{ borderColor: customStyle.accentColor, width: '40px', borderStyle: separatorBorderStyle, opacity: 0.5 }} />
+                  <div className={`h-[3px] mb-8 rounded-full`} style={{ backgroundColor: customStyle.accentColor, width: '50px', opacity: 0.6, marginLeft: customStyle.headingAlign === 'center' ? 'auto' : (customStyle.headingAlign === 'right' ? 'auto' : '0'), marginRight: customStyle.headingAlign === 'center' ? 'auto' : '0' }} />
                 )}
                 
                 {isTimelineSection(section.title) ? (
@@ -411,7 +347,7 @@ export default function CvPreview({
                 ) : isTagSection(section.title) ? (
                   renderTags(section.items)
                 ) : (
-                  <div className={`space-y-3 opacity-85 ${textAlign}`}>
+                  <div className="space-y-4 opacity-80" style={{ textAlign: getTextAlign() }}>
                     {section.items.map((line, j) => <p key={j}>{line}</p>)}
                   </div>
                 )}
