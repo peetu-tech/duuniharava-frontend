@@ -136,16 +136,6 @@ const emptyJobForm = {
   companyWebsite: "",
 };
 
-const pdfHeadingNames = [
-  "Profiili",
-  "Työkokemus",
-  "Koulutus",
-  "Kielitaito",
-  "Taidot",
-  "Kortit ja pätevyydet",
-  "Harrastukset",
-];
-
 const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
@@ -1216,25 +1206,36 @@ export default function Home() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: customStyle.mainBg,
-        onclone: (doc) => {
-          const styles = doc.querySelectorAll("style, link");
-          styles.forEach((s) => {
-            if (s.innerHTML) {
-              s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)");
-              s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)");
-              s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)");
-            }
-          });
+        onclone: (clonedDoc) => {
+          let safeCss = "";
           
-          const allElements = doc.querySelectorAll("*");
-          allElements.forEach((el) => {
-            if (el instanceof HTMLElement) {
-              const inlineStyle = el.getAttribute("style") || "";
-              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch") || inlineStyle.includes("color-mix")) {
-                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)"));
+          // Imuroi kaikki CSS-säännöt ja siivoaa "oklab"-värit pois lennosta!
+          for (let i = 0; i < document.styleSheets.length; i++) {
+            try {
+              const sheet = document.styleSheets[i];
+              const rules = sheet.cssRules || sheet.rules;
+              for (let j = 0; j < rules.length; j++) {
+                let ruleText = rules[j].cssText;
+                if (ruleText.includes('oklab') || ruleText.includes('oklch') || ruleText.includes('color-mix')) {
+                  ruleText = ruleText.replace(/oklab\([^)]+\)/g, 'rgba(0,0,0,0.8)')
+                                     .replace(/oklch\([^)]+\)/g, 'rgba(0,0,0,0.8)')
+                                     .replace(/color-mix\([^)]+\)/g, 'rgba(0,0,0,0.8)');
+                }
+                safeCss += ruleText + "\n";
               }
+            } catch (e) {
+              // Jos selaimeen on ladattu cross-origin (vieraita) tyylejä, ohitetaan ne turvallisesti.
             }
-          });
+          }
+
+          // Poistetaan alkuperäiset (kaatuvat) tyylit kokonaan vain tästä kloonista
+          const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
+          originalStyles.forEach(el => el.remove());
+
+          // Lisätään uusi turvallinen tyyli tilalle!
+          const newStyle = clonedDoc.createElement("style");
+          newStyle.innerHTML = safeCss;
+          clonedDoc.head.appendChild(newStyle);
         },
       });
 
