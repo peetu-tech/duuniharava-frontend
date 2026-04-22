@@ -2,9 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CSSProperties } from "react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { saveAs } from "file-saver";
 import {
   Document,
@@ -13,7 +10,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
+import CvPreview, { type ExtendedCvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
@@ -29,21 +26,6 @@ function getSupabaseHeaders() {
     "Content-Type": "application/json",
   };
 }
-
-// LAAJENNETUT TYYPIT CANVA-OMINAISUUKSILLE
-export type ExtendedCvCustomStyle = CvCustomStyle & {
-  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross";
-  patternOpacity?: number;
-  sidebarPattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross";
-  sidebarPatternOpacity?: number;
-  showSeparators?: boolean;
-  fontFamily?: "modern" | "classic" | "mono" | "elegant" | "clean" | "tech" | "brutalist" | "playful";
-  layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column" | "minimalist";
-  headerStyle?: "solid" | "transparent" | "gradient";
-  headingAlign?: "left" | "center" | "right";
-  tagStyle?: "solid" | "outline" | "minimal" | "pill" | "sharp";
-  imageShape?: "square" | "circle" | "rounded" | "blob" | "leaf";
-};
 
 // --- TYYPIT JA VAKIOT ---
 type ParsedCvResult = {
@@ -171,11 +153,11 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     headingColor: "#475569",
     accentColor: "#0369a1",
     borderRadius: 30,
-    sidebarWidth: 255,
+    sidebarWidth: 280,
     nameSize: 40,
-    bodySize: 15,
-    lineHeight: 1.7,
-    sectionSpacing: 24,
+    bodySize: 14,
+    lineHeight: 1.6,
+    sectionSpacing: 36,
     imageRadius: 24,
     pattern: "none",
     patternOpacity: 5,
@@ -187,6 +169,8 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "solid",
     imageShape: "circle",
+    pagePadding: 48,
+    headingStyle: "underline",
   },
   classic: {
     sidebarBg: "#f5f5f4",
@@ -196,11 +180,11 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     headingColor: "#78716c",
     accentColor: "#a16207",
     borderRadius: 0,
-    sidebarWidth: 255,
+    sidebarWidth: 260,
     nameSize: 42,
-    bodySize: 15,
+    bodySize: 14,
     lineHeight: 1.7,
-    sectionSpacing: 24,
+    sectionSpacing: 32,
     imageRadius: 0,
     pattern: "lines",
     patternOpacity: 3,
@@ -212,6 +196,8 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     headingAlign: "center",
     tagStyle: "outline",
     imageShape: "square",
+    pagePadding: 56,
+    headingStyle: "simple",
   },
   compact: {
     sidebarBg: "#f8fafc",
@@ -222,10 +208,10 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     accentColor: "#0f766e",
     borderRadius: 16,
     sidebarWidth: 220,
-    nameSize: 32,
-    bodySize: 14,
-    lineHeight: 1.6,
-    sectionSpacing: 18,
+    nameSize: 36,
+    bodySize: 13,
+    lineHeight: 1.5,
+    sectionSpacing: 24,
     imageRadius: 16,
     pattern: "dots",
     patternOpacity: 4,
@@ -237,6 +223,8 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "minimal",
     imageShape: "rounded",
+    pagePadding: 40,
+    headingStyle: "highlight",
   },
   bold: {
     sidebarBg: "#1e1b4b",
@@ -246,11 +234,11 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     headingColor: "#4338ca",
     accentColor: "#4f46e5",
     borderRadius: 30,
-    sidebarWidth: 255,
-    nameSize: 48,
+    sidebarWidth: 300,
+    nameSize: 52,
     bodySize: 15,
-    lineHeight: 1.7,
-    sectionSpacing: 24,
+    lineHeight: 1.6,
+    sectionSpacing: 40,
     imageRadius: 24,
     pattern: "grid",
     patternOpacity: 8,
@@ -262,6 +250,8 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "pill",
     imageShape: "blob",
+    pagePadding: 48,
+    headingStyle: "boxed",
   },
 };
 
@@ -419,15 +409,7 @@ function SectionShell({
   );
 }
 
-function StatCard({
-  title,
-  value,
-  description,
-}: {
-  title: string;
-  value: string;
-  description: string;
-}) {
+function StatCard({ title, value, description }: { title: string; value: string; description: string; }) {
   return (
     <div className="rounded-[30px] border border-white/10 bg-[#141414] p-10 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-[#00BFA6]/50 w-full">
       <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-gray-500">
@@ -449,25 +431,7 @@ function TextareaClass(minHeight: string) {
   return `w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-white text-base outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] ${minHeight}`;
 }
 
-function JobCard({
-  job,
-  isActive,
-  applicationsCount,
-  cvsCount,
-  onSelect,
-  onRemove,
-  onUpdate,
-  onSparring,
-}: {
-  job: JobItem;
-  isActive: boolean;
-  applicationsCount: number;
-  cvsCount: number;
-  onSelect: () => void;
-  onRemove: () => void;
-  onUpdate: (patch: Partial<JobItem>) => void;
-  onSparring: () => void;
-}) {
+function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring }: any) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
 
@@ -537,7 +501,6 @@ function JobCard({
             {isActive ? "Valittu" : "Valitse paikka"}
           </button>
 
-          {/* SPARRING NAPPI */}
           <button
             type="button"
             onClick={onSparring}
@@ -761,7 +724,6 @@ export default function Home() {
   const [loadingLetter, setLoadingLetter] = useState(false);
   const [loadingJobs, setLoadingJobs] = useState(false);
   const [loadingTailoredCv, setLoadingTailoredCv] = useState(false);
-  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [downloadingDocx, setDownloadingDocx] = useState(false);
 
   const [cvResult, setCvResult] = useState("");
@@ -800,7 +762,7 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null); // Automaattista scrollausta varten
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const customStyle = customStyles[cvStyle];
 
@@ -902,7 +864,7 @@ export default function Home() {
     loadDataFromDb();
   }, [router]);
 
-  // SUPABASE: Profiilin automaattinen tallennus (Debounce)
+  // SUPABASE: Profiilin automaattinen tallennus
   useEffect(() => {
     if (isAuthChecking || !hasSession) return;
     const session = getSession();
@@ -1054,7 +1016,6 @@ export default function Home() {
     setJobForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  // SUPABASE: Päivitä työpaikka
   function updateJob(id: string, patch: Partial<JobItem>) {
     setJobs((prev) =>
       prev.map((job) =>
@@ -1177,74 +1138,55 @@ export default function Home() {
     }
   }
 
-  async function downloadPdf() {
-    if (!pdfRef.current) return;
+  // NATIIVI TULOSTUS / PDF LATAUS (Korjaa html2canvas bugin modernilla CSS:llä)
+  const downloadNativePdf = () => {
+    const printContent = document.getElementById("cv-preview");
+    if (!printContent) return;
 
-    try {
-      setDownloadingPdf(true);
-      setMessage("");
-      setErrorMessage("");
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
 
-      const canvas = await html2canvas(pdfRef.current, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        onclone: (doc) => {
-          const styles = doc.querySelectorAll("style");
-          styles.forEach((s) => {
-            s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)");
-            s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgb(0,0,0)");
-            s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgb(0,0,0)");
-          });
-          
-          const allElements = doc.querySelectorAll("*");
-          allElements.forEach((el) => {
-            if (el instanceof HTMLElement) {
-              const inlineStyle = el.getAttribute("style") || "";
-              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch")) {
-                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)").replace(/oklch\([^)]+\)/g, "rgb(0,0,0)"));
-              }
+    const doc = iframe.contentWindow?.document;
+    if (!doc) return;
+
+    // Kopioidaan tyylit
+    const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+    let stylesHtml = '';
+    styles.forEach(s => { stylesHtml += s.outerHTML; });
+
+    doc.open();
+    doc.write(`
+      <html>
+        <head>
+          <title>CV_${form.name.replace(/\s+/g, '_')}</title>
+          ${stylesHtml}
+          <style>
+            @media print {
+              @page { margin: 0; size: A4; }
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; background: ${customStyle.mainBg}; }
+              #cv-preview { box-shadow: none !important; transform: none !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; min-height: 100vh !important; }
             }
-          });
-        },
-      });
+          </style>
+        </head>
+        <body>
+          ${printContent.outerHTML}
+        </body>
+      </html>
+    `);
+    doc.close();
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "p",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const pageWidth = 210;
-      const pageHeight = 297;
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position -= pageHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
-      setMessage("PDF ladattu onnistuneesti.");
-      setTimeout(() => setMessage(""), 2500);
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Virhe PDF-luonnissa. Yritä päivittää sivu.");
-    } finally {
-      setDownloadingPdf(false);
-    }
-  }
+    iframe.contentWindow?.focus();
+    setTimeout(() => {
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 500);
+  };
 
   async function downloadDocx() {
     try {
@@ -1383,7 +1325,6 @@ export default function Home() {
     return true;
   }
 
-  // SUPABASE: Lisää työpaikka
   function addJob() {
     setMessage("");
     setErrorMessage("");
@@ -1442,7 +1383,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Poista työpaikka
   function removeJob(id: string) {
     const filtered = jobs.filter((job) => job.id !== id);
     setJobs(filtered);
@@ -1513,7 +1453,6 @@ export default function Home() {
       setTab("job");
       setMessage("Työpaikkaehdotukset lisätty.");
 
-      // Tallenna kaikki kerralla tietokantaan
       const session = getSession();
       if(session) {
         newJobs.forEach(job => {
@@ -1535,7 +1474,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna räätälöity CV
   async function createTailoredCv() {
     if (!activeJob) {
       setErrorMessage("Valitse työpaikka ennen kohdistetun CV:n luontia.");
@@ -1633,7 +1571,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna generoitu hakemus
   async function handleCoverLetterSubmit() {
     setMessage("");
     setErrorMessage("");
@@ -1695,7 +1632,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna oma muokattu hakemus
   function saveEditedLetter() {
     if (!activeJob || !letterDraft.trim()) return;
 
@@ -1722,7 +1658,6 @@ export default function Home() {
     }
   }
 
-  // --- HAASTATTELUSIMULAATTORIN FUNKTIOT ---
   function startSparring(job: JobItem) {
     setSparringJob(job);
     setSparringChat([
@@ -1739,7 +1674,6 @@ export default function Home() {
     setSparringMessage("");
     setIsSparringTyping(true);
 
-    // Demo-vastaus tekoälyltä animoidulla viiveellä
     setTimeout(() => {
       setSparringChat([...newChat, { role: "ai", text: "Kiitos vastauksestasi! Se kuulostaa erittäin mielenkiintoiselta. Miten yleensä reagoit tilanteisiin, joissa kohtaat yllättäviä ongelmia tai aikataulupainetta? Voitko antaa jonkin konkreettisen esimerkin aiemmasta työkokemuksestasi?" }]);
       setIsSparringTyping(false);
@@ -1791,18 +1725,10 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-5">
                 <button
                   type="button"
-                  onClick={() => setShowHelp(!showHelp)}
-                  className="bg-[#00BFA6]/10 border border-[#00BFA6]/40 text-[#00BFA6] px-10 py-5 rounded-[24px] text-lg font-black hover:bg-[#00BFA6]/20 transition-all shadow-xl flex items-center justify-center gap-3"
-                >
-                  <span className="text-2xl">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
-                </button>
-
-                <button
-                  type="button"
                   onClick={fillExample}
-                  className="bg-white text-black px-10 py-5 rounded-[24px] text-lg font-black hover:bg-gray-200 transition-all shadow-xl"
+                  className="bg-[#00BFA6] text-black px-10 py-5 rounded-[24px] text-lg font-black hover:scale-[1.03] transition-transform shadow-[0_0_20px_rgba(0,191,166,0.3)]"
                 >
-                  Täytä esimerkki
+                  Täytä esimerkkidata
                 </button>
               </div>
             </div>
@@ -1830,58 +1756,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- OHJE-OSIO --- */}
-      {showHelp && (
-        <section className="max-w-7xl mx-auto px-8 mt-12 animate-in fade-in slide-in-from-top-6">
-          <div className="rounded-[40px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-10 sm:p-16 shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
-              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
-              <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-white font-bold p-2 text-xl transition">✕ Sulje</button>
-            </div>
-            
-            <div className="space-y-10 text-gray-300 text-lg leading-relaxed">
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">1</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Täytä omat tietosi</strong>
-                  Aloita alempaa laatikosta nimeltä "Vaihe 1: Hakijan tiedot". Kirjoita nimesi, työkokemuksesi ja koulutuksesi. Voit myös vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoäly lukee sen puolestasi.
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">2</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Paina "Generoi CV"</strong>
-                  Rullaa Vaihe 1 -laatikon loppuun ja paina vihreää nappia. Tekoäly muotoilee sinulle uuden, hienon CV:n. Näet esikatselun sivun oikeassa laidassa (tai mobiilissa alhaalla). Voit ladata sen suoraan koneellesi PDF-napista.
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">3</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Etsi työpaikkoja</strong>
-                  Siirry "Vaihe 2: Hakuprofiili" -laatikkoon. Kerro siellä, millaista työtä etsit (esim. "Myyjä, Uusimaa"). Paina "Ehdota työpaikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia, voimassa olevia avoimia tehtäviä ja tuo ne näkyviin.
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">4</div>
-                <div className="mt-2">
-                  <strong className="text-white block text-2xl mb-3">Tee hakemus napin painalluksella</strong>
-                  Sivun oikeassa reunassa (tai mobiilissa alempana) on välilehdet: "CV", "Työpaikat" ja "Hakemukset". Valitse listalta kiinnostava työpaikka ja pyydä tekoälyä kirjoittamaan siihen valmis, räätälöity työhakemus yhdellä klikkauksella.
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-12 pt-10 border-t border-white/10 text-center sm:text-left">
-              <button onClick={() => setShowHelp(false)} className="rounded-2xl bg-white px-10 py-5 text-lg font-black text-black transition-all hover:bg-gray-200 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.2)] w-full sm:w-auto">
-                Selvä, ymmärsin! Aloitetaan!
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
       <div className="mx-auto max-w-7xl px-8 py-16 md:py-20 lg:px-12">
         <div className="mb-10 flex flex-wrap items-center gap-5 border-b border-white/5 pb-6">
           <button
@@ -1893,7 +1767,7 @@ export default function Home() {
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
             }`}
           >
-            Paranna CV
+            Paranna nykyinen CV
           </button>
 
           <button
@@ -1905,7 +1779,7 @@ export default function Home() {
                 : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
             }`}
           >
-            Luo uusi CV
+            Luo täysin uusi CV
           </button>
 
           <div className="ml-auto hidden text-base font-medium text-gray-500 lg:block">
@@ -2074,61 +1948,42 @@ export default function Home() {
                   <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
                 </div>
 
-                <div className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 md:p-10 mt-8">
+                {/* --- CANVA TASON EDITOR --- */}
+                <div className="rounded-[32px] border border-white/10 bg-[#0A0A0A] p-8 md:p-10 mt-10 shadow-2xl">
                   <div className="flex flex-wrap items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
                     <div>
-                      <p className="text-xl font-black text-white tracking-tight">Ulkoasun säädöt (CV)</p>
-                      <p className="mt-2 text-base text-gray-400">
-                        Rakenna itsellesi Canva-tasoinen ulkoasu.
-                      </p>
+                      <p className="text-xl font-black text-white tracking-tight">Värit ja Teema</p>
+                      <p className="mt-2 text-base text-gray-400">Valitse valmis teema tai säädä itse.</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={resetCurrentStyle}
-                      className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50"
-                    >
+                    <button type="button" onClick={resetCurrentStyle} className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50">
                       Palauta oletukset
                     </button>
                   </div>
 
-                  <div className="mt-8 flex flex-wrap gap-4">
-                    {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map(
-                      (variant) => (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={() => setCvStyle(variant)}
-                          className={`rounded-2xl px-6 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${
-                            cvStyle === variant
-                              ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105"
-                              : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
-                          }`}
-                        >
-                          {variant === "modern" && "Moderni"}
-                          {variant === "classic" && "Klassinen"}
-                          {variant === "compact" && "Tiivis"}
-                          {variant === "bold" && "Näyttävä"}
-                        </button>
-                      )
-                    )}
+                  <div className="mb-10 flex flex-wrap gap-4">
+                    {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map((variant) => (
+                      <button
+                        key={variant}
+                        type="button"
+                        onClick={() => setCvStyle(variant)}
+                        className={`rounded-2xl px-6 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none ${cvStyle === variant ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105" : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"}`}
+                      >
+                        {variant === "modern" && "Moderni"}
+                        {variant === "classic" && "Klassinen"}
+                        {variant === "compact" && "Tiivis"}
+                        {variant === "bold" && "Näyttävä"}
+                      </button>
+                    ))}
                   </div>
 
-                  {/* KATEGORISOIDUT ASETUKSET */}
-                  <div className="mt-10 space-y-10">
-                    
+                  <div className="space-y-12">
                     {/* TYPOGRAFIA & ASETTELU */}
                     <div>
-                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-2">Asettelu & Typografia</h4>
+                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Asettelu & Typografia</h4>
                       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <div>
-                          <label className="mb-3 block text-sm font-bold text-gray-400">
-                            Asettelu (Layout)
-                          </label>
-                          <select
-                            value={customStyle.layout || "left-sidebar"}
-                            onChange={(e) => updateCustomStyle("layout", e.target.value as any)}
-                            className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
-                          >
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Asettelu (Layout)</label>
+                          <select value={customStyle.layout || "left-sidebar"} onChange={(e) => updateCustomStyle("layout", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="left-sidebar">Vasen sivupalkki</option>
                             <option value="right-sidebar">Oikea sivupalkki</option>
                             <option value="top-header">Yläpalkki (Koko leveys)</option>
@@ -2137,14 +1992,8 @@ export default function Home() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-3 block text-sm font-bold text-gray-400">
-                            Fonttiperhe
-                          </label>
-                          <select
-                            value={customStyle.fontFamily || "modern"}
-                            onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)}
-                            className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
-                          >
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Fonttiperhe</label>
+                          <select value={customStyle.fontFamily || "modern"} onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="modern">Moderni (Sans-serif)</option>
                             <option value="classic">Klassinen (Serif)</option>
                             <option value="mono">Koodari (Monospace)</option>
@@ -2152,21 +2001,16 @@ export default function Home() {
                             <option value="clean">Puhdas (Arial)</option>
                             <option value="tech">Tekninen (Trebuchet)</option>
                             <option value="brutalist">Brutalistinen (Impact)</option>
-                            <option value="playful">Leikkisä (Comic/Marker)</option>
+                            <option value="playful">Leikkisä (Comic)</option>
                           </select>
                         </div>
                         <div>
-                          <label className="mb-3 block text-sm font-bold text-gray-400">
-                            Otsikoiden tasaus
-                          </label>
-                          <select
-                            value={customStyle.headingAlign || "left"}
-                            onChange={(e) => updateCustomStyle("headingAlign", e.target.value as any)}
-                            className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
-                          >
-                            <option value="left">Vasemmalle</option>
-                            <option value="center">Keskelle</option>
-                            <option value="right">Oikealle</option>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Otsikoiden tyyli</label>
+                          <select value={customStyle.headingStyle || "simple"} onChange={(e) => updateCustomStyle("headingStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                            <option value="simple">Yksinkertainen</option>
+                            <option value="underline">Alleviivaus</option>
+                            <option value="highlight">Korostusväri taustalla</option>
+                            <option value="boxed">Laatikko</option>
                           </select>
                         </div>
                       </div>
@@ -2174,42 +2018,42 @@ export default function Home() {
 
                     {/* VÄRIT */}
                     <div>
-                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-2">Värimaailma</h4>
+                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Värimaailma</h4>
                       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Sivupalkki Bg</label>
-                          <input type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer" />
+                          <input type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Sivupalkki Txt</label>
-                          <input type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer" />
+                          <input type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Pääalue Bg</label>
-                          <input type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer" />
+                          <input type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Pääalue Txt</label>
-                          <input type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer" />
+                          <input type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Otsikot</label>
-                          <input type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer" />
+                          <input type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Korosteväri</label>
-                          <input type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer" />
+                          <input type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                       </div>
                     </div>
 
                     {/* KUVIOINTI & YKSITYISKOHDAT */}
                     <div>
-                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-2">Kuviointi & Yksityiskohdat</h4>
+                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Kuviointi & Yksityiskohdat</h4>
                       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Pääalueen kuviointi</label>
-                          <select value={customStyle.pattern || "none"} onChange={(e) => updateCustomStyle("pattern", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                          <select value={customStyle.pattern || "none"} onChange={(e) => updateCustomStyle("pattern", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="none">Ei kuviointia</option>
                             <option value="dots">Pisteet (Dots)</option>
                             <option value="lines">Vaakaviivat (Lines)</option>
@@ -2220,7 +2064,7 @@ export default function Home() {
                         </div>
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin kuviointi</label>
-                          <select value={customStyle.sidebarPattern || "none"} onChange={(e) => updateCustomStyle("sidebarPattern", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                          <select value={customStyle.sidebarPattern || "none"} onChange={(e) => updateCustomStyle("sidebarPattern", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="none">Ei kuviointia</option>
                             <option value="dots">Pisteet (Dots)</option>
                             <option value="lines">Vaakaviivat (Lines)</option>
@@ -2231,7 +2075,7 @@ export default function Home() {
                         </div>
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Tagien (Taidot) tyyli</label>
-                          <select value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                          <select value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="solid">Täytetty</option>
                             <option value="outline">Reunukset (Outline)</option>
                             <option value="pill">Pillerit (Pyöreät)</option>
@@ -2241,7 +2085,7 @@ export default function Home() {
                         </div>
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli (Top-Header asettelulle)</label>
-                          <select value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                          <select value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="solid">Yksivärinen</option>
                             <option value="gradient">Liukuväri (Gradient)</option>
                             <option value="transparent">Läpinäkyvä</option>
@@ -2249,7 +2093,7 @@ export default function Home() {
                         </div>
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Kuvan muoto</label>
-                          <select value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                          <select value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="square">Neliö</option>
                             <option value="rounded">Pyöristetty</option>
                             <option value="circle">Ympyrä</option>
@@ -2259,7 +2103,7 @@ export default function Home() {
                         </div>
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Erotinviivat osioiden välissä</label>
-                          <select value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                          <select value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="yes">Kyllä, näytä viivat</option>
                             <option value="no">Ei, piilota viivat</option>
                           </select>
@@ -2269,8 +2113,8 @@ export default function Home() {
 
                     {/* MITAT & VÄLIT */}
                     <div>
-                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-2">Mitat & Välit</h4>
-                      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Mitat & Välit</h4>
+                      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Kuvioinnin vahvuus ({customStyle.patternOpacity || 5}%)</label>
                           <input type="range" min={1} max={30} value={customStyle.patternOpacity || 5} onChange={(e) => updateCustomStyle("patternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
@@ -2278,6 +2122,10 @@ export default function Home() {
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin kuvioinnin vahvuus ({customStyle.sidebarPatternOpacity || 5}%)</label>
                           <input type="range" min={1} max={30} value={customStyle.sidebarPatternOpacity || 5} onChange={(e) => updateCustomStyle("sidebarPatternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
+                        </div>
+                        <div>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Sivun sisämarginaalit ({customStyle.pagePadding || 48}px)</label>
+                          <input type="range" min={20} max={80} value={customStyle.pagePadding || 48} onChange={(e) => updateCustomStyle("pagePadding", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
                         </div>
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin leveys ({customStyle.sidebarWidth}px)</label>
@@ -2301,9 +2149,9 @@ export default function Home() {
                         </div>
                         <div>
                           <label className="mb-3 block text-sm font-bold text-gray-400">Osioiden väli ({customStyle.sectionSpacing}px)</label>
-                          <input type="range" min={8} max={36} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
+                          <input type="range" min={8} max={60} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
                         </div>
-                        <div>
+                        <div className="sm:col-span-3">
                           <label className="mb-3 block text-sm font-bold text-gray-400">Kuvan pyöristys ({customStyle.imageRadius}px)</label>
                           <input type="range" min={0} max={40} value={customStyle.imageRadius} onChange={(e) => updateCustomStyle("imageRadius", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
                         </div>
@@ -2312,47 +2160,13 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-5 pt-8 pb-4">
-                  <button
-                    type="submit"
-                    disabled={loadingCv}
-                    className="w-full sm:w-auto rounded-2xl bg-[#00BFA6] px-10 py-5 text-xl font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)]"
-                  >
-                    {loadingCv ? "Luodaan CV:tä..." : "1. GENEROI CV"}
-                  </button>
-
-                  {parsedCv.cvBody && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          copyText(parsedCv.cvBody, "CV kopioitu leikepöydälle.")
-                        }
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10"
-                      >
-                        Kopioi leikepöydälle
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={downloadPdf}
-                        disabled={downloadingPdf}
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
-                      >
-                        {downloadingPdf ? "Luodaan PDF..." : "Lataa PDF"}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={downloadDocx}
-                        disabled={downloadingDocx}
-                        className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-8 py-5 font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
-                      >
-                        {downloadingDocx ? "Luodaan DOCX..." : "Lataa DOCX"}
-                      </button>
-                    </>
-                  )}
-                </div>
+                <button
+                  type="submit"
+                  disabled={loadingCv}
+                  className="w-full bg-[#00BFA6] text-black font-black py-6 rounded-[24px] text-2xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)] mt-8"
+                >
+                  {loadingCv ? "Tekoäly rakentaa CV:tä..." : "1. GENEROI CV"}
+                </button>
               </form>
             </SectionShell>
 
@@ -2502,7 +2316,7 @@ export default function Home() {
               </div>
 
               {tab === "cv" && (
-                <div className="space-y-10 overflow-hidden">
+                <div className="space-y-10 overflow-hidden animate-in fade-in duration-500">
                   {parsedCv.cvBody && activeJob && (
                     <div className="flex flex-col sm:flex-row gap-5 bg-black/40 p-6 rounded-3xl border border-white/10">
                       <div className="flex-1">
@@ -2606,26 +2420,33 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Piilotettu div PDF renderöintiin */}
-                      <div
-                        style={{
-                          position: "fixed",
-                          left: "-99999px",
-                          top: 0,
-                          width: "794px",
-                          pointerEvents: "none",
-                          opacity: 1,
-                          zIndex: -1,
-                        }}
-                      >
-                        <div ref={pdfRef}>
-                          <CvPreview
-                            cvText={parsedCv.cvBody}
-                            image={profileImage}
-                            styleVariant={cvStyle}
-                            customStyle={customStyle}
-                          />
-                        </div>
+                      <div className="flex flex-col sm:flex-row gap-5">
+                        <button
+                          type="button"
+                          onClick={downloadNativePdf}
+                          className="flex-1 rounded-2xl bg-black text-white px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-2xl border border-white/20"
+                        >
+                          LATAA PDF (Suositeltu)
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={downloadDocx}
+                          disabled={downloadingDocx}
+                          className="flex-1 rounded-2xl border-2 border-zinc-800 bg-transparent px-8 py-5 font-black text-zinc-400 transition-all hover:border-white hover:text-white disabled:opacity-50"
+                        >
+                          {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
+                        </button>
+                      </div>
+                      <div className="flex justify-center mt-2">
+                        <button
+                          type="button"
+                          onClick={downloadPdf}
+                          disabled={downloadingPdf}
+                          className="text-sm text-gray-500 font-bold hover:text-white transition-colors"
+                        >
+                          {downloadingPdf ? "Luodaan kuvaa..." : "Tarvitsetko PNG-kuvan? Lataa tästä"}
+                        </button>
                       </div>
                     </>
                   ) : (
@@ -2639,7 +2460,7 @@ export default function Home() {
               )}
 
               {tab === "job" && (
-                <div className="space-y-10">
+                <div className="space-y-10 animate-in fade-in duration-500">
                   <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
                     <div className="rounded-[24px] border border-white/10 bg-black/50 p-6 text-center hover:-translate-y-1 transition-transform">
                       <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 truncate">
@@ -2929,7 +2750,7 @@ export default function Home() {
               )}
 
               {tab === "letter" && (
-                <div className="space-y-10">
+                <div className="space-y-10 animate-in fade-in duration-500">
                   <div className="rounded-[40px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-8 sm:p-12 relative overflow-hidden shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
                     <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none leading-none">”</div>
                     <h3 className="text-3xl font-black text-white mb-8">
