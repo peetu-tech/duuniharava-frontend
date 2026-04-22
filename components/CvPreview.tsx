@@ -4,6 +4,7 @@ import React from "react";
 
 export type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
+// Kaikki ominaisuudet yhdistetty virallisesti tähän yhteen tyyppiin
 export type CvCustomStyle = {
   sidebarBg: string;
   sidebarText: string;
