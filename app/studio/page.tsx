@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { CSSProperties } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { saveAs } from "file-saver";
@@ -28,6 +29,30 @@ function getSupabaseHeaders() {
     "Content-Type": "application/json",
   };
 }
+
+// LAAJENNETUT TYYPIT CANVA-OMINAISUUKSILLE
+export type ExtendedCvCustomStyle = CvCustomStyle & {
+  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag";
+  patternOpacity?: number;
+  sidebarPattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag";
+  sidebarPatternOpacity?: number;
+  showSeparators?: boolean;
+  fontFamily?: "modern" | "classic" | "mono" | "elegant" | "clean" | "tech" | "brutalist" | "playful";
+  layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column" | "minimalist";
+  headerStyle?: "solid" | "transparent" | "gradient";
+  headingAlign?: "left" | "center" | "right";
+  tagStyle?: "solid" | "outline" | "minimal" | "pill" | "sharp";
+  imageShape?: "square" | "circle" | "rounded" | "blob" | "leaf";
+  pagePadding?: number;
+  headingStyle?: "simple" | "underline" | "boxed" | "highlight";
+  
+  // Uudet Liukuvärit ja 3D/Varjot
+  mainBg2?: string;
+  sidebarBg2?: string;
+  mainGradientDirection?: "none" | "to bottom" | "to right" | "135deg" | "circle";
+  sidebarGradientDirection?: "none" | "to bottom" | "to right" | "135deg" | "circle";
+  shadowStyle?: "none" | "soft" | "hard" | "3d" | "neon";
+};
 
 // --- TYYPIT JA VAKIOT ---
 type ParsedCvResult = {
@@ -146,11 +171,13 @@ const pdfHeadingNames = [
   "Harrastukset",
 ];
 
-const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
+const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
+    sidebarBg2: "#1e293b",
     sidebarText: "#ffffff",
     mainBg: "#ffffff",
+    mainBg2: "#f8fafc",
     mainText: "#111827",
     headingColor: "#475569",
     accentColor: "#0369a1",
@@ -173,11 +200,16 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     imageShape: "circle",
     pagePadding: 48,
     headingStyle: "underline",
+    mainGradientDirection: "none",
+    sidebarGradientDirection: "135deg",
+    shadowStyle: "soft",
   },
   classic: {
     sidebarBg: "#f5f5f4",
+    sidebarBg2: "#e7e5e4",
     sidebarText: "#111827",
     mainBg: "#ffffff",
+    mainBg2: "#ffffff",
     mainText: "#111827",
     headingColor: "#78716c",
     accentColor: "#a16207",
@@ -200,11 +232,16 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     imageShape: "square",
     pagePadding: 56,
     headingStyle: "simple",
+    mainGradientDirection: "none",
+    sidebarGradientDirection: "none",
+    shadowStyle: "none",
   },
   compact: {
     sidebarBg: "#f8fafc",
+    sidebarBg2: "#f1f5f9",
     sidebarText: "#111827",
     mainBg: "#ffffff",
+    mainBg2: "#ffffff",
     mainText: "#111827",
     headingColor: "#64748b",
     accentColor: "#0f766e",
@@ -227,11 +264,16 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     imageShape: "rounded",
     pagePadding: 40,
     headingStyle: "highlight",
+    mainGradientDirection: "none",
+    sidebarGradientDirection: "none",
+    shadowStyle: "none",
   },
   bold: {
     sidebarBg: "#1e1b4b",
+    sidebarBg2: "#312e81",
     sidebarText: "#ffffff",
     mainBg: "#ffffff",
+    mainBg2: "#f3f4f6",
     mainText: "#111827",
     headingColor: "#4338ca",
     accentColor: "#4f46e5",
@@ -242,8 +284,8 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     lineHeight: 1.6,
     sectionSpacing: 40,
     imageRadius: 24,
-    pattern: "grid",
-    patternOpacity: 8,
+    pattern: "intersecting",
+    patternOpacity: 5,
     sidebarPattern: "cross",
     sidebarPatternOpacity: 10,
     showSeparators: true,
@@ -254,6 +296,9 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     imageShape: "blob",
     pagePadding: 48,
     headingStyle: "boxed",
+    mainGradientDirection: "to bottom",
+    sidebarGradientDirection: "135deg",
+    shadowStyle: "hard",
   },
 };
 
@@ -782,7 +827,7 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+    useState<Record<CvStyleVariant, ExtendedCvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -791,7 +836,7 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null); 
+  const chatEndRef = useRef<HTMLDivElement | null>(null); // Automaattista scrollausta varten
 
   const customStyle = customStyles[cvStyle];
 
@@ -1045,7 +1090,6 @@ export default function Home() {
     setJobForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  // SUPABASE: Päivitä työpaikka
   function updateJob(id: string, patch: Partial<JobItem>) {
     setJobs((prev) =>
       prev.map((job) =>
@@ -1076,9 +1120,9 @@ export default function Home() {
     });
   }
 
-  function updateCustomStyle<K extends keyof CvCustomStyle>(
+  function updateCustomStyle<K extends keyof ExtendedCvCustomStyle>(
     key: K,
-    value: CvCustomStyle[K]
+    value: ExtendedCvCustomStyle[K]
   ) {
     setCustomStyles((prev) => ({
       ...prev,
@@ -1157,45 +1201,6 @@ export default function Home() {
     setTimeout(() => setMessage(""), 2500);
   }
 
-  function applyQuickTarget(type: "sales" | "warehouse" | "shorter") {
-    setErrorMessage("");
-    setMessage("");
-
-    if (type === "sales") {
-      updateField("targetJob", "Myyjä");
-      updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
-      setMessage("Tavoitetta suunnattu myyntityöhön.");
-    }
-
-    if (type === "warehouse") {
-      updateField("targetJob", "Varastotyöntekijä");
-      updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
-      setMessage("Tavoitetta suunnattu varastotyöhön.");
-    }
-
-    if (type === "shorter") {
-      const shorten = (text: string) =>
-        text
-          .split(/[.!?\n]+/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .slice(0, 2)
-          .join(". ");
-
-      setForm((prev) => ({
-        ...prev,
-        education: shorten(prev.education),
-        experience: shorten(prev.experience),
-        skills: shorten(prev.skills),
-        cards: shorten(prev.cards),
-        hobbies: shorten(prev.hobbies),
-      }));
-      setMessage("Kenttiä tiivistetty.");
-    }
-
-    setTimeout(() => setMessage(""), 2500);
-  }
-
   async function copyText(text: string, successMessage: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -1206,56 +1211,6 @@ export default function Home() {
       setTimeout(() => setErrorMessage(""), 2500);
     }
   }
-
-  // NATIIVI TULOSTUS / PDF LATAUS (Korjaa html2canvas bugin modernilla CSS:llä)
-  const downloadNativePdf = () => {
-    const printContent = document.getElementById("cv-preview");
-    if (!printContent) return;
-
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0px';
-    iframe.style.height = '0px';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow?.document;
-    if (!doc) return;
-
-    // Kopioidaan tyylit
-    const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
-    let stylesHtml = '';
-    styles.forEach(s => { stylesHtml += s.outerHTML; });
-
-    doc.open();
-    doc.write(`
-      <html>
-        <head>
-          <title>CV_${form.name.replace(/\s+/g, '_')}</title>
-          ${stylesHtml}
-          <style>
-            @media print {
-              @page { margin: 0; size: A4; }
-              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; background: ${customStyle.mainBg}; }
-              #cv-preview { box-shadow: none !important; transform: none !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; min-height: 100vh !important; }
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.outerHTML}
-        </body>
-      </html>
-    `);
-    doc.close();
-
-    iframe.contentWindow?.focus();
-    setTimeout(() => {
-      iframe.contentWindow?.print();
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 1000);
-    }, 500);
-  };
 
   async function downloadPdf() {
     if (!pdfRef.current) return;
@@ -1269,28 +1224,30 @@ export default function Home() {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: "#ffffff",
+        backgroundColor: customStyle.mainBg,
         onclone: (doc) => {
-          const styles = doc.querySelectorAll("style");
+          const styles = doc.querySelectorAll("style, link");
           styles.forEach((s) => {
-            s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)");
-            s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgb(0,0,0)");
-            s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgb(0,0,0)");
+            if (s.innerHTML) {
+              s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)");
+              s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)");
+              s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)");
+            }
           });
           
           const allElements = doc.querySelectorAll("*");
           allElements.forEach((el) => {
             if (el instanceof HTMLElement) {
               const inlineStyle = el.getAttribute("style") || "";
-              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch")) {
-                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)").replace(/oklch\([^)]+\)/g, "rgb(0,0,0)"));
+              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch") || inlineStyle.includes("color-mix")) {
+                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)"));
               }
             }
           });
         },
       });
 
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL("image/jpeg", 0.98);
       const pdf = new jsPDF({
         orientation: "p",
         unit: "mm",
@@ -1305,13 +1262,13 @@ export default function Home() {
       let heightLeft = imgHeight;
       let position = 0;
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
       while (heightLeft > 0) {
         position -= pageHeight;
         pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
@@ -1320,7 +1277,7 @@ export default function Home() {
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
       console.error(error);
-      setErrorMessage("Virhe PDF-luonnissa. Yritä käyttää Natiivi-PDF latausta.");
+      setErrorMessage("Virhe PDF-luonnissa.");
     } finally {
       setDownloadingPdf(false);
     }
@@ -1463,7 +1420,6 @@ export default function Home() {
     return true;
   }
 
-  // SUPABASE: Lisää työpaikka
   function addJob() {
     setMessage("");
     setErrorMessage("");
@@ -1522,7 +1478,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Poista työpaikka
   function removeJob(id: string) {
     const filtered = jobs.filter((job) => job.id !== id);
     setJobs(filtered);
@@ -1614,7 +1569,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna räätälöity CV
   async function createTailoredCv() {
     if (!activeJob) {
       setErrorMessage("Valitse työpaikka ennen kohdistetun CV:n luontia.");
@@ -1712,7 +1666,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna generoitu hakemus
   async function handleCoverLetterSubmit() {
     setMessage("");
     setErrorMessage("");
@@ -1774,7 +1727,6 @@ export default function Home() {
     }
   }
 
-  // SUPABASE: Tallenna oma muokattu hakemus
   function saveEditedLetter() {
     if (!activeJob || !letterDraft.trim()) return;
 
@@ -2228,12 +2180,20 @@ export default function Home() {
                           <input type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
+                          <label className="mb-3 block text-xs font-bold text-gray-400">Sivupalkki Bg 2</label>
+                          <input type="color" value={customStyle.sidebarBg2 || customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg2", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                        </div>
+                        <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Sivupalkki Txt</label>
                           <input type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Pääalue Bg</label>
                           <input type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                        </div>
+                        <div>
+                          <label className="mb-3 block text-xs font-bold text-gray-400">Pääalue Bg 2</label>
+                          <input type="color" value={customStyle.mainBg2 || customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg2", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
                         </div>
                         <div>
                           <label className="mb-3 block text-xs font-bold text-gray-400">Pääalue Txt</label>
@@ -2263,6 +2223,9 @@ export default function Home() {
                             <option value="diagonal">Vinoviivat (Diagonal)</option>
                             <option value="grid">Ruudukko (Grid)</option>
                             <option value="cross">Ristit (Cross)</option>
+                            <option value="intersecting">Risteävät viivat</option>
+                            <option value="waves">Aallot (Waves)</option>
+                            <option value="zigzag">Sahalaita (Zigzag)</option>
                           </select>
                         </div>
                         <div>
@@ -2274,6 +2237,29 @@ export default function Home() {
                             <option value="diagonal">Vinoviivat (Diagonal)</option>
                             <option value="grid">Ruudukko (Grid)</option>
                             <option value="cross">Ristit (Cross)</option>
+                            <option value="intersecting">Risteävät viivat</option>
+                            <option value="waves">Aallot (Waves)</option>
+                            <option value="zigzag">Sahalaita (Zigzag)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Pääalueen liukuväri (Suunta)</label>
+                          <select value={customStyle.mainGradientDirection || "none"} onChange={(e) => updateCustomStyle("mainGradientDirection", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                            <option value="none">Ei liukuväriä</option>
+                            <option value="to bottom">Ylhäältä alas</option>
+                            <option value="to right">Vasemmalta oikealle</option>
+                            <option value="135deg">Viistosti (135deg)</option>
+                            <option value="circle">Ympyrä (Radial)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin liukuväri (Suunta)</label>
+                          <select value={customStyle.sidebarGradientDirection || "none"} onChange={(e) => updateCustomStyle("sidebarGradientDirection", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                            <option value="none">Ei liukuväriä</option>
+                            <option value="to bottom">Ylhäältä alas</option>
+                            <option value="to right">Vasemmalta oikealle</option>
+                            <option value="135deg">Viistosti (135deg)</option>
+                            <option value="circle">Ympyrä (Radial)</option>
                           </select>
                         </div>
                         <div>
@@ -2302,6 +2288,16 @@ export default function Home() {
                             <option value="circle">Ympyrä</option>
                             <option value="blob">Epäsymmetrinen (Blob)</option>
                             <option value="leaf">Lehti (Leaf)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Varjostukset & 3D</label>
+                          <select value={customStyle.shadowStyle || "none"} onChange={(e) => updateCustomStyle("shadowStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                            <option value="none">Ei varjoja</option>
+                            <option value="soft">Pehmeä varjo</option>
+                            <option value="hard">Kova (Brutalistinen)</option>
+                            <option value="3d">3D-syvyys</option>
+                            <option value="neon">Neon-hohto</option>
                           </select>
                         </div>
                         <div>
@@ -2626,10 +2622,11 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row gap-5">
                         <button
                           type="button"
-                          onClick={downloadNativePdf}
-                          className="flex-1 rounded-2xl bg-black text-white px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-2xl border border-white/20"
+                          onClick={downloadPdf}
+                          disabled={downloadingPdf}
+                          className="flex-1 rounded-2xl bg-[#00BFA6] text-black px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,191,166,0.3)] disabled:opacity-50"
                         >
-                          LATAA PDF (Suositeltu)
+                          {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF"}
                         </button>
 
                         <button
@@ -2639,16 +2636,6 @@ export default function Home() {
                           className="flex-1 rounded-2xl border-2 border-zinc-800 bg-transparent px-8 py-5 font-black text-zinc-400 transition-all hover:border-white hover:text-white disabled:opacity-50"
                         >
                           {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
-                        </button>
-                      </div>
-                      <div className="flex justify-center mt-2">
-                        <button
-                          type="button"
-                          onClick={downloadPdf}
-                          disabled={downloadingPdf}
-                          className="text-sm text-gray-500 font-bold hover:text-white transition-colors"
-                        >
-                          {downloadingPdf ? "Luodaan kuvaa..." : "Tarvitsetko PNG-kuvan? Lataa tästä"}
                         </button>
                       </div>
                     </>
