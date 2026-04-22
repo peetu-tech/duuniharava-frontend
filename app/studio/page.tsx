@@ -30,12 +30,16 @@ function getSupabaseHeaders() {
   };
 }
 
-// Olen lisännyt tänne uudet kentät, jotka vaadittiin Canva-tyylisiä muokkauksia varten
-// Jotta tyyppivirhe Vercelissä katoaa, meidän piti vain varmistaa että kääntäjä tietää näiden olevan olemassa.
+// Uudet laajennetut tyypit jotta Vercel ei kaadu tyyppivirheisiin
 export type ExtendedCvCustomStyle = CvCustomStyle & {
   pattern?: "none" | "dots" | "lines" | "grid";
   patternOpacity?: number;
   showSeparators?: boolean;
+  fontFamily?: "sans" | "serif" | "mono";
+  layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column";
+  headingAlign?: "left" | "center";
+  tagStyle?: "solid" | "outline" | "minimal";
+  imageShape?: "square" | "circle" | "rounded";
 };
 
 // --- TYYPIT JA VAKIOT ---
@@ -173,6 +177,11 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     pattern: "none",
     patternOpacity: 5,
     showSeparators: true,
+    fontFamily: "sans",
+    layout: "left-sidebar",
+    headingAlign: "left",
+    tagStyle: "solid",
+    imageShape: "circle",
   },
   classic: {
     sidebarBg: "#f5f5f4",
@@ -181,16 +190,21 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     mainText: "#111827",
     headingColor: "#78716c",
     accentColor: "#a16207",
-    borderRadius: 30,
+    borderRadius: 0,
     sidebarWidth: 255,
-    nameSize: 40,
+    nameSize: 42,
     bodySize: 15,
     lineHeight: 1.7,
     sectionSpacing: 24,
-    imageRadius: 24,
+    imageRadius: 0,
     pattern: "lines",
     patternOpacity: 3,
     showSeparators: true,
+    fontFamily: "serif",
+    layout: "left-sidebar",
+    headingAlign: "center",
+    tagStyle: "outline",
+    imageShape: "square",
   },
   compact: {
     sidebarBg: "#f8fafc",
@@ -199,16 +213,21 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     mainText: "#111827",
     headingColor: "#64748b",
     accentColor: "#0f766e",
-    borderRadius: 30,
+    borderRadius: 16,
     sidebarWidth: 220,
     nameSize: 32,
     bodySize: 14,
     lineHeight: 1.6,
     sectionSpacing: 18,
-    imageRadius: 20,
+    imageRadius: 16,
     pattern: "dots",
     patternOpacity: 4,
     showSeparators: false,
+    fontFamily: "sans",
+    layout: "top-header",
+    headingAlign: "left",
+    tagStyle: "minimal",
+    imageShape: "rounded",
   },
   bold: {
     sidebarBg: "#1e1b4b",
@@ -217,7 +236,7 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     mainText: "#111827",
     headingColor: "#4338ca",
     accentColor: "#4f46e5",
-    borderRadius: 30,
+    borderRadius: 24,
     sidebarWidth: 255,
     nameSize: 48,
     bodySize: 15,
@@ -227,6 +246,11 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     pattern: "grid",
     patternOpacity: 8,
     showSeparators: true,
+    fontFamily: "sans",
+    layout: "right-sidebar",
+    headingAlign: "left",
+    tagStyle: "solid",
+    imageShape: "rounded",
   },
 };
 
@@ -1195,6 +1219,26 @@ export default function Home() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
+        onclone: (doc) => {
+          // Tailwind CSS v4 / modern CSS oklab fix for html2canvas
+          const styles = doc.querySelectorAll("style");
+          styles.forEach((s) => {
+            s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)");
+            s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgb(0,0,0)");
+            s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgb(0,0,0)");
+          });
+          
+          // Also ensure inline styles don't crash
+          const allElements = doc.querySelectorAll("*");
+          allElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              const inlineStyle = el.getAttribute("style") || "";
+              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch")) {
+                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)").replace(/oklch\([^)]+\)/g, "rgb(0,0,0)"));
+              }
+            }
+          });
+        },
       });
 
       const imgData = canvas.toDataURL("image/png");
@@ -2123,7 +2167,53 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2">
+                  <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Asettelu (Layout)
+                      </label>
+                      <select
+                        value={customStyle.layout || "left-sidebar"}
+                        onChange={(e) => updateCustomStyle("layout", e.target.value as any)}
+                        className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="left-sidebar">Vasen sivupalkki</option>
+                        <option value="right-sidebar">Oikea sivupalkki</option>
+                        <option value="top-header">Yläpalkki (Koko leveys)</option>
+                        <option value="two-column">Jaettu kahteen sarakkeeseen</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Fonttiperhe
+                      </label>
+                      <select
+                        value={customStyle.fontFamily || "sans"}
+                        onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)}
+                        className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="sans">Moderni (Sans-serif)</option>
+                        <option value="serif">Klassinen (Serif)</option>
+                        <option value="mono">Koodari (Monospace)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Kuvan muoto
+                      </label>
+                      <select
+                        value={customStyle.imageShape || "rounded"}
+                        onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)}
+                        className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="square">Neliö</option>
+                        <option value="rounded">Pyöristetty</option>
+                        <option value="circle">Ympyrä</option>
+                      </select>
+                    </div>
+
                     <div>
                       <label className="mb-3 block text-sm font-bold text-gray-400">
                         Sivupalkin väri
@@ -2134,7 +2224,7 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("sidebarBg", e.target.value)
                         }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer"
                       />
                     </div>
 
@@ -2148,7 +2238,7 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("sidebarText", e.target.value)
                         }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer"
                       />
                     </div>
 
@@ -2162,7 +2252,7 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("mainBg", e.target.value)
                         }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer"
                       />
                     </div>
 
@@ -2176,7 +2266,7 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("mainText", e.target.value)
                         }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer"
                       />
                     </div>
 
@@ -2190,7 +2280,7 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("headingColor", e.target.value)
                         }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer"
                       />
                     </div>
 
@@ -2204,7 +2294,7 @@ export default function Home() {
                         onChange={(e) =>
                           updateCustomStyle("accentColor", e.target.value)
                         }
-                        className="h-16 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-2 cursor-pointer"
+                        className="h-14 w-full rounded-2xl border border-white/10 bg-[#0F0F0F] p-1 cursor-pointer"
                       />
                     </div>
 
@@ -2235,6 +2325,20 @@ export default function Home() {
                       >
                         <option value="yes">Kyllä, näytä viivat</option>
                         <option value="no">Ei, piilota viivat</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Otsikoiden tasaus
+                      </label>
+                      <select
+                        value={customStyle.headingAlign || "left"}
+                        onChange={(e) => updateCustomStyle("headingAlign", e.target.value as any)}
+                        className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="left">Vasemmalle</option>
+                        <option value="center">Keskelle</option>
                       </select>
                     </div>
 
@@ -2354,7 +2458,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="sm:col-span-2">
+                    <div>
                       <label className="mb-3 block text-sm font-bold text-gray-400">
                         Kuvan kulmat ({customStyle.imageRadius}px)
                       </label>
