@@ -12,7 +12,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
+import CvPreview, { type ExtendedCvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
@@ -136,7 +136,7 @@ const emptyJobForm = {
   companyWebsite: "",
 };
 
-const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
+const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
     sidebarBg2: "#1e293b",
@@ -766,7 +766,7 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+    useState<Record<CvStyleVariant, ExtendedCvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -774,9 +774,7 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null); 
-
-  const customStyle = customStyles[cvStyle];
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const session = getSession();
@@ -1061,9 +1059,9 @@ export default function Home() {
     });
   }
 
-  function updateCustomStyle<K extends keyof CvCustomStyle>(
+  function updateCustomStyle<K extends keyof ExtendedCvCustomStyle>(
     key: K,
-    value: CvCustomStyle[K]
+    value: ExtendedCvCustomStyle[K]
   ) {
     setCustomStyles((prev) => ({
       ...prev,
@@ -1192,77 +1190,67 @@ export default function Home() {
     }
   }
 
-  const downloadPdf = async () => {
-    const printContent = document.getElementById("cv-preview");
-    if (!printContent) return;
+  const downloadPdf = () => {
+    const originalPreview = document.getElementById("cv-preview");
+    if (!originalPreview) return;
 
-    try {
-      setDownloadingPdf(true);
-      setMessage("Käsitellään fontteja ja värejä...");
-      setErrorMessage("");
+    setMessage("Avaa PDF-latauksen... Odota hetki!");
 
-      const canvas = await html2canvas(printContent, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: customStyle.mainBg,
-        onclone: (doc) => {
-          const styles = doc.querySelectorAll("style, link");
-          styles.forEach((s) => {
-            if (s.innerHTML) {
-              s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)");
-              s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)");
-              s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)");
-            }
-          });
-          
-          const allElements = doc.querySelectorAll("*");
-          allElements.forEach((el) => {
-            if (el instanceof HTMLElement) {
-              const inlineStyle = el.getAttribute("style") || "";
-              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch") || inlineStyle.includes("color-mix")) {
-                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)"));
-              }
-            }
-          });
-        },
-      });
+    const printContainer = document.createElement("div");
+    printContainer.id = "print-wrapper";
+    
+    // Luodaan syväkopio alkuperäisestä CV-esikatselusta
+    const clone = originalPreview.cloneNode(true) as HTMLElement;
+    
+    // Pakotetaan klooni A4-mittoihin ja poistetaan selainnäkymän varjostukset/pyöristykset PDF:ää varten
+    clone.style.boxShadow = "none";
+    clone.style.borderRadius = "0";
+    clone.style.margin = "0";
+    clone.style.width = "210mm";
+    clone.style.minHeight = "297mm";
+    clone.style.maxWidth = "100%";
+    
+    printContainer.appendChild(clone);
+    document.body.appendChild(printContainer);
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
-      const pdf = new jsPDF({
-        orientation: "p",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const pageWidth = 210;
-      const pageHeight = 297;
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position -= pageHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+    // Määritellään globaalit tulostustyylit, jotka piilottavat kaiken muun sivulta paitsi kloonatun CV:n
+    const style = document.createElement("style");
+    style.innerHTML = `
+      @media print {
+        @page { 
+          size: A4 portrait; 
+          margin: 0; 
+        }
+        body * { 
+          visibility: hidden; 
+        }
+        #print-wrapper, #print-wrapper * { 
+          visibility: visible; 
+        }
+        #print-wrapper {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 210mm;
+          margin: 0;
+          padding: 0;
+          background-color: ${customStyle.mainBg};
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
       }
+    `;
+    document.head.appendChild(style);
 
-      pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
-      setMessage("PDF ladattu onnistuneesti koneellesi!");
-      setTimeout(() => setMessage(""), 3500);
-
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
-    } finally {
-      setDownloadingPdf(false);
-    }
+    setTimeout(() => {
+      // Avataan selainnatiivi tulostusikkuna, josta saa maailman parhaan vektoroidun PDF:n
+      window.print();
+      
+      // Siivotaan jäljet heti perään
+      document.body.removeChild(printContainer);
+      document.head.removeChild(style);
+      setTimeout(() => setMessage(""), 3000);
+    }, 500);
   };
 
   async function downloadDocx() {
