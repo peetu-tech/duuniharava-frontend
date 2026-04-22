@@ -409,7 +409,15 @@ function SectionShell({
   );
 }
 
-function StatCard({ title, value, description }: { title: string; value: string; description: string; }) {
+function StatCard({
+  title,
+  value,
+  description,
+}: {
+  title: string;
+  value: string;
+  description: string;
+}) {
   return (
     <div className="rounded-[30px] border border-white/10 bg-[#141414] p-10 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-[#00BFA6]/50 w-full">
       <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-gray-500">
@@ -431,7 +439,25 @@ function TextareaClass(minHeight: string) {
   return `w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-white text-base outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] ${minHeight}`;
 }
 
-function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring }: any) {
+function JobCard({
+  job,
+  isActive,
+  applicationsCount,
+  cvsCount,
+  onSelect,
+  onRemove,
+  onUpdate,
+  onSparring,
+}: {
+  job: JobItem;
+  isActive: boolean;
+  applicationsCount: number;
+  cvsCount: number;
+  onSelect: () => void;
+  onRemove: () => void;
+  onUpdate: (patch: Partial<JobItem>) => void;
+  onSparring: () => void;
+}) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
 
