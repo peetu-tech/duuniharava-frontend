@@ -1137,45 +1137,6 @@ export default function Home() {
     setTimeout(() => setMessage(""), 2500);
   }
 
-  function applyQuickTarget(type: "sales" | "warehouse" | "shorter") {
-    setErrorMessage("");
-    setMessage("");
-
-    if (type === "sales") {
-      updateField("targetJob", "Myyjä");
-      updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
-      setMessage("Tavoitetta suunnattu myyntityöhön.");
-    }
-
-    if (type === "warehouse") {
-      updateField("targetJob", "Varastotyöntekijä");
-      updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
-      setMessage("Tavoitetta suunnattu varastotyöhön.");
-    }
-
-    if (type === "shorter") {
-      const shorten = (text: string) =>
-        text
-          .split(/[.!?\n]+/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .slice(0, 2)
-          .join(". ");
-
-      setForm((prev) => ({
-        ...prev,
-        education: shorten(prev.education),
-        experience: shorten(prev.experience),
-        skills: shorten(prev.skills),
-        cards: shorten(prev.cards),
-        hobbies: shorten(prev.hobbies),
-      }));
-      setMessage("Kenttiä tiivistetty.");
-    }
-
-    setTimeout(() => setMessage(""), 2500);
-  }
-
   async function copyText(text: string, successMessage: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -1187,16 +1148,15 @@ export default function Home() {
     }
   }
 
-  const downloadNativePdf = async () => {
-    const printContent = document.getElementById("cv-preview");
-    if (!printContent) return;
+  const downloadPdf = async () => {
+    if (!pdfRef.current) return;
 
     try {
       setDownloadingPdf(true);
       setMessage("Käsitellään fontteja ja värejä...");
       setErrorMessage("");
 
-      const canvas = await html2canvas(printContent, {
+      const canvas = await html2canvas(pdfRef.current, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
@@ -1258,11 +1218,6 @@ export default function Home() {
     } finally {
       setDownloadingPdf(false);
     }
-  };
-
-  const downloadPdf = async () => {
-    // Varajärjestelmä
-    await downloadNativePdf();
   };
 
   async function downloadDocx() {
