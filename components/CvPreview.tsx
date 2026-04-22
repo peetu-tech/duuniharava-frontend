@@ -29,6 +29,8 @@ export type CvCustomStyle = {
   headingAlign?: "left" | "center" | "right";
   tagStyle?: "solid" | "outline" | "minimal" | "pill" | "sharp";
   imageShape?: "square" | "circle" | "rounded" | "blob" | "leaf";
+  pagePadding?: number;
+  headingStyle?: "simple" | "underline" | "boxed" | "highlight";
 };
 
 type CvPreviewProps = {
@@ -76,7 +78,6 @@ export default function CvPreview({
 }: CvPreviewProps) {
   const lines = splitLines(cvText);
 
-  // Varmistetaan että tyyli on olemassa, jottei kaadu
   if (!customStyle) return null;
 
   if (!lines.length) {
@@ -87,7 +88,6 @@ export default function CvPreview({
     );
   }
 
-  // Puretaan teksti osiin
   const name = lines[0] || "";
   const phone = lines[1] || "";
   const email = lines[2] || "";
@@ -121,9 +121,7 @@ export default function CvPreview({
   const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS"].includes(title.toUpperCase());
   const isProfileSection = (title: string) => ["PROFIILI", "TIIVISTELMÄ", "TAVOITE"].includes(title.toUpperCase());
 
-  // --- DYNAAMISET TYYLIT (CANVA-OMINAISUUDET) ---
-  
-  // 1. Fonttiperhe
+  // --- DYNAAMISET TYYLIT ---
   const getFontFamily = () => {
     switch(customStyle.fontFamily) {
       case 'classic': return '"Times New Roman", Times, serif';
@@ -138,26 +136,23 @@ export default function CvPreview({
     }
   };
 
-  // 2. Kuvan muoto
   const getImageBorderRadius = () => {
     switch(customStyle.imageShape) {
       case 'circle': return '50%';
       case 'square': return '0px';
-      case 'blob': return '40% 60% 70% 30% / 40% 50% 60% 50%'; // Orgaaninen muoto
-      case 'leaf': return '0 50% 50% 50%'; // Pisaran/lehden muoto
+      case 'blob': return '40% 60% 70% 30% / 40% 50% 60% 50%'; 
+      case 'leaf': return '0 50% 50% 50%'; 
       case 'rounded':
       default: return `${customStyle.imageRadius}px`;
     }
   };
 
-  // 3. Tekstin tasaus
   const getTextAlign = () => {
     if (customStyle.headingAlign === 'center') return 'center';
     if (customStyle.headingAlign === 'right') return 'right';
     return 'left';
   };
 
-  // 4. Taustakuvioinnit (Pääalue ja Sivupalkki erikseen)
   const getPatternStyle = (type: "main" | "sidebar"): React.CSSProperties => {
     const patternType = type === "main" ? customStyle.pattern : customStyle.sidebarPattern;
     const opacityVal = type === "main" ? customStyle.patternOpacity : customStyle.sidebarPatternOpacity;
@@ -165,32 +160,20 @@ export default function CvPreview({
     if (!patternType || patternType === "none") return {};
     const opacity = (opacityVal || 5) / 100;
     const color = `rgba(0, 0, 0, ${opacity})`;
-    const colorWhite = `rgba(255, 255, 255, ${opacity})`; // Vaalea versio tummalle taustalle
+    const colorWhite = `rgba(255, 255, 255, ${opacity})`; 
     
-    // Yritetään päätellä onko tausta tumma vai vaalea
     const bgCol = type === "main" ? customStyle.mainBg : customStyle.sidebarBg;
     const isDarkBg = bgCol.startsWith('#') && parseInt(bgCol.replace('#',''), 16) < 0xffffff / 2;
     const useColor = isDarkBg ? colorWhite : color;
 
-    if (patternType === "dots") {
-      return { backgroundImage: `radial-gradient(${useColor} 2px, transparent 2px)`, backgroundSize: "20px 20px" };
-    }
-    if (patternType === "lines") {
-      return { backgroundImage: `repeating-linear-gradient(180deg, ${useColor} 0, ${useColor} 1px, transparent 1px, transparent 20px)` };
-    }
-    if (patternType === "diagonal") {
-      return { backgroundImage: `repeating-linear-gradient(45deg, ${useColor} 0, ${useColor} 2px, transparent 2px, transparent 15px)` };
-    }
-    if (patternType === "grid") {
-      return { backgroundImage: `linear-gradient(${useColor} 1px, transparent 1px), linear-gradient(90deg, ${useColor} 1px, transparent 1px)`, backgroundSize: "20px 20px" };
-    }
-    if (patternType === "cross") {
-      return { backgroundImage: `radial-gradient(circle, transparent 20%, ${bgCol} 20%, ${bgCol} 80%, transparent 80%, transparent), radial-gradient(circle, transparent 20%, ${bgCol} 20%, ${bgCol} 80%, transparent 80%, transparent) ${useColor}`, backgroundSize: "40px 40px" };
-    }
+    if (patternType === "dots") return { backgroundImage: `radial-gradient(${useColor} 2px, transparent 2px)`, backgroundSize: "20px 20px" };
+    if (patternType === "lines") return { backgroundImage: `repeating-linear-gradient(180deg, ${useColor} 0, ${useColor} 1px, transparent 1px, transparent 20px)` };
+    if (patternType === "diagonal") return { backgroundImage: `repeating-linear-gradient(45deg, ${useColor} 0, ${useColor} 2px, transparent 2px, transparent 15px)` };
+    if (patternType === "grid") return { backgroundImage: `linear-gradient(${useColor} 1px, transparent 1px), linear-gradient(90deg, ${useColor} 1px, transparent 1px)`, backgroundSize: "20px 20px" };
+    if (patternType === "cross") return { backgroundImage: `radial-gradient(circle, transparent 20%, ${bgCol} 20%, ${bgCol} 80%, transparent 80%, transparent), radial-gradient(circle, transparent 20%, ${bgCol} 20%, ${bgCol} 80%, transparent 80%, transparent) ${useColor}`, backgroundSize: "40px 40px" };
     return {};
   };
 
-  // 5. Yläpalkin tyyli
   const getHeaderStyle = (): React.CSSProperties => {
     if (customStyle.headerStyle === "gradient") {
       return { background: `linear-gradient(135deg, ${customStyle.sidebarBg}, ${customStyle.accentColor})`, color: customStyle.sidebarText, ...getPatternStyle("sidebar") };
@@ -201,7 +184,6 @@ export default function CvPreview({
     return { background: customStyle.sidebarBg, color: customStyle.sidebarText, ...getPatternStyle("sidebar") };
   };
 
-  // Renderöidään Taidot / Kielet / Harrastukset tyylikkäinä pillereinä
   const renderTags = (items: string[]) => {
     const tags = items.flatMap(i => i.split(/,|•|-/)).map(t => t.trim()).filter(Boolean);
     
@@ -219,7 +201,6 @@ export default function CvPreview({
           } else if (customStyle.tagStyle === 'minimal') {
             tagCss = { backgroundColor: 'transparent', color: customStyle.mainText, borderBottom: `2px solid ${customStyle.accentColor}`, borderRadius: '0px', paddingLeft: '4px', paddingRight: '4px' };
           } else {
-            // Solid
             tagCss = { backgroundColor: customStyle.accentColor, color: '#fff', border: 'none', borderRadius: '6px' };
           }
 
@@ -233,24 +214,22 @@ export default function CvPreview({
     );
   };
 
-  // Renderöidään Työkokemus / Koulutus aikajanana
   const renderTimeline = (items: string[]) => {
     const isMinimalist = customStyle.layout === "minimalist";
     
     return (
-      <div className={`mt-4 space-y-6 ${customStyle.headingAlign === 'center' ? '' : (isMinimalist ? '' : 'pl-4 border-l-2')}`} style={{ borderColor: `${customStyle.accentColor}40` }}>
+      <div className={`mt-4`} style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing * 0.7}px`, borderColor: `${customStyle.accentColor}40`, paddingLeft: (customStyle.headingAlign !== 'center' && !isMinimalist) ? '1rem' : '0', borderLeftWidth: (customStyle.headingAlign !== 'center' && !isMinimalist) ? '2px' : '0' }}>
         {items.map((item, idx) => {
           const isMainPoint = !item.startsWith("-") && (item.includes("|") || item.includes(","));
           const parts = item.includes("|") ? item.split("|").map(s => s.trim()) : item.split(",").map(s => s.trim());
 
           if (isMainPoint && parts.length >= 2) {
             return (
-              <div key={idx} className={`relative mt-6 first:mt-2`} style={{ textAlign: getTextAlign() }}>
+              <div key={idx} className={`relative`} style={{ textAlign: getTextAlign() }}>
                 {customStyle.headingAlign !== 'center' && !isMinimalist && (
                   <div className="absolute -left-[23px] top-1.5 w-4 h-4 rounded-full border-4 bg-white" style={{ borderColor: customStyle.accentColor }} />
                 )}
                 
-                {/* Asettelutyylin mukainen tittelin esitys */}
                 <div className="font-bold" style={{ fontSize: `${customStyle.bodySize + 2}px`, color: customStyle.headingColor }}>
                   {parts[0]} <span className="opacity-40 font-normal mx-1">|</span> <span style={{ color: customStyle.accentColor }}>{parts[1]}</span>
                 </div>
@@ -263,9 +242,8 @@ export default function CvPreview({
             );
           }
 
-          // Normaalit selitystekstit
           return (
-            <p key={idx} className={`relative leading-relaxed opacity-80 ${item.startsWith("-") ? 'pl-5' : 'mt-2'}`} style={{ fontSize: `${customStyle.bodySize}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
+            <p key={idx} className={`relative leading-relaxed opacity-80 ${item.startsWith("-") ? 'pl-5' : ''}`} style={{ fontSize: `${customStyle.bodySize}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
               {item.startsWith("-") && <span className="absolute left-0 top-0 font-bold" style={{ color: customStyle.accentColor }}>•</span>}
               {item.replace(/^- /, '')}
             </p>
@@ -275,25 +253,47 @@ export default function CvPreview({
     );
   };
 
-  // Renderöidään myyvä Hook (Profiili) erottuvasti
   const renderProfileHook = (items: string[]) => {
     return (
       <div className="relative p-6 mt-4 rounded-2xl overflow-hidden" style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}` }}>
         <div className="absolute -top-4 -left-2 opacity-10 font-serif" style={{ fontSize: "80px", color: customStyle.accentColor }}>"</div>
-        <div className="relative z-10 space-y-3 opacity-90 font-medium italic" style={{ fontSize: `${customStyle.bodySize + 1}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
+        <div className="relative z-10 opacity-90 font-medium italic" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: `${customStyle.bodySize + 1}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
           {items.map((line, j) => <p key={j}>{line}</p>)}
         </div>
       </div>
     );
   };
 
-  // Layoutin määritys
+  const renderHeading = (title: string) => {
+    const hStyle = customStyle.headingStyle || "simple";
+    const align = getTextAlign();
+
+    let css: React.CSSProperties = { fontSize: "16px", color: customStyle.headingColor, textAlign: align as any };
+
+    if (hStyle === "boxed") {
+      css = { ...css, backgroundColor: customStyle.accentColor, color: "#fff", padding: "8px 16px", borderRadius: "8px", display: "inline-block" };
+    } else if (hStyle === "highlight") {
+      css = { ...css, borderBottom: `8px solid ${customStyle.accentColor}40`, display: "inline-block", lineHeight: "0.6" };
+    } else if (hStyle === "underline") {
+      css = { ...css, borderBottom: `2px solid ${customStyle.accentColor}`, paddingBottom: "4px", display: "inline-block" };
+    }
+
+    return (
+      <div style={{ textAlign: align as any, marginBottom: '24px' }}>
+        <h2 className="uppercase tracking-[0.2em] font-black" style={css}>
+          {title}
+        </h2>
+      </div>
+    );
+  };
+
   const isTopHeader = customStyle.layout === "top-header";
   const isRightSidebar = customStyle.layout === "right-sidebar";
   const isTwoColumn = customStyle.layout === "two-column"; 
   const isMinimalist = customStyle.layout === "minimalist";
 
-  // Yhteystiedot lohko
+  const padding = customStyle.pagePadding || 48; // Oletus padding 48px
+
   const ContactInfo = ({ isDarkBg }: { isDarkBg: boolean }) => (
     <div className={`space-y-4 text-sm font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`}>
       {phone && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.Phone /></span> {phone}</div>}
@@ -309,11 +309,11 @@ export default function CvPreview({
       style={{ backgroundColor: customStyle.mainBg, color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
     >
       
-      {/* 1. YLÄPALKKI / MINIMALISTINEN LAYOUT */}
+      {/* YLÄPALKKI / MINIMALISTINEN */}
       {(isTopHeader || isMinimalist) && (
-        <header className="px-14 py-16 flex flex-col sm:flex-row items-center gap-10 relative" style={isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()}>
+        <header className="flex flex-col sm:flex-row items-center gap-10 relative" style={{ padding: `${padding}px`, ...(isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()) }}>
           {image && (
-            <img src={image} alt="Profiili" className="relative z-10 w-44 h-44 object-cover shadow-2xl border-4 border-white/20" style={{ borderRadius: getImageBorderRadius() }} />
+            <img src={image} alt="Profiili" className="relative z-10 object-cover shadow-2xl border-4 border-white/20" style={{ width: '160px', height: '160px', borderRadius: getImageBorderRadius() }} />
           )}
           <div className={`relative z-10 flex-1 ${(!image || customStyle.headingAlign === 'center') ? 'text-center w-full' : ''}`} style={{ textAlign: getTextAlign() }}>
             <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.05, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
@@ -327,9 +327,9 @@ export default function CvPreview({
 
       <div className={`flex flex-col ${isTopHeader || isMinimalist ? '' : (isRightSidebar ? 'md:flex-row-reverse' : 'md:flex-row')} min-h-[1050px]`}>
         
-        {/* SIVUPALKKI (Jos ei yläpalkki-leiskaa) */}
+        {/* SIVUPALKKI */}
         {(!isTopHeader && !isMinimalist) && (
-          <aside className="flex flex-col p-10 shrink-0 relative overflow-hidden" style={{ background: customStyle.sidebarBg, color: customStyle.sidebarText, width: isTwoColumn ? '50%' : `${customStyle.sidebarWidth}px`, ...getPatternStyle("sidebar") }}>
+          <aside className="flex flex-col shrink-0 relative overflow-hidden" style={{ padding: `${padding}px`, background: customStyle.sidebarBg, color: customStyle.sidebarText, width: isTwoColumn ? '50%' : `${customStyle.sidebarWidth}px`, ...getPatternStyle("sidebar") }}>
             <div className="relative z-10">
               {image && (
                 <img src={image} alt="Profiili" className="mb-12 aspect-square w-full object-cover shadow-2xl border-2 border-white/10" style={{ borderRadius: getImageBorderRadius() }} />
@@ -345,8 +345,7 @@ export default function CvPreview({
                 <ContactInfo isDarkBg={true} />
               </div>
 
-              {/* Tägit sivupalkkiin jos ei olla Top-header moodissa */}
-              <div className="space-y-12 mt-auto">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing}px`, marginTop: 'auto' }}>
                 {sections.filter(s => isTagSection(s.title)).map((section, i) => (
                   <div key={i}>
                     <h2 className="uppercase tracking-[0.2em] font-black mb-5 opacity-40 text-[10px]" style={{ textAlign: getTextAlign() }}>{section.title}</h2>
@@ -359,20 +358,14 @@ export default function CvPreview({
         )}
 
         {/* PÄÄALUE */}
-        <main className={`relative z-10 flex-1 ${isMinimalist ? 'p-16 max-w-4xl mx-auto' : 'p-12 md:p-16'}`}>
-          <div className={`space-y-12 ${isTwoColumn && (isTopHeader || isMinimalist) ? 'columns-1 md:columns-2 gap-12 space-y-0' : ''}`} style={{ fontSize: `${customStyle.bodySize}px`, lineHeight: customStyle.lineHeight }}>
+        <main className={`relative z-10 flex-1`} style={{ padding: `${padding}px` }}>
+          {/* UUSI RAKENNE OSIOIDEN VÄLEILLE */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing}px`, fontSize: `${customStyle.bodySize}px`, lineHeight: customStyle.lineHeight }}>
             
-            {/* Piirretään joko kaikki (TopHeader/Minimalist) tai vain tekstit (Sidebar moodi) */}
             {sections.filter(s => (isTopHeader || isMinimalist) ? true : !isTagSection(s.title)).map((section, index) => (
-              <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid mb-12' : ''}>
-                <h2 className="uppercase tracking-[0.2em] font-black mb-6" style={{ fontSize: "16px", color: customStyle.headingColor, textAlign: getTextAlign() }}>
-                  {section.title}
-                </h2>
+              <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}>
                 
-                {/* Valinnainen erotinviiva otsikon alle */}
-                {customStyle.showSeparators && (
-                  <div className={`h-[3px] mb-8 rounded-full`} style={{ backgroundColor: customStyle.accentColor, width: '50px', opacity: 0.6, marginLeft: customStyle.headingAlign === 'center' ? 'auto' : (customStyle.headingAlign === 'right' ? 'auto' : '0'), marginRight: customStyle.headingAlign === 'center' ? 'auto' : '0' }} />
-                )}
+                {renderHeading(section.title)}
                 
                 {isProfileSection(section.title) ? (
                   renderProfileHook(section.items)
@@ -381,7 +374,7 @@ export default function CvPreview({
                 ) : isTagSection(section.title) ? (
                   renderTags(section.items)
                 ) : (
-                  <div className="space-y-4 opacity-80" style={{ textAlign: getTextAlign() }}>
+                  <div className="opacity-80" style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: getTextAlign() }}>
                     {section.items.map((line, j) => <p key={j}>{line}</p>)}
                   </div>
                 )}
