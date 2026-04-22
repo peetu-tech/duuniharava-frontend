@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { CSSProperties } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { saveAs } from "file-saver";
 import {
   Document,
@@ -10,7 +13,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview, { type ExtendedCvCustomStyle } from "@/components/CvPreview";
+import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
@@ -144,7 +147,7 @@ const pdfHeadingNames = [
   "Harrastukset",
 ];
 
-const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
+const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
     sidebarText: "#ffffff",
@@ -501,6 +504,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             {isActive ? "Valittu" : "Valitse paikka"}
           </button>
 
+          {/* SPARRING NAPPI */}
           <button
             type="button"
             onClick={onSparring}
@@ -724,6 +728,7 @@ export default function Home() {
   const [loadingLetter, setLoadingLetter] = useState(false);
   const [loadingJobs, setLoadingJobs] = useState(false);
   const [loadingTailoredCv, setLoadingTailoredCv] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [downloadingDocx, setDownloadingDocx] = useState(false);
 
   const [cvResult, setCvResult] = useState("");
@@ -753,7 +758,7 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, ExtendedCvCustomStyle>>(defaultCustomStyles);
+    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -762,7 +767,7 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null); // Automaattista scrollausta varten
 
   const customStyle = customStyles[cvStyle];
 
@@ -1046,9 +1051,9 @@ export default function Home() {
     });
   }
 
-  function updateCustomStyle<K extends keyof ExtendedCvCustomStyle>(
+  function updateCustomStyle<K extends keyof CvCustomStyle>(
     key: K,
-    value: ExtendedCvCustomStyle[K]
+    value: CvCustomStyle[K]
   ) {
     setCustomStyles((prev) => ({
       ...prev,
@@ -1127,6 +1132,45 @@ export default function Home() {
     setTimeout(() => setMessage(""), 2500);
   }
 
+  function applyQuickTarget(type: "sales" | "warehouse" | "shorter") {
+    setErrorMessage("");
+    setMessage("");
+
+    if (type === "sales") {
+      updateField("targetJob", "Myyjä");
+      updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
+      setMessage("Tavoitetta suunnattu myyntityöhön.");
+    }
+
+    if (type === "warehouse") {
+      updateField("targetJob", "Varastotyöntekijä");
+      updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
+      setMessage("Tavoitetta suunnattu varastotyöhön.");
+    }
+
+    if (type === "shorter") {
+      const shorten = (text: string) =>
+        text
+          .split(/[.!?\n]+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .slice(0, 2)
+          .join(". ");
+
+      setForm((prev) => ({
+        ...prev,
+        education: shorten(prev.education),
+        experience: shorten(prev.experience),
+        skills: shorten(prev.skills),
+        cards: shorten(prev.cards),
+        hobbies: shorten(prev.hobbies),
+      }));
+      setMessage("Kenttiä tiivistetty.");
+    }
+
+    setTimeout(() => setMessage(""), 2500);
+  }
+
   async function copyText(text: string, successMessage: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -1187,6 +1231,75 @@ export default function Home() {
       }, 1000);
     }, 500);
   };
+
+  async function downloadPdf() {
+    if (!pdfRef.current) return;
+
+    try {
+      setDownloadingPdf(true);
+      setMessage("");
+      setErrorMessage("");
+
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        onclone: (doc) => {
+          const styles = doc.querySelectorAll("style");
+          styles.forEach((s) => {
+            s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)");
+            s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgb(0,0,0)");
+            s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgb(0,0,0)");
+          });
+          
+          const allElements = doc.querySelectorAll("*");
+          allElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              const inlineStyle = el.getAttribute("style") || "";
+              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch")) {
+                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgb(0,0,0)").replace(/oklch\([^)]+\)/g, "rgb(0,0,0)"));
+              }
+            }
+          });
+        },
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
+      setMessage("PDF ladattu onnistuneesti.");
+      setTimeout(() => setMessage(""), 2500);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Virhe PDF-luonnissa. Yritä käyttää Natiivi-PDF latausta.");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  }
 
   async function downloadDocx() {
     try {
@@ -1325,6 +1438,7 @@ export default function Home() {
     return true;
   }
 
+  // SUPABASE: Lisää työpaikka
   function addJob() {
     setMessage("");
     setErrorMessage("");
@@ -1383,6 +1497,7 @@ export default function Home() {
     }
   }
 
+  // SUPABASE: Poista työpaikka
   function removeJob(id: string) {
     const filtered = jobs.filter((job) => job.id !== id);
     setJobs(filtered);
@@ -1453,6 +1568,7 @@ export default function Home() {
       setTab("job");
       setMessage("Työpaikkaehdotukset lisätty.");
 
+      // Tallenna kaikki kerralla tietokantaan
       const session = getSession();
       if(session) {
         newJobs.forEach(job => {
@@ -1474,6 +1590,7 @@ export default function Home() {
     }
   }
 
+  // SUPABASE: Tallenna räätälöity CV
   async function createTailoredCv() {
     if (!activeJob) {
       setErrorMessage("Valitse työpaikka ennen kohdistetun CV:n luontia.");
@@ -1571,6 +1688,7 @@ export default function Home() {
     }
   }
 
+  // SUPABASE: Tallenna generoitu hakemus
   async function handleCoverLetterSubmit() {
     setMessage("");
     setErrorMessage("");
@@ -1632,6 +1750,7 @@ export default function Home() {
     }
   }
 
+  // SUPABASE: Tallenna oma muokattu hakemus
   function saveEditedLetter() {
     if (!activeJob || !letterDraft.trim()) return;
 
