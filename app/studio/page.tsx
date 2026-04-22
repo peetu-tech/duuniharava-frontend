@@ -30,16 +30,17 @@ function getSupabaseHeaders() {
   };
 }
 
-// Uudet laajennetut tyypit jotta Vercel ei kaadu tyyppivirheisiin
+// LAAJENNETUT TYYPIT CANVA-OMINAISUUKSILLE
 export type ExtendedCvCustomStyle = CvCustomStyle & {
-  pattern?: "none" | "dots" | "lines" | "grid";
+  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal";
   patternOpacity?: number;
   showSeparators?: boolean;
-  fontFamily?: "sans" | "serif" | "mono";
-  layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column";
-  headingAlign?: "left" | "center";
-  tagStyle?: "solid" | "outline" | "minimal";
-  imageShape?: "square" | "circle" | "rounded";
+  fontFamily?: "modern" | "classic" | "mono" | "elegant" | "clean" | "tech";
+  layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column" | "minimalist";
+  headerStyle?: "solid" | "transparent" | "gradient";
+  headingAlign?: "left" | "center" | "right";
+  tagStyle?: "solid" | "outline" | "minimal" | "pill" | "sharp";
+  imageShape?: "square" | "circle" | "rounded" | "blob";
 };
 
 // --- TYYPIT JA VAKIOT ---
@@ -177,7 +178,7 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     pattern: "none",
     patternOpacity: 5,
     showSeparators: true,
-    fontFamily: "sans",
+    fontFamily: "modern",
     layout: "left-sidebar",
     headingAlign: "left",
     tagStyle: "solid",
@@ -200,7 +201,7 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     pattern: "lines",
     patternOpacity: 3,
     showSeparators: true,
-    fontFamily: "serif",
+    fontFamily: "classic",
     layout: "left-sidebar",
     headingAlign: "center",
     tagStyle: "outline",
@@ -223,7 +224,7 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     pattern: "dots",
     patternOpacity: 4,
     showSeparators: false,
-    fontFamily: "sans",
+    fontFamily: "clean",
     layout: "top-header",
     headingAlign: "left",
     tagStyle: "minimal",
@@ -236,7 +237,7 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     mainText: "#111827",
     headingColor: "#4338ca",
     accentColor: "#4f46e5",
-    borderRadius: 24,
+    borderRadius: 30,
     sidebarWidth: 255,
     nameSize: 48,
     bodySize: 15,
@@ -246,11 +247,11 @@ const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
     pattern: "grid",
     patternOpacity: 8,
     showSeparators: true,
-    fontFamily: "sans",
+    fontFamily: "tech",
     layout: "right-sidebar",
     headingAlign: "left",
-    tagStyle: "solid",
-    imageShape: "rounded",
+    tagStyle: "pill",
+    imageShape: "blob",
   },
 };
 
@@ -408,15 +409,7 @@ function SectionShell({
   );
 }
 
-function StatCard({
-  title,
-  value,
-  description,
-}: {
-  title: string;
-  value: string;
-  description: string;
-}) {
+function StatCard({ title, value, description }: { title: string; value: string; description: string; }) {
   return (
     <div className="rounded-[30px] border border-white/10 bg-[#141414] p-10 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-[#00BFA6]/50 w-full">
       <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-gray-500">
@@ -438,25 +431,7 @@ function TextareaClass(minHeight: string) {
   return `w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-white text-base outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] ${minHeight}`;
 }
 
-function JobCard({
-  job,
-  isActive,
-  applicationsCount,
-  cvsCount,
-  onSelect,
-  onRemove,
-  onUpdate,
-  onSparring,
-}: {
-  job: JobItem;
-  isActive: boolean;
-  applicationsCount: number;
-  cvsCount: number;
-  onSelect: () => void;
-  onRemove: () => void;
-  onUpdate: (patch: Partial<JobItem>) => void;
-  onSparring: () => void;
-}) {
+function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring }: any) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
 
@@ -2065,7 +2040,7 @@ export default function Home() {
                 <div className="pt-4">
                   <label className="mb-3 block text-sm font-bold text-gray-500 ml-1">Koulutus</label>
                   <textarea
-                    placeholder="Oppilaitos, Tutkinto, Valmistumisvuosi&#10;Esim. Helsingin Yliopisto, Kauppatieteiden maisteri, 2024"
+                    placeholder="Oppilaitos | Tutkinto | Valmistumisvuosi&#10;Esim. Helsingin Yliopisto | Kauppatieteiden maisteri | 2024"
                     value={form.education}
                     onChange={(e) => updateField("education", e.target.value)}
                     className={TextareaClass("min-h-[140px]")}
@@ -2193,9 +2168,12 @@ export default function Home() {
                         onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)}
                         className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
                       >
-                        <option value="sans">Moderni (Sans-serif)</option>
-                        <option value="serif">Klassinen (Serif)</option>
+                        <option value="modern">Moderni (Sans-serif)</option>
+                        <option value="classic">Klassinen (Serif)</option>
                         <option value="mono">Koodari (Monospace)</option>
+                        <option value="elegant">Elegantti (Georgia)</option>
+                        <option value="clean">Puhdas (Arial)</option>
+                        <option value="tech">Tekninen (Trebuchet)</option>
                       </select>
                     </div>
 
@@ -2211,6 +2189,7 @@ export default function Home() {
                         <option value="square">Neliö</option>
                         <option value="rounded">Pyöristetty</option>
                         <option value="circle">Ympyrä</option>
+                        <option value="blob">Epäsymmetrinen (Blob)</option>
                       </select>
                     </div>
 
@@ -2309,8 +2288,26 @@ export default function Home() {
                       >
                         <option value="none">Ei kuviointia</option>
                         <option value="dots">Pisteet (Dots)</option>
-                        <option value="lines">Viivat (Lines)</option>
+                        <option value="lines">Vaakaviivat (Lines)</option>
+                        <option value="diagonal">Vinoviivat (Diagonal)</option>
                         <option value="grid">Ruudukko (Grid)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-3 block text-sm font-bold text-gray-400">
+                        Tagien (Taidot) tyyli
+                      </label>
+                      <select
+                        value={customStyle.tagStyle || "solid"}
+                        onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)}
+                        className="w-full rounded-2xl border border-white/10 bg-[#0F0F0F] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="solid">Täytetty</option>
+                        <option value="outline">Reunukset (Outline)</option>
+                        <option value="pill">Pillerit (Pyöreät)</option>
+                        <option value="sharp">Terävät kulmat</option>
+                        <option value="minimal">Minimaalinen viiva</option>
                       </select>
                     </div>
 
@@ -2339,6 +2336,7 @@ export default function Home() {
                       >
                         <option value="left">Vasemmalle</option>
                         <option value="center">Keskelle</option>
+                        <option value="right">Oikealle</option>
                       </select>
                     </div>
 
@@ -2458,9 +2456,9 @@ export default function Home() {
                       />
                     </div>
 
-                    <div>
+                    <div className="sm:col-span-3">
                       <label className="mb-3 block text-sm font-bold text-gray-400">
-                        Kuvan kulmat ({customStyle.imageRadius}px)
+                        Kuvan pyöristys (Pätee vain Neliö- ja Pyöristetty -muotoihin)
                       </label>
                       <input
                         type="range"
