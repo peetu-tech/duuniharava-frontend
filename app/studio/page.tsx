@@ -13,7 +13,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview, { type ExtendedCvCustomStyle } from "@/components/CvPreview";
+import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
@@ -137,7 +137,17 @@ const emptyJobForm = {
   companyWebsite: "",
 };
 
-const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
+const pdfHeadingNames = [
+  "Profiili",
+  "Työkokemus",
+  "Koulutus",
+  "Kielitaito",
+  "Taidot",
+  "Kortit ja pätevyydet",
+  "Harrastukset",
+];
+
+const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
     sidebarBg2: "#1e293b",
@@ -767,18 +777,20 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, ExtendedCvCustomStyle>>(defaultCustomStyles);
+    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
+  // Sparraus (Haastattelusimulaattori) tilat
   const [sparringJob, setSparringJob] = useState<JobItem | null>(null);
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null); 
+  const chatEndRef = useRef<HTMLDivElement | null>(null); // Automaattista scrollausta varten
 
   const customStyle = customStyles[cvStyle];
 
+  // SUPABASE: Datan lataus alussa
   useEffect(() => {
     const session = getSession();
     if (!session) {
@@ -882,6 +894,7 @@ export default function Home() {
     loadDataFromDb();
   }, [router]);
 
+  // SUPABASE: Profiilin automaattinen tallennus
   useEffect(() => {
     if (isAuthChecking || !hasSession) return;
     const session = getSession();
@@ -916,6 +929,7 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [form, profileImage, isAuthChecking, hasSession]);
 
+  // Automaattinen scrollaus chattiin
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [sparringChat, isSparringTyping]);
@@ -1062,9 +1076,9 @@ export default function Home() {
     });
   }
 
-  function updateCustomStyle<K extends keyof ExtendedCvCustomStyle>(
+  function updateCustomStyle<K extends keyof CvCustomStyle>(
     key: K,
-    value: ExtendedCvCustomStyle[K]
+    value: CvCustomStyle[K]
   ) {
     setCustomStyles((prev) => ({
       ...prev,
@@ -1143,6 +1157,45 @@ export default function Home() {
     setTimeout(() => setMessage(""), 2500);
   }
 
+  function applyQuickTarget(type: "sales" | "warehouse" | "shorter") {
+    setErrorMessage("");
+    setMessage("");
+
+    if (type === "sales") {
+      updateField("targetJob", "Myyjä");
+      updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
+      setMessage("Tavoitetta suunnattu myyntityöhön.");
+    }
+
+    if (type === "warehouse") {
+      updateField("targetJob", "Varastotyöntekijä");
+      updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
+      setMessage("Tavoitetta suunnattu varastotyöhön.");
+    }
+
+    if (type === "shorter") {
+      const shorten = (text: string) =>
+        text
+          .split(/[.!?\n]+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .slice(0, 2)
+          .join(". ");
+
+      setForm((prev) => ({
+        ...prev,
+        education: shorten(prev.education),
+        experience: shorten(prev.experience),
+        skills: shorten(prev.skills),
+        cards: shorten(prev.cards),
+        hobbies: shorten(prev.hobbies),
+      }));
+      setMessage("Kenttiä tiivistetty.");
+    }
+
+    setTimeout(() => setMessage(""), 2500);
+  }
+
   async function copyText(text: string, successMessage: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -1154,59 +1207,41 @@ export default function Home() {
     }
   }
 
-  async function downloadPdf() {
-    if (!pdfRef.current) return;
+  // NATIIVI TULOSTUS / PDF LATAUS - KORJATTU TÄYSIN (Poistettu ylimääräinen window.print)
+  const downloadNativePdf = async () => {
+    const printContent = document.getElementById("cv-preview");
+    if (!printContent) return;
 
     try {
       setDownloadingPdf(true);
       setMessage("Käsitellään fontteja ja värejä...");
       setErrorMessage("");
 
-      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
-      const disabledLinks: HTMLLinkElement[] = [];
-
-      for (const link of links) {
-        try {
-          const res = await fetch(link.href);
-          let css = await res.text();
-          if (css.includes('oklab') || css.includes('oklch') || css.includes('color-mix')) {
-            css = css.replace(/oklab/g, 'ignore').replace(/oklch/g, 'ignore').replace(/color-mix/g, 'ignore');
-            const style = document.createElement('style');
-            style.innerHTML = css;
-            style.id = 'html2canvas-safe-style';
-            document.head.appendChild(style);
-            link.disabled = true;
-            disabledLinks.push(link);
-          }
-        } catch (e) {
-          console.warn("Could not sanitize stylesheet", e);
-        }
-      }
-
-      const inlineStyles = Array.from(document.querySelectorAll('style:not(#html2canvas-safe-style)')) as HTMLStyleElement[];
-      inlineStyles.forEach(s => {
-        if (s.innerHTML.includes('oklab') || s.innerHTML.includes('oklch') || s.innerHTML.includes('color-mix')) {
-          s.setAttribute('data-orig-css', s.innerHTML);
-          s.innerHTML = s.innerHTML.replace(/oklab/g, 'ignore').replace(/oklch/g, 'ignore').replace(/color-mix/g, 'ignore');
-        }
-      });
-
-      setMessage("Luodaan PDF-tiedostoa...");
-
-      const canvas = await html2canvas(pdfRef.current, {
+      const canvas = await html2canvas(printContent, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: customStyle.mainBg,
-      });
-
-      disabledLinks.forEach(link => { link.disabled = false; });
-      document.querySelectorAll('#html2canvas-safe-style').forEach(el => el.remove());
-      inlineStyles.forEach(s => {
-        if (s.hasAttribute('data-orig-css')) {
-          s.innerHTML = s.getAttribute('data-orig-css') || '';
-          s.removeAttribute('data-orig-css');
-        }
+        onclone: (doc) => {
+          const styles = doc.querySelectorAll("style, link");
+          styles.forEach((s) => {
+            if (s.innerHTML) {
+              s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)");
+              s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)");
+              s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)");
+            }
+          });
+          
+          const allElements = doc.querySelectorAll("*");
+          allElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              const inlineStyle = el.getAttribute("style") || "";
+              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch") || inlineStyle.includes("color-mix")) {
+                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)"));
+              }
+            }
+          });
+        },
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
@@ -1241,18 +1276,10 @@ export default function Home() {
     } catch (error) {
       console.error(error);
       setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
-      
-      document.querySelectorAll('link[rel="stylesheet"]').forEach((l: any) => l.disabled = false);
-      document.querySelectorAll('#html2canvas-safe-style').forEach(el => el.remove());
-      document.querySelectorAll('style[data-orig-css]').forEach(s => {
-        s.innerHTML = s.getAttribute('data-orig-css') || '';
-        s.removeAttribute('data-orig-css');
-      });
-
     } finally {
       setDownloadingPdf(false);
     }
-  }
+  };
 
   async function downloadDocx() {
     try {
@@ -1391,6 +1418,7 @@ export default function Home() {
     return true;
   }
 
+  // SUPABASE: Lisää työpaikka
   function addJob() {
     setMessage("");
     setErrorMessage("");
@@ -1449,6 +1477,7 @@ export default function Home() {
     }
   }
 
+  // SUPABASE: Poista työpaikka
   function removeJob(id: string) {
     const filtered = jobs.filter((job) => job.id !== id);
     setJobs(filtered);
@@ -1791,10 +1820,18 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-5">
                 <button
                   type="button"
-                  onClick={fillExample}
-                  className="bg-[#00BFA6] text-black px-10 py-5 rounded-[24px] text-lg font-black hover:scale-[1.03] transition-transform shadow-[0_0_20px_rgba(0,191,166,0.3)]"
+                  onClick={() => setShowHelp(!showHelp)}
+                  className="bg-[#00BFA6]/10 border border-[#00BFA6]/40 text-[#00BFA6] px-10 py-5 rounded-[24px] text-lg font-black hover:bg-[#00BFA6]/20 transition-all shadow-xl flex items-center justify-center gap-3"
                 >
-                  Täytä esimerkkidata
+                  <span className="text-2xl">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={fillExample}
+                  className="bg-white text-black px-10 py-5 rounded-[24px] text-lg font-black hover:bg-gray-200 transition-all shadow-xl"
+                >
+                  Täytä esimerkki
                 </button>
               </div>
             </div>
@@ -1821,6 +1858,58 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* --- OHJE-OSIO --- */}
+      {showHelp && (
+        <section className="max-w-7xl mx-auto px-8 mt-12 animate-in fade-in slide-in-from-top-6">
+          <div className="rounded-[40px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-10 sm:p-16 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
+              <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-white font-bold p-2 text-xl transition">✕ Sulje</button>
+            </div>
+            
+            <div className="space-y-10 text-gray-300 text-lg leading-relaxed">
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">1</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Täytä omat tietosi</strong>
+                  Aloita alempaa laatikosta nimeltä "Vaihe 1: Hakijan tiedot". Kirjoita nimesi, työkokemuksesi ja koulutuksesi. Voit myös vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoäly lukee sen puolestasi.
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">2</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Paina "Generoi CV"</strong>
+                  Rullaa Vaihe 1 -laatikon loppuun ja paina vihreää nappia. Tekoäly muotoilee sinulle uuden, hienon CV:n. Näet esikatselun sivun oikeassa laidassa (tai mobiilissa alhaalla). Voit ladata sen suoraan koneellesi PDF-napista.
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">3</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Etsi työpaikkoja</strong>
+                  Siirry "Vaihe 2: Hakuprofiili" -laatikkoon. Kerro siellä, millaista työtä etsit (esim. "Myyjä, Uusimaa"). Paina "Ehdota työpaikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia, voimassa olevia avoimia tehtäviä ja tuo ne näkyviin.
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">4</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Tee hakemus napin painalluksella</strong>
+                  Sivun oikeassa reunassa (tai mobiilissa alempana) on välilehdet: "CV", "Työpaikat" ja "Hakemukset". Valitse listalta kiinnostava työpaikka ja pyydä tekoälyä kirjoittamaan siihen valmis, räätälöity työhakemus yhdellä klikkauksella.
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 pt-10 border-t border-white/10 text-center sm:text-left">
+              <button onClick={() => setShowHelp(false)} className="rounded-2xl bg-white px-10 py-5 text-lg font-black text-black transition-all hover:bg-gray-200 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.2)] w-full sm:w-auto">
+                Selvä, ymmärsin! Aloitetaan!
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="mx-auto max-w-7xl px-8 py-16 md:py-20 lg:px-12">
         <div className="mb-10 flex flex-wrap items-center gap-5 border-b border-white/5 pb-6">
@@ -2533,11 +2622,10 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row gap-5">
                         <button
                           type="button"
-                          onClick={downloadPdf}
-                          disabled={downloadingPdf}
-                          className="flex-1 rounded-2xl bg-[#00BFA6] text-black px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,191,166,0.3)] disabled:opacity-50"
+                          onClick={downloadNativePdf}
+                          className="flex-1 rounded-2xl bg-black text-white px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-2xl border border-white/20"
                         >
-                          {downloadingPdf ? "Käsitellään..." : "LATAA PDF TÄSTÄ"}
+                          LATAA PDF (Suositeltu)
                         </button>
 
                         <button
@@ -2547,6 +2635,16 @@ export default function Home() {
                           className="flex-1 rounded-2xl border-2 border-zinc-800 bg-transparent px-8 py-5 font-black text-zinc-400 transition-all hover:border-white hover:text-white disabled:opacity-50"
                         >
                           {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
+                        </button>
+                      </div>
+                      <div className="flex justify-center mt-2">
+                        <button
+                          type="button"
+                          onClick={downloadPdf}
+                          disabled={downloadingPdf}
+                          className="text-sm text-gray-500 font-bold hover:text-white transition-colors"
+                        >
+                          {downloadingPdf ? "Luodaan kuvaa..." : "Tarvitsetko PNG-kuvan? Lataa tästä"}
                         </button>
                       </div>
                     </>
