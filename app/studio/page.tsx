@@ -12,7 +12,7 @@ import {
   TextRun,
   HeadingLevel,
 } from "docx";
-import CvPreview, { type ExtendedCvCustomStyle } from "@/components/CvPreview";
+import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
@@ -136,7 +136,7 @@ const emptyJobForm = {
   companyWebsite: "",
 };
 
-const defaultCustomStyles: Record<CvStyleVariant, ExtendedCvCustomStyle> = {
+const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
     sidebarBg2: "#1e293b",
@@ -766,7 +766,7 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, ExtendedCvCustomStyle>>(defaultCustomStyles);
+    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -1059,9 +1059,9 @@ export default function Home() {
     });
   }
 
-  function updateCustomStyle<K extends keyof ExtendedCvCustomStyle>(
+  function updateCustomStyle<K extends keyof CvCustomStyle>(
     key: K,
-    value: ExtendedCvCustomStyle[K]
+    value: CvCustomStyle[K]
   ) {
     setCustomStyles((prev) => ({
       ...prev,
@@ -1190,67 +1190,82 @@ export default function Home() {
     }
   }
 
-  const downloadPdf = () => {
-    const originalPreview = document.getElementById("cv-preview");
-    if (!originalPreview) return;
+  const downloadNativePdf = async () => {
+    const printContent = document.getElementById("cv-preview");
+    if (!printContent) return;
 
-    setMessage("Avaa PDF-latauksen... Odota hetki!");
+    try {
+      setDownloadingPdf(true);
+      setMessage("Käsitellään fontteja ja värejä...");
+      setErrorMessage("");
 
-    const printContainer = document.createElement("div");
-    printContainer.id = "print-wrapper";
-    
-    // Luodaan syväkopio alkuperäisestä CV-esikatselusta
-    const clone = originalPreview.cloneNode(true) as HTMLElement;
-    
-    // Pakotetaan klooni A4-mittoihin ja poistetaan selainnäkymän varjostukset/pyöristykset PDF:ää varten
-    clone.style.boxShadow = "none";
-    clone.style.borderRadius = "0";
-    clone.style.margin = "0";
-    clone.style.width = "210mm";
-    clone.style.minHeight = "297mm";
-    clone.style.maxWidth = "100%";
-    
-    printContainer.appendChild(clone);
-    document.body.appendChild(printContainer);
+      const canvas = await html2canvas(printContent, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: customStyle.mainBg,
+        onclone: (doc) => {
+          const styles = doc.querySelectorAll("style, link");
+          styles.forEach((s) => {
+            if (s.innerHTML) {
+              s.innerHTML = s.innerHTML.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)");
+              s.innerHTML = s.innerHTML.replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)");
+              s.innerHTML = s.innerHTML.replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)");
+            }
+          });
+          
+          const allElements = doc.querySelectorAll("*");
+          allElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              const inlineStyle = el.getAttribute("style") || "";
+              if (inlineStyle.includes("oklab") || inlineStyle.includes("oklch") || inlineStyle.includes("color-mix")) {
+                el.setAttribute("style", inlineStyle.replace(/oklab\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/oklch\([^)]+\)/g, "rgba(0,0,0,0.8)").replace(/color-mix\([^)]+\)/g, "rgba(0,0,0,0.8)"));
+              }
+            }
+          });
+        },
+      });
 
-    // Määritellään globaalit tulostustyylit, jotka piilottavat kaiken muun sivulta paitsi kloonatun CV:n
-    const style = document.createElement("style");
-    style.innerHTML = `
-      @media print {
-        @page { 
-          size: A4 portrait; 
-          margin: 0; 
-        }
-        body * { 
-          visibility: hidden; 
-        }
-        #print-wrapper, #print-wrapper * { 
-          visibility: visible; 
-        }
-        #print-wrapper {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 210mm;
-          margin: 0;
-          padding: 0;
-          background-color: ${customStyle.mainBg};
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
-        }
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      const pdf = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
-    `;
-    document.head.appendChild(style);
 
-    setTimeout(() => {
-      // Avataan selainnatiivi tulostusikkuna, josta saa maailman parhaan vektoroidun PDF:n
-      window.print();
-      
-      // Siivotaan jäljet heti perään
-      document.body.removeChild(printContainer);
-      document.head.removeChild(style);
-      setTimeout(() => setMessage(""), 3000);
-    }, 500);
+      pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
+      setMessage("PDF ladattu onnistuneesti koneellesi!");
+      setTimeout(() => setMessage(""), 3500);
+
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
+  const downloadPdf = async () => {
+    // Varajärjestelmä
+    await downloadNativePdf();
   };
 
   async function downloadDocx() {
@@ -2592,11 +2607,10 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row gap-5">
                         <button
                           type="button"
-                          onClick={downloadPdf}
-                          disabled={downloadingPdf}
-                          className="flex-1 rounded-2xl bg-[#00BFA6] text-black px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,191,166,0.3)] disabled:opacity-50"
+                          onClick={downloadNativePdf}
+                          className="flex-1 rounded-2xl bg-black text-white px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-2xl border border-white/20"
                         >
-                          {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF"}
+                          LATAA PDF (Suositeltu)
                         </button>
 
                         <button
@@ -2606,6 +2620,16 @@ export default function Home() {
                           className="flex-1 rounded-2xl border-2 border-zinc-800 bg-transparent px-8 py-5 font-black text-zinc-400 transition-all hover:border-white hover:text-white disabled:opacity-50"
                         >
                           {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
+                        </button>
+                      </div>
+                      <div className="flex justify-center mt-2">
+                        <button
+                          type="button"
+                          onClick={downloadPdf}
+                          disabled={downloadingPdf}
+                          className="text-sm text-gray-500 font-bold hover:text-white transition-colors"
+                        >
+                          {downloadingPdf ? "Luodaan kuvaa..." : "Tarvitsetko PNG-kuvan? Lataa tästä"}
                         </button>
                       </div>
                     </>
