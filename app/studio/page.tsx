@@ -136,6 +136,16 @@ const emptyJobForm = {
   companyWebsite: "",
 };
 
+const pdfHeadingNames = [
+  "Profiili",
+  "Työkokemus",
+  "Koulutus",
+  "Kielitaito",
+  "Taidot",
+  "Kortit ja pätevyydet",
+  "Harrastukset",
+];
+
 const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
@@ -719,7 +729,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   );
 }
 
-// --- PÄÄKOMPONENTTI ---
 export default function Home() {
   const router = useRouter();
   
@@ -727,6 +736,7 @@ export default function Home() {
   const [hasSession, setHasSession] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
+  // Perustilat
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
@@ -747,9 +757,13 @@ export default function Home() {
   const [profileImage, setProfileImage] = useState("");
   const [jobFilter, setJobFilter] = useState("");
 
-  const [jobStatusFilter, setJobStatusFilter] = useState<"all" | JobStatus>("all");
-  const [jobPriorityFilter, setJobPriorityFilter] = useState<"all" | JobPriority>("all");
-  const [jobSort, setJobSort] = useState<"match" | "deadline" | "priority" | "newest" | "company">("newest");
+  const [jobStatusFilter, setJobStatusFilter] =
+    useState<"all" | JobStatus>("all");
+  const [jobPriorityFilter, setJobPriorityFilter] =
+    useState<"all" | JobPriority>("all");
+  const [jobSort, setJobSort] = useState<
+    "match" | "deadline" | "priority" | "newest" | "company"
+  >("newest");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
@@ -761,7 +775,8 @@ export default function Home() {
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
-  const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+  const [customStyles, setCustomStyles] =
+    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -1137,6 +1152,45 @@ export default function Home() {
     setTimeout(() => setMessage(""), 2500);
   }
 
+  function applyQuickTarget(type: "sales" | "warehouse" | "shorter") {
+    setErrorMessage("");
+    setMessage("");
+
+    if (type === "sales") {
+      updateField("targetJob", "Myyjä");
+      updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
+      setMessage("Tavoitetta suunnattu myyntityöhön.");
+    }
+
+    if (type === "warehouse") {
+      updateField("targetJob", "Varastotyöntekijä");
+      updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
+      setMessage("Tavoitetta suunnattu varastotyöhön.");
+    }
+
+    if (type === "shorter") {
+      const shorten = (text: string) =>
+        text
+          .split(/[.!?\n]+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .slice(0, 2)
+          .join(". ");
+
+      setForm((prev) => ({
+        ...prev,
+        education: shorten(prev.education),
+        experience: shorten(prev.experience),
+        skills: shorten(prev.skills),
+        cards: shorten(prev.cards),
+        hobbies: shorten(prev.hobbies),
+      }));
+      setMessage("Kenttiä tiivistetty.");
+    }
+
+    setTimeout(() => setMessage(""), 2500);
+  }
+
   async function copyText(text: string, successMessage: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -1149,14 +1203,15 @@ export default function Home() {
   }
 
   const downloadPdf = async () => {
-    if (!pdfRef.current) return;
+    const printContent = document.getElementById("cv-preview");
+    if (!printContent) return;
 
     try {
       setDownloadingPdf(true);
       setMessage("Käsitellään fontteja ja värejä...");
       setErrorMessage("");
 
-      const canvas = await html2canvas(pdfRef.current, {
+      const canvas = await html2canvas(printContent, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
