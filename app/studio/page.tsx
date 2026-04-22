@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CSSProperties } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { saveAs } from "file-saver";
@@ -412,7 +411,15 @@ function SectionShell({
   );
 }
 
-function StatCard({ title, value, description }: { title: string; value: string; description: string; }) {
+function StatCard({
+  title,
+  value,
+  description,
+}: {
+  title: string;
+  value: string;
+  description: string;
+}) {
   return (
     <div className="rounded-[30px] border border-white/10 bg-[#141414] p-10 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-[#00BFA6]/50 w-full">
       <p className="text-[12px] font-bold uppercase tracking-[0.24em] text-gray-500">
@@ -434,7 +441,25 @@ function TextareaClass(minHeight: string) {
   return `w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-white text-base outline-none transition-all placeholder:text-gray-600 focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] ${minHeight}`;
 }
 
-function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring }: any) {
+function JobCard({
+  job,
+  isActive,
+  applicationsCount,
+  cvsCount,
+  onSelect,
+  onRemove,
+  onUpdate,
+  onSparring,
+}: {
+  job: JobItem;
+  isActive: boolean;
+  applicationsCount: number;
+  cvsCount: number;
+  onSelect: () => void;
+  onRemove: () => void;
+  onUpdate: (patch: Partial<JobItem>) => void;
+  onSparring: () => void;
+}) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
 
@@ -504,7 +529,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             {isActive ? "Valittu" : "Valitse paikka"}
           </button>
 
-          {/* SPARRING NAPPI */}
           <button
             type="button"
             onClick={onSparring}
@@ -767,7 +791,7 @@ export default function Home() {
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement | null>(null); // Automaattista scrollausta varten
+  const chatEndRef = useRef<HTMLDivElement | null>(null); 
 
   const customStyle = customStyles[cvStyle];
 
@@ -1021,6 +1045,7 @@ export default function Home() {
     setJobForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  // SUPABASE: Päivitä työpaikka
   function updateJob(id: string, patch: Partial<JobItem>) {
     setJobs((prev) =>
       prev.map((job) =>
@@ -1568,7 +1593,6 @@ export default function Home() {
       setTab("job");
       setMessage("Työpaikkaehdotukset lisätty.");
 
-      // Tallenna kaikki kerralla tietokantaan
       const session = getSession();
       if(session) {
         newJobs.forEach(job => {
@@ -1844,10 +1868,18 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-5">
                 <button
                   type="button"
-                  onClick={fillExample}
-                  className="bg-[#00BFA6] text-black px-10 py-5 rounded-[24px] text-lg font-black hover:scale-[1.03] transition-transform shadow-[0_0_20px_rgba(0,191,166,0.3)]"
+                  onClick={() => setShowHelp(!showHelp)}
+                  className="bg-[#00BFA6]/10 border border-[#00BFA6]/40 text-[#00BFA6] px-10 py-5 rounded-[24px] text-lg font-black hover:bg-[#00BFA6]/20 transition-all shadow-xl flex items-center justify-center gap-3"
                 >
-                  Täytä esimerkkidata
+                  <span className="text-2xl">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={fillExample}
+                  className="bg-white text-black px-10 py-5 rounded-[24px] text-lg font-black hover:bg-gray-200 transition-all shadow-xl"
+                >
+                  Täytä esimerkki
                 </button>
               </div>
             </div>
@@ -1874,6 +1906,58 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* --- OHJE-OSIO --- */}
+      {showHelp && (
+        <section className="max-w-7xl mx-auto px-8 mt-12 animate-in fade-in slide-in-from-top-6">
+          <div className="rounded-[40px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-10 sm:p-16 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
+              <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-white font-bold p-2 text-xl transition">✕ Sulje</button>
+            </div>
+            
+            <div className="space-y-10 text-gray-300 text-lg leading-relaxed">
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">1</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Täytä omat tietosi</strong>
+                  Aloita alempaa laatikosta nimeltä "Vaihe 1: Hakijan tiedot". Kirjoita nimesi, työkokemuksesi ja koulutuksesi. Voit myös vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoäly lukee sen puolestasi.
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl">2</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Paina "Generoi CV"</strong>
+                  Rullaa Vaihe 1 -laatikon loppuun ja paina vihreää nappia. Tekoäly muotoilee sinulle uuden, hienon CV:n. Näet esikatselun sivun oikeassa laidassa (tai mobiilissa alhaalla). Voit ladata sen suoraan koneellesi PDF-napista.
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">3</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Etsi työpaikkoja</strong>
+                  Siirry "Vaihe 2: Hakuprofiili" -laatikkoon. Kerro siellä, millaista työtä etsit (esim. "Myyjä, Uusimaa"). Paina "Ehdota työpaikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia, voimassa olevia avoimia tehtäviä ja tuo ne näkyviin.
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl">4</div>
+                <div className="mt-2">
+                  <strong className="text-white block text-2xl mb-3">Tee hakemus napin painalluksella</strong>
+                  Sivun oikeassa reunassa (tai mobiilissa alempana) on välilehdet: "CV", "Työpaikat" ja "Hakemukset". Valitse listalta kiinnostava työpaikka ja pyydä tekoälyä kirjoittamaan siihen valmis, räätälöity työhakemus yhdellä klikkauksella.
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 pt-10 border-t border-white/10 text-center sm:text-left">
+              <button onClick={() => setShowHelp(false)} className="rounded-2xl bg-white px-10 py-5 text-lg font-black text-black transition-all hover:bg-gray-200 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.2)] w-full sm:w-auto">
+                Selvä, ymmärsin! Aloitetaan!
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="mx-auto max-w-7xl px-8 py-16 md:py-20 lg:px-12">
         <div className="mb-10 flex flex-wrap items-center gap-5 border-b border-white/5 pb-6">
@@ -2857,7 +2941,7 @@ export default function Home() {
                               cvsCount={jobCvs.length}
                               onSelect={() => setActiveJobId(job.id)}
                               onRemove={() => removeJob(job.id)}
-                              onUpdate={(patch) => updateJob(job.id, patch)}
+                              onUpdate={(patch: Partial<JobItem>) => updateJob(job.id, patch)}
                               onSparring={() => startSparring(job)}
                             />
                           );
