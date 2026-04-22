@@ -4,7 +4,6 @@ import React from "react";
 
 export type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
-// Kaikki ominaisuudet yhdessä virallisessa tyypissä, jotta Vercel ei kaadu
 export type CvCustomStyle = {
   sidebarBg: string;
   sidebarText: string;
@@ -19,9 +18,9 @@ export type CvCustomStyle = {
   lineHeight: number;
   sectionSpacing: number;
   imageRadius: number;
-  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross";
+  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag";
   patternOpacity?: number;
-  sidebarPattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross";
+  sidebarPattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag";
   sidebarPatternOpacity?: number;
   showSeparators?: boolean;
   fontFamily?: "modern" | "classic" | "mono" | "elegant" | "clean" | "tech" | "brutalist" | "playful";
@@ -32,6 +31,11 @@ export type CvCustomStyle = {
   imageShape?: "square" | "circle" | "rounded" | "blob" | "leaf";
   pagePadding?: number;
   headingStyle?: "simple" | "underline" | "boxed" | "highlight";
+  mainBg2?: string;
+  sidebarBg2?: string;
+  mainGradientDirection?: "none" | "to bottom" | "to right" | "135deg" | "circle";
+  sidebarGradientDirection?: "none" | "to bottom" | "to right" | "135deg" | "circle";
+  shadowStyle?: "none" | "soft" | "hard" | "3d" | "neon";
 };
 
 type CvPreviewProps = {
@@ -154,25 +158,62 @@ export default function CvPreview({
     return 'left';
   };
 
+  // BACKGROUND PATTERNS
   const getPatternStyle = (type: "main" | "sidebar"): React.CSSProperties => {
     const patternType = type === "main" ? customStyle.pattern : customStyle.sidebarPattern;
     const opacityVal = type === "main" ? customStyle.patternOpacity : customStyle.sidebarPatternOpacity;
     
-    if (!patternType || patternType === "none") return {};
+    // Gradient backgrounds
+    const bg1 = type === "main" ? customStyle.mainBg : customStyle.sidebarBg;
+    const bg2 = type === "main" ? (customStyle.mainBg2 || customStyle.mainBg) : (customStyle.sidebarBg2 || customStyle.sidebarBg);
+    const gradientDir = type === "main" ? customStyle.mainGradientDirection : customStyle.sidebarGradientDirection;
+    
+    let baseBackground = bg1;
+    if (gradientDir && gradientDir !== "none") {
+      baseBackground = gradientDir === "circle" 
+        ? `radial-gradient(circle, ${bg1}, ${bg2})`
+        : `linear-gradient(${gradientDir}, ${bg1}, ${bg2})`;
+    }
+
+    if (!patternType || patternType === "none") return { background: baseBackground };
+
     const opacity = (opacityVal || 5) / 100;
     const color = `rgba(0, 0, 0, ${opacity})`;
     const colorWhite = `rgba(255, 255, 255, ${opacity})`; 
-    
-    const bgCol = type === "main" ? customStyle.mainBg : customStyle.sidebarBg;
-    const isDarkBg = bgCol.startsWith('#') && parseInt(bgCol.replace('#',''), 16) < 0xffffff / 2;
+    const isDarkBg = bg1.startsWith('#') && parseInt(bg1.replace('#',''), 16) < 0xffffff / 2;
     const useColor = isDarkBg ? colorWhite : color;
 
-    if (patternType === "dots") return { backgroundImage: `radial-gradient(${useColor} 2px, transparent 2px)`, backgroundSize: "20px 20px" };
-    if (patternType === "lines") return { backgroundImage: `repeating-linear-gradient(180deg, ${useColor} 0, ${useColor} 1px, transparent 1px, transparent 20px)` };
-    if (patternType === "diagonal") return { backgroundImage: `repeating-linear-gradient(45deg, ${useColor} 0, ${useColor} 2px, transparent 2px, transparent 15px)` };
-    if (patternType === "grid") return { backgroundImage: `linear-gradient(${useColor} 1px, transparent 1px), linear-gradient(90deg, ${useColor} 1px, transparent 1px)`, backgroundSize: "20px 20px" };
-    if (patternType === "cross") return { backgroundImage: `radial-gradient(circle, transparent 20%, ${bgCol} 20%, ${bgCol} 80%, transparent 80%, transparent), radial-gradient(circle, transparent 20%, ${bgCol} 20%, ${bgCol} 80%, transparent 80%, transparent) ${useColor}`, backgroundSize: "40px 40px" };
-    return {};
+    let patternImg = "";
+    let patternSize = "";
+
+    if (patternType === "dots") {
+      patternImg = `radial-gradient(${useColor} 2px, transparent 2px)`;
+      patternSize = "20px 20px";
+    } else if (patternType === "lines") {
+      patternImg = `repeating-linear-gradient(180deg, ${useColor} 0, ${useColor} 1px, transparent 1px, transparent 20px)`;
+    } else if (patternType === "diagonal") {
+      patternImg = `repeating-linear-gradient(45deg, ${useColor} 0, ${useColor} 2px, transparent 2px, transparent 15px)`;
+    } else if (patternType === "grid") {
+      patternImg = `linear-gradient(${useColor} 1px, transparent 1px), linear-gradient(90deg, ${useColor} 1px, transparent 1px)`;
+      patternSize = "20px 20px";
+    } else if (patternType === "cross") {
+      patternImg = `radial-gradient(circle, transparent 20%, ${bg1} 20%, ${bg1} 80%, transparent 80%, transparent), radial-gradient(circle, transparent 20%, ${bg1} 20%, ${bg1} 80%, transparent 80%, transparent) ${useColor}`;
+      patternSize = "40px 40px";
+    } else if (patternType === "intersecting") {
+      patternImg = `repeating-linear-gradient(45deg, ${useColor} 0, ${useColor} 1px, transparent 1px, transparent 20px), repeating-linear-gradient(-45deg, ${useColor} 0, ${useColor} 1px, transparent 1px, transparent 20px)`;
+    } else if (patternType === "waves") {
+      patternImg = `radial-gradient(circle at 100% 50%, transparent 20%, ${useColor} 21%, ${useColor} 34%, transparent 35%, transparent), radial-gradient(circle at 0% 50%, transparent 20%, ${useColor} 21%, ${useColor} 34%, transparent 35%, transparent) 0 -50px`;
+      patternSize = "100px 100px";
+    } else if (patternType === "zigzag") {
+      patternImg = `linear-gradient(135deg, ${useColor} 25%, transparent 25%) -50px 0, linear-gradient(225deg, ${useColor} 25%, transparent 25%) -50px 0, linear-gradient(315deg, ${useColor} 25%, transparent 25%), linear-gradient(45deg, ${useColor} 25%, transparent 25%)`;
+      patternSize = "100px 100px";
+    }
+
+    return { 
+      background: baseBackground,
+      backgroundImage: patternImg ? (gradientDir !== "none" ? `${patternImg}, ${baseBackground}` : patternImg) : baseBackground,
+      backgroundSize: patternSize || "auto"
+    };
   };
 
   const getHeaderStyle = (): React.CSSProperties => {
@@ -183,6 +224,17 @@ export default function CvPreview({
       return { background: "transparent", color: customStyle.mainText, borderBottom: `2px solid ${customStyle.accentColor}40` };
     }
     return { background: customStyle.sidebarBg, color: customStyle.sidebarText, ...getPatternStyle("sidebar") };
+  };
+
+  // SHADOWS
+  const getShadowClass = () => {
+    switch (customStyle.shadowStyle) {
+      case "soft": return "shadow-lg";
+      case "hard": return "shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]";
+      case "3d": return "shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10";
+      case "neon": return `shadow-[0_0_20px_${customStyle.accentColor}]`;
+      default: return "shadow-none";
+    }
   };
 
   const renderTags = (items: string[]) => {
@@ -256,7 +308,7 @@ export default function CvPreview({
 
   const renderProfileHook = (items: string[]) => {
     return (
-      <div className="relative p-6 mt-4 rounded-2xl overflow-hidden" style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}` }}>
+      <div className={`relative p-6 mt-4 rounded-2xl overflow-hidden ${getShadowClass()}`} style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}` }}>
         <div className="absolute -top-4 -left-2 opacity-10 font-serif" style={{ fontSize: "80px", color: customStyle.accentColor }}>"</div>
         <div className="relative z-10 opacity-90 font-medium italic" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: `${customStyle.bodySize + 1}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
           {items.map((line, j) => <p key={j}>{line}</p>)}
@@ -293,7 +345,7 @@ export default function CvPreview({
   const isTwoColumn = customStyle.layout === "two-column"; 
   const isMinimalist = customStyle.layout === "minimalist";
 
-  const padding = customStyle.pagePadding || 48; // Oletus padding 48px
+  const padding = customStyle.pagePadding || 48;
 
   const ContactInfo = ({ isDarkBg }: { isDarkBg: boolean }) => (
     <div className={`space-y-4 text-sm font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`}>
@@ -306,15 +358,15 @@ export default function CvPreview({
   return (
     <div 
       id="cv-preview" 
-      className={`mx-auto w-full max-w-[900px] overflow-hidden shadow-2xl transition-all duration-300`} 
-      style={{ backgroundColor: customStyle.mainBg, color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
+      className={`mx-auto w-full max-w-[900px] overflow-hidden transition-all duration-300 ${getShadowClass()}`} 
+      style={{ color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
     >
       
       {/* YLÄPALKKI / MINIMALISTINEN */}
       {(isTopHeader || isMinimalist) && (
         <header className="flex flex-col sm:flex-row items-center gap-10 relative" style={{ padding: `${padding}px`, ...(isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()) }}>
           {image && (
-            <img src={image} alt="Profiili" className="relative z-10 object-cover shadow-2xl border-4 border-white/20" style={{ width: '160px', height: '160px', borderRadius: getImageBorderRadius() }} />
+            <img src={image} alt="Profiili" className={`relative z-10 object-cover border-4 border-white/20 ${getShadowClass()}`} style={{ width: '160px', height: '160px', borderRadius: getImageBorderRadius() }} />
           )}
           <div className={`relative z-10 flex-1 ${(!image || customStyle.headingAlign === 'center') ? 'text-center w-full' : ''}`} style={{ textAlign: getTextAlign() }}>
             <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.05, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
@@ -330,10 +382,10 @@ export default function CvPreview({
         
         {/* SIVUPALKKI */}
         {(!isTopHeader && !isMinimalist) && (
-          <aside className="flex flex-col shrink-0 relative overflow-hidden" style={{ padding: `${padding}px`, background: customStyle.sidebarBg, color: customStyle.sidebarText, width: isTwoColumn ? '50%' : `${customStyle.sidebarWidth}px`, ...getPatternStyle("sidebar") }}>
-            <div className="relative z-10">
+          <aside className="flex flex-col shrink-0 relative overflow-hidden" style={{ padding: `${padding}px`, color: customStyle.sidebarText, width: isTwoColumn ? '50%' : `${customStyle.sidebarWidth}px`, ...getPatternStyle("sidebar") }}>
+            <div className="relative z-10 flex flex-col h-full">
               {image && (
-                <img src={image} alt="Profiili" className="mb-12 aspect-square w-full object-cover shadow-2xl border-2 border-white/10" style={{ borderRadius: getImageBorderRadius() }} />
+                <img src={image} alt="Profiili" className={`mb-12 aspect-square w-full object-cover border-2 border-white/10 ${getShadowClass()}`} style={{ borderRadius: getImageBorderRadius() }} />
               )}
 
               <div className="mb-14" style={{ textAlign: getTextAlign() }}>
@@ -360,18 +412,12 @@ export default function CvPreview({
 
         {/* PÄÄALUE */}
         <main className={`relative z-10 flex-1`} style={{ padding: `${padding}px` }}>
-          {/* UUSI RAKENNE OSIOIDEN VÄLEILLE */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing}px`, fontSize: `${customStyle.bodySize}px`, lineHeight: customStyle.lineHeight }}>
             
             {sections.filter(s => (isTopHeader || isMinimalist) ? true : !isTagSection(s.title)).map((section, index) => (
               <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}>
                 
                 {renderHeading(section.title)}
-                
-                {/* Valinnainen erotinviiva otsikon alle */}
-                {customStyle.showSeparators && (
-                  <div className={`h-[3px] mb-8 rounded-full`} style={{ backgroundColor: customStyle.accentColor, width: '50px', opacity: 0.6, marginLeft: customStyle.headingAlign === 'center' ? 'auto' : (customStyle.headingAlign === 'right' ? 'auto' : '0'), marginRight: customStyle.headingAlign === 'center' ? 'auto' : '0' }} />
-                )}
                 
                 {isProfileSection(section.title) ? (
                   renderProfileHook(section.items)
