@@ -4,6 +4,7 @@ import React from "react";
 
 export type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
+// Kaikki ominaisuudet yhdessä virallisessa tyypissä, jotta Vercel ei kaadu
 export type CvCustomStyle = {
   sidebarBg: string;
   sidebarText: string;
@@ -218,7 +219,7 @@ export default function CvPreview({
     const isMinimalist = customStyle.layout === "minimalist";
     
     return (
-      <div className={`mt-4`} style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing * 0.7}px`, borderColor: `${customStyle.accentColor}40`, paddingLeft: (customStyle.headingAlign !== 'center' && !isMinimalist) ? '1rem' : '0', borderLeftWidth: (customStyle.headingAlign !== 'center' && !isMinimalist) ? '2px' : '0' }}>
+      <div className={`mt-4`} style={{ display: 'flex', flexDirection: 'column', gap: `${(customStyle.sectionSpacing || 24) * 0.7}px`, borderColor: `${customStyle.accentColor}40`, paddingLeft: (customStyle.headingAlign !== 'center' && !isMinimalist) ? '1rem' : '0', borderLeftWidth: (customStyle.headingAlign !== 'center' && !isMinimalist) ? '2px' : '0' }}>
         {items.map((item, idx) => {
           const isMainPoint = !item.startsWith("-") && (item.includes("|") || item.includes(","));
           const parts = item.includes("|") ? item.split("|").map(s => s.trim()) : item.split(",").map(s => s.trim());
@@ -366,6 +367,11 @@ export default function CvPreview({
               <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}>
                 
                 {renderHeading(section.title)}
+                
+                {/* Valinnainen erotinviiva otsikon alle */}
+                {customStyle.showSeparators && (
+                  <div className={`h-[3px] mb-8 rounded-full`} style={{ backgroundColor: customStyle.accentColor, width: '50px', opacity: 0.6, marginLeft: customStyle.headingAlign === 'center' ? 'auto' : (customStyle.headingAlign === 'right' ? 'auto' : '0'), marginRight: customStyle.headingAlign === 'center' ? 'auto' : '0' }} />
+                )}
                 
                 {isProfileSection(section.title) ? (
                   renderProfileHook(section.items)
