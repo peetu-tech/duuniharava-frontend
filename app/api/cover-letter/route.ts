@@ -1,5 +1,13 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { buildCoverLetterPrompt } from "@/lib/prompts";
+
+// 1. Alusta Supabase Admin (ohittaa tietoturvasäännöt taustalla tietojen lukua varten)
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -17,25 +25,59 @@ function safeTone(value: unknown): CoverLetterTone {
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return Response.json(
+      return NextResponse.json(
         { error: "OPENAI_API_KEY puuttuu palvelimen ympäristömuuttujista." },
         { status: 500 }
       );
     }
 
     const body = await req.json();
-    const selectedTone = safeTone(body.tone);
+    
+    // Puretaan payloadista tarvittavat tiedot
+    const { userId, cvText, jobTitle, companyName, jobAd, tone, name, phone, email, location, targetJob } = body;
+    const selectedTone = safeTone(tone);
+
+    // ==========================================
+    // 🔒 PORTINVARTIJA-LOGIIKKA ALKAA TÄSTÄ
+    // ==========================================
+    if (userId) {
+      // 1. Tarkistetaan onko käyttäjä Pro
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("is_pro")
+        .eq("id", userId)
+        .single();
+        
+      // 2. Jos EI ole pro, lasketaan montako hakemusta hän on jo tehnyt
+      if (!profile?.is_pro) {
+        const { count, error } = await supabaseAdmin
+          .from("saved_letters")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId);
+          
+        // 3. Jos 3 on täynnä, hylätään pyyntö (403 Forbidden)
+        if (count !== null && count >= 3) {
+          return NextResponse.json(
+            { error: "LIMIT_REACHED" }, 
+            { status: 403 }
+          );
+        }
+      }
+    }
+    // ==========================================
+    // 🔓 PORTINVARTIJA-LOGIIKKA LOPPUU
+    // ==========================================
 
     const basePrompt = buildCoverLetterPrompt({
-      name: body.name || "",
-      phone: body.phone || "",
-      email: body.email || "",
-      location: body.location || "",
-      targetJob: body.targetJob || "",
-      cvText: body.cvText || "",
-      jobTitle: body.jobTitle || "",
-      companyName: body.companyName || "",
-      jobAd: body.jobAd || "",
+      name: name || "",
+      phone: phone || "",
+      email: email || "",
+      location: location || "",
+      targetJob: targetJob || "",
+      cvText: cvText || "",
+      jobTitle: jobTitle || "",
+      companyName: companyName || "",
+      jobAd: jobAd || "",
       tone: selectedTone,
     });
 
@@ -76,11 +118,11 @@ HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen ri
       response.choices[0]?.message?.content?.trim() ||
       "HAKEMUS:\nHakemuksen luonti epäonnistui. Kokeile uudelleen.";
 
-    return Response.json({ output });
-  } catch (error) {
+    return NextResponse.json({ output });
+  } catch (error: any) {
     console.error("cover-letter route error:", error);
 
-    return Response.json(
+    return NextResponse.json(
       { error: "Hakemuksen luonti epäonnistui teknisen virheen vuoksi." },
       { status: 500 }
     );
