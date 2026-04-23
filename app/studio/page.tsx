@@ -163,6 +163,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "solid",
     imageShape: "circle",
+    imagePosition: "left",
     pagePadding: 48,
     headingStyle: "underline",
     mainGradientDirection: "none",
@@ -195,6 +196,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "center",
     tagStyle: "outline",
     imageShape: "square",
+    imagePosition: "center",
     pagePadding: 56,
     headingStyle: "simple",
     mainGradientDirection: "none",
@@ -227,6 +229,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "minimal",
     imageShape: "rounded",
+    imagePosition: "left",
     pagePadding: 40,
     headingStyle: "highlight",
     mainGradientDirection: "none",
@@ -259,6 +262,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "pill",
     imageShape: "blob",
+    imagePosition: "right",
     pagePadding: 48,
     headingStyle: "boxed",
     mainGradientDirection: "to bottom",
@@ -719,7 +723,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   );
 }
 
-// --- PÄÄKOMPONENTTI ---
 export default function Home() {
   const router = useRouter();
   
@@ -727,6 +730,7 @@ export default function Home() {
   const [hasSession, setHasSession] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
+  // Perustilat
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
@@ -747,9 +751,13 @@ export default function Home() {
   const [profileImage, setProfileImage] = useState("");
   const [jobFilter, setJobFilter] = useState("");
 
-  const [jobStatusFilter, setJobStatusFilter] = useState<"all" | JobStatus>("all");
-  const [jobPriorityFilter, setJobPriorityFilter] = useState<"all" | JobPriority>("all");
-  const [jobSort, setJobSort] = useState<"match" | "deadline" | "priority" | "newest" | "company">("newest");
+  const [jobStatusFilter, setJobStatusFilter] =
+    useState<"all" | JobStatus>("all");
+  const [jobPriorityFilter, setJobPriorityFilter] =
+    useState<"all" | JobPriority>("all");
+  const [jobSort, setJobSort] = useState<
+    "match" | "deadline" | "priority" | "newest" | "company"
+  >("newest");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
@@ -761,7 +769,8 @@ export default function Home() {
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
-  const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+  const [customStyles, setCustomStyles] =
+    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -789,9 +798,7 @@ export default function Home() {
 
       try {
         const pRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers });
-        
-        // JOS SESSIO VANHENTUNUT -> KIRJAA ULOS JA OHJAA KIRJAUTUMAAN
-        if (pRes.status === 401 || pRes.status === 403) {
+        if (pRes.status === 401) {
           clearSession();
           router.replace("/login");
           return;
@@ -1235,6 +1242,13 @@ export default function Home() {
             }
           }
 
+          // Nollataan kloonin pyöristykset, jotta vasen reuna pysyy terävänä!
+          const previewEl = clonedDoc.getElementById("cv-preview");
+          if (previewEl) {
+            previewEl.style.borderRadius = "0px";
+            previewEl.style.boxShadow = "none";
+          }
+
           const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
           originalStyles.forEach(el => el.remove());
 
@@ -1254,6 +1268,7 @@ export default function Home() {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
+      // Täytetään tausta oikealla värillä varmuuden vuoksi
       pdf.setFillColor(customStyle.mainBg);
       pdf.rect(0, 0, pageWidth, pageHeight, "F");
 
@@ -1265,7 +1280,7 @@ export default function Home() {
         const fitRatio = pageHeight / canvas.height;
         const fitWidth = canvas.width * fitRatio;
         
-        // Asetetaan x=0 jotta vasen sivupalkki pysyy KIIINNI reunassa
+        // Asetetaan x=0 jotta vasen sivupalkki pysyy KIINNI reunassa, ei valkoisia saumoja!
         pdf.addImage(imgData, "JPEG", 0, 0, fitWidth, pageHeight);
       } else {
         pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
@@ -2282,7 +2297,7 @@ export default function Home() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli (Top-Header asettelulle)</label>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli</label>
                           <select value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="solid">Yksivärinen</option>
                             <option value="gradient">Liukuväri (Gradient)</option>
@@ -2297,6 +2312,14 @@ export default function Home() {
                             <option value="circle">Ympyrä</option>
                             <option value="blob">Epäsymmetrinen (Blob)</option>
                             <option value="leaf">Lehti (Leaf)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Kuvan sijainti</label>
+                          <select value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                            <option value="left">Vasemmalla</option>
+                            <option value="center">Keskellä</option>
+                            <option value="right">Oikealla</option>
                           </select>
                         </div>
                         <div>
