@@ -1217,7 +1217,6 @@ export default function Home() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: customStyle.mainBg,
-        windowWidth: 800, // PAKOTTAA KUVAN 800PX LEVEYTEEN MYÖS MOBIILISSA
         onclone: (clonedDoc) => {
           let safeCss = "";
           
@@ -1243,18 +1242,6 @@ export default function Home() {
           if (previewEl) {
             previewEl.style.borderRadius = "0px";
             previewEl.style.boxShadow = "none";
-            
-            // TÄMÄ ESTÄÄ ESIKATSELUN KAPEUTUMISEN KUVASSA
-            previewEl.style.width = "800px";
-            previewEl.style.minWidth = "800px";
-            previewEl.style.maxWidth = "800px";
-            previewEl.style.transform = "none";
-            
-            const parent = previewEl.parentElement;
-            if (parent) {
-              parent.style.width = "800px";
-              parent.style.overflow = "visible";
-            }
           }
 
           const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
@@ -2439,8 +2426,35 @@ export default function Home() {
                         </div>
                       )}
 
-                      {/* NÄMÄ NAPIT SIIRRETTIIN TÄHÄN YLÖS, JOTTA NE LÖYTYVÄT HELPOSTI MOBIILISSA */}
-                      <div className="flex flex-col sm:flex-row gap-5">
+                      {/* VAPAA CV-TEKSTIN MUOKKAUS */}
+                      <div className="rounded-[32px] sm:rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-12 shadow-xl mt-10">
+                        <div className="mb-8 flex flex-col gap-2">
+                          <h3 className="text-2xl font-black text-white">Muokkaa CV-tekstiä</h3>
+                          <p className="text-sm text-gray-400">Tekoälyn tuottama luonnos. Voit muokata tekstiä täysin vapaasti tässä ennen latausta.</p>
+                        </div>
+                        <textarea
+                          value={parsedCv.cvBody}
+                          onChange={(e) => {
+                            const prefix = cvResult.split("CV_BODY:")[0] || "";
+                            setCvResult(prefix + "CV_BODY:\n" + e.target.value);
+                          }}
+                          className="min-h-[500px] w-full rounded-2xl sm:rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8 font-mono text-sm leading-relaxed text-gray-200 outline-none transition focus:border-[#00BFA6]"
+                        />
+                      </div>
+
+                      <div className="rounded-[32px] sm:rounded-[40px] border border-white/10 bg-[#0A0A0A] p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10">
+                        <div className="min-w-[800px] lg:min-w-0">
+                          <CvPreview
+                            cvText={parsedCv.cvBody}
+                            image={profileImage}
+                            styleVariant={cvStyle}
+                            customStyle={customStyle}
+                          />
+                        </div>
+                      </div>
+
+                      {/* LATAUSNAPIT PALAUTETTU TÄNNE ALAS (CV:N ALLE) */}
+                      <div className="flex flex-col sm:flex-row gap-5 mt-10">
                         <button
                           type="button"
                           onClick={downloadPdf}
@@ -2458,22 +2472,6 @@ export default function Home() {
                         >
                           {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
                         </button>
-                      </div>
-
-                      {/* VAPAA CV-TEKSTIN MUOKKAUS */}
-                      <div className="rounded-[32px] sm:rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-12 shadow-xl mt-10">
-                        <div className="mb-8 flex flex-col gap-2">
-                          <h3 className="text-2xl font-black text-white">Muokkaa CV-tekstiä</h3>
-                          <p className="text-sm text-gray-400">Tekoälyn tuottama luonnos. Voit muokata tekstiä täysin vapaasti tässä ennen latausta.</p>
-                        </div>
-                        <textarea
-                          value={parsedCv.cvBody}
-                          onChange={(e) => {
-                            const prefix = cvResult.split("CV_BODY:")[0] || "";
-                            setCvResult(prefix + "CV_BODY:\n" + e.target.value);
-                          }}
-                          className="min-h-[500px] w-full rounded-2xl sm:rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8 font-mono text-sm leading-relaxed text-gray-200 outline-none transition focus:border-[#00BFA6]"
-                        />
                       </div>
 
                       {/* --- CANVA TASON EDITOR SIIRRETTY TÄNNE --- */}
@@ -2750,16 +2748,6 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="rounded-[32px] sm:rounded-[40px] border border-white/10 bg-[#0A0A0A] p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10">
-                        <div className="min-w-[800px] lg:min-w-0">
-                          <CvPreview
-                            cvText={parsedCv.cvBody}
-                            image={profileImage}
-                            styleVariant={cvStyle}
-                            customStyle={customStyle}
-                          />
-                        </div>
-                      </div>
                     </>
                   ) : (
                     <div className="rounded-[32px] sm:rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center font-medium text-gray-500">
