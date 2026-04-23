@@ -1217,6 +1217,7 @@ export default function Home() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: customStyle.mainBg,
+        windowWidth: 800, // PAKOTTAA KUVAN 800PX LEVEYTEEN MYÖS MOBIILISSA
         onclone: (clonedDoc) => {
           let safeCss = "";
           
@@ -1242,6 +1243,18 @@ export default function Home() {
           if (previewEl) {
             previewEl.style.borderRadius = "0px";
             previewEl.style.boxShadow = "none";
+            
+            // TÄMÄ ESTÄÄ ESIKATSELUN KAPEUTUMISEN KUVASSA
+            previewEl.style.width = "800px";
+            previewEl.style.minWidth = "800px";
+            previewEl.style.maxWidth = "800px";
+            previewEl.style.transform = "none";
+            
+            const parent = previewEl.parentElement;
+            if (parent) {
+              parent.style.width = "800px";
+              parent.style.overflow = "visible";
+            }
           }
 
           const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
@@ -2194,280 +2207,6 @@ export default function Home() {
                   <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
                 </div>
 
-                {/* --- CANVA TASON EDITOR --- */}
-                <div className="rounded-[32px] sm:rounded-[40px] border border-white/10 bg-[#0A0A0A] p-6 sm:p-10 mt-12 shadow-2xl">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10 border-b border-white/5 pb-8">
-                    <div>
-                      <p className="text-2xl font-black text-white tracking-tight">Värit ja Teema</p>
-                      <p className="mt-2 text-base text-gray-400">Pikavalinnat väreille tai säädä itse.</p>
-                    </div>
-                    <button type="button" onClick={resetCurrentStyle} className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-6 py-4 sm:py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50">
-                      Palauta oletukset
-                    </button>
-                  </div>
-
-                  {/* PIKAVÄRIT - SCROLLAAVA MOBIILISSA */}
-                  <div className="mb-10 flex overflow-x-auto whitespace-nowrap gap-3 border-b border-white/5 pb-10 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
-                    <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#0369a1] hover:bg-white/5 transition-all bg-[#141414]">🌊 Merellinen</button>
-                    <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#10b981] hover:bg-white/5 transition-all bg-[#141414]">🌲 Metsä</button>
-                    <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#d97706] hover:bg-white/5 transition-all bg-[#141414]">🍂 Syksy</button>
-                    <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#7c3aed] hover:bg-white/5 transition-all bg-[#141414]">🔮 Kyber</button>
-                    <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#14b8a6] hover:bg-white/5 transition-all bg-[#141414]">🌑 Tumma Tyyli</button>
-                  </div>
-
-                  {/* TYYLIVALINNAT TABS */}
-                  <div className="mb-12 flex flex-col sm:flex-row flex-wrap gap-4">
-                    {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map((variant) => (
-                      <button
-                        key={variant}
-                        type="button"
-                        onClick={() => setCvStyle(variant)}
-                        className={`rounded-2xl px-6 py-5 sm:py-4 text-base font-bold transition-all duration-300 flex-1 ${cvStyle === variant ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-[1.02]" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}
-                      >
-                        {variant === "modern" && "Moderni"}
-                        {variant === "classic" && "Klassinen"}
-                        {variant === "compact" && "Tiivis"}
-                        {variant === "bold" && "Näyttävä"}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="space-y-16">
-                    {/* TYPOGRAFIA & ASETTELU */}
-                    <div>
-                      <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Asettelu & Typografia</h4>
-                      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        <div>
-                          <label className={LabelClass()}>Asettelu (Layout)</label>
-                          <select value={customStyle.layout || "left-sidebar"} onChange={(e) => updateCustomStyle("layout", e.target.value as any)} className={InputClass()}>
-                            <option value="left-sidebar">Vasen sivupalkki</option>
-                            <option value="right-sidebar">Oikea sivupalkki</option>
-                            <option value="top-header">Yläpalkki (Koko leveys)</option>
-                            <option value="minimalist">Minimalistinen (Keskitetty)</option>
-                            <option value="two-column">Jaettu kahteen sarakkeeseen</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Fonttiperhe</label>
-                          <select value={customStyle.fontFamily || "modern"} onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)} className={InputClass()}>
-                            <option value="modern">Moderni (Sans-serif)</option>
-                            <option value="classic">Klassinen (Serif)</option>
-                            <option value="mono">Koodari (Monospace)</option>
-                            <option value="elegant">Elegantti (Georgia)</option>
-                            <option value="clean">Puhdas (Arial)</option>
-                            <option value="tech">Tekninen (Trebuchet)</option>
-                            <option value="brutalist">Brutalistinen (Impact)</option>
-                            <option value="playful">Leikkisä (Comic)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Otsikoiden tyyli</label>
-                          <select value={customStyle.headingStyle || "simple"} onChange={(e) => updateCustomStyle("headingStyle", e.target.value as any)} className={InputClass()}>
-                            <option value="simple">Yksinkertainen</option>
-                            <option value="underline">Alleviivaus</option>
-                            <option value="highlight">Korostusväri taustalla</option>
-                            <option value="boxed">Laatikko</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* VÄRIT */}
-                    <div>
-                      <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Värimaailma</h4>
-                      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-                        <div>
-                          <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Sivupalkki Bg</label>
-                          <input type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Sivupalkki Bg 2</label>
-                          <input type="color" value={customStyle.sidebarBg2 || customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg2", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Sivupalkki Txt</label>
-                          <input type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Pääalue Bg</label>
-                          <input type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Pääalue Bg 2</label>
-                          <input type="color" value={customStyle.mainBg2 || customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg2", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Pääalue Txt</label>
-                          <input type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Otsikot</label>
-                          <input type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Korosteväri</label>
-                          <input type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* KUVIOINTI & YKSITYISKOHDAT */}
-                    <div>
-                      <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Kuviointi & Yksityiskohdat</h4>
-                      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        <div>
-                          <label className={LabelClass()}>Pääalueen kuviointi</label>
-                          <select value={customStyle.pattern || "none"} onChange={(e) => updateCustomStyle("pattern", e.target.value as any)} className={InputClass()}>
-                            <option value="none">Ei kuviointia</option>
-                            <option value="dots">Pisteet (Dots)</option>
-                            <option value="lines">Vaakaviivat (Lines)</option>
-                            <option value="diagonal">Vinoviivat (Diagonal)</option>
-                            <option value="grid">Ruudukko (Grid)</option>
-                            <option value="cross">Ristit (Cross)</option>
-                            <option value="intersecting">Risteävät viivat</option>
-                            <option value="waves">Aallot (Waves)</option>
-                            <option value="zigzag">Sahalaita (Zigzag)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Sivupalkin kuviointi</label>
-                          <select value={customStyle.sidebarPattern || "none"} onChange={(e) => updateCustomStyle("sidebarPattern", e.target.value as any)} className={InputClass()}>
-                            <option value="none">Ei kuviointia</option>
-                            <option value="dots">Pisteet (Dots)</option>
-                            <option value="lines">Vaakaviivat (Lines)</option>
-                            <option value="diagonal">Vinoviivat (Diagonal)</option>
-                            <option value="grid">Ruudukko (Grid)</option>
-                            <option value="cross">Ristit (Cross)</option>
-                            <option value="intersecting">Risteävät viivat</option>
-                            <option value="waves">Aallot (Waves)</option>
-                            <option value="zigzag">Sahalaita (Zigzag)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Pääalueen liukuväri</label>
-                          <select value={customStyle.mainGradientDirection || "none"} onChange={(e) => updateCustomStyle("mainGradientDirection", e.target.value as any)} className={InputClass()}>
-                            <option value="none">Ei liukuväriä</option>
-                            <option value="to bottom">Ylhäältä alas</option>
-                            <option value="to right">Vasemmalta oikealle</option>
-                            <option value="135deg">Viistosti (135deg)</option>
-                            <option value="circle">Ympyrä (Radial)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Sivupalkin liukuväri</label>
-                          <select value={customStyle.sidebarGradientDirection || "none"} onChange={(e) => updateCustomStyle("sidebarGradientDirection", e.target.value as any)} className={InputClass()}>
-                            <option value="none">Ei liukuväriä</option>
-                            <option value="to bottom">Ylhäältä alas</option>
-                            <option value="to right">Vasemmalta oikealle</option>
-                            <option value="135deg">Viistosti (135deg)</option>
-                            <option value="circle">Ympyrä (Radial)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Tagien (Taidot) tyyli</label>
-                          <select value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className={InputClass()}>
-                            <option value="solid">Täytetty</option>
-                            <option value="outline">Reunukset (Outline)</option>
-                            <option value="pill">Pillerit (Pyöreät)</option>
-                            <option value="sharp">Terävät kulmat</option>
-                            <option value="minimal">Minimaalinen viiva</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Yläpalkin tyyli</label>
-                          <select value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className={InputClass()}>
-                            <option value="solid">Yksivärinen</option>
-                            <option value="gradient">Liukuväri (Gradient)</option>
-                            <option value="transparent">Läpinäkyvä</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Kuvan muoto</label>
-                          <select value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className={InputClass()}>
-                            <option value="square">Neliö</option>
-                            <option value="rounded">Pyöristetty</option>
-                            <option value="circle">Ympyrä</option>
-                            <option value="blob">Epäsymmetrinen (Blob)</option>
-                            <option value="leaf">Lehti (Leaf)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Kuvan sijainti</label>
-                          <select value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className={InputClass()}>
-                            <option value="left">Vasemmalla</option>
-                            <option value="center">Keskellä</option>
-                            <option value="right">Oikealla</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Varjostukset & 3D</label>
-                          <select value={customStyle.shadowStyle || "none"} onChange={(e) => updateCustomStyle("shadowStyle", e.target.value as any)} className={InputClass()}>
-                            <option value="none">Ei varjoja</option>
-                            <option value="soft">Pehmeä varjo</option>
-                            <option value="hard">Kova (Brutalistinen)</option>
-                            <option value="3d">3D-syvyys</option>
-                            <option value="neon">Neon-hohto</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Erotinviivat osioiden välissä</label>
-                          <select value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className={InputClass()}>
-                            <option value="yes">Kyllä, näytä viivat</option>
-                            <option value="no">Ei, piilota viivat</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* MITAT & VÄLIT */}
-                    <div>
-                      <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Mitat & Välit</h4>
-                      <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
-                        <div>
-                          <label className={LabelClass()}>Kuvioinnin vahvuus ({customStyle.patternOpacity || 5}%)</label>
-                          <input type="range" min={1} max={30} value={customStyle.patternOpacity || 5} onChange={(e) => updateCustomStyle("patternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Sivupalkin kuvioinnin vahvuus ({customStyle.sidebarPatternOpacity || 5}%)</label>
-                          <input type="range" min={1} max={30} value={customStyle.sidebarPatternOpacity || 5} onChange={(e) => updateCustomStyle("sidebarPatternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Sivun sisämarginaalit ({customStyle.pagePadding || 48}px)</label>
-                          <input type="range" min={20} max={80} value={customStyle.pagePadding || 48} onChange={(e) => updateCustomStyle("pagePadding", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Sivupalkin leveys ({customStyle.sidebarWidth}px)</label>
-                          <input type="range" min={180} max={340} value={customStyle.sidebarWidth} onChange={(e) => updateCustomStyle("sidebarWidth", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Nimen koko ({customStyle.nameSize}px)</label>
-                          <input type="range" min={28} max={64} value={customStyle.nameSize} onChange={(e) => updateCustomStyle("nameSize", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Tekstin koko ({customStyle.bodySize}px)</label>
-                          <input type="range" min={12} max={20} value={customStyle.bodySize} onChange={(e) => updateCustomStyle("bodySize", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Sisälaatikoiden pyöreys ({customStyle.borderRadius}px)</label>
-                          <input type="range" min={0} max={40} value={customStyle.borderRadius} onChange={(e) => updateCustomStyle("borderRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Riviväli ({customStyle.lineHeight})</label>
-                          <input type="range" min={1.2} max={2} step={0.05} value={customStyle.lineHeight} onChange={(e) => updateCustomStyle("lineHeight", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div>
-                          <label className={LabelClass()}>Osioiden väli ({customStyle.sectionSpacing}px)</label>
-                          <input type="range" min={8} max={60} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                        <div className="sm:col-span-3">
-                          <label className={LabelClass()}>Kuvan pyöristys ({customStyle.imageRadius}px)</label>
-                          <input type="range" min={0} max={40} value={customStyle.imageRadius} onChange={(e) => updateCustomStyle("imageRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <button
                   type="submit"
                   disabled={loadingCv}
@@ -2735,6 +2474,280 @@ export default function Home() {
                           }}
                           className="min-h-[500px] w-full rounded-2xl sm:rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8 font-mono text-sm leading-relaxed text-gray-200 outline-none transition focus:border-[#00BFA6]"
                         />
+                      </div>
+
+                      {/* --- CANVA TASON EDITOR SIIRRETTY TÄNNE --- */}
+                      <div className="rounded-[32px] sm:rounded-[40px] border border-white/10 bg-[#0A0A0A] p-6 sm:p-10 shadow-2xl mt-10">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10 border-b border-white/5 pb-8">
+                          <div>
+                            <p className="text-2xl font-black text-white tracking-tight">Värit ja Teema</p>
+                            <p className="mt-2 text-base text-gray-400">Pikavalinnat väreille tai säädä itse.</p>
+                          </div>
+                          <button type="button" onClick={resetCurrentStyle} className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-6 py-4 sm:py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50">
+                            Palauta oletukset
+                          </button>
+                        </div>
+
+                        {/* PIKAVÄRIT - SCROLLAAVA MOBIILISSA */}
+                        <div className="mb-10 flex overflow-x-auto whitespace-nowrap gap-3 border-b border-white/5 pb-10 custom-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
+                          <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#0369a1] hover:bg-white/5 transition-all bg-[#141414]">🌊 Merellinen</button>
+                          <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#10b981] hover:bg-white/5 transition-all bg-[#141414]">🌲 Metsä</button>
+                          <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#d97706] hover:bg-white/5 transition-all bg-[#141414]">🍂 Syksy</button>
+                          <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#7c3aed] hover:bg-white/5 transition-all bg-[#141414]">🔮 Kyber</button>
+                          <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className="flex-shrink-0 rounded-2xl px-6 py-4 text-sm font-bold border border-white/10 hover:border-[#14b8a6] hover:bg-white/5 transition-all bg-[#141414]">🌑 Tumma Tyyli</button>
+                        </div>
+
+                        {/* TYYLIVALINNAT TABS */}
+                        <div className="mb-12 flex flex-col sm:flex-row flex-wrap gap-4">
+                          {(["modern", "classic", "compact", "bold"] as CvStyleVariant[]).map((variant) => (
+                            <button
+                              key={variant}
+                              type="button"
+                              onClick={() => setCvStyle(variant)}
+                              className={`rounded-2xl px-6 py-5 sm:py-4 text-base font-bold transition-all duration-300 flex-1 ${cvStyle === variant ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-[1.02]" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}
+                            >
+                              {variant === "modern" && "Moderni"}
+                              {variant === "classic" && "Klassinen"}
+                              {variant === "compact" && "Tiivis"}
+                              {variant === "bold" && "Näyttävä"}
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="space-y-16">
+                          {/* TYPOGRAFIA & ASETTELU */}
+                          <div>
+                            <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Asettelu & Typografia</h4>
+                            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                              <div>
+                                <label className={LabelClass()}>Asettelu (Layout)</label>
+                                <select value={customStyle.layout || "left-sidebar"} onChange={(e) => updateCustomStyle("layout", e.target.value as any)} className={InputClass()}>
+                                  <option value="left-sidebar">Vasen sivupalkki</option>
+                                  <option value="right-sidebar">Oikea sivupalkki</option>
+                                  <option value="top-header">Yläpalkki (Koko leveys)</option>
+                                  <option value="minimalist">Minimalistinen (Keskitetty)</option>
+                                  <option value="two-column">Jaettu kahteen sarakkeeseen</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Fonttiperhe</label>
+                                <select value={customStyle.fontFamily || "modern"} onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)} className={InputClass()}>
+                                  <option value="modern">Moderni (Sans-serif)</option>
+                                  <option value="classic">Klassinen (Serif)</option>
+                                  <option value="mono">Koodari (Monospace)</option>
+                                  <option value="elegant">Elegantti (Georgia)</option>
+                                  <option value="clean">Puhdas (Arial)</option>
+                                  <option value="tech">Tekninen (Trebuchet)</option>
+                                  <option value="brutalist">Brutalistinen (Impact)</option>
+                                  <option value="playful">Leikkisä (Comic)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Otsikoiden tyyli</label>
+                                <select value={customStyle.headingStyle || "simple"} onChange={(e) => updateCustomStyle("headingStyle", e.target.value as any)} className={InputClass()}>
+                                  <option value="simple">Yksinkertainen</option>
+                                  <option value="underline">Alleviivaus</option>
+                                  <option value="highlight">Korostusväri taustalla</option>
+                                  <option value="boxed">Laatikko</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* VÄRIT */}
+                          <div>
+                            <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Värimaailma</h4>
+                            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+                              <div>
+                                <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Sivupalkki Bg</label>
+                                <input type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Sivupalkki Bg 2</label>
+                                <input type="color" value={customStyle.sidebarBg2 || customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg2", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Sivupalkki Txt</label>
+                                <input type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className="mb-3 block text-xs font-black uppercase tracking-wider text-gray-400 ml-1">Pääalue Bg</label>
+                                <input type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Pääalue Bg 2</label>
+                                <input type="color" value={customStyle.mainBg2 || customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg2", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Pääalue Txt</label>
+                                <input type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Otsikot</label>
+                                <input type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-gray-400 ml-1">Korosteväri</label>
+                                <input type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className="h-16 w-full rounded-2xl border border-white/10 bg-[#141414] p-1 cursor-pointer" />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* KUVIOINTI & YKSITYISKOHDAT */}
+                          <div>
+                            <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Kuviointi & Yksityiskohdat</h4>
+                            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                              <div>
+                                <label className={LabelClass()}>Pääalueen kuviointi</label>
+                                <select value={customStyle.pattern || "none"} onChange={(e) => updateCustomStyle("pattern", e.target.value as any)} className={InputClass()}>
+                                  <option value="none">Ei kuviointia</option>
+                                  <option value="dots">Pisteet (Dots)</option>
+                                  <option value="lines">Vaakaviivat (Lines)</option>
+                                  <option value="diagonal">Vinoviivat (Diagonal)</option>
+                                  <option value="grid">Ruudukko (Grid)</option>
+                                  <option value="cross">Ristit (Cross)</option>
+                                  <option value="intersecting">Risteävät viivat</option>
+                                  <option value="waves">Aallot (Waves)</option>
+                                  <option value="zigzag">Sahalaita (Zigzag)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Sivupalkin kuviointi</label>
+                                <select value={customStyle.sidebarPattern || "none"} onChange={(e) => updateCustomStyle("sidebarPattern", e.target.value as any)} className={InputClass()}>
+                                  <option value="none">Ei kuviointia</option>
+                                  <option value="dots">Pisteet (Dots)</option>
+                                  <option value="lines">Vaakaviivat (Lines)</option>
+                                  <option value="diagonal">Vinoviivat (Diagonal)</option>
+                                  <option value="grid">Ruudukko (Grid)</option>
+                                  <option value="cross">Ristit (Cross)</option>
+                                  <option value="intersecting">Risteävät viivat</option>
+                                  <option value="waves">Aallot (Waves)</option>
+                                  <option value="zigzag">Sahalaita (Zigzag)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Pääalueen liukuväri</label>
+                                <select value={customStyle.mainGradientDirection || "none"} onChange={(e) => updateCustomStyle("mainGradientDirection", e.target.value as any)} className={InputClass()}>
+                                  <option value="none">Ei liukuväriä</option>
+                                  <option value="to bottom">Ylhäältä alas</option>
+                                  <option value="to right">Vasemmalta oikealle</option>
+                                  <option value="135deg">Viistosti (135deg)</option>
+                                  <option value="circle">Ympyrä (Radial)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Sivupalkin liukuväri</label>
+                                <select value={customStyle.sidebarGradientDirection || "none"} onChange={(e) => updateCustomStyle("sidebarGradientDirection", e.target.value as any)} className={InputClass()}>
+                                  <option value="none">Ei liukuväriä</option>
+                                  <option value="to bottom">Ylhäältä alas</option>
+                                  <option value="to right">Vasemmalta oikealle</option>
+                                  <option value="135deg">Viistosti (135deg)</option>
+                                  <option value="circle">Ympyrä (Radial)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Tagien (Taidot) tyyli</label>
+                                <select value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className={InputClass()}>
+                                  <option value="solid">Täytetty</option>
+                                  <option value="outline">Reunukset (Outline)</option>
+                                  <option value="pill">Pillerit (Pyöreät)</option>
+                                  <option value="sharp">Terävät kulmat</option>
+                                  <option value="minimal">Minimaalinen viiva</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Yläpalkin tyyli</label>
+                                <select value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className={InputClass()}>
+                                  <option value="solid">Yksivärinen</option>
+                                  <option value="gradient">Liukuväri (Gradient)</option>
+                                  <option value="transparent">Läpinäkyvä</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Kuvan muoto</label>
+                                <select value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className={InputClass()}>
+                                  <option value="square">Neliö</option>
+                                  <option value="rounded">Pyöristetty</option>
+                                  <option value="circle">Ympyrä</option>
+                                  <option value="blob">Epäsymmetrinen (Blob)</option>
+                                  <option value="leaf">Lehti (Leaf)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Kuvan sijainti</label>
+                                <select value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className={InputClass()}>
+                                  <option value="left">Vasemmalla</option>
+                                  <option value="center">Keskellä</option>
+                                  <option value="right">Oikealla</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Varjostukset & 3D</label>
+                                <select value={customStyle.shadowStyle || "none"} onChange={(e) => updateCustomStyle("shadowStyle", e.target.value as any)} className={InputClass()}>
+                                  <option value="none">Ei varjoja</option>
+                                  <option value="soft">Pehmeä varjo</option>
+                                  <option value="hard">Kova (Brutalistinen)</option>
+                                  <option value="3d">3D-syvyys</option>
+                                  <option value="neon">Neon-hohto</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Erotinviivat osioiden välissä</label>
+                                <select value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className={InputClass()}>
+                                  <option value="yes">Kyllä, näytä viivat</option>
+                                  <option value="no">Ei, piilota viivat</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* MITAT & VÄLIT */}
+                          <div>
+                            <h4 className="text-[#00BFA6] font-black text-sm uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-4">Mitat & Välit</h4>
+                            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                              <div>
+                                <label className={LabelClass()}>Kuvioinnin vahvuus ({customStyle.patternOpacity || 5}%)</label>
+                                <input type="range" min={1} max={30} value={customStyle.patternOpacity || 5} onChange={(e) => updateCustomStyle("patternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Sivupalkin kuvioinnin vahvuus ({customStyle.sidebarPatternOpacity || 5}%)</label>
+                                <input type="range" min={1} max={30} value={customStyle.sidebarPatternOpacity || 5} onChange={(e) => updateCustomStyle("sidebarPatternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Sivun sisämarginaalit ({customStyle.pagePadding || 48}px)</label>
+                                <input type="range" min={20} max={80} value={customStyle.pagePadding || 48} onChange={(e) => updateCustomStyle("pagePadding", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Sivupalkin leveys ({customStyle.sidebarWidth}px)</label>
+                                <input type="range" min={180} max={340} value={customStyle.sidebarWidth} onChange={(e) => updateCustomStyle("sidebarWidth", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Nimen koko ({customStyle.nameSize}px)</label>
+                                <input type="range" min={28} max={64} value={customStyle.nameSize} onChange={(e) => updateCustomStyle("nameSize", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Tekstin koko ({customStyle.bodySize}px)</label>
+                                <input type="range" min={12} max={20} value={customStyle.bodySize} onChange={(e) => updateCustomStyle("bodySize", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Sisälaatikoiden pyöreys ({customStyle.borderRadius}px)</label>
+                                <input type="range" min={0} max={40} value={customStyle.borderRadius} onChange={(e) => updateCustomStyle("borderRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Riviväli ({customStyle.lineHeight})</label>
+                                <input type="range" min={1.2} max={2} step={0.05} value={customStyle.lineHeight} onChange={(e) => updateCustomStyle("lineHeight", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div>
+                                <label className={LabelClass()}>Osioiden väli ({customStyle.sectionSpacing}px)</label>
+                                <input type="range" min={8} max={60} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                              <div className="sm:col-span-3">
+                                <label className={LabelClass()}>Kuvan pyöristys ({customStyle.imageRadius}px)</label>
+                                <input type="range" min={0} max={40} value={customStyle.imageRadius} onChange={(e) => updateCustomStyle("imageRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="rounded-[32px] sm:rounded-[40px] border border-white/10 bg-[#0A0A0A] p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10">
