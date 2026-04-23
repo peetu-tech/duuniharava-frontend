@@ -163,7 +163,6 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "solid",
     imageShape: "circle",
-    imagePosition: "left",
     pagePadding: 48,
     headingStyle: "underline",
     mainGradientDirection: "none",
@@ -196,7 +195,6 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "center",
     tagStyle: "outline",
     imageShape: "square",
-    imagePosition: "center",
     pagePadding: 56,
     headingStyle: "simple",
     mainGradientDirection: "none",
@@ -229,7 +227,6 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "minimal",
     imageShape: "rounded",
-    imagePosition: "left",
     pagePadding: 40,
     headingStyle: "highlight",
     mainGradientDirection: "none",
@@ -262,7 +259,6 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "pill",
     imageShape: "blob",
-    imagePosition: "right",
     pagePadding: 48,
     headingStyle: "boxed",
     mainGradientDirection: "to bottom",
@@ -793,7 +789,9 @@ export default function Home() {
 
       try {
         const pRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers });
-        if (pRes.status === 401) {
+        
+        // JOS SESSIO VANHENTUNUT -> KIRJAA ULOS JA OHJAA KIRJAUTUMAAN
+        if (pRes.status === 401 || pRes.status === 403) {
           clearSession();
           router.replace("/login");
           return;
@@ -1208,7 +1206,7 @@ export default function Home() {
 
     try {
       setDownloadingPdf(true);
-      setMessage("Imuroidaan tyylejä (Tämä voi kestää muutaman sekunnin)...");
+      setMessage("Imuroidaan tyylejä (Tämä voi kestää sekunnin)...");
       setErrorMessage("");
 
       const canvas = await html2canvas(printContent, {
@@ -1233,7 +1231,7 @@ export default function Home() {
                 safeCss += ruleText + "\n";
               }
             } catch (e) {
-              // Ignore cross-origin stylesheet reading errors silently
+              // Ignore cross-origin
             }
           }
 
@@ -1256,6 +1254,9 @@ export default function Home() {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
+      pdf.setFillColor(customStyle.mainBg);
+      pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
       const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -1263,8 +1264,9 @@ export default function Home() {
         // Jos sisältö on liian pitkä, pienennetään automaattisesti yhdelle A4-sivulle!
         const fitRatio = pageHeight / canvas.height;
         const fitWidth = canvas.width * fitRatio;
-        const xOffset = (pageWidth - fitWidth) / 2;
-        pdf.addImage(imgData, "JPEG", xOffset, 0, fitWidth, pageHeight);
+        
+        // Asetetaan x=0 jotta vasen sivupalkki pysyy KIIINNI reunassa
+        pdf.addImage(imgData, "JPEG", 0, 0, fitWidth, pageHeight);
       } else {
         pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
       }
@@ -2280,7 +2282,7 @@ export default function Home() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli</label>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli (Top-Header asettelulle)</label>
                           <select value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="solid">Yksivärinen</option>
                             <option value="gradient">Liukuväri (Gradient)</option>
@@ -2295,14 +2297,6 @@ export default function Home() {
                             <option value="circle">Ympyrä</option>
                             <option value="blob">Epäsymmetrinen (Blob)</option>
                             <option value="leaf">Lehti (Leaf)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="mb-3 block text-sm font-bold text-gray-400">Kuvan sijainti</label>
-                          <select value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
-                            <option value="left">Vasemmalla</option>
-                            <option value="center">Keskellä</option>
-                            <option value="right">Oikealla</option>
                           </select>
                         </div>
                         <div>
