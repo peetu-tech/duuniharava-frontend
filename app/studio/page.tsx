@@ -1782,6 +1782,33 @@ export default function Home() {
     }, 1800);
   }
 
+  // --- UUSI: MAKSUN KÄSITTELY ---
+  async function handleUpgradeToPro() {
+    const session = getSession();
+    if (!session) return;
+    
+    try {
+      setMessage("Ohjataan suojattuun maksuun...");
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          userId: session.user.id,
+          userEmail: session.user.email
+        }),
+      });
+      
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; 
+      } else {
+        setErrorMessage("Maksuikkunan avaus epäonnistui.");
+      }
+    } catch (error) {
+      setErrorMessage("Virhe yhteydessä maksupalveluun.");
+    }
+  }
+
   if (isAuthChecking) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#0F0F0F] text-white">
@@ -1803,15 +1830,25 @@ export default function Home() {
               <span className="font-black text-2xl sm:text-3xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
               <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest">Studio</div>
             </div>
-            <button
-              onClick={() => {
-                clearSession();
-                router.push("/login");
-              }}
-              className="w-full sm:w-auto rounded-2xl border border-white/10 px-8 py-4 sm:py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap"
-            >
-              KIRJAUDU ULOS
-            </button>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <button
+                onClick={handleUpgradeToPro}
+                className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 sm:py-3 text-sm font-black text-black hover:scale-[1.05] active:scale-95 transition-all whitespace-nowrap shadow-[0_0_20px_rgba(0,191,166,0.3)]"
+              >
+                PÄIVITÄ PRO-TASOLLE (9,90€/kk)
+              </button>
+
+              <button
+                onClick={() => {
+                  clearSession();
+                  router.push("/login");
+                }}
+                className="w-full sm:w-auto rounded-2xl border border-white/10 px-8 py-4 sm:py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap"
+              >
+                KIRJAUDU ULOS
+              </button>
+            </div>
           </div>
 
           <div className="grid gap-12 lg:gap-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center text-center lg:text-left">
