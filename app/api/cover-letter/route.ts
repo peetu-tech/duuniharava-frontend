@@ -39,11 +39,11 @@ export async function POST(req: Request) {
       tone: selectedTone,
     });
 
-    // Määritellään sävyt todella tarkasti suoraan täällä, jotta tekoäly ymmärtää eron
+    // Määritellään sävyt huomattavasti tarkemmin, jotta tekoäly ymmärtää nyanssit
     const toneInstructions = {
-      professional: "Kirjoita asiallinen, ytimekäs ja skarppi hakemus. Fokusoi vahvasti ammatilliseen osaamiseen, faktoihin ja siihen, miten hakijan aiempi kokemus ratkaisee yrityksen ongelmia.",
-      warm: "Kirjoita lämmin, ihmisläheinen ja innostunut hakemus. Tuo esiin hakijan persoonaa, tiimitaitoja ja aitoa paloa kyseistä yritystä kohtaan. Pidä teksti kuitenkin ammattimaisena.",
-      sales: "Kirjoita erittäin myyvä, itsevarmuutta huokuva ja tuloshakuinen hakemus. Aloita todella rohkealla ja erottuvalla 'hookilla'. Keskity numeroihin, saavutuksiin ja siihen, mitä viivan alle jää."
+      professional: "SÄVY: Asiallinen, ytimekäs ja asiantunteva. Keskity puhtaasti siihen, miten hakijan aiempi kokemus ja taidot tuovat yritykselle välitöntä hyötyä. Älä jaarittele.",
+      warm: "SÄVY: Ihmisläheinen, helposti lähestyttävä ja innostunut. Tuo esiin hakijan persoonaa, tiimitaitoja ja kykyä tulla toimeen erilaisten ihmisten kanssa. Sopii erinomaisesti kulttuuripainotteisiin yrityksiin.",
+      sales: "SÄVY: Itsevarma, tuloshakuinen ja rohkea. Aloita erittäin vahvalla koukulla. Keskity saavutuksiin, lukuihin ja tavoitteiden ylittämiseen. Älä kuitenkaan kuulosta ylimieliseltä."
     };
 
     const response = await openai.chat.completions.create({
@@ -51,15 +51,15 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-          content: `Olet Suomen kokenein rekrytointikonsultti ja huipputason copywriter. Tehtäväsi on kirjoittaa täydellinen, 100% aidon ihmisen kuuloinen ja moderni työhakemus.
+          content: `Olet Suomen kokenein rekrytoija ja taitavin copywriter. Kirjoitat huipputason työhakemuksia, jotka erottuvat massasta edukseen olemalla aitoja, suoria ja vakuuttavia.
 
-TÄRKEÄT SÄÄNNÖT, JOITA SINUN ON NOUDATETTAVA:
-1. KIELLETYT KLISEET: Älä KOSKAAN käytä fraaseja kuten "Olen erittäin motivoitunut", "Kirjoitan hakeakseni", "Innovatiivinen", "Dynaaminen", "Kuten CV:stäni käy ilmi" tai "Olen tiimipelaaja".
-2. VAHVA ALOITUS: Aloita HETI kiinnostavalla "Hookilla" tai tuloksella. Älä tuhlaa ensimmäistä lausetta itsestäänselvyyksiin (kuten siihen, mitä paikkaa hakee).
-3. LISÄARVO: Keskity siihen, mitä konkreettista hyötyä hakija tuo yritykselle. Yhdistä CV:n faktat työpaikkailmoituksen tarpeisiin.
-4. RAKENNE: Pidä teksti napakkana. Maksimissaan 3-4 lyhyttä, iskevää kappaletta. Kukaan ei jaksa lukea romaania.
-5. LOPETUS: Päätä luontevaan ja aktiiviseen toimintakehotteeseen (Call to Action), esim. tapaamisen ehdottamiseen.
-6. SÄVY: ${toneInstructions[selectedTone]}
+TÄRKEIMMÄT SÄÄNNÖT, JOITA SINUN ON NOUDATETTAVA:
+1. KIELLETYT KLISEET: Älä IKINÄ käytä sanoja tai fraaseja kuten "Olen erittäin motivoitunut", "Innovatiivinen", "Dynaaminen", "Kuten CV:stäni näkyy", "Olen tiimipelaaja" tai "Kirjoitan hakeakseni".
+2. SUOMALAINEN TYÖKULTTUURI: Ole suorapuheinen, rehellinen ja itsevarma, mutta vältä jenkkityylistä ylimielisyyttä ja liiallista hehkutusta.
+3. TOTUUDENMUKAISUUS: ÄLÄ keksi kokemusta, taitoja tai numeroita, joita hakija ei ole antanut. Käytä vain annettua dataa ja yhdistä se älykkäästi työpaikkailmoituksen tarpeisiin.
+4. RAKENNE JA MUOTOILU: Kirjoita sujuvaa leipätekstiä. ÄLÄ käytä ranskalaisia viivoja (bullet pointteja). Jaa teksti maksimissaan 3-4 lyhyeen kappaleeseen. Kukaan ei jaksa lukea pitkiä tekstimassoja.
+5. VAHVA ALOITUS & LOPETUS: Aloita heti asiaan menevällä "koukulla" (esim. hakijan paras saavutus, ydinosaaminen tai miksi hän on täydellinen match juuri tähän rooliin). Lopeta aktiiviseen ja luontevaan toimintakehotteeseen (CTA), esim. ehdottamalla lyhyttä puhelua.
+6. ${toneInstructions[selectedTone]}
 
 HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen rivinvaihto. Tämä on kriittistä sovelluksen toiminnan kannalta.`
         },
@@ -68,7 +68,8 @@ HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen ri
           content: basePrompt,
         },
       ],
-      temperature: 0.65, // Lämptila 0.65 pitää tekstin luovana mutta estää tekoälymäisen "hallusinoinnin" ja jaarittelun
+      // Lämpötila 0.6 pitää tekstin erittäin asiallisena ja estää tekoälyä hallusinoimasta omiaan
+      temperature: 0.6, 
     });
 
     const output =
