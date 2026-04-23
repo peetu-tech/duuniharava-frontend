@@ -1588,6 +1588,12 @@ export default function Home() {
       return;
     }
 
+    const session = getSession();
+    if (!session) {
+      setErrorMessage("Kirjaudu sisään jatkaaksesi.");
+      return;
+    }
+
     setLoadingTailoredCv(true);
     setMessage("");
     setErrorMessage("");
@@ -1599,6 +1605,7 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          userId: session.user.id,
           currentCv,
           jobTitle: activeJob.title,
           companyName: activeJob.company,
@@ -1607,6 +1614,13 @@ export default function Home() {
       });
 
       const data = await res.json();
+
+      if (res.status === 403 && data.error === "LIMIT_REACHED") {
+        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle yläpalkista jatkaaksesi!");
+        setLoadingTailoredCv(false);
+        return;
+      }
+
       const parsed = parseTailoredCv(data.output || "");
 
       const item: SavedCvVariant = {
@@ -1624,7 +1638,6 @@ export default function Home() {
       setMessage("Työpaikkaan sopiva CV-versio luotu.");
       setTimeout(() => setMessage(""), 2500);
 
-      const session = getSession();
       if(session) {
         fetch(`${supabaseUrl}/rest/v1/cv_variants`, {
           method: "POST", headers: getSupabaseHeaders(),
@@ -1646,6 +1659,12 @@ export default function Home() {
 
     if (!validateCvForm()) return;
 
+    const session = getSession();
+    if (!session) {
+      setErrorMessage("Kirjaudu sisään jatkaaksesi.");
+      return;
+    }
+
     setLoadingCv(true);
     setCvResult("");
 
@@ -1657,11 +1676,19 @@ export default function Home() {
         },
         body: JSON.stringify({
           mode,
+          userId: session.user.id,
           ...form,
         }),
       });
 
       const data = await res.json();
+
+      if (res.status === 403 && data.error === "LIMIT_REACHED") {
+        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle yläpalkista jatkaaksesi!");
+        setLoadingCv(false);
+        return;
+      }
+
       const output = data.output || data.error || "Jokin meni pieleen.";
       setCvResult(output);
       setTab("cv");
@@ -1679,7 +1706,6 @@ export default function Home() {
 
     if (!validateLetterForm() || !activeJob) return;
 
-    // 1. Hae käyttäjän ID!
     const session = getSession();
     if (!session) {
       setErrorMessage("Sinun täytyy kirjautua sisään jatkaaksesi.");
@@ -1702,20 +1728,18 @@ export default function Home() {
           companyName: activeJob.company,
           jobAd: activeJob.adText,
           tone: letterTone,
-          userId: session.user.id, // <--- TÄMÄ ON UUSI JA TÄRKEÄ!
+          userId: session.user.id,
         }),
       });
 
       const data = await res.json();
 
-      // 2. OTETAAN KIINNI PORTINVARTIJAN VIRHE!
       if (res.status === 403 && data.error === "LIMIT_REACHED") {
         setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle yläpalkista jatkaaksesi!");
         setLoadingLetter(false);
-        return; // Pysäytetään koodin suoritus tähän
+        return;
       }
 
-      // Jos kaikki meni hyvin, jatketaan normaalisti...
       const output = data.output || data.error || "Jokin meni pieleen.";
       const parsed = parseCoverLetter(output);
 
@@ -1798,7 +1822,6 @@ export default function Home() {
     }, 1800);
   }
 
-  // --- UUSI: MAKSUN KÄSITTELY ---
   async function handleUpgradeToPro() {
     const session = getSession();
     if (!session) {
