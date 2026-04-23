@@ -308,7 +308,7 @@ export default function CvPreview({
 
   const renderProfileHook = (items: string[]) => {
     return (
-      <div className={`relative p-6 mt-4 rounded-2xl overflow-hidden ${getShadowClass()}`} style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}` }}>
+      <div className={`relative p-6 mt-4 overflow-hidden ${getShadowClass()}`} style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}`, borderRadius: `${customStyle.borderRadius}px` }}>
         <div className="absolute -top-4 -left-2 opacity-10 font-serif" style={{ fontSize: "80px", color: customStyle.accentColor }}>"</div>
         <div className="relative z-10 opacity-90 font-medium italic" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: `${customStyle.bodySize + 1}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
           {items.map((line, j) => <p key={j}>{line}</p>)}
@@ -324,7 +324,7 @@ export default function CvPreview({
     let css: React.CSSProperties = { fontSize: "16px", color: customStyle.headingColor, textAlign: align as any };
 
     if (hStyle === "boxed") {
-      css = { ...css, backgroundColor: customStyle.accentColor, color: "#fff", padding: "8px 16px", borderRadius: "8px", display: "inline-block" };
+      css = { ...css, backgroundColor: customStyle.accentColor, color: "#fff", padding: "8px 16px", borderRadius: `${customStyle.borderRadius / 2}px`, display: "inline-block" };
     } else if (hStyle === "highlight") {
       css = { ...css, borderBottom: `8px solid ${customStyle.accentColor}40`, display: "inline-block", lineHeight: "0.6" };
     } else if (hStyle === "underline") {
