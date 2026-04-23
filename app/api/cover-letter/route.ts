@@ -3,7 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { buildCoverLetterPrompt } from "@/lib/prompts";
 
-// 1. Alusta Supabase Admin (ohittaa tietoturvasäännöt taustalla tietojen lukua varten)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -32,40 +31,32 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    
-    // Puretaan payloadista tarvittavat tiedot
     const { userId, cvText, jobTitle, companyName, jobAd, tone, name, phone, email, location, targetJob } = body;
     const selectedTone = safeTone(tone);
 
     // ==========================================
-    // 🔒 PORTINVARTIJA-LOGIIKKA ALKAA TÄSTÄ
+    // 🔒 PORTINVARTIJA
     // ==========================================
     if (userId) {
-      // 1. Tarkistetaan onko käyttäjä Pro
       const { data: profile } = await supabaseAdmin
         .from("profiles")
-        .select("is_pro")
+        .select("is_pro, api_usage_count")
         .eq("id", userId)
         .single();
         
-      // 2. Jos EI ole pro, lasketaan montako hakemusta hän on jo tehnyt
       if (!profile?.is_pro) {
-        const { count, error } = await supabaseAdmin
-          .from("saved_letters")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", userId);
-          
-        // 3. Jos 3 on täynnä, hylätään pyyntö (403 Forbidden)
-        if (count !== null && count >= 3) {
-          return NextResponse.json(
-            { error: "LIMIT_REACHED" }, 
-            { status: 403 }
-          );
+        // Estetään, jos on käyttänyt vähintään 3 kertaa
+        if (profile && profile.api_usage_count >= 3) {
+          return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
         }
+        
+        // Lisätään laskuriin +1
+        await supabaseAdmin
+          .from("profiles")
+          .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
+          .eq("id", userId);
       }
     }
-    // ==========================================
-    // 🔓 PORTINVARTIJA-LOGIIKKA LOPPUU
     // ==========================================
 
     const basePrompt = buildCoverLetterPrompt({
@@ -81,7 +72,6 @@ export async function POST(req: Request) {
       tone: selectedTone,
     });
 
-    // Määritellään sävyt huomattavasti tarkemmin, jotta tekoäly ymmärtää nyanssit
     const toneInstructions = {
       professional: "SÄVY: Asiallinen, ytimekäs ja asiantunteva. Keskity puhtaasti siihen, miten hakijan aiempi kokemus ja taidot tuovat yritykselle välitöntä hyötyä. Älä jaarittele.",
       warm: "SÄVY: Ihmisläheinen, helposti lähestyttävä ja innostunut. Tuo esiin hakijan persoonaa, tiimitaitoja ja kykyä tulla toimeen erilaisten ihmisten kanssa. Sopii erinomaisesti kulttuuripainotteisiin yrityksiin.",
@@ -110,7 +100,6 @@ HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen ri
           content: basePrompt,
         },
       ],
-      // Lämpötila 0.6 pitää tekstin erittäin asiallisena ja estää tekoälyä hallusinoimasta omiaan
       temperature: 0.6, 
     });
 
@@ -121,7 +110,6 @@ HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen ri
     return NextResponse.json({ output });
   } catch (error: any) {
     console.error("cover-letter route error:", error);
-
     return NextResponse.json(
       { error: "Hakemuksen luonti epäonnistui teknisen virheen vuoksi." },
       { status: 500 }
