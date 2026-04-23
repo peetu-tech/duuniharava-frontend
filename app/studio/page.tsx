@@ -163,6 +163,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "solid",
     imageShape: "circle",
+    imagePosition: "left",
     pagePadding: 48,
     headingStyle: "underline",
     mainGradientDirection: "none",
@@ -195,6 +196,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "center",
     tagStyle: "outline",
     imageShape: "square",
+    imagePosition: "center",
     pagePadding: 56,
     headingStyle: "simple",
     mainGradientDirection: "none",
@@ -227,6 +229,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "minimal",
     imageShape: "rounded",
+    imagePosition: "left",
     pagePadding: 40,
     headingStyle: "highlight",
     mainGradientDirection: "none",
@@ -259,6 +262,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     headingAlign: "left",
     tagStyle: "pill",
     imageShape: "blob",
+    imagePosition: "right",
     pagePadding: 48,
     headingStyle: "boxed",
     mainGradientDirection: "to bottom",
@@ -719,6 +723,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   );
 }
 
+// --- PÄÄKOMPONENTTI ---
 export default function Home() {
   const router = useRouter();
   
@@ -726,7 +731,6 @@ export default function Home() {
   const [hasSession, setHasSession] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
-  // Perustilat
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
@@ -747,13 +751,9 @@ export default function Home() {
   const [profileImage, setProfileImage] = useState("");
   const [jobFilter, setJobFilter] = useState("");
 
-  const [jobStatusFilter, setJobStatusFilter] =
-    useState<"all" | JobStatus>("all");
-  const [jobPriorityFilter, setJobPriorityFilter] =
-    useState<"all" | JobPriority>("all");
-  const [jobSort, setJobSort] = useState<
-    "match" | "deadline" | "priority" | "newest" | "company"
-  >("newest");
+  const [jobStatusFilter, setJobStatusFilter] = useState<"all" | JobStatus>("all");
+  const [jobPriorityFilter, setJobPriorityFilter] = useState<"all" | JobPriority>("all");
+  const [jobSort, setJobSort] = useState<"match" | "deadline" | "priority" | "newest" | "company">("newest");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
@@ -765,8 +765,7 @@ export default function Home() {
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
-  const [customStyles, setCustomStyles] =
-    useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+  const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -1074,6 +1073,17 @@ export default function Home() {
     }));
   }
 
+  function applyPalette(mainBg: string, mainBg2: string, sidebarBg: string, sidebarBg2: string, accentColor: string, mainText: string, sidebarText: string, headingColor: string) {
+    updateCustomStyle("mainBg", mainBg);
+    updateCustomStyle("mainBg2", mainBg2);
+    updateCustomStyle("sidebarBg", sidebarBg);
+    updateCustomStyle("sidebarBg2", sidebarBg2);
+    updateCustomStyle("accentColor", accentColor);
+    updateCustomStyle("mainText", mainText);
+    updateCustomStyle("sidebarText", sidebarText);
+    updateCustomStyle("headingColor", headingColor);
+  }
+
   function resetCurrentStyle() {
     setCustomStyles((prev) => ({
       ...prev,
@@ -1198,7 +1208,7 @@ export default function Home() {
 
     try {
       setDownloadingPdf(true);
-      setMessage("Käsitellään fontteja ja värejä...");
+      setMessage("Imuroidaan tyylejä (Tämä voi kestää muutaman sekunnin)...");
       setErrorMessage("");
 
       const canvas = await html2canvas(printContent, {
@@ -1209,7 +1219,6 @@ export default function Home() {
         onclone: (clonedDoc) => {
           let safeCss = "";
           
-          // Imuroi kaikki CSS-säännöt ja siivoaa "oklab"-värit pois lennosta!
           for (let i = 0; i < document.styleSheets.length; i++) {
             try {
               const sheet = document.styleSheets[i];
@@ -1224,15 +1233,13 @@ export default function Home() {
                 safeCss += ruleText + "\n";
               }
             } catch (e) {
-              // Jos selaimeen on ladattu cross-origin (vieraita) tyylejä, ohitetaan ne turvallisesti.
+              // Ignore cross-origin stylesheet reading errors silently
             }
           }
 
-          // Poistetaan alkuperäiset (kaatuvat) tyylit kokonaan vain tästä kloonista
           const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
           originalStyles.forEach(el => el.remove());
 
-          // Lisätään uusi turvallinen tyyli tilalle!
           const newStyle = clonedDoc.createElement("style");
           newStyle.innerHTML = safeCss;
           clonedDoc.head.appendChild(newStyle);
@@ -1246,22 +1253,20 @@ export default function Home() {
         format: "a4",
       });
 
-      const pageWidth = 210;
-      const pageHeight = 297;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
       const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position -= pageHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      if (imgHeight > pageHeight) {
+        // Jos sisältö on liian pitkä, pienennetään automaattisesti yhdelle A4-sivulle!
+        const fitRatio = pageHeight / canvas.height;
+        const fitWidth = canvas.width * fitRatio;
+        const xOffset = (pageWidth - fitWidth) / 2;
+        pdf.addImage(imgData, "JPEG", xOffset, 0, fitWidth, pageHeight);
+      } else {
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
       }
 
       pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
@@ -2101,11 +2106,20 @@ export default function Home() {
                   <div className="flex flex-wrap items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
                     <div>
                       <p className="text-xl font-black text-white tracking-tight">Värit ja Teema</p>
-                      <p className="mt-2 text-base text-gray-400">Valitse valmis teema tai säädä itse.</p>
+                      <p className="mt-2 text-base text-gray-400">Pikavalinnat väreille tai säädä itse.</p>
                     </div>
                     <button type="button" onClick={resetCurrentStyle} className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50">
                       Palauta oletukset
                     </button>
+                  </div>
+
+                  {/* UUDET PIKAVÄRIT */}
+                  <div className="mb-10 flex flex-wrap gap-3 border-b border-white/5 pb-8">
+                    <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#0369a1] hover:bg-white/5 transition-all">🌊 Merellinen</button>
+                    <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#10b981] hover:bg-white/5 transition-all">🌲 Metsä</button>
+                    <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#d97706] hover:bg-white/5 transition-all">🍂 Syksy</button>
+                    <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#7c3aed] hover:bg-white/5 transition-all">🔮 Kyber</button>
+                    <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#14b8a6] hover:bg-white/5 transition-all">🌑 Tumma Tyyli</button>
                   </div>
 
                   <div className="mb-10 flex flex-wrap gap-4">
@@ -2266,7 +2280,7 @@ export default function Home() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli (Top-Header asettelulle)</label>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli</label>
                           <select value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
                             <option value="solid">Yksivärinen</option>
                             <option value="gradient">Liukuväri (Gradient)</option>
@@ -2281,6 +2295,14 @@ export default function Home() {
                             <option value="circle">Ympyrä</option>
                             <option value="blob">Epäsymmetrinen (Blob)</option>
                             <option value="leaf">Lehti (Leaf)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-3 block text-sm font-bold text-gray-400">Kuvan sijainti</label>
+                          <select value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer">
+                            <option value="left">Vasemmalla</option>
+                            <option value="center">Keskellä</option>
+                            <option value="right">Oikealla</option>
                           </select>
                         </div>
                         <div>
