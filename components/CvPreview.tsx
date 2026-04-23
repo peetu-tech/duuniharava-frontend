@@ -363,7 +363,7 @@ export default function CvPreview({
   return (
     <div 
       id="cv-preview" 
-      className={`mx-auto w-full max-w-[900px] overflow-hidden transition-all duration-300 ${getShadowClass()}`} 
+      className={`mx-auto w-[800px] sm:w-full max-w-[900px] shrink-0 overflow-hidden transition-all duration-300 ${getShadowClass()}`} 
       style={{ color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
     >
       
