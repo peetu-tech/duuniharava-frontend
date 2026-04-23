@@ -1679,6 +1679,13 @@ export default function Home() {
 
     if (!validateLetterForm() || !activeJob) return;
 
+    // 1. Hae käyttäjän ID!
+    const session = getSession();
+    if (!session) {
+      setErrorMessage("Sinun täytyy kirjautua sisään jatkaaksesi.");
+      return;
+    }
+
     setLoadingLetter(true);
     setLetterResult("");
 
@@ -1695,10 +1702,20 @@ export default function Home() {
           companyName: activeJob.company,
           jobAd: activeJob.adText,
           tone: letterTone,
+          userId: session.user.id, // <--- TÄMÄ ON UUSI JA TÄRKEÄ!
         }),
       });
 
       const data = await res.json();
+
+      // 2. OTETAAN KIINNI PORTINVARTIJAN VIRHE!
+      if (res.status === 403 && data.error === "LIMIT_REACHED") {
+        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle yläpalkista jatkaaksesi!");
+        setLoadingLetter(false);
+        return; // Pysäytetään koodin suoritus tähän
+      }
+
+      // Jos kaikki meni hyvin, jatketaan normaalisti...
       const output = data.output || data.error || "Jokin meni pieleen.";
       const parsed = parseCoverLetter(output);
 
@@ -1719,7 +1736,6 @@ export default function Home() {
       setMessage("Hakemus luotu valittuun työpaikkaan.");
       setTimeout(() => setMessage(""), 2500);
 
-      const session = getSession();
       if(session) {
         fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
           method: "POST", headers: getSupabaseHeaders(),
@@ -1785,7 +1801,10 @@ export default function Home() {
   // --- UUSI: MAKSUN KÄSITTELY ---
   async function handleUpgradeToPro() {
     const session = getSession();
-    if (!session) return;
+    if (!session) {
+        setErrorMessage("Kirjaudu sisään päivittääksesi Pro-tasolle.");
+        return;
+    }
     
     try {
       setMessage("Ohjataan suojattuun maksuun...");
