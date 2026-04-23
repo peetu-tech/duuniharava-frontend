@@ -369,21 +369,21 @@ export default function CvPreview({
       
       {/* YLÄPALKKI / MINIMALISTINEN */}
       {(isTopHeader || isMinimalist) && (
-        <header className={`flex flex-col sm:flex-row items-center gap-10 relative ${isImgRight ? 'sm:flex-row-reverse' : ''}`} style={{ padding: `${padding}px`, ...(isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()) }}>
+        <header className={`flex items-center gap-10 relative ${isImgRight ? 'flex-row-reverse' : 'flex-row'}`} style={{ padding: `${padding}px`, ...(isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()) }}>
           {image && (
             <img src={image} alt="Profiili" className={`relative z-10 object-cover border-4 border-white/20 ${getShadowClass()}`} style={{ width: '160px', height: '160px', borderRadius: getImageBorderRadius(), alignSelf: isImgCenter ? 'center' : 'auto' }} />
           )}
           <div className={`relative z-10 flex-1 ${(!image || customStyle.headingAlign === 'center' || isImgCenter) ? 'text-center w-full' : ''}`} style={{ textAlign: isImgCenter ? 'center' : getTextAlign() as any }}>
             <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.05, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
             {roleLine && <p className="mt-4 text-xl font-bold tracking-widest uppercase" style={{ color: customStyle.accentColor, opacity: 0.9 }}>{roleLine}</p>}
-            <div className="mt-8 flex flex-wrap gap-6 justify-center sm:justify-start" style={{ justifyContent: isImgCenter ? 'center' : getTextAlign() }}>
+            <div className="mt-8 flex flex-wrap gap-6" style={{ justifyContent: isImgCenter ? 'center' : getTextAlign() }}>
                <ContactInfo isDarkBg={!isMinimalist && customStyle.headerStyle !== "transparent"} />
             </div>
           </div>
         </header>
       )}
 
-      <div className={`flex flex-col ${isTopHeader || isMinimalist ? '' : (isRightSidebar ? 'md:flex-row-reverse' : 'md:flex-row')} min-h-[1050px]`}>
+      <div className={`flex ${isTopHeader || isMinimalist ? 'flex-col' : (isRightSidebar ? 'flex-row-reverse' : 'flex-row')} min-h-[1050px]`}>
         
         {/* SIVUPALKKI */}
         {(!isTopHeader && !isMinimalist) && (
