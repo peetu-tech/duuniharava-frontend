@@ -24,8 +24,9 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    const selectedTone = safeTone(body.tone);
 
-    const prompt = buildCoverLetterPrompt({
+    const basePrompt = buildCoverLetterPrompt({
       name: body.name || "",
       phone: body.phone || "",
       email: body.email || "",
@@ -35,22 +36,39 @@ export async function POST(req: Request) {
       jobTitle: body.jobTitle || "",
       companyName: body.companyName || "",
       jobAd: body.jobAd || "",
-      tone: safeTone(body.tone),
+      tone: selectedTone,
     });
 
+    // Määritellään sävyt todella tarkasti suoraan täällä, jotta tekoäly ymmärtää eron
+    const toneInstructions = {
+      professional: "Kirjoita asiallinen, ytimekäs ja skarppi hakemus. Fokusoi vahvasti ammatilliseen osaamiseen, faktoihin ja siihen, miten hakijan aiempi kokemus ratkaisee yrityksen ongelmia.",
+      warm: "Kirjoita lämmin, ihmisläheinen ja innostunut hakemus. Tuo esiin hakijan persoonaa, tiimitaitoja ja aitoa paloa kyseistä yritystä kohtaan. Pidä teksti kuitenkin ammattimaisena.",
+      sales: "Kirjoita erittäin myyvä, itsevarmuutta huokuva ja tuloshakuinen hakemus. Aloita todella rohkealla ja erottuvalla 'hookilla'. Keskity numeroihin, saavutuksiin ja siihen, mitä viivan alle jää."
+    };
+
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Käytetään OpenAI:n lippulaivamallia laadun takaamiseksi
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "Olet huipputason suomalainen rekrytointikonsultti ja uravalmentaja. Kirjoitat täydellistä, inhimillistä ja vaikuttavaa suomea. Et koskaan käytä tekoälylle tyypillisiä kliseitä tai ylisanoja (esim. 'innovatiivinen', 'dynaaminen', 'synergia'). Tekstisi on uskottavaa ja kohdistuu suoraan suomalaiseen työkulttuuriin.",
+          content: `Olet Suomen kokenein rekrytointikonsultti ja huipputason copywriter. Tehtäväsi on kirjoittaa täydellinen, 100% aidon ihmisen kuuloinen ja moderni työhakemus.
+
+TÄRKEÄT SÄÄNNÖT, JOITA SINUN ON NOUDATETTAVA:
+1. KIELLETYT KLISEET: Älä KOSKAAN käytä fraaseja kuten "Olen erittäin motivoitunut", "Kirjoitan hakeakseni", "Innovatiivinen", "Dynaaminen", "Kuten CV:stäni käy ilmi" tai "Olen tiimipelaaja".
+2. VAHVA ALOITUS: Aloita HETI kiinnostavalla "Hookilla" tai tuloksella. Älä tuhlaa ensimmäistä lausetta itsestäänselvyyksiin (kuten siihen, mitä paikkaa hakee).
+3. LISÄARVO: Keskity siihen, mitä konkreettista hyötyä hakija tuo yritykselle. Yhdistä CV:n faktat työpaikkailmoituksen tarpeisiin.
+4. RAKENNE: Pidä teksti napakkana. Maksimissaan 3-4 lyhyttä, iskevää kappaletta. Kukaan ei jaksa lukea romaania.
+5. LOPETUS: Päätä luontevaan ja aktiiviseen toimintakehotteeseen (Call to Action), esim. tapaamisen ehdottamiseen.
+6. SÄVY: ${toneInstructions[selectedTone]}
+
+HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen rivinvaihto. Tämä on kriittistä sovelluksen toiminnan kannalta.`
         },
         {
           role: "user",
-          content: prompt,
+          content: basePrompt,
         },
       ],
-      temperature: 0.7, // 0.7 antaa luonnollisen ja luovan, mutta ammattimaisen sävyn
+      temperature: 0.65, // Lämptila 0.65 pitää tekstin luovana mutta estää tekoälymäisen "hallusinoinnin" ja jaarittelun
     });
 
     const output =
