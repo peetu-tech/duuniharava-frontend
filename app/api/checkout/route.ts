@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-// Alustetaan Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any,
 });
@@ -17,17 +16,18 @@ export async function POST(req: Request) {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      customer_email: userEmail || undefined, // Esitäyttää asiakkaan sähköpostin maksuikkunaan
-      client_reference_id: userId, // TÄMÄ ON KRIITTINEN! Yhdistää maksun Supabase-käyttäjään
+      customer_email: userEmail || undefined,
+      client_reference_id: userId, // YHDISTÄÄ MAKSUN SUPABASE-KÄYTTÄJÄÄN!
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID, // Esim. price_1Pxxxxxx (Se jonka kopioit aiemmin)
+          price: process.env.STRIPE_PRICE_ID,
           quantity: 1,
         },
       ],
-      mode: "subscription", // Kuukausitilaus
-      success_url: `${req.headers.get("origin")}/studio?payment=success`,
-      cancel_url: `${req.headers.get("origin")}/studio?payment=cancelled`,
+      mode: "subscription",
+      // Stripe ohjaa takaisin näihin osoitteisiin maksun jälkeen
+      success_url: `${req.headers.get("origin")}?payment=success`,
+      cancel_url: `${req.headers.get("origin")}?payment=cancelled`,
     });
 
     return NextResponse.json({ url: session.url });
