@@ -1,7 +1,12 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { buildCreateCvPrompt, buildImproveCvPrompt } from "@/lib/prompts";
 
-// Huom! Ei "use client" -tunnistetta, koska tämä on backend/API-reitti.
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,46 +15,68 @@ const openai = new OpenAI({
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return Response.json(
+      return NextResponse.json(
         { error: "OPENAI_API_KEY puuttuu palvelimen ympäristömuuttujista." },
         { status: 500 }
       );
     }
 
     const body = await req.json();
-    const mode = body.mode as "improve" | "create";
+    const { userId, mode, ...formParams } = body;
+
+    // ==========================================
+    // 🔒 PORTINVARTIJA
+    // ==========================================
+    if (userId) {
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("is_pro, api_usage_count")
+        .eq("id", userId)
+        .single();
+        
+      if (!profile?.is_pro) {
+        if (profile && profile.api_usage_count >= 3) {
+          return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
+        }
+        
+        await supabaseAdmin
+          .from("profiles")
+          .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
+          .eq("id", userId);
+      }
+    }
+    // ==========================================
 
     const prompt =
       mode === "improve"
         ? buildImproveCvPrompt({
-            cvText: body.cvText,
-            targetJob: body.targetJob,
-            education: body.education,
-            experience: body.experience,
-            languages: body.languages,
-            skills: body.skills,
-            phone: body.phone,
-            email: body.email,
-            location: body.location,
-            cards: body.cards,
-            hobbies: body.hobbies,
-            name: body.name,
+            cvText: formParams.cvText,
+            targetJob: formParams.targetJob,
+            education: formParams.education,
+            experience: formParams.experience,
+            languages: formParams.languages,
+            skills: formParams.skills,
+            phone: formParams.phone,
+            email: formParams.email,
+            location: formParams.location,
+            cards: formParams.cards,
+            hobbies: formParams.hobbies,
+            name: formParams.name,
           })
         : buildCreateCvPrompt({
-            name: body.name,
-            phone: body.phone,
-            email: body.email,
-            location: body.location,
-            targetJob: body.targetJob,
-            education: body.education,
-            experience: body.experience,
-            languages: body.languages,
-            skills: body.skills,
-            cards: body.cards,
-            hobbies: body.hobbies,
+            name: formParams.name,
+            phone: formParams.phone,
+            email: formParams.email,
+            location: formParams.location,
+            targetJob: formParams.targetJob,
+            education: formParams.education,
+            experience: formParams.experience,
+            languages: formParams.languages,
+            skills: formParams.skills,
+            cards: formParams.cards,
+            hobbies: formParams.hobbies,
           });
 
-    // Korjattu OpenAI kutsun syntaksi ja vaihdettu tehokkaaseen gpt-4o malliin
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -62,16 +89,16 @@ export async function POST(req: Request) {
           content: prompt,
         },
       ],
-      temperature: 0.5, // 0.5 pitää CV:n faktoissa kiinni, mutta sallii sujuvan kielen
+      temperature: 0.5,
     });
 
     const output =
       response.choices[0]?.message?.content?.trim() || "Virhe: mallilta ei saatu vastausta.";
 
-    return Response.json({ output });
-  } catch (error) {
+    return NextResponse.json({ output });
+  } catch (error: any) {
     console.error("CV route error:", error);
-    return Response.json(
+    return NextResponse.json(
       { error: "Palvelimella tapahtui virhe CV:n luonnissa." },
       { status: 500 }
     );
