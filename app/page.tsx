@@ -1,5 +1,14 @@
-import { redirect } from "next/navigation";
+@import "tailwindcss";
 
-export default function Home() {
-  redirect("/login");
+body {
+  background: #08090D;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  /* Tailwindin antialiased on layout.tsx:ssä, joten body on täällä ihanan puhdas */
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
