@@ -1,27 +1,32 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-// Alustetaan Stripe salaisella avaimella
+// Alustetaan Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16" as any,
 });
 
 export async function POST(req: Request) {
   try {
-    // Luodaan maksuistunto
+    const body = await req.json();
+    const { userId, userEmail } = body;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Käyttäjä-ID puuttuu" }, { status: 400 });
+    }
+
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"], // Voit lisätä "mobilepay" myöhemmin Live-tilassa
+      payment_method_types: ["card"],
+      customer_email: userEmail || undefined, // Esitäyttää asiakkaan sähköpostin maksuikkunaan
+      client_reference_id: userId, // TÄMÄ ON KRIITTINEN! Yhdistää maksun Supabase-käyttäjään
       line_items: [
         {
-          // Käytetään sitä Price ID:tä, jonka juuri hait
-          price: process.env.STRIPE_PRICE_ID,
+          price: process.env.STRIPE_PRICE_ID, // Esim. price_1Pxxxxxx (Se jonka kopioit aiemmin)
           quantity: 1,
         },
       ],
-      mode: "subscription", // Koska kyseessä on jatkuva tilaus (9,90€/kk)
-      
-      // Mihin käyttäjä palaa maksun jälkeen?
-      success_url: `${req.headers.get("origin")}/studio?session_id={CHECKOUT_SESSION_ID}&payment=success`,
+      mode: "subscription", // Kuukausitilaus
+      success_url: `${req.headers.get("origin")}/studio?payment=success`,
       cancel_url: `${req.headers.get("origin")}/studio?payment=cancelled`,
     });
 
