@@ -2429,7 +2429,7 @@ export default function Home() {
                       </div>
 
                       <div className="rounded-[40px] border border-white/10 bg-white p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10">
-                        <div className="min-w-[800px] lg:min-w-0">
+                        <div className="min-w-[900px] lg:min-w-0">
                           <CvPreview
                             cvText={parsedCv.cvBody}
                             image={profileImage}
