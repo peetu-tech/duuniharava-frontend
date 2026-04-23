@@ -1616,7 +1616,7 @@ export default function Home() {
       const data = await res.json();
 
       if (res.status === 403 && data.error === "LIMIT_REACHED") {
-        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle yläpalkista jatkaaksesi!");
+        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle jatkaaksesi!");
         setLoadingTailoredCv(false);
         return;
       }
@@ -1684,7 +1684,7 @@ export default function Home() {
       const data = await res.json();
 
       if (res.status === 403 && data.error === "LIMIT_REACHED") {
-        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle yläpalkista jatkaaksesi!");
+        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle jatkaaksesi!");
         setLoadingCv(false);
         return;
       }
@@ -1735,7 +1735,7 @@ export default function Home() {
       const data = await res.json();
 
       if (res.status === 403 && data.error === "LIMIT_REACHED") {
-        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle yläpalkista jatkaaksesi!");
+        setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle jatkaaksesi!");
         setLoadingLetter(false);
         return;
       }
@@ -3278,13 +3278,22 @@ export default function Home() {
             {/* Ponnahdusilmoitukset (Alerts) */}
             {(message || errorMessage) && (
               <div
-                className={`fixed bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[28px] border-2 p-8 text-lg font-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all animate-in slide-in-from-bottom-5 ${
+                className={`fixed bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[28px] border-2 p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all animate-in slide-in-from-bottom-5 ${
                   errorMessage
                     ? "border-red-900 bg-red-950/95 text-red-300 backdrop-blur-xl"
                     : "border-[#00BFA6] bg-[#00BFA6]/95 text-black backdrop-blur-xl"
                 }`}
               >
-                {errorMessage || message}
+                <p className="text-lg font-black mb-3">{errorMessage || message}</p>
+                
+                {errorMessage && errorMessage.includes("Pro-tasolle") && (
+                  <button
+                    onClick={handleUpgradeToPro}
+                    className="w-full mt-2 rounded-xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-6 py-4 text-base font-black text-black hover:scale-[1.03] active:scale-95 transition-all shadow-[0_0_20px_rgba(0,191,166,0.3)]"
+                  >
+                    PÄIVITÄ PRO-TASOLLE NYT ➔
+                  </button>
+                )}
               </div>
             )}
           </section>
