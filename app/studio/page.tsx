@@ -1222,32 +1222,11 @@ export default function Home() {
         allowTaint: true,
         backgroundColor: customStyle.mainBg,
         onclone: (clonedDoc) => {
-          let safeCss = "";
-          
-          for (let i = 0; i < document.styleSheets.length; i++) {
-            try {
-              const sheet = document.styleSheets[i];
-              const rules = sheet.cssRules || sheet.rules;
-              for (let j = 0; j < rules.length; j++) {
-                let ruleText = rules[j].cssText;
-                if (ruleText.includes('oklab') || ruleText.includes('oklch') || ruleText.includes('color-mix')) {
-                  ruleText = ruleText.replace(/oklab\([^)]+\)/g, 'rgba(0,0,0,0.8)')
-                                     .replace(/oklch\([^)]+\)/g, 'rgba(0,0,0,0.8)')
-                                     .replace(/color-mix\([^)]+\)/g, 'rgba(0,0,0,0.8)');
-                }
-                safeCss += ruleText + "\n";
-              }
-            } catch (e) {
-              // Ignore cross-origin
-            }
+          const previewEl = clonedDoc.getElementById("cv-preview");
+          if (previewEl) {
+            previewEl.style.borderRadius = "0px";
+            previewEl.style.boxShadow = "none";
           }
-
-          const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
-          originalStyles.forEach(el => el.remove());
-
-          const newStyle = clonedDoc.createElement("style");
-          newStyle.innerHTML = safeCss;
-          clonedDoc.head.appendChild(newStyle);
         },
       });
 
@@ -2414,7 +2393,6 @@ export default function Home() {
                         />
                       </div>
 
-                      {/* CV PREVIEW */}
                       <div className="rounded-[40px] border border-white/10 bg-white p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10">
                         <div className="min-w-[900px]">
                           <CvPreview
@@ -2426,8 +2404,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* LATAUSNAPIT */}
-                      <div className="flex flex-col sm:flex-row gap-5 mt-10">
+                      {/* LATAUSNAPIT SIIRRETTY CV:N ALLE */}
+                      <div className="flex flex-col sm:flex-row gap-5 mt-24 pt-8 border-t border-white/10">
                         <button
                           type="button"
                           onClick={downloadPdf}
@@ -2448,7 +2426,7 @@ export default function Home() {
                       </div>
 
                       {/* --- CANVA TASON EDITOR --- */}
-                      <div className="rounded-[32px] border border-white/10 bg-[#0A0A0A] p-8 md:p-10 mt-16 shadow-2xl">
+                      <div className="rounded-[32px] border border-white/10 bg-[#0A0A0A] p-8 md:p-10 mt-10 shadow-2xl">
                         <div className="flex flex-wrap items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
                           <div>
                             <p className="text-xl font-black text-white tracking-tight">Värit ja Teema</p>
