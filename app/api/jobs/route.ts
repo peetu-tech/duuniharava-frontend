@@ -52,7 +52,8 @@ export async function POST(req: Request) {
       throw new Error("Työmarkkinatorin rajapinta ei vastannut oikein.");
     }
 
-    const kehaData = await kehaResponse.json();
+    // TÄSSÄ KORJAUS: lisätty "as any", jotta TypeScript hyväksyy datan rakenteen
+    const kehaData = await kehaResponse.json() as any;
     const rawJobs = kehaData.items || kehaData.results || [];
 
     if (rawJobs.length === 0) {
