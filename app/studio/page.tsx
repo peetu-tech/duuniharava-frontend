@@ -1209,29 +1209,76 @@ export default function Home() {
 
     try {
       setDownloadingPdf(true);
-      setMessage("Luodaan PDF-tiedostoa...");
+      setMessage("Luodaan PDF-tiedostoa... (Tämä voi kestää sekunnin)");
       setErrorMessage("");
 
       const canvas = await html2canvas(printContent, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         backgroundColor: customStyle.mainBg,
+        onclone: (clonedDoc) => {
+          let safeCss = "";
+          
+          for (let i = 0; i < document.styleSheets.length; i++) {
+            try {
+              const sheet = document.styleSheets[i];
+              const rules = sheet.cssRules || sheet.rules;
+              for (let j = 0; j < rules.length; j++) {
+                let ruleText = rules[j].cssText;
+                if (ruleText.includes('oklab') || ruleText.includes('oklch') || ruleText.includes('color-mix')) {
+                  ruleText = ruleText.replace(/oklab\([^)]+\)/g, 'rgba(0,0,0,0.8)')
+                                     .replace(/oklch\([^)]+\)/g, 'rgba(0,0,0,0.8)')
+                                     .replace(/color-mix\([^)]+\)/g, 'rgba(0,0,0,0.8)');
+                }
+                safeCss += ruleText + "\n";
+              }
+            } catch (e) {
+              // Ignore cross-origin
+            }
+          }
+
+          const previewEl = clonedDoc.getElementById("cv-preview");
+          if (previewEl) {
+            previewEl.style.borderRadius = "0px";
+            previewEl.style.boxShadow = "none";
+          }
+
+          const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
+          originalStyles.forEach(el => el.remove());
+
+          const newStyle = clonedDoc.createElement("style");
+          newStyle.innerHTML = safeCss;
+          clonedDoc.head.appendChild(newStyle);
+        },
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
-      
       const pdf = new jsPDF({
         orientation: "p",
         unit: "mm",
         format: "a4",
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      pdf.setFillColor(customStyle.mainBg);
+      pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      if (imgHeight > pageHeight) {
+        const fitRatio = pageHeight / canvas.height;
+        const fitWidth = canvas.width * fitRatio;
+        
+        pdf.addImage(imgData, "JPEG", 0, 0, fitWidth, pageHeight);
+      } else {
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+      }
+
       pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
-      
       setMessage("PDF ladattu onnistuneesti koneellesi!");
       setTimeout(() => setMessage(""), 3500);
 
