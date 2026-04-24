@@ -169,6 +169,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     mainGradientDirection: "none",
     sidebarGradientDirection: "135deg",
     shadowStyle: "soft",
+    contactSpacing: 40,
   },
   classic: {
     sidebarBg: "#f5f5f4",
@@ -202,6 +203,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     mainGradientDirection: "none",
     sidebarGradientDirection: "none",
     shadowStyle: "none",
+    contactSpacing: 40,
   },
   compact: {
     sidebarBg: "#f8fafc",
@@ -235,6 +237,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     mainGradientDirection: "none",
     sidebarGradientDirection: "none",
     shadowStyle: "none",
+    contactSpacing: 32,
   },
   bold: {
     sidebarBg: "#1e1b4b",
@@ -268,6 +271,7 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     mainGradientDirection: "to bottom",
     sidebarGradientDirection: "135deg",
     shadowStyle: "hard",
+    contactSpacing: 40,
   },
 };
 
@@ -1238,12 +1242,6 @@ export default function Home() {
             }
           }
 
-          const previewEl = clonedDoc.getElementById("cv-preview");
-          if (previewEl) {
-            previewEl.style.borderRadius = "0px";
-            previewEl.style.boxShadow = "none";
-          }
-
           const originalStyles = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
           originalStyles.forEach(el => el.remove());
 
@@ -1254,31 +1252,19 @@ export default function Home() {
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      
       const pdf = new jsPDF({
         orientation: "p",
         unit: "mm",
         format: "a4",
       });
 
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       
-      pdf.setFillColor(customStyle.mainBg);
-      pdf.rect(0, 0, pageWidth, pageHeight, "F");
-
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      if (imgHeight > pageHeight) {
-        const fitRatio = pageHeight / canvas.height;
-        const fitWidth = canvas.width * fitRatio;
-        
-        pdf.addImage(imgData, "JPEG", 0, 0, fitWidth, pageHeight);
-      } else {
-        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
-      }
-
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
+      
       setMessage("PDF ladattu onnistuneesti koneellesi!");
       setTimeout(() => setMessage(""), 3500);
 
@@ -2428,6 +2414,7 @@ export default function Home() {
                         />
                       </div>
 
+                      {/* CV PREVIEW */}
                       <div className="rounded-[40px] border border-white/10 bg-white p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10">
                         <div className="min-w-[900px]">
                           <CvPreview
@@ -2439,8 +2426,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* LATAUSNAPIT SIIRRETTY CV:N ALLE */}
-                      <div className="flex flex-col sm:flex-row gap-5 mt-24 pt-8 border-t border-white/10">
+                      {/* LATAUSNAPIT */}
+                      <div className="flex flex-col sm:flex-row gap-5 mt-10">
                         <button
                           type="button"
                           onClick={downloadPdf}
@@ -2461,7 +2448,7 @@ export default function Home() {
                       </div>
 
                       {/* --- CANVA TASON EDITOR --- */}
-                      <div className="rounded-[32px] border border-white/10 bg-[#0A0A0A] p-8 md:p-10 mt-10 shadow-2xl">
+                      <div className="rounded-[32px] border border-white/10 bg-[#0A0A0A] p-8 md:p-10 mt-16 shadow-2xl">
                         <div className="flex flex-wrap items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
                           <div>
                             <p className="text-xl font-black text-white tracking-tight">Värit ja Teema</p>
@@ -2688,6 +2675,10 @@ export default function Home() {
                           <div>
                             <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Mitat & Välit</h4>
                             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                              <div>
+                                <label className="mb-3 block text-sm font-bold text-gray-400">Yhteystietojen yläväli ({customStyle.contactSpacing || 40}px)</label>
+                                <input type="range" min={0} max={120} value={customStyle.contactSpacing || 40} onChange={(e) => updateCustomStyle("contactSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
+                              </div>
                               <div>
                                 <label className="mb-3 block text-sm font-bold text-gray-400">Kuvioinnin vahvuus ({customStyle.patternOpacity || 5}%)</label>
                                 <input type="range" min={1} max={30} value={customStyle.patternOpacity || 5} onChange={(e) => updateCustomStyle("patternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6]" />
