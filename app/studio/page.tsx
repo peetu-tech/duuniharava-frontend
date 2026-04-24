@@ -1570,7 +1570,7 @@ export default function Home() {
 
       if (res.status === 403 && data.error === "LIMIT_REACHED") {
         setErrorMessage("Ilmaisversion kokeilukerrat (3 kpl) on käytetty. Päivitä Pro-tasolle jatkaaksesi!");
-        loadingTailoredCv(false);
+        setLoadingTailoredCv(false);
         return;
       }
 
