@@ -1,5 +1,12 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { buildCoverLetterPrompt } from "@/lib/prompts";
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -17,29 +24,54 @@ function safeTone(value: unknown): CoverLetterTone {
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return Response.json(
+      return NextResponse.json(
         { error: "OPENAI_API_KEY puuttuu palvelimen ympäristömuuttujista." },
         { status: 500 }
       );
     }
 
     const body = await req.json();
-    const selectedTone = safeTone(body.tone);
+    const { userId, cvText, jobTitle, companyName, jobAd, tone, name, phone, email, location, targetJob } = body;
+    const selectedTone = safeTone(tone);
+
+    // ==========================================
+    // 🔒 PORTINVARTIJA
+    // ==========================================
+    if (userId) {
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("is_pro, api_usage_count")
+        .eq("id", userId)
+        .single();
+        
+      if (!profile?.is_pro) {
+        // Estetään, jos on käyttänyt vähintään 3 kertaa
+        if (profile && profile.api_usage_count >= 3) {
+          return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
+        }
+        
+        // Lisätään laskuriin +1
+        await supabaseAdmin
+          .from("profiles")
+          .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
+          .eq("id", userId);
+      }
+    }
+    // ==========================================
 
     const basePrompt = buildCoverLetterPrompt({
-      name: body.name || "",
-      phone: body.phone || "",
-      email: body.email || "",
-      location: body.location || "",
-      targetJob: body.targetJob || "",
-      cvText: body.cvText || "",
-      jobTitle: body.jobTitle || "",
-      companyName: body.companyName || "",
-      jobAd: body.jobAd || "",
+      name: name || "",
+      phone: phone || "",
+      email: email || "",
+      location: location || "",
+      targetJob: targetJob || "",
+      cvText: cvText || "",
+      jobTitle: jobTitle || "",
+      companyName: companyName || "",
+      jobAd: jobAd || "",
       tone: selectedTone,
     });
 
-    // Määritellään sävyt huomattavasti tarkemmin, jotta tekoäly ymmärtää nyanssit
     const toneInstructions = {
       professional: "SÄVY: Asiallinen, ytimekäs ja asiantunteva. Keskity puhtaasti siihen, miten hakijan aiempi kokemus ja taidot tuovat yritykselle välitöntä hyötyä. Älä jaarittele.",
       warm: "SÄVY: Ihmisläheinen, helposti lähestyttävä ja innostunut. Tuo esiin hakijan persoonaa, tiimitaitoja ja kykyä tulla toimeen erilaisten ihmisten kanssa. Sopii erinomaisesti kulttuuripainotteisiin yrityksiin.",
@@ -68,7 +100,6 @@ HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen ri
           content: basePrompt,
         },
       ],
-      // Lämpötila 0.6 pitää tekstin erittäin asiallisena ja estää tekoälyä hallusinoimasta omiaan
       temperature: 0.6, 
     });
 
@@ -76,11 +107,10 @@ HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen ri
       response.choices[0]?.message?.content?.trim() ||
       "HAKEMUS:\nHakemuksen luonti epäonnistui. Kokeile uudelleen.";
 
-    return Response.json({ output });
-  } catch (error) {
+    return NextResponse.json({ output });
+  } catch (error: any) {
     console.error("cover-letter route error:", error);
-
-    return Response.json(
+    return NextResponse.json(
       { error: "Hakemuksen luonti epäonnistui teknisen virheen vuoksi." },
       { status: 500 }
     );
