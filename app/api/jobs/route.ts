@@ -1,119 +1,144 @@
+import { NextResponse } from "next/server";
+import fetch from "node-fetch";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import OpenAI from "openai";
-import { buildJobSuggestionsPrompt } from "@/lib/prompts";
 
-// Huom! Ei "use client" -tunnistetta, koska tämä on backend/API-reitti.
-
+// 1. Alustetaan palvelut ympäristömuuttujista
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Reititin Fixien kautta (välttämätön KEHA:n palomuurin takia)
+const proxyAgent = process.env.FIXIE_URL 
+  ? new HttpsProxyAgent(process.env.FIXIE_URL) 
+  : undefined;
+
 export async function POST(req: Request) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      return Response.json(
-        { error: "OPENAI_API_KEY puuttuu palvelimen ympäristömuuttujista." },
+    // Tarkistetaan, että kaikki avaimet löytyvät
+    if (!process.env.OPENAI_API_KEY || !process.env.KIPA_SUBSCRIPTION_KEY) {
+      return NextResponse.json(
+        { error: "Palvelimen avaimet (OpenAI tai KEHA) puuttuvat." },
         { status: 500 }
       );
     }
 
     const body = await req.json();
+    const searchTerms = [body.targetJob, body.desiredRoles, body.keywords].filter(Boolean).join(" ");
+    const locationTerm = body.desiredLocation || "";
 
-    const prompt = buildJobSuggestionsPrompt({
-      desiredRoles: body.desiredRoles,
-      desiredLocation: body.desiredLocation,
-      workType: body.workType,
-      shiftPreference: body.shiftPreference,
-      salaryWish: body.salaryWish,
-      keywords: body.keywords,
-      targetJob: body.targetJob,
-      experience: body.experience,
-      skills: body.skills,
-      languages: body.languages,
+    // ==========================================
+    // VAIHE 1: HAE AIDOT TYÖPAIKAT KEHA-KESKUKSELTA
+    // ==========================================
+    const baseUrl = 'https://api-qa.ahtp.fi/v1/job-postings';
+    const url = new URL(baseUrl);
+    
+    // Lisätään hakusanat, jos niitä on
+    if (searchTerms) url.searchParams.append('q', searchTerms);
+    if (locationTerm) url.searchParams.append('location', locationTerm);
+    url.searchParams.append('limit', '5'); // Haetaan 5 parasta osumaa
+
+    const kehaResponse = await fetch(url.toString(), {
+      method: "GET",
+      agent: proxyAgent as any,
+      headers: {
+        "KIPA-Subscription-Key": process.env.KIPA_SUBSCRIPTION_KEY,
+        "Content-Type": "application/json",
+      }
     });
 
-    // Lasketaan tarkka nykyhetki ja realistiset tulevaisuuden deadlinet
-    const todayDate = new Date();
-    const todayString = todayDate.toLocaleDateString("fi-FI");
-    
-    const futureDate1 = new Date(todayDate);
-    futureDate1.setDate(futureDate1.getDate() + 10); // Vähintään 10 päivää hakuaikaa
-    
-    const futureDate2 = new Date(todayDate);
-    futureDate2.setDate(futureDate2.getDate() + 25); // Max 25 päivää hakuaikaa
+    if (!kehaResponse.ok) {
+      console.error("KEHA API virhe:", kehaResponse.status);
+      throw new Error("Työmarkkinatorin rajapinta ei vastannut oikein.");
+    }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Lippulaivamalli parhaan päättelykyvyn takaamiseksi
-      response_format: { type: "json_object" }, // Pakotetaan konekielinen JSON-vastaus
-      messages: [
-        {
-          role: "system",
-          content: `Olet huipputason suomalainen rekrytointikonsultti ja ohjelmistoarkkitehti.
-Tehtäväsi on analysoida käyttäjän profiili ja generoida 4-6 erittäin realistista, juuri hänelle räätälöityä työpaikkaehdotusta.
+    const kehaData = await kehaResponse.json();
+    const rawJobs = kehaData.items || kehaData.results || [];
 
-AIKASÄÄNTÖ: Tänään on ${todayString}. Kaikkien deadline-päivämäärien on oltava tulevaisuudessa, aikavälillä ${futureDate1.toLocaleDateString("fi-FI")} - ${futureDate2.toLocaleDateString("fi-FI")}. Muotoile deadline muodossa YYYY-MM-DD.
+    if (rawJobs.length === 0) {
+      return NextResponse.json({ output: "[]" });
+    }
 
-REALISMI & LAATU:
-- Simuloi aidot suomalaiset työpaikkailmoitukset (lähteinä esim. Duunitori, Oikotie Työpaikat, LinkedIn, Työmarkkinatori).
-- Käytä aitojen suomalaisten tai Suomessa toimivien yritysten nimiä, jotka sopivat alaan (esim. Kesko, Elisa, Nordea, Attendot, paikalliset rakennusliikkeet tms.).
-- Palkka-arvioiden (salary) tulee olla erittäin realistisia ja noudattaa Suomen yleistä palkkatasoa.
-- 'matchScore' (numero 50-99) pitää laskea OIKEASTI sen perusteella, miten hyvin käyttäjän syöttämät taidot kohtaavat ilmoituksen keksityt vaatimukset.
-- 'adText' pitää olla pitkä ja uskottava: kerro yrityksestä, tehtävästä, vaatimuksista ja tarjotuista eduista.
+    // Yksinkertaistetaan KEHA:n dataa OpenAI:ta varten (säästetään tokeneita)
+    const jobsForAI = rawJobs.map((job: any) => ({
+      id: job.id,
+      title: job.title || "Tuntematon",
+      company: job.employerName || "Tuntematon",
+      location: job.municipalities?.[0]?.name || "Suomi",
+      description: job.description ? job.description.substring(0, 800) : "", // Rajataan pituutta
+      url: job.externalUrl || `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${job.id}`,
+      deadline: job.applicationEndDate || "",
+    }));
 
-PALAUTUSMUOTO:
-Palauta AINOASTAAN validi JSON-objekti, jolla on avain "jobs". "jobs" sisältää taulukon (array) työpaikkaobjekteja.
+    // ==========================================
+    // VAIHE 2: RIKASTA DATA OPENAI:LLA (Match Score & Perustelut)
+    // ==========================================
+    const aiPrompt = `
+Olet rekrytointikonsultti. Tässä on käyttäjän profiilin tiivistelmä:
+- Kokemus: ${body.experience || 'Ei määritelty'}
+- Taidot: ${body.skills || 'Ei määritelty'}
+- Koulutus/Kielet: ${body.languages || 'Ei määritelty'}
 
-JSON-rakenne jokaiselle työpaikalle:
+Ja tässä on lista AITOJA avoimia työpaikkoja (JSON-muodossa):
+${JSON.stringify(jobsForAI)}
+
+TEHTÄVÄSI:
+Lue oikeat työpaikkailmoitukset läpi ja arvioi, kuinka hyvin hakija sopii niihin.
+Palauta JSON-objekti, jossa on avain "jobs". Jokaisen työpaikan tulee noudattaa tarkalleen tätä muotoa:
+
 {
-  "title": "String (Ammattinimike)",
-  "company": "String (Yrityksen nimi)",
-  "location": "String (Kaupunki/Alue)",
-  "type": "String (Esim. Kokoaikainen, Vakituinen)",
-  "summary": "String (Myyvä 1-2 lauseen tiivistelmä paikasta)",
-  "adText": "String (Kokonainen ja pitkä työpaikkailmoituksen teksti)",
-  "url": "String (Keksitty uskottava linkki, esim. https://duunitori.fi/tyopaikat/123456)",
-  "whyFit": "String (Henkilökohtainen perustelu, miksi hakijan profiili sopii tähän)",
-  "source": "String (Esim. Duunitori, Oikotie)",
-  "matchScore": Number (Kokonaisluku 50-99),
+  "title": "Sama kuin syötteessä",
+  "company": "Sama kuin syötteessä",
+  "location": "Sama kuin syötteessä",
+  "type": "Kokoaikainen/Osa-aikainen (päättele kuvauksesta)",
+  "summary": "Myyvä 2 lauseen tiivistelmä tehtävästä hakijalle",
+  "adText": "Työpaikkailmoituksen alkuperäinen teksti tiivistettynä (väh. 3 lausetta)",
+  "url": "Sama kuin syötteessä",
+  "whyFit": "Sinun kirjoittamasi henkilökohtainen perustelu: miksi juuri TÄMÄ hakija sopii tähän paikkaan?",
+  "source": "Työmarkkinatori",
+  "matchScore": Numero 50-99 (Kuinka hyvin taidot osuvat vaatimuksiin),
   "status": "interested",
-  "priority": "String (high, medium, tai low)",
-  "salary": "String (Esim. 2500 - 3000 €/kk)",
+  "priority": "high tai medium",
+  "salary": "Palkkaus sopimuksen mukaan",
   "appliedAt": "",
-  "deadline": "String (YYYY-MM-DD)",
+  "deadline": "Sama kuin syötteessä",
   "notes": "",
-  "contactPerson": "String (Keksitty nimi ja titteli)",
-  "contactEmail": "String (Keksitty sähköposti muodossa etunimi.sukunimi@yritys.fi)",
-  "companyWebsite": "String (Yrityksen kotisivu URL)"
-}`
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
+  "contactPerson": "Katso ilmoitus",
+  "contactEmail": "",
+  "companyWebsite": ""
+}
+`;
+
+    const aiResponse = await openai.chat.completions.create({
+      model: "gpt-4o", 
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: "Olet apuri, joka palauttaa vain validia JSON-dataa pyydetyssä muodossa." },
+        { role: "user", content: aiPrompt }
       ],
-      temperature: 0.6, // Pidetään tasapainossa luovuuden (ilmoitusten tekstit) ja logiikan (JSON-formaatti) välillä
+      temperature: 0.4, // Hieman matalampi lämpötila, jotta pysyy faktuaalisena
     });
 
-    const rawOutput = response.choices[0]?.message?.content?.trim() || '{"jobs": []}';
+    const rawOutput = aiResponse.choices[0]?.message?.content?.trim() || '{"jobs": []}';
     
-    // Varmistetaan, että data puretaan oikein JSON-muodosta arrayksi
-    let outputArray = "[]";
+    // Parsitaan ja varmistetaan tulos
+    let finalOutput = "[]";
     try {
-      const parsedJson = JSON.parse(rawOutput);
-      if (parsedJson.jobs && Array.isArray(parsedJson.jobs)) {
-        outputArray = JSON.stringify(parsedJson.jobs);
-      } else {
-        outputArray = rawOutput;
+      const parsed = JSON.parse(rawOutput);
+      if (parsed.jobs && Array.isArray(parsed.jobs)) {
+        finalOutput = JSON.stringify(parsed.jobs);
       }
     } catch (e) {
       console.error("JSON parse error from AI:", e);
-      outputArray = "[]";
+      finalOutput = "[]";
     }
 
-    return Response.json({ output: outputArray });
-  } catch (error) {
+    return NextResponse.json({ output: finalOutput });
+
+  } catch (error: any) {
     console.error("Jobs route error:", error);
-    return Response.json(
-      { error: "Työpaikkaehdotusten haku epäonnistui teknisen virheen vuoksi." },
+    return NextResponse.json(
+      { error: "Työpaikkaehdotusten haku epäonnistui." },
       { status: 500 }
     );
   }
