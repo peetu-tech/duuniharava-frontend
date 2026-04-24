@@ -38,6 +38,7 @@ export type CvCustomStyle = {
   mainGradientDirection?: "none" | "to bottom" | "to right" | "135deg" | "circle";
   sidebarGradientDirection?: "none" | "to bottom" | "to right" | "135deg" | "circle";
   shadowStyle?: "none" | "soft" | "hard" | "3d" | "neon";
+  contactSpacing?: number; // Lisätty uusi asetus yhteystietojen välille
 };
 
 type CvPreviewProps = {
@@ -363,7 +364,7 @@ export default function CvPreview({
   return (
     <div 
       id="cv-preview" 
-      className={`mx-auto w-[900px] shrink-0 overflow-hidden transition-all duration-300 ${getShadowClass()}`} 
+      className={`mx-auto w-[800px] shrink-0 overflow-hidden transition-all duration-300 ${getShadowClass()}`} 
       style={{ color: customStyle.mainText, borderRadius: `${customStyle.borderRadius}px`, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
     >
       
@@ -376,14 +377,15 @@ export default function CvPreview({
           <div className={`relative z-10 flex-1 ${(!image || customStyle.headingAlign === 'center' || isImgCenter) ? 'text-center w-full' : ''}`} style={{ textAlign: isImgCenter ? 'center' : getTextAlign() as any }}>
             <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.05, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
             {roleLine && <p className="mt-4 text-xl font-bold tracking-widest uppercase" style={{ color: customStyle.accentColor, opacity: 0.9 }}>{roleLine}</p>}
-            <div className="mt-8 flex flex-wrap gap-6" style={{ justifyContent: isImgCenter ? 'center' : getTextAlign() }}>
+            <div className="flex flex-wrap gap-6" style={{ justifyContent: isImgCenter ? 'center' : getTextAlign(), marginTop: `${customStyle.contactSpacing !== undefined ? customStyle.contactSpacing : 32}px` }}>
                <ContactInfo isDarkBg={!isMinimalist && customStyle.headerStyle !== "transparent"} />
             </div>
           </div>
         </header>
       )}
 
-      <div className={`flex ${isTopHeader || isMinimalist ? 'flex-col' : (isRightSidebar ? 'flex-row-reverse' : 'flex-row')} min-h-[1050px]`}>
+      {/* Lisätty min-h-[1132px] varmistamaan että A4-mittasuhde täyttyy, eikä tausta katkea valkoiseen! */}
+      <div className={`flex ${isTopHeader || isMinimalist ? 'flex-col' : (isRightSidebar ? 'flex-row-reverse' : 'flex-row')} min-h-[1132px]`}>
         
         {/* SIVUPALKKI */}
         {(!isTopHeader && !isMinimalist) && (
@@ -395,12 +397,12 @@ export default function CvPreview({
                 <img src={image} alt="Profiili" className={`mb-12 aspect-square w-full object-cover border-2 border-white/10 ${getShadowClass()}`} style={{ borderRadius: getImageBorderRadius() }} />
               )}
 
-              <div className="mb-14" style={{ textAlign: getTextAlign() }}>
+              <div style={{ textAlign: getTextAlign() }}>
                 <h1 style={{ fontSize: `${customStyle.nameSize * 0.75}px`, lineHeight: 1.1, fontWeight: 900, letterSpacing: "-0.02em" }}>{name}</h1>
                 {roleLine && <p className="mt-4 text-sm font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
               </div>
 
-              <div className="mb-14">
+              <div style={{ marginTop: `${customStyle.contactSpacing !== undefined ? customStyle.contactSpacing : 40}px`, marginBottom: '56px' }}>
                 <h2 className="uppercase tracking-[0.2em] font-black mb-6 opacity-40 text-[10px]" style={{ textAlign: getTextAlign() }}>Yhteystiedot</h2>
                 <ContactInfo isDarkBg={true} />
               </div>
