@@ -4,7 +4,6 @@ import React from "react";
 
 export type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 
-// Kaikki ominaisuudet yhdistetty virallisesti tähän yhteen tyyppiin
 export type CvCustomStyle = {
   sidebarBg: string;
   sidebarText: string;
@@ -56,9 +55,10 @@ type CvPreviewProps = {
   image?: string;
   styleVariant?: CvStyleVariant;
   customStyle?: CvCustomStyle;
+  mode?: "cv" | "letter"; // UUSI TILA HAKEMUSKIRJEELLE
 };
 
-// Ikonit yhteystiedoille (lisätty aria-hidden ruudunlukijoita varten)
+// Ikonit yhteystiedoille
 const Icons = {
   Phone: ({ style }: { style: "solid" | "outline" }) => (
     <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill={style === "solid" ? "currentColor" : "none"} stroke="currentColor" strokeWidth={style === "solid" ? "0" : "2"} strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
@@ -83,6 +83,8 @@ const headingNames = [
   "TAIDOT",
   "KORTIT JA PÄTEVYYDET",
   "HARRASTUKSET",
+  "PROJEKTIT",
+  "PORTFOLIO",
 ];
 
 function isHeading(line: string) {
@@ -93,6 +95,7 @@ export default function CvPreview({
   cvText,
   image,
   customStyle,
+  mode = "cv"
 }: CvPreviewProps) {
   const lines = splitLines(cvText);
 
@@ -101,19 +104,27 @@ export default function CvPreview({
   if (!lines.length) {
     return (
       <div className="rounded-[32px] border border-dashed border-white/10 bg-zinc-950/70 p-12 text-zinc-400 text-center font-medium" role="status" aria-live="polite">
-        CV-esikatselu muodostuu tähän.
+        {mode === "cv" ? "CV-esikatselu muodostuu tähän." : "Hakemuksen esikatselu muodostuu tähän."}
       </div>
     );
   }
 
   const name = lines[0] || "";
-  const phone = lines[1] || "";
-  const email = lines[2] || "";
-  const location = lines[3] || "";
-  const contentLines = lines.slice(4);
+  const phone = mode === "cv" ? (lines[1] || "") : "";
+  const email = mode === "cv" ? (lines[2] || "") : "";
+  const location = mode === "cv" ? (lines[3] || "") : "";
+  
+  // Kirjetilassa ei ole puhelinta/sähköpostia alussa samalla tavalla, parsitaan ne
+  let contactInfoLetter = { phone: "", email: "", location: "" };
+  if (mode === "letter") {
+      contactInfoLetter.phone = lines.find(l => l.match(/04[0-9]/) || l.match(/\+358/)) || "";
+      contactInfoLetter.email = lines.find(l => l.includes("@")) || "";
+  }
+
+  const contentLines = mode === "cv" ? lines.slice(4) : lines.slice(1);
   
   let roleLine = "";
-  if (contentLines[0] && !isHeading(contentLines[0])) {
+  if (contentLines[0] && !isHeading(contentLines[0]) && mode === "cv") {
     roleLine = contentLines[0];
     contentLines.shift();
   }
@@ -121,23 +132,21 @@ export default function CvPreview({
   const sections: { title: string; items: string[] }[] = [];
   let currentSection = { title: "", items: [] as string[] };
 
-  contentLines.forEach((line) => {
-    if (isHeading(line)) {
-      if (currentSection.title || currentSection.items.length > 0) {
-        sections.push(currentSection);
+  if (mode === "cv") {
+    contentLines.forEach((line) => {
+      if (isHeading(line)) {
+        if (currentSection.title || currentSection.items.length > 0) {
+          sections.push(currentSection);
+        }
+        currentSection = { title: line, items: [] };
+      } else {
+        currentSection.items.push(line);
       }
-      currentSection = { title: line, items: [] };
-    } else {
-      currentSection.items.push(line);
+    });
+    if (currentSection.title || currentSection.items.length > 0) {
+      sections.push(currentSection);
     }
-  });
-  if (currentSection.title || currentSection.items.length > 0) {
-    sections.push(currentSection);
   }
-
-  const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET", "HARRASTUKSET"].includes(title.toUpperCase());
-  const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS"].includes(title.toUpperCase());
-  const isProfileSection = (title: string) => ["PROFIILI", "TIIVISTELMÄ", "TAVOITE"].includes(title.toUpperCase());
 
   // --- DYNAAMISET TYYLIT ---
   const getFontFamily = () => {
@@ -362,13 +371,19 @@ export default function CvPreview({
   const padding = customStyle.pagePadding || 48;
   const iconStyleChoice = customStyle.iconStyle || "outline";
 
-  const ContactInfo = ({ isDarkBg }: { isDarkBg: boolean }) => (
-    <div className={`font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`} style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: `${customStyle.contactSize || 14}px` }}>
-      {phone && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Phone style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Puhelinnumero: </span>{phone}</span></div>}
-      {email && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.Mail style={iconStyleChoice as any} /></span> <span className="break-all"><span className="sr-only">Sähköposti: </span>{email}</span></div>}
-      {location && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}><span style={{ color: customStyle.accentColor }}><Icons.MapPin style={iconStyleChoice as any} /></span> <span><span className="sr-only">Sijainti: </span>{location}</span></div>}
-    </div>
-  );
+  const ContactInfo = ({ isDarkBg }: { isDarkBg: boolean }) => {
+    const renderPhone = mode === "cv" ? phone : contactInfoLetter.phone;
+    const renderEmail = mode === "cv" ? email : contactInfoLetter.email;
+    const renderLocation = mode === "cv" ? location : contactInfoLetter.location;
+
+    return (
+      <div className={`font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`} style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: `${customStyle.contactSize || 14}px` }}>
+        {renderPhone && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Phone style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Puhelinnumero: </span>{renderPhone}</span></div>}
+        {renderEmail && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Mail style={iconStyleChoice as any} /></span>} <span className="break-all"><span className="sr-only">Sähköposti: </span>{renderEmail}</span></div>}
+        {renderLocation && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.MapPin style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Sijainti: </span>{renderLocation}</span></div>}
+      </div>
+    );
+  }
 
   // Kuvien asettelulogiikka
   const imagePos = customStyle.imagePosition || "left";
@@ -381,7 +396,7 @@ export default function CvPreview({
       style={{ borderRadius: `${customStyle.borderRadius}px`, backgroundColor: customStyle.mainBg }}
     >
       <div 
-        id="cv-preview" 
+        id={mode === "cv" ? "cv-preview" : "letter-preview"} 
         className="w-full flex flex-col"
         style={{ color: customStyle.mainText, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
       >
@@ -394,7 +409,8 @@ export default function CvPreview({
             )}
             <div className={`relative z-10 flex-1 ${(!image || customStyle.headingAlign === 'center' || isImgCenter) ? 'text-center w-full' : ''}`} style={{ textAlign: isImgCenter ? 'center' : getTextAlign() as any }}>
               <h1 style={{ fontSize: `${customStyle.nameSize}px`, lineHeight: 1.05, fontWeight: 900, letterSpacing: "-0.03em" }}>{name}</h1>
-              {roleLine && <p className="mt-4 text-xl font-bold tracking-widest uppercase" style={{ color: customStyle.accentColor, opacity: 0.9 }}>{roleLine}</p>}
+              {roleLine && mode === "cv" && <p className="mt-4 text-xl font-bold tracking-widest uppercase" style={{ color: customStyle.accentColor, opacity: 0.9 }}>{roleLine}</p>}
+              {mode === "letter" && <p className="mt-4 text-xl font-bold tracking-widest uppercase" style={{ color: customStyle.accentColor, opacity: 0.9 }}>TYÖHAKEMUS</p>}
               <div className="flex flex-wrap gap-6" style={{ justifyContent: isImgCenter ? 'center' : getTextAlign(), marginTop: `${customStyle.contactSpacing !== undefined ? customStyle.contactSpacing : 32}px` }}>
                  <ContactInfo isDarkBg={!isMinimalist && customStyle.headerStyle !== "transparent"} />
               </div>
@@ -415,7 +431,8 @@ export default function CvPreview({
 
                 <div style={{ textAlign: getTextAlign() }}>
                   <h1 style={{ fontSize: `${customStyle.nameSize * 0.75}px`, lineHeight: 1.1, fontWeight: 900, letterSpacing: "-0.02em" }}>{name}</h1>
-                  {roleLine && <p className="mt-4 text-sm font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
+                  {roleLine && mode === "cv" && <p className="mt-4 text-sm font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
+                  {mode === "letter" && <p className="mt-4 text-sm font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>TYÖHAKEMUS</p>}
                 </div>
 
                 <div style={{ marginTop: `${customStyle.contactSpacing !== undefined ? customStyle.contactSpacing : 40}px`, marginBottom: '56px' }}>
@@ -423,45 +440,66 @@ export default function CvPreview({
                   <ContactInfo isDarkBg={true} />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing}px`, marginTop: 'auto' }}>
-                  {sections.filter(s => isTagSection(s.title)).map((section, i) => (
-                    <div key={i}>
-                      {renderHeading(section.title)}
-                      {renderTags(section.items)}
-                    </div>
-                  ))}
-                </div>
+                {mode === "cv" && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing}px`, marginTop: 'auto' }}>
+                    {sections.filter(s => isTagSection(s.title)).map((section, i) => (
+                      <div key={i}>
+                        {renderHeading(section.title)}
+                        {renderTags(section.items)}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </aside>
           )}
 
-          {/* PÄÄALUE */}
+          {/* PÄÄALUE: CV TAI HAKEMUSKIRJE */}
           <main className={`relative z-10 flex-1`} style={{ padding: `${padding}px` }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing}px`, fontSize: `${customStyle.bodySize}px`, lineHeight: customStyle.lineHeight }}>
               
-              {sections.filter(s => (isTopHeader || isMinimalist) ? true : !isTagSection(s.title)).map((section, index) => (
-                <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}>
-                  
-                  {renderHeading(section.title)}
-                  
-                  {/* Valinnainen erotinviiva otsikon alle */}
-                  {customStyle.showSeparators && (
-                    <div className={`h-[3px] mb-8 rounded-full`} style={{ backgroundColor: customStyle.accentColor, width: '50px', opacity: 0.6, marginLeft: customStyle.headingAlign === 'center' ? 'auto' : (customStyle.headingAlign === 'right' ? 'auto' : '0'), marginRight: customStyle.headingAlign === 'center' ? 'auto' : '0' }} aria-hidden="true" />
-                  )}
-                  
-                  {isProfileSection(section.title) ? (
-                    renderProfileHook(section.items)
-                  ) : isTimelineSection(section.title) ? (
-                    renderTimeline(section.items)
-                  ) : isTagSection(section.title) ? (
-                    renderTags(section.items)
-                  ) : (
-                    <div className="opacity-80" style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: getTextAlign() }}>
-                      {section.items.map((line, j) => <p key={j}>{line}</p>)}
-                    </div>
-                  )}
-                </section>
-              ))}
+              {mode === "cv" ? (
+                sections.filter(s => (isTopHeader || isMinimalist) ? true : !isTagSection(s.title)).map((section, index) => (
+                  <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}>
+                    
+                    {renderHeading(section.title)}
+                    
+                    {customStyle.showSeparators && (
+                      <div className={`h-[3px] mb-8 rounded-full`} style={{ backgroundColor: customStyle.accentColor, width: '50px', opacity: 0.6, marginLeft: customStyle.headingAlign === 'center' ? 'auto' : (customStyle.headingAlign === 'right' ? 'auto' : '0'), marginRight: customStyle.headingAlign === 'center' ? 'auto' : '0' }} aria-hidden="true" />
+                    )}
+                    
+                    {isProfileSection(section.title) ? (
+                      renderProfileHook(section.items)
+                    ) : isTimelineSection(section.title) ? (
+                      renderTimeline(section.items)
+                    ) : isTagSection(section.title) ? (
+                      renderTags(section.items)
+                    ) : (
+                      <div className="opacity-80" style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: getTextAlign() }}>
+                        {section.items.map((line, j) => <p key={j}>{line}</p>)}
+                      </div>
+                    )}
+                  </section>
+                ))
+              ) : (
+                // HAKEMUSKIRJEEN RENDERÖINTI
+                <div className="opacity-90" style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: getTextAlign(), fontSize: `${customStyle.bodySize + 1}px` }}>
+                  {contentLines.map((paragraph, idx) => {
+                    // Poistetaan tuplarivinvaihdot renderöinnistä
+                    if (!paragraph.trim()) return null;
+                    return (
+                      <p key={idx} className="leading-relaxed">
+                        {paragraph}
+                      </p>
+                    );
+                  })}
+                  {/* Allekirjoitus */}
+                  <div className="mt-12 pt-8" style={{ borderTop: `2px solid ${customStyle.accentColor}30` }}>
+                    <p className="font-bold" style={{ color: customStyle.accentColor }}>Ystävällisin terveisin,</p>
+                    <p className="mt-2 text-xl font-black">{name}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </main>
 
