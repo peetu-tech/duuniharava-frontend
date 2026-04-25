@@ -14,20 +14,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Käyttäjä-ID puuttuu" }, { status: 400 });
     }
 
+    // Varmistetaan, että saamme varmasti kiinni oikean nettiosoitteen
+    const origin = req.headers.get("origin") || "https://duuniharava-frontend.vercel.app";
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       customer_email: userEmail || undefined,
       client_reference_id: userId, // YHDISTÄÄ MAKSUN SUPABASE-KÄYTTÄJÄÄN!
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID,
+          // Lisätty !, jotta TypeScript ei valita mahdollisesta undefined-arvosta
+          price: process.env.STRIPE_PRICE_ID!, 
           quantity: 1,
         },
       ],
       mode: "subscription",
       // Stripe ohjaa takaisin näihin osoitteisiin maksun jälkeen
-      success_url: `${req.headers.get("origin")}?payment=success`,
-      cancel_url: `${req.headers.get("origin")}?payment=cancelled`,
+      success_url: `${origin}?payment=success`,
+      cancel_url: `${origin}?payment=cancelled`,
     });
 
     return NextResponse.json({ url: session.url });
