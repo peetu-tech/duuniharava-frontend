@@ -3925,4 +3925,23 @@ export default function Home() {
                     value={sparringMessage} 
                     onChange={e => setSparringMessage(e.target.value)} 
                     placeholder="Kirjoita vastauksesi tähän..." 
-                    className={`flex-1 rounded-2xl border px-6 py-4 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-
+                    className={`flex-1 rounded-2xl border px-6 py-4 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-colors ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`} 
+                    disabled={isSparringTyping}
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={!sparringMessage.trim() || isSparringTyping} 
+                    className="bg-[#00BFA6] text-black font-black px-8 rounded-2xl disabled:opacity-50 hover:scale-[1.05] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                  >
+                    LÄHETÄ
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </main>
+    </div>
+  );
+}
