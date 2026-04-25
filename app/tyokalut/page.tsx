@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSession, clearSession } from "../../lib/supabaseAuth";
 
-type ToolTab = "hidden-jobs" | "calling-script" | "salary-negotiation";
+type ToolTab = "hidden-jobs" | "calling-script" | "salary-negotiation" | "linkedin-magnet" | "career-pivot";
 
 export default function ExtraToolsPage() {
   const router = useRouter();
@@ -12,21 +12,34 @@ export default function ExtraToolsPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [activeTab, setActiveTab] = useState<ToolTab>("hidden-jobs");
 
-  // Tilamuuttujat työkaluille
-  const [companyName, setCompanyName] = useState("");
+  // Tilamuuttujat: Piilotyöpaikat
+  const [targetIndustry, setTargetIndustry] = useState("");
   const [userCoreSkill, setUserCoreSkill] = useState("");
   const [hiddenJobResult, setHiddenJobResult] = useState("");
   const [isLoadingHidden, setIsLoadingHidden] = useState(false);
 
-  const [callTarget, setCallTarget] = useState("");
-  const [callGoal, setCallGoal] = useState("");
+  // Tilamuuttujat: Soittokäsikirjoitus
+  const [callCompany, setCallCompany] = useState("");
+  const [callRole, setCallRole] = useState("");
   const [callScriptResult, setCallScriptResult] = useState("");
   const [isLoadingCall, setIsLoadingCall] = useState(false);
 
+  // Tilamuuttujat: Palkkaneuvottelu
   const [offeredSalary, setOfferedSalary] = useState("");
   const [targetSalary, setTargetSalary] = useState("");
   const [salaryResult, setSalaryResult] = useState("");
   const [isLoadingSalary, setIsLoadingSalary] = useState(false);
+
+  // Tilamuuttujat: LinkedIn-Magneetti
+  const [linkedInRole, setLinkedInRole] = useState("");
+  const [linkedInResult, setLinkedInResult] = useState({ about: "", post: "" });
+  const [isLoadingLinkedIn, setIsLoadingLinkedIn] = useState(false);
+
+  // Tilamuuttujat: Uravaihtajan Kompassi
+  const [oldJob, setOldJob] = useState("");
+  const [newJob, setNewJob] = useState("");
+  const [pivotResult, setPivotResult] = useState("");
+  const [isLoadingPivot, setIsLoadingPivot] = useState(false);
 
   const [message, setMessage] = useState("");
 
@@ -46,24 +59,25 @@ export default function ExtraToolsPage() {
   };
 
   // --- SIMULOIDUT API-KUTSUT ---
+
   const generateHiddenJobApp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!companyName || !userCoreSkill) return;
+    if (!targetIndustry || !userCoreSkill) return;
     setIsLoadingHidden(true);
     
     setTimeout(() => {
-      setHiddenJobResult(`Hei [Toimitusjohtajan/Rekrytoijan Nimi],\n\nSeuraan ${companyName}n tekemistä mielenkiinnolla. Huomasin, että teillä ei ole tällä hetkellä avoimia hakuja päällä, mutta uskon vakaasti, että tiiminne voisi hyötyä osaamisestani.\n\nYdinosaamistani on ${userCoreSkill}. Olen huomannut, että monilla alan yrityksillä on juuri nyt haasteita [Keksi alan haaste], ja tiedän pystyväni tuomaan tähän ratkaisun heti ensimmäisestä päivästä alkaen.\n\nOlisiko teillä 10 minuuttia aikaa lyhyelle Teams-puhelulle ensi viikon tiistaina tai torstaina? Haluaisin kertoa, miten voisin auttaa ${companyName}a säästämään aikaa ja kasvattamaan tulosta.\n\nYstävällisin terveisin,\n[Nimesi]\n[Puhelinnumero]\n[LinkedIn-profiili]`);
+      setHiddenJobResult(`Hei [Nimi],\n\nOlen seurannut ${targetIndustry}-alan kehitystä ja yrityksenne kasvua suurella mielenkiinnolla. Tiedän, että julkiset rekrytointiprosessit ovat usein hitaita ja raskaita, joten päätin lähestyä suoraan.\n\nErikoisosaamiseni on ${userCoreSkill}. Tekoälymme analyysin mukaan monilla alan toimijoilla on juuri nyt pullonkauloja tehokkuudessa, ja pystyn tuomaan tähän välittömän ratkaisun.\n\nOlisitteko avoimia lyhyelle 10 minuutin esittäytymiselle ensi viikolla? Haluaisin kertoa, miten voisin vapauttaa tiiminne aikaa ja tuottaa teille mitattavaa arvoa jo ensimmäisen kuukauden aikana.\n\nYstävällisin terveisin,\n[Nimesi]\n[Puhelinnumero]`);
       setIsLoadingHidden(false);
     }, 1800);
   };
 
   const generateCallScript = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!callTarget || !callGoal) return;
+    if (!callCompany || !callRole) return;
     setIsLoadingCall(true);
 
     setTimeout(() => {
-      setCallScriptResult(`(Hengitä syvään, hymyile ja soita)\n\n"Hei ${callTarget}, täällä on [Nimesi]. Häiritsenkö pahasti?"\n\n(Jos ei häiritse, jatka:)\n"Hienoa. Soitan siksi, että huomasin teidän hakevan [Rooli] ja laitoinkin jo hakemukseni tulemaan. Minulla on vahva tausta ${callGoal}, ja halusin vain lyhyesti varmistaa, oletteko jo ehtineet käydä hakemuksia läpi?"\n\n(Anna heidän vastata)\n\n"Ymmärrän täysin. Halusin soittaa, koska olen erittäin motivoitunut tästä tehtävästä. Mikä on teidän mielestänne se kaikkein tärkein ominaisuus, jota tähän rooliin etsitte?"\n\n(Kuuntele tarkasti ja vastaa siihen peilaten omaa osaamistasi)`);
+      setCallScriptResult(`📱 SOITON VAIHEET:\n\n1. JÄÄNMURTAJA (Hengitä ja hymyile)\n"Hei! Täällä on [Nimesi]. Huomasin, että haette ${callRole}a sinne ${callCompany}lle. Häiritsenkö pahasti, vai onko pari minuuttia aikaa?"\n\n2. KOUKKU (Arvon tuottaminen)\n"Hienoa! Laitoin juuri hakemukseni tulemaan. Koska tekoäly on hoitanut taustatyöni, pystyin perehtymään yritykseenne todella tarkasti. Halusin soittaa ja kysyä suoraan: Mikä on tällä hetkellä tiiminne suurin haaste, johon uuden ${callRole}n pitäisi tarttua ensimmäisenä?"\n\n3. VASTAUS (Kuuntele ja peilaa)\n[Kuuntele rekrytoijan vastaus huolellisesti. Kun hän lopettaa, vastaa näin:]\n"Tuo kuulostaa täysin loogiselta. Olen itse ratkonut juuri tuota ongelmaa aiemmin käyttämällä [Oma taitosi]. Uskon, että pääsisin teillä todella nopeasti kiinni itse työhön."\n\n4. LOPETUS (Call to action)\n"Kiitos paljon ajastasi! Kuten sanoin, hakemukseni on jo laatikossanne. Odotan innolla, että pääsemme jatkamaan keskustelua haastattelussa."`);
       setIsLoadingCall(false);
     }, 1800);
   };
@@ -74,15 +88,40 @@ export default function ExtraToolsPage() {
     setIsLoadingSalary(true);
 
     setTimeout(() => {
-      setSalaryResult(`Hei, ja kiitos todella paljon tarjouksesta! Olen erittäin innoissani mahdollisuudesta aloittaa tiimissänne.\n\nMitä tulee palkkaan, olin ajatellut tason olevan lähempänä ${targetSalary} euroa, perustuen aiempaan kokemukseeni ja tuomaani lisäarvoon (erityisesti [Lisää tärkein taitosi]).\n\nTarjoamanne ${offeredSalary} € on hyvä alku, mutta olisiko meidän mahdollista tulla hieman vastaan ja lyödä kättä päälle esimerkiksi [Laske tarjouksen ja tavoitteen puoliväli] euron kohdalla? Tällä summalla olisin valmis allekirjoittamaan sopimuksen vaikka heti tänään.\n\nMiltä tämä kuulostaa?`);
+      setSalaryResult(`Hei,\n\nKiitos todella paljon tarjouksestanne! Olen innoissani mahdollisuudesta aloittaa tiimissänne ja auttaa yritystänne saavuttamaan tavoitteensa.\n\nKävin tarjouksen läpi, ja tekoälymme markkina-analyysin sekä tuomani lisäarvon (kuten [Tärkein taitosi]) myötä olin budjetoinut tavoitepalkkani lähemmäs ${targetSalary} euroa.\n\nYmmärrän, että tarjoamanne ${offeredSalary} € perustuu nykyiseen budjettiin, mutta olisiko meidän mahdollista tulla hieman vastaan ja lyödä kättä päälle esimerkiksi [Laske puoliväli] euron kohdalla? Tällä summalla olisin valmis sitoutumaan ja aloittamaan työt täydellä panoksella.\n\nMiltä tämä teistä kuulostaa?\n\nYstävällisin terveisin,\n[Nimesi]`);
       setIsLoadingSalary(false);
     }, 1800);
+  };
+
+  const generateLinkedIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!linkedInRole) return;
+    setIsLoadingLinkedIn(true);
+
+    setTimeout(() => {
+      setLinkedInResult({
+        about: `Tekoäly suosittelee 'Tietoja'-osioon:\n\n"Olen tuloshakuinen ammattilainen, jonka intohimona on ${linkedInRole} -tehtävät. Yhdistän analyyttisen ajattelun ja ihmisläheisen otteen luodakseni mitattavaa arvoa. Kun en ole ratkomassa alan haasteita, koulutan itseäni jatkuvasti uusien teknologioiden parissa. Etsin tällä hetkellä uusia haasteita – verkostoidutaan!"`,
+        post: `Tekoäly suosittelee postausta:\n\n"Aika kääntää uusi lehti uralla! 🚀 Olen alkanut kartoittaa uusia mahdollisuuksia ${linkedInRole} -tehtävien parissa. Olen erityisen kiinnostunut yrityksistä, jotka arvostavat innovatiivisuutta ja haluavat aidosti ratkoa asiakkaidensa ongelmia. Jos tiimissänne on paikka tekijälle, joka on valmis käärimään hihat heti ensimmäisenä päivänä, laita viestiä! Verkostoni: saa tykätä ja jakaa, arvostan jokaista nostoa valtavasti! 🙏 #työnhaku #rekry #uusisuunta #${linkedInRole.replace(/\s+/g, '')}"`
+      });
+      setIsLoadingLinkedIn(false);
+    }, 2000);
+  };
+
+  const generatePivotPlan = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!oldJob || !newJob) return;
+    setIsLoadingPivot(true);
+
+    setTimeout(() => {
+      setPivotResult(`Tekoälyn laatima siltasuunnitelma: ${oldJob} ➔ ${newJob}\n\n1. KÄÄNNÄ KOKEMUKSESI KIELELLE, JOTA ${newJob} YMMÄRTÄÄ\nÄlä sano: "Olin ${oldJob}."\nSano: "Olen tottunut hallitsemaan aikatauluja, ratkomaan yllättäviä ongelmia paineen alla ja palvelemaan vaativia sidosryhmiä. Nämä ovat täsmälleen niitä taitoja, joita huipputason ${newJob} tarvitsee."\n\n2. KOROSTA NÄITÄ SIIRRETTÄVIÄ TAITOJA CV:SSÄSI:\n- Ongelmanratkaisukyky ja stressinsietokyky\n- Asiakas- tai sidosryhmäymmärrys\n- Kyky omaksua uutta tietoa nopeasti\n\n3. TOIMENPIDE TÄLLE PÄIVÄLLE:\nLisää LinkedIn-otsikkoosi "Aspiring ${newJob} | [Vahvin taitosi]". Rekrytoijat arvostavat motivaatiota ja kykyä nähdä omien taitojen soveltuvuus uudessa ympäristössä. Duuniharavan tekoäly on jo huomioinut tämän generoidessaan CV:täsi!`);
+      setIsLoadingPivot(false);
+    }, 2500);
   };
 
   if (isAuthChecking) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#0F0F0F] text-white">
-        <p className="text-[#00BFA6] font-black text-2xl animate-pulse uppercase tracking-widest">Ladataan työkaluja...</p>
+        <p className="text-[#00BFA6] font-black text-2xl animate-pulse uppercase tracking-widest">Käynnistetään työkaluja...</p>
       </main>
     );
   }
@@ -101,99 +140,146 @@ export default function ExtraToolsPage() {
         .light-theme .border-white\\/10 { border-color: #E5E7EB !important; }
         .light-theme .border-white\\/5 { border-color: #F3F4F6 !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white font-sans pb-20 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white font-sans pb-24 transition-colors duration-300">
         
+        {/* MOBIILIN PIKANAVIGOINTI */}
+        <nav className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center p-3 pb-safe border-t sm:hidden backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`} aria-label="Mobiilin pikavalikko">
+          <button onClick={() => router.push('/studio')} className={`flex flex-col items-center gap-1 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+            <span className="text-xl" aria-hidden="true">🏠</span> Studio
+          </button>
+          <button className={`flex flex-col items-center gap-1 text-xs font-bold text-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg p-1`}>
+            <span className="text-xl" aria-hidden="true">🛠️</span> Työkalut
+          </button>
+        </nav>
+
         {/* HERO */}
-        <section className="border-b border-white/10 bg-gradient-to-b from-zinc-900/50 to-transparent pt-12 pb-16 px-8">
+        <section className="border-b border-white/10 bg-gradient-to-b from-purple-900/20 to-transparent pt-12 pb-12 sm:pb-16 px-6 sm:px-8">
           <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
             <div>
               <div className="flex items-center gap-4 mb-4">
-                <span className="font-black text-3xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
-                <div className="bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded-full text-[10px] font-bold text-purple-400 uppercase tracking-widest">Työkalupakki</div>
+                <span className="font-black text-2xl sm:text-3xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
+                <div className="bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded-full text-[10px] font-bold text-purple-400 uppercase tracking-widest">Automaatio</div>
               </div>
-              <h1 className="text-4xl sm:text-5xl font-black">Työnhakijan <span className="text-purple-500">Salaiset Aseet</span></h1>
+              <h1 className="text-3xl sm:text-5xl font-black">Anna tekoälyn <span className="text-purple-500">tehdä työt.</span></h1>
+              <p className={`mt-4 text-sm sm:text-lg max-w-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Sinun ei tarvitse etsiä toimitusjohtajien numeroita tai keksiä postauksia tyhjästä. Valitse työkalu, ja me hoidamme loput.
+              </p>
             </div>
             
-            <div className="flex gap-4">
-              <button onClick={() => router.push('/studio')} className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all">
-                ← TAKAISIN STUDIOON
+            <div className="flex gap-4 w-full sm:w-auto">
+              <button onClick={() => router.push('/studio')} className="flex-1 sm:flex-none rounded-2xl border border-white/10 px-6 py-4 sm:py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all text-center">
+                ← STUDIO
               </button>
-              <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all">
+              <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-2xl border border-white/10 px-6 py-4 sm:py-3 text-lg sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center">
                 {theme === 'light' ? '🌙' : '☀️'}
               </button>
             </div>
           </div>
         </section>
 
-        <div className="max-w-5xl mx-auto px-8 mt-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 mt-8 sm:mt-12">
           
-          {/* TABS */}
-          <div className={`flex overflow-x-auto gap-4 border-b pb-6 mb-12 custom-scrollbar ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
+          {/* TABS - Mobiilisti rullaava rivi */}
+          <div className={`flex overflow-x-auto gap-3 sm:gap-4 border-b pb-4 sm:pb-6 mb-8 sm:mb-12 custom-scrollbar snap-x snap-mandatory ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
+            <button 
+              onClick={() => setActiveTab("linkedin-magnet")} 
+              className={`snap-start shrink-0 rounded-2xl px-6 sm:px-8 py-4 sm:py-4 text-sm sm:text-base font-black transition-all ${activeTab === 'linkedin-magnet' ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
+            >
+              🚀 LinkedIn-Magneetti
+            </button>
             <button 
               onClick={() => setActiveTab("hidden-jobs")} 
-              className={`rounded-2xl px-8 py-4 font-black transition-all whitespace-nowrap ${activeTab === 'hidden-jobs' ? 'bg-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
+              className={`snap-start shrink-0 rounded-2xl px-6 sm:px-8 py-4 sm:py-4 text-sm sm:text-base font-black transition-all ${activeTab === 'hidden-jobs' ? 'bg-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
             >
-              🕵️ Piilotyöpaikka-tutka
+              🕵️ Piilotyöpaikat
             </button>
             <button 
               onClick={() => setActiveTab("calling-script")} 
-              className={`rounded-2xl px-8 py-4 font-black transition-all whitespace-nowrap ${activeTab === 'calling-script' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
+              className={`snap-start shrink-0 rounded-2xl px-6 sm:px-8 py-4 sm:py-4 text-sm sm:text-base font-black transition-all ${activeTab === 'calling-script' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
             >
               📞 Soittokäsikirjoitus
             </button>
             <button 
+              onClick={() => setActiveTab("career-pivot")} 
+              className={`snap-start shrink-0 rounded-2xl px-6 sm:px-8 py-4 sm:py-4 text-sm sm:text-base font-black transition-all ${activeTab === 'career-pivot' ? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
+            >
+              🧭 Uravaihtajan Kompassi
+            </button>
+            <button 
               onClick={() => setActiveTab("salary-negotiation")} 
-              className={`rounded-2xl px-8 py-4 font-black transition-all whitespace-nowrap ${activeTab === 'salary-negotiation' ? 'bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
+              className={`snap-start shrink-0 rounded-2xl px-6 sm:px-8 py-4 sm:py-4 text-sm sm:text-base font-black transition-all ${activeTab === 'salary-negotiation' ? 'bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]' : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400' : 'border border-gray-200 bg-gray-50 text-gray-600')}`}
             >
               🤝 Palkkaneuvottelija
             </button>
           </div>
 
-          <div className={`rounded-[40px] border p-8 sm:p-12 shadow-2xl backdrop-blur-xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+          <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-2xl backdrop-blur-xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
             
-            {/* PIILOTYÖPAIKAT */}
-            {activeTab === "hidden-jobs" && (
+            {/* LINKEDIN MAGNEETTI */}
+            {activeTab === "linkedin-magnet" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
-                <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Luo vastustamaton avoin hakemus</h2>
-                <p className={`text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Piilotyöpaikat ovat yritysten tarpeita, joita ei ole vielä julkaistu avoimeksi hauksi. Ole askeleen edellä.</p>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Tee profiilistasi magneetti</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Älä hae töitä, vaan anna rekrytoijien löytää sinut. Tekoäly kirjoittaa sinulle asiantuntijatason esittelyn ja postauksen sekunneissa.</p>
                 
-                {/* VINKKIBOKSI */}
-                <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-purple-500/5 border-purple-500/20' : 'bg-purple-50 border-purple-200'}`}>
-                  <h3 className={`text-xl font-bold mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
-                    <span>💡</span> Mitä ovat piilotyöpaikat ja miten niitä haetaan?
-                  </h3>
-                  <p className={`leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Jopa <strong>70–80 % avoimista työpaikoista</strong> ei koskaan päädy julkisiin hakuportaaleihin. Yritykset palkkaavat suositusten, verkostojen tai suorien yhteydenottojen kautta välttääkseen raskaat rekrytointiprosessit. Kun lähetät hyvän avoimen hakemuksen, <strong>et kilpaile satojen muiden kanssa</strong>. <br/><br/>
-                    <strong>Näin onnistut:</strong> Etsi yritys, jonka toiminnasta pidät. Selvitä LinkedInistä kuka vetää sinun alaasi (esim. Myyntijohtaja tai CTO) ja lähesty häntä suoraan. Älä pelkästään "kysy töitä", vaan tarjoa heille <em>ratkaisu johonkin heidän ongelmaansa</em>.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  <form onSubmit={generateHiddenJobApp} className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
+                  <form onSubmit={generateLinkedIn} className="space-y-6">
                     <div>
-                      <label className={LabelClass}>Yrityksen nimi</label>
-                      <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Esim. Supercell" className={InputClass} required />
+                      <label className={LabelClass}>Mitä työtä haluat tehdä?</label>
+                      <input value={linkedInRole} onChange={e => setLinkedInRole(e.target.value)} placeholder="Esim. Graafinen suunnittelija tai Myyjä" className={InputClass} required />
                     </div>
-                    <div>
-                      <label className={LabelClass}>Mikä on vahvin taitosi?</label>
-                      <textarea value={userCoreSkill} onChange={e => setUserCoreSkill(e.target.value)} placeholder="Esim. B2B-myynti ja prosessien automatisointi..." className={`${InputClass} min-h-[140px]`} required />
-                    </div>
-                    <button type="submit" disabled={isLoadingHidden} className="w-full bg-purple-500 text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(168,85,247,0.3)]">
-                      {isLoadingHidden ? "Kirjoitetaan..." : "LUO AVOIN HAKEMUS"}
+                    <button type="submit" disabled={isLoadingLinkedIn} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(37,99,235,0.3)]">
+                      {isLoadingLinkedIn ? "Tekoäly generoi..." : "LUO LINKEDIN-SISÄLLÖT"}
                     </button>
                   </form>
 
-                  <div className={`p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                    <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>Generoidun viestin luonnos</p>
+                  <div className="space-y-6">
+                    <div className={`p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                      <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>1. "About" -teksti profiiliin</p>
+                      <textarea readOnly value={linkedInResult.about || "Täytä tiedot ja paina nappia, niin teksti ilmestyy tähän."} className={`w-full min-h-[150px] bg-transparent outline-none resize-none leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
+                      {linkedInResult.about && <button onClick={() => copyToClipboard(linkedInResult.about)} className="mt-2 text-sm font-bold text-blue-500 hover:underline">Kopioi teksti</button>}
+                    </div>
+                    <div className={`p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                      <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>2. Valmis postaus uutisvirtaan</p>
+                      <textarea readOnly value={linkedInResult.post || "Täytä tiedot ja paina nappia, niin teksti ilmestyy tähän."} className={`w-full min-h-[150px] bg-transparent outline-none resize-none leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
+                      {linkedInResult.post && <button onClick={() => copyToClipboard(linkedInResult.post)} className="mt-2 text-sm font-bold text-blue-500 hover:underline">Kopioi postaus</button>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PIILOTYÖPAIKAT */}
+            {activeTab === "hidden-jobs" && (
+              <div className="animate-in fade-in slide-in-from-bottom-4">
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Piilotyöpaikan Kartoittaja</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Yli 70% paikoista ei tule koskaan julkiseen hakuun. Anna tekoälyn laatia viesti, jolla avaat oven suoraan päättäjän luo.</p>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
+                  <form onSubmit={generateHiddenJobApp} className="space-y-6">
+                    <div>
+                      <label className={LabelClass}>Kohdetoimiala tai yritys</label>
+                      <input value={targetIndustry} onChange={e => setTargetIndustry(e.target.value)} placeholder="Esim. Ohjelmistoala tai Wolt" className={InputClass} required />
+                    </div>
+                    <div>
+                      <label className={LabelClass}>Mikä on se yksi ongelma, jonka osaat ratkaista?</label>
+                      <textarea value={userCoreSkill} onChange={e => setUserCoreSkill(e.target.value)} placeholder="Esim. Osaan nopeuttaa asiakaspalvelua automaatiolla..." className={`${InputClass} min-h-[120px]`} required />
+                    </div>
+                    <button type="submit" disabled={isLoadingHidden} className="w-full bg-purple-500 text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(168,85,247,0.3)]">
+                      {isLoadingHidden ? "Luodaan viestiä..." : "LUO LÄHESTYMISVIESTI"}
+                    </button>
+                  </form>
+
+                  <div className={`p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                    <p className={`text-xs font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>Valmis viesti kopioitavaksi</p>
                     {hiddenJobResult ? (
                       <div className="space-y-4">
-                        <textarea readOnly value={hiddenJobResult} className={`w-full min-h-[300px] bg-transparent outline-none resize-none leading-relaxed ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
+                        <textarea readOnly value={hiddenJobResult} className={`w-full min-h-[300px] bg-transparent outline-none resize-none leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
                         <button onClick={() => copyToClipboard(hiddenJobResult)} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-colors">
-                          KOPIOI TEKSTI
+                          KOPIOI TEKSTI LEIKEPÖYDÄLLE
                         </button>
                       </div>
                     ) : (
-                      <p className={`text-center py-20 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Täytä tiedot ja paina nappia.</p>
+                      <p className={`text-center py-20 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Tekoäly luonnostelee viestin tähän.</p>
                     )}
                   </div>
                 </div>
@@ -203,46 +289,71 @@ export default function ExtraToolsPage() {
             {/* SOITTOKÄSIKIRJOITUS */}
             {activeTab === "calling-script" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
-                <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Erotu massasta soittamalla</h2>
-                <p className={`text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Jännittääkö soittaa rekrytoijalle? Tekoäly rakentaa sinulle luonnollisen hissipuheen, jonka voit lukea suoraan paperista.</p>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Puhelun Teleprompteri</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Jännittääkö soittaa? Et ole yksin. Tämä työkalu tekee sinulle askel-askeleelta etenevän käsikirjoituksen, jonka voit lukea suoraan puhelun aikana.</p>
                 
-                {/* VINKKIBOKSI */}
-                <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-indigo-500/5 border-indigo-500/20' : 'bg-indigo-50 border-indigo-200'}`}>
-                  <h3 className={`text-xl font-bold mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-700'}`}>
-                    <span>💡</span> Miksi rekrytoijalle soittaminen kannattaa?
-                  </h3>
-                  <p className={`leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Soittaminen on nopein tapa erottua paperipinosta ja muuttua kasvottomasta hakijasta aidoksi ihmiseksi. Hyvä puhelu jättää rekrytoijalle positiivisen muistijäljen, ja usein he kaivavat hakemuksesi esiin heti puhelun jälkeen.<br/><br/>
-                    <strong>Muista tämä:</strong> Älä soita vain kysyäksesi "tuliko hakemus perille" tai "mitä prosessissa tapahtuu seuraavaksi". Soita silloin, kun sinulla on <em>aito, fiksusti mietitty kysymys</em> itse työtehtävästä. Tämä osoittaa, että olet todella perehtynyt rooliin. Hymyile puhelun aikana – se nimittäin kuuluu äänestä!
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
                   <form onSubmit={generateCallScript} className="space-y-6">
                     <div>
-                      <label className={LabelClass}>Kenelle soitat?</label>
-                      <input value={callTarget} onChange={e => setCallTarget(e.target.value)} placeholder="Esim. Matti (HR-päällikkö)" className={InputClass} required />
+                      <label className={LabelClass}>Kohdeyritys</label>
+                      <input value={callCompany} onChange={e => setCallCompany(e.target.value)} placeholder="Esim. Kone Keskus Oy" className={InputClass} required />
                     </div>
                     <div>
-                      <label className={LabelClass}>Mikä on soiton kulma/tavoite?</label>
-                      <textarea value={callGoal} onChange={e => setCallGoal(e.target.value)} placeholder="Esim. Haluan kysyä, painottavatko he enemmän koodausta vai asiakaspalvelua..." className={`${InputClass} min-h-[140px]`} required />
+                      <label className={LabelClass}>Mihin rooliin haet?</label>
+                      <input value={callRole} onChange={e => setCallRole(e.target.value)} placeholder="Esim. Projektipäällikkö" className={InputClass} required />
                     </div>
                     <button type="submit" disabled={isLoadingCall} className="w-full bg-indigo-500 text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(99,102,241,0.3)]">
-                      {isLoadingCall ? "Laaditaan skriptiä..." : "TEE SOITTOKÄSIKIRJOITUS"}
+                      {isLoadingCall ? "Laaditaan skriptiä..." : "LUO KÄSIKIRJOITUS"}
                     </button>
                   </form>
 
-                  <div className={`p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                    <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`}>Käsikirjoitus puheluun</p>
+                  <div className={`relative p-6 sm:p-8 rounded-[32px] border-4 ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-gray-100 border-gray-300'}`}>
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-1.5 rounded-full bg-gray-500/50"></div>
+                    <p className={`text-xs font-bold uppercase text-center tracking-widest mt-2 mb-6 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`}>Puhelimen näkymä</p>
                     {callScriptResult ? (
                       <div className="space-y-4">
-                        <textarea readOnly value={callScriptResult} className={`w-full min-h-[300px] bg-transparent outline-none resize-none leading-relaxed text-lg ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
-                        <button onClick={() => copyToClipboard(callScriptResult)} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-colors">
-                          KOPIOI TEKSTI
+                        <textarea readOnly value={callScriptResult} className={`w-full min-h-[350px] bg-transparent outline-none resize-none leading-relaxed text-base sm:text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`} />
+                      </div>
+                    ) : (
+                      <p className={`text-center py-20 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Käsikirjoitus ilmestyy tähän puhelimen näytölle luettavaksi.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* URAVAIHTAJAN KOMPASSI */}
+            {activeTab === "career-pivot" && (
+              <div className="animate-in fade-in slide-in-from-bottom-4">
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Uravaihtajan Kompassi</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Haluatko vaihtaa alaa, mutta tuntuu että aloitat nollasta? Tekoäly etsii vanhasta kokemuksestasi piilevät taidot ja kääntää ne uuden alan vaatimalle kielelle.</p>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
+                  <form onSubmit={generatePivotPlan} className="space-y-6">
+                    <div>
+                      <label className={LabelClass}>Nykyinen / Vanha ammattisi</label>
+                      <input value={oldJob} onChange={e => setOldJob(e.target.value)} placeholder="Esim. Sairaanhoitaja" className={InputClass} required />
+                    </div>
+                    <div>
+                      <label className={LabelClass}>Mihin työhön haluat siirtyä?</label>
+                      <input value={newJob} onChange={e => setNewJob(e.target.value)} placeholder="Esim. Asiakaspalvelupäällikkö tai Koodari" className={InputClass} required />
+                    </div>
+                    <button type="submit" disabled={isLoadingPivot} className="w-full bg-emerald-500 text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(16,185,129,0.3)]">
+                      {isLoadingPivot ? "Analysoidaan taitoja..." : "NÄYTÄ REITTI UUDELLE ALALLE"}
+                    </button>
+                  </form>
+
+                  <div className={`p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                    <p className={`text-xs font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>Toimintasuunnitelma</p>
+                    {pivotResult ? (
+                      <div className="space-y-4">
+                        <textarea readOnly value={pivotResult} className={`w-full min-h-[300px] bg-transparent outline-none resize-none leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
+                        <button onClick={() => copyToClipboard(pivotResult)} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-colors">
+                          KOPIOI SUUNNITELMA
                         </button>
                       </div>
                     ) : (
-                      <p className={`text-center py-20 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Täytä tiedot ja paina nappia.</p>
+                      <p className={`text-center py-20 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Tekoäly rakentaa reitin tähän.</p>
                     )}
                   </div>
                 </div>
@@ -252,21 +363,10 @@ export default function ExtraToolsPage() {
             {/* PALKKANEUVOTTELIJA */}
             {activeTab === "salary-negotiation" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
-                <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Älä jätä rahaa pöydälle</h2>
-                <p className={`text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Saitko tarjouksen, mutta palkka on liian pieni? Tekoäly muotoilee asiallisen mutta jämäkän vastatarjouksen.</p>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Asiantuntijan Palkkaneuvottelija</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Työnantajat odottavat sinun neuvottelevan. Anna tekoälyn muotoilla täydellisen asiallinen, mutta jämäkkä vastatarjous.</p>
                 
-                {/* VINKKIBOKSI */}
-                <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-200'}`}>
-                  <h3 className={`text-xl font-bold mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`}>
-                    <span>💡</span> Palkkaneuvottelun kultaiset säännöt
-                  </h3>
-                  <p className={`leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Palkasta neuvotteleminen ei ole ahneutta, se on odotettua ammattimaisuutta. Työnantajat jättävät usein ensimmäiseen tarjoukseensa tarkoituksella hieman neuvotteluvaraa. Jos hyväksyt ensimmäisen tarjouksen suoraan, saatat jättää tuhansia euroja pöydälle vuositasolla.<br/><br/>
-                    <strong>Näin onnistut:</strong> Älä koskaan perustele palkkapyyntöäsi omilla elinkustannuksillasi tai asuntolainallasi. Perustele se <em>markkinatasolla ja sillä suoralla arvolla, jonka tuot yritykselle</em>. Aseta vastatarjouksesi hieman todellista tavoitettasi korkeammalle, jotta teillä on tilaa kohdata sujuvasti puolivälissä.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
                   <form onSubmit={generateSalaryCounter} className="space-y-6">
                     <div>
                       <label className={LabelClass}>Mitä he tarjosivat? (€/kk)</label>
@@ -276,22 +376,22 @@ export default function ExtraToolsPage() {
                       <label className={LabelClass}>Mikä on oma tavoitteesi? (€/kk)</label>
                       <input type="number" value={targetSalary} onChange={e => setTargetSalary(e.target.value)} placeholder="Esim. 3200" className={InputClass} required />
                     </div>
-                    <button type="submit" disabled={isLoadingSalary} className="w-full bg-blue-500 text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(59,130,246,0.3)]">
-                      {isLoadingSalary ? "Lasketaan..." : "LAADI VASTATARJOUS"}
+                    <button type="submit" disabled={isLoadingSalary} className="w-full bg-[#00BFA6] text-black font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(0,191,166,0.3)]">
+                      {isLoadingSalary ? "Lasketaan vastatarjousta..." : "LAADI VASTATARJOUS"}
                     </button>
                   </form>
 
-                  <div className={`p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                    <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>Ehdotus sähköpostiksi</p>
+                  <div className={`p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/50 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                    <p className={`text-xs font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-[#00BFA6]' : 'text-teal-700'}`}>Valmis vastaus sähköpostiin</p>
                     {salaryResult ? (
                       <div className="space-y-4">
-                        <textarea readOnly value={salaryResult} className={`w-full min-h-[300px] bg-transparent outline-none resize-none leading-relaxed ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
+                        <textarea readOnly value={salaryResult} className={`w-full min-h-[300px] bg-transparent outline-none resize-none leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`} />
                         <button onClick={() => copyToClipboard(salaryResult)} className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-colors">
                           KOPIOI TEKSTI
                         </button>
                       </div>
                     ) : (
-                      <p className={`text-center py-20 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Täytä tiedot ja paina nappia.</p>
+                      <p className={`text-center py-20 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>Syötä luvut, niin teemme tarjouksen.</p>
                     )}
                   </div>
                 </div>
@@ -303,7 +403,7 @@ export default function ExtraToolsPage() {
 
         {/* TOAST MESSAGE */}
         {message && (
-          <div className="fixed bottom-8 right-8 z-50 rounded-[28px] border-2 border-green-500 bg-green-500/95 p-6 text-lg font-black text-black shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-5">
+          <div className="fixed bottom-24 sm:bottom-8 right-4 sm:right-8 z-50 rounded-[28px] border-2 border-green-500 bg-green-500/95 p-5 sm:p-6 text-base sm:text-lg font-black text-black shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-5">
             {message}
           </div>
         )}
