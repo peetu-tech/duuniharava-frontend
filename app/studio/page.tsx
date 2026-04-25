@@ -107,7 +107,6 @@ const emptyForm = {
   languages: "",
   skills: "",
   cards: "",
-  hobbies: "",
   projects: "",
 };
 
@@ -489,20 +488,6 @@ function SectionShell({
   );
 }
 
-function StatCard({ title, value, description, theme }: { title: string; value: string; description: string; theme: "light" | "dark"; }) {
-  return (
-    <div className={`rounded-[30px] border p-8 sm:p-10 shadow-xl transition-all duration-300 hover:-translate-y-2 w-full flex flex-col justify-center ${theme === 'dark' ? 'border-white/10 bg-[#141414] hover:border-[#00BFA6]/50' : 'border-gray-200 bg-white hover:border-[#00BFA6]/50'}`}>
-      <p className={`text-[12px] font-bold uppercase tracking-[0.24em] transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-        {title}
-      </p>
-      <p className={`mt-4 text-5xl font-black tracking-tight transition-colors ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-        {value}
-      </p>
-      <p className={`mt-3 text-sm leading-relaxed transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{description}</p>
-    </div>
-  );
-}
-
 function InputClass(theme: "light" | "dark") {
   return `w-full rounded-2xl border px-6 py-5 text-base outline-none transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] min-h-[60px] ${
     theme === "dark"
@@ -672,42 +657,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             : `Deadline ${daysLeft} päivän päästä`}
         </div>
       )}
-
-      <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className={`rounded-3xl border p-6 ${theme === 'dark' ? 'border-white/10 bg-black/40' : 'border-gray-100 bg-gray-50'}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-[0.15em] mb-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-            Yritys
-          </p>
-          <p className={`text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            {job.company || "-"}
-          </p>
-        </div>
-
-        <div className={`rounded-3xl border p-6 ${theme === 'dark' ? 'border-white/10 bg-black/40' : 'border-gray-100 bg-gray-50'}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-[0.15em] mb-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-            Sijainti
-          </p>
-          <p className={`text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            {job.location || "-"}
-          </p>
-        </div>
-
-        <div className={`rounded-3xl border p-6 ${theme === 'dark' ? 'border-white/10 bg-black/40' : 'border-gray-100 bg-gray-50'}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-[0.15em] mb-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-            Hakemukset
-          </p>
-          <p className="text-xl font-black text-[#00BFA6]">
-            {applicationsCount}
-          </p>
-        </div>
-
-        <div className={`rounded-3xl border p-6 ${theme === 'dark' ? 'border-white/10 bg-black/40' : 'border-gray-100 bg-gray-50'}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-[0.15em] mb-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-            CV-versiot
-          </p>
-          <p className="text-xl font-black text-[#FF6F3C]">{cvsCount}</p>
-        </div>
-      </div>
 
       <div className={`mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 pt-8 border-t ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
         <div>
@@ -883,7 +832,7 @@ export default function Home() {
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
-  // UUDET MODAALIT TILAT
+  // MODAALIT
   const [sparringJob, setSparringJob] = useState<JobItem | null>(null);
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
@@ -894,7 +843,6 @@ export default function Home() {
   const [showSkillTranslator, setShowSkillTranslator] = useState(false);
   const [emailTemplateModal, setEmailTemplateModal] = useState<{type: string, content: string} | null>(null);
   
-  // ATS Scanner & Kysymysennakoija
   const [atsJob, setAtsJob] = useState<JobItem | null>(null);
   const [atsResult, setAtsResult] = useState<{match: number, missing: string[], found: string[]} | null>(null);
   const [isAtsScanning, setIsAtsScanning] = useState(false);
@@ -910,12 +858,6 @@ export default function Home() {
   const chatEndRef = useRef<HTMLDivElement | null>(null); 
 
   const customStyle = customStyles[cvStyle];
-
-  const profileCompletion = useMemo(() => {
-    const fields = [form.name, form.phone, form.email, form.location, form.targetJob, form.education, form.experience, form.languages, form.skills, form.projects];
-    const filled = fields.filter(f => f && f.trim().length > 0).length;
-    return Math.round((filled / fields.length) * 100);
-  }, [form]);
 
   useEffect(() => {
     const session = getSession();
@@ -954,7 +896,6 @@ export default function Home() {
             languages: p.languages || "",
             skills: p.skills || "",
             cards: p.cards || "",
-            hobbies: p.hobbies || "",
             projects: p.projects || "",
           }));
           if (p.profile_image_url) setProfileImage(p.profile_image_url);
@@ -1043,7 +984,6 @@ export default function Home() {
             languages: form.languages,
             skills: form.skills,
             cards: form.cards,
-            hobbies: form.hobbies,
             projects: form.projects,
             profile_image_url: profileImage
           })
@@ -1277,7 +1217,6 @@ export default function Home() {
       languages: "Suomi (äidinkieli), Englanti (erinomainen), Ruotsi (perusteet)",
       skills: "B2B-myynti, Neuvottelutaidot, CRM-järjestelmät, Tiimityöskentely, Ongelmanratkaisu",
       cards: "B-ajokortti, Ensiapu 1",
-      hobbies: "Padel, lukeminen, sijoittaminen",
       projects: "Yrityksen X Verkkosivutupäivitys | 2020\n- Johdin tiimiä, joka uudisti koko verkkopalvelun ja kasvatti liidimäärää 40%.\n\nOma verkkokauppa (Sivuprojekti) | 2019-2021\n- Perustin ja pyöritin menestyksekästä verkkokauppaa, jossa vastasin koko prosessista hankinnasta asiakaspalveluun.",
     });
 
@@ -1326,7 +1265,6 @@ export default function Home() {
         experience: shorten(prev.experience),
         skills: shorten(prev.skills),
         cards: shorten(prev.cards),
-        hobbies: shorten(prev.hobbies),
       }));
       setMessage("Kenttiä tiivistetty.");
     }
@@ -1981,7 +1919,7 @@ export default function Home() {
     setIsTranslating(true);
     setErrorMessage("");
     
-    // Tämä on fallback siihen asti että sinulla on /api/skill-translator reitti valmiina
+    // Tämä on fallback (toimii toistaiseksi ilman oikeaa API-routea)
     setTimeout(() => {
       setSkillOutput("Proaktiivinen ongelmanratkaisu, Tiimityö ja fasilitointi, Aikataulutus ja organisointi");
       setIsTranslating(false);
@@ -2158,15 +2096,11 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid gap-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div className="grid gap-16 lg:items-center">
               <div>
                 <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-8">
                   Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
                 </h1>
-
-                <p className="text-xl text-gray-400 max-w-xl leading-relaxed mb-12">
-                  Luo upea CV, löydä avoimet työpaikat ja anna tekoälyn kirjoittaa hakemukset puolestasi. Kaikki yhdessä näkymässä.
-                </p>
 
                 <div className="flex flex-col sm:flex-row gap-5">
                   <button
@@ -2186,48 +2120,6 @@ export default function Home() {
                   >
                     Täytä esimerkki
                   </button>
-                </div>
-              </div>
-
-              {/* MOBIILIN PIKATILASTOT */}
-              <div className={`flex lg:hidden justify-between items-center rounded-3xl p-5 border shadow-sm ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`} aria-label="Työnhaun tilastot">
-                <div className="text-center">
-                  <p className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{jobs.length}</p>
-                  <p className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Työpaikat</p>
-                </div>
-                <div className={`w-px h-8 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`} aria-hidden="true"></div>
-                <div className="text-center">
-                  <p className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>4</p>
-                  <p className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Tyylit</p>
-                </div>
-                <div className={`w-px h-8 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`} aria-hidden="true"></div>
-                <div className="text-center">
-                  <p className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3</p>
-                  <p className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Sävyt</p>
-                </div>
-              </div>
-
-              {/* DESKTOP TILASTOT */}
-              <div className="hidden lg:grid gap-6 w-full" aria-hidden="true">
-                <StatCard
-                  title="TYÖPAIKAT"
-                  value={jobs.length.toString()}
-                  description="Seurannassa olevat paikat"
-                  theme={theme}
-                />
-                <div className="grid grid-cols-2 gap-6">
-                  <StatCard
-                    title="CV-TYYLIT"
-                    value="4"
-                    description="Valmista pohjaa"
-                    theme={theme}
-                  />
-                  <StatCard
-                    title="SÄVYT"
-                    value="3"
-                    description="Hakemuksiin"
-                    theme={theme}
-                  />
                 </div>
               </div>
             </div>
@@ -2321,26 +2213,6 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr]">
             <section className="space-y-4 sm:space-y-12">
-              
-              {/* PELILLISTÄMINEN: Profiilin valmiusaste */}
-              <div className="mb-4">
-                <div className="flex justify-between items-end mb-2">
-                  <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Profiilin valmiusaste</span>
-                  <span className="text-[#00BFA6] font-black text-xl">{profileCompletion}%</span>
-                </div>
-                <div className={`w-full h-3 rounded-full overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'}`}>
-                  <div 
-                    className="h-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] transition-all duration-1000 ease-out"
-                    style={{ width: `${profileCompletion}%` }}
-                  />
-                </div>
-                {profileCompletion < 100 && (
-                  <p className={`text-xs mt-2 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                    Täyttämällä profiilin 100% valmiiksi, tekoäly tuottaa jopa 3x tarkempia hakemuksia.
-                  </p>
-                )}
-              </div>
-
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -2513,27 +2385,15 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
-                    <div>
-                      <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
-                      <textarea
-                        id="input-cards"
-                        placeholder="Työturvallisuuskortti, B-ajokortti..."
-                        value={form.cards}
-                        onChange={(e) => updateField("cards", e.target.value)}
-                        className={TextareaClass("min-h-[120px]", theme)}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="input-hobbies" className={LabelClass(theme)}>Harrastukset</label>
-                      <textarea
-                        id="input-hobbies"
-                        placeholder="Mitä teet vapaa-ajalla?"
-                        value={form.hobbies}
-                        onChange={(e) => updateField("hobbies", e.target.value)}
-                        className={TextareaClass("min-h-[120px]", theme)}
-                      />
-                    </div>
+                  <div className="pt-4">
+                    <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
+                    <textarea
+                      id="input-cards"
+                      placeholder="Työturvallisuuskortti, B-ajokortti..."
+                      value={form.cards}
+                      onChange={(e) => updateField("cards", e.target.value)}
+                      className={TextareaClass("min-h-[120px]", theme)}
+                    />
                   </div>
 
                   <div className="pt-4">
@@ -2655,6 +2515,17 @@ export default function Home() {
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
             <section id="studio-tulokset" className="space-y-10 lg:sticky lg:top-8 lg:self-start scroll-mt-24">
+              
+              {/* OSTATKO PRO-TASON? Nappi näkyy oikean sarakkeen huipulla */}
+              <div className="flex justify-end w-full mb-4">
+                <button 
+                  onClick={handleUpgradeToPro} 
+                  className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black text-sm px-6 py-3 rounded-full hover:scale-105 transition-transform shadow-[0_0_20px_rgba(168,85,247,0.4)] flex items-center gap-2 border border-white/20"
+                >
+                  <span className="text-lg">⭐</span> PÄIVITÄ PRO -TASOLLE
+                </button>
+              </div>
+
               <div className={`rounded-[32px] sm:rounded-[40px] border p-8 sm:p-10 shadow-2xl backdrop-blur-xl transition-all ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
@@ -3159,41 +3030,6 @@ export default function Home() {
 
                 {tab === "job" && (
                   <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 animate-in fade-in duration-500">
-                    <div className="grid grid-cols-2 gap-4 sm:gap-5 sm:grid-cols-4">
-                      <div className={`rounded-[24px] border p-6 text-center hover:-translate-y-1 transition-transform ${theme === 'dark' ? 'border-white/10 bg-black/50' : 'border-gray-200 bg-white shadow-sm'}`}>
-                        <p className={`text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] truncate ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                          Työpaikat
-                        </p>
-                        <p className={`mt-3 text-3xl sm:text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {dashboardStats.total}
-                        </p>
-                      </div>
-                      <div className={`rounded-[24px] border p-6 text-center hover:-translate-y-1 transition-transform ${theme === 'dark' ? 'border-white/10 bg-black/50' : 'border-gray-200 bg-white shadow-sm'}`}>
-                        <p className={`text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] truncate ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                          Haettu
-                        </p>
-                        <p className={`mt-3 text-3xl sm:text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {dashboardStats.applied}
-                        </p>
-                      </div>
-                      <div className="rounded-[24px] border border-[#00BFA6]/40 bg-[#00BFA6]/10 p-6 text-center hover:-translate-y-1 transition-transform shadow-[0_0_20px_rgba(0,191,166,0.1)]">
-                        <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-[#00BFA6] truncate">
-                          Haastattelu
-                        </p>
-                        <p className="mt-3 text-3xl sm:text-4xl font-black text-[#00BFA6]">
-                          {dashboardStats.interview}
-                        </p>
-                      </div>
-                      <div className="rounded-[24px] border border-[#FF6F3C]/40 bg-[#FF6F3C]/10 p-6 text-center hover:-translate-y-1 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.1)]">
-                        <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-[#FF6F3C] truncate">
-                          Suosikit
-                        </p>
-                        <p className="mt-3 text-3xl sm:text-4xl font-black text-[#FF6F3C]">
-                          {dashboardStats.favorites}
-                        </p>
-                      </div>
-                    </div>
-
                     <div className={`rounded-[32px] border p-6 sm:p-10 space-y-8 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                       <h3 className={`text-2xl font-black border-b pb-5 ${theme === 'dark' ? 'text-white border-white/10' : 'text-gray-900 border-gray-100'}`}>
                         Lisää oma työpaikka seurantaan
@@ -4020,7 +3856,7 @@ export default function Home() {
             
             <div className="flex-1 overflow-y-auto bg-[#141414] rounded-[32px] sm:rounded-[40px] border border-white/10 p-8 sm:p-16 flex flex-col items-center custom-scrollbar">
               <div className="max-w-4xl space-y-12 text-3xl sm:text-5xl font-black leading-[1.6] text-gray-300 text-center py-20">
-<p className="text-white">Hei! Olen {form.name || "[Nimesi]"}, ja haen teille <span className="text-[#FF6F3C]">{teleprompterJob.title}</span> -tehtävään.</p>
+                <p className="text-white">Hei! Olen {form.name || "[Nimesi]"}, ja haen teille <span className="text-[#FF6F3C]">{teleprompterJob.title}</span> -tehtävään.</p>
                 <p>Olen seurannut yrityksenne {teleprompterJob.company || "[Yrityksen nimi]"} toimintaa jo pitkään, ja arvostan erityisesti tapaanne toimia alalla.</p>
                 <p>Taustani ansiosta minulla on vahva kokemus juuri niistä asioista, joita ilmoituksessanne peräänkuulutitte.</p>
                 <p>Uskon, että asenteeni ja osaamiseni tekisivät minusta loistavan lisäyksen tiimiinne.</p>
@@ -4089,23 +3925,4 @@ export default function Home() {
                     value={sparringMessage} 
                     onChange={e => setSparringMessage(e.target.value)} 
                     placeholder="Kirjoita vastauksesi tähän..." 
-                    className={`flex-1 rounded-2xl border px-6 py-4 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-colors ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`} 
-                    disabled={isSparringTyping}
-                  />
-                  <button 
-                    type="submit" 
-                    disabled={!sparringMessage.trim() || isSparringTyping} 
-                    className="bg-[#00BFA6] text-black font-black px-8 rounded-2xl disabled:opacity-50 hover:scale-[1.05] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
-                  >
-                    LÄHETÄ
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-
-      </main>
-    </div>
-  );
-}
+                    className={`flex-1 rounded-2xl border px-6 py-4 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-
