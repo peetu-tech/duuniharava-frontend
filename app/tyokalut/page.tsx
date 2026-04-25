@@ -76,89 +76,97 @@ export default function ExtraToolsPage() {
     setTimeout(() => setMessage(""), 2500);
   };
 
-  // --- SIMULOIDUT API-KUTSUT ---
+  // YHTEINEN APUFUKTIO API-KUTSUILLE
+  const fetchToolResult = async (toolName: string, dataPayload: any, setResult: Function, setLoading: Function) => {
+    setLoading(true);
+    try {
+      const session = getSession();
+      const res = await fetch("/api/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tool: toolName, userId: session?.user?.id, data: dataPayload }),
+      });
+      const data = await res.json();
+      
+      if (data.output) {
+        setResult(data.output);
+      } else {
+        setMessage("Tekoäly palautti tyhjän vastauksen.");
+      }
+    } catch (err) {
+      setMessage("Virhe yhteydessä palvelimeen.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const generateHiddenJobApp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!targetIndustry || !userCoreSkill) return;
-    setIsLoadingHidden(true);
-    setTimeout(() => {
-      setHiddenJobResult(`Hei [Nimi],\n\nOlen seurannut ${targetIndustry}-alan kehitystä ja yrityksenne kasvua suurella mielenkiinnolla. Tiedän, että julkiset rekrytointiprosessit ovat usein hitaita ja raskaita, joten päätin lähestyä suoraan.\n\nErikoisosaamiseni on ${userCoreSkill}. Tekoälymme analyysin mukaan monilla alan toimijoilla on juuri nyt pullonkauloja tehokkuudessa, ja pystyn tuomaan tähän välittömän ratkaisun.\n\nOlisitteko avoimia lyhyelle 10 minuutin esittäytymiselle ensi viikolla? Haluaisin kertoa, miten voisin vapauttaa tiiminne aikaa ja tuottaa teille mitattavaa arvoa jo ensimmäisen kuukauden aikana.\n\nYstävällisin terveisin,\n[Nimesi]\n[Puhelinnumero]`);
-      setIsLoadingHidden(false);
-    }, 1800);
+    fetchToolResult("hidden-jobs", { targetIndustry, userCoreSkill }, setHiddenJobResult, setIsLoadingHidden);
   };
 
   const generateCallScript = (e: React.FormEvent) => {
     e.preventDefault();
     if (!callCompany || !callRole) return;
-    setIsLoadingCall(true);
-    setTimeout(() => {
-      setCallScriptResult(`📱 SOITON VAIHEET:\n\n1. JÄÄNMURTAJA (Hengitä ja hymyile)\n"Hei! Täällä on [Nimesi]. Huomasin, että haette ${callRole}a sinne ${callCompany}lle. Häiritsenkö pahasti, vai onko pari minuuttia aikaa?"\n\n2. KOUKKU (Arvon tuottaminen)\n"Hienoa! Laitoin juuri hakemukseni tulemaan. Pystyin perehtymään yritykseenne todella tarkasti, mutta halusin soittaa ja kysyä suoraan: Mikä on tällä hetkellä tiiminne suurin haaste, johon uuden ${callRole}n pitäisi tarttua ensimmäisenä?"\n\n3. VASTAUS (Kuuntele ja peilaa)\n[Kuuntele rekrytoijan vastaus huolellisesti. Kun hän lopettaa, vastaa näin:]\n"Tuo kuulostaa täysin loogiselta. Olen itse ratkonut juuri tuota ongelmaa aiemmin ja uskon, että pääsisin teillä nopeasti kiinni työhön."\n\n4. LOPETUS (Call to action)\n"Kiitos paljon ajastasi! Kuten sanoin, hakemukseni on jo laatikossanne. Odotan innolla, että pääsemme jatkamaan keskustelua haastattelussa."`);
-      setIsLoadingCall(false);
-    }, 1800);
+    fetchToolResult("calling-script", { callCompany, callRole }, setCallScriptResult, setIsLoadingCall);
   };
 
   const generateSalaryCounter = (e: React.FormEvent) => {
     e.preventDefault();
     if (!offeredSalary || !targetSalary) return;
-    setIsLoadingSalary(true);
-    setTimeout(() => {
-      setSalaryResult(`Hei,\n\nKiitos todella paljon tarjouksestanne! Olen innoissani mahdollisuudesta aloittaa tiimissänne ja auttaa yritystänne saavuttamaan tavoitteensa.\n\nKävin tarjouksen läpi, ja markkinatason sekä tuomani lisäarvon myötä olin budjetoinut tavoitepalkkani lähemmäs ${targetSalary} euroa.\n\nYmmärrän, että tarjoamanne ${offeredSalary} € perustuu nykyiseen budjettiin, mutta olisiko meidän mahdollista tulla hieman vastaan ja lyödä kättä päälle esimerkiksi [Laske puoliväli] euron kohdalla? Tällä summalla olisin valmis sitoutumaan ja aloittamaan työt täydellä panoksella heti.\n\nMiltä tämä teistä kuulostaa?\n\nYstävällisin terveisin,\n[Nimesi]`);
-      setIsLoadingSalary(false);
-    }, 1800);
+    fetchToolResult("salary-negotiation", { offeredSalary, targetSalary }, setSalaryResult, setIsLoadingSalary);
   };
 
-  const generateLinkedIn = (e: React.FormEvent) => {
+  const generateLinkedIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!linkedInRole) return;
     setIsLoadingLinkedIn(true);
-    setTimeout(() => {
-      setLinkedInResult({
-        about: `Tekoäly suosittelee 'Tietoja'-osioon:\n\n"Olen tuloshakuinen ammattilainen, jonka intohimona on ${linkedInRole} -tehtävät. Yhdistän analyyttisen ajattelun ja ihmisläheisen otteen luodakseni mitattavaa arvoa. Kun en ole ratkomassa alan haasteita, koulutan itseäni jatkuvasti uusien teknologioiden parissa. Etsin tällä hetkellä uusia haasteita – verkostoidutaan!"`,
-        post: `Tekoäly suosittelee postausta uutisvirtaan:\n\n"Aika kääntää uusi lehti uralla! 🚀 Olen alkanut kartoittaa uusia mahdollisuuksia ${linkedInRole} -tehtävien parissa. Olen erityisen kiinnostunut yrityksistä, jotka arvostavat innovatiivisuutta ja haluavat aidosti ratkoa asiakkaidensa ongelmia. Jos tiimissänne on paikka tekijälle, joka on valmis käärimään hihat heti ensimmäisenä päivänä, laita viestiä! Verkostoni: saa tykätä ja jakaa, arvostan jokaista nostoa valtavasti! 🙏 #työnhaku #rekry #uusisuunta #${linkedInRole.replace(/\s+/g, '')}"`
+    try {
+      const session = getSession();
+      const res = await fetch("/api/tools", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tool: "linkedin-magnet", userId: session?.user?.id, data: { linkedInRole } }),
       });
+      const data = await res.json();
+      if (data.output) {
+        // Yksinkertainen parseri, jos vastaus on yhdessä pötkössä
+        const aboutMatch = data.output.split("POST:")[0]?.replace("ABOUT:", "")?.trim();
+        const postMatch = data.output.split("POST:")[1]?.trim();
+        setLinkedInResult({ 
+          about: aboutMatch || data.output, 
+          post: postMatch || "" 
+        });
+      }
+    } catch (err) {
+      setMessage("Virhe API-kutsussa.");
+    } finally {
       setIsLoadingLinkedIn(false);
-    }, 2000);
+    }
   };
 
   const generatePivotPlan = (e: React.FormEvent) => {
     e.preventDefault();
     if (!oldJob || !newJob) return;
-    setIsLoadingPivot(true);
-    setTimeout(() => {
-      setPivotResult(`Tekoälyn laatima siltasuunnitelma: ${oldJob} ➔ ${newJob}\n\n1. KÄÄNNÄ KOKEMUKSESI KIELELLE, JOTA ${newJob} YMMÄRTÄÄ\nÄlä sano: "Olin vain ${oldJob}."\nSano: "Olen tottunut hallitsemaan aikatauluja, ratkomaan yllättäviä ongelmia paineen alla ja palvelemaan vaativia sidosryhmiä. Nämä ovat täsmälleen niitä taitoja, joita huipputason ${newJob} tarvitsee."\n\n2. KOROSTA NÄITÄ SIIRRETTÄVIÄ TAITOJA CV:SSÄSI:\n- Ongelmanratkaisukyky ja stressinsietokyky\n- Asiakas- tai sidosryhmäymmärrys\n- Kyky omaksua uutta tietoa nopeasti\n\n3. TOIMENPIDE TÄLLE PÄIVÄLLE:\nLisää LinkedIn-otsikkoosi "Aspiring ${newJob} | [Vahvin taitosi]". Rekrytoijat arvostavat motivaatiota ja kykyä nähdä omien taitojen soveltuvuus uudessa ympäristössä.`);
-      setIsLoadingPivot(false);
-    }, 2500);
+    fetchToolResult("career-pivot", { oldJob, newJob }, setPivotResult, setIsLoadingPivot);
   };
 
   const generateRedFlag = (e: React.FormEvent) => {
     e.preventDefault();
     if (!redFlagIssue) return;
-    setIsLoadingRedFlag(true);
-    setTimeout(() => {
-      setRedFlagResult(`Tekoälyn rakentama vastaus haastatteluun aiheesta: "${redFlagIssue}"\n\n"Tuo on erittäin hyvä kysymys. Rehellisesti sanottuna tilanne opetti minulle todella paljon omista rajoistani ja siitä, millaisessa ympäristössä pystyn tuottamaan parasta mahdollista arvoa.\n\nSen sijaan että olisin jäänyt paikoilleni, otin tuon ajan ja analysoin tarkasti, mitä voin tehdä toisin. Sen seurauksena kehitin vahvasti uusia rutiineja ja ammatillista joustavuuttani.\n\nNyt tiedän tarkalleen mitä haluan, ja siksi hain nimenomaan teille. Arvostan teidän tapaanne toimia, ja olen nyt 100% valmis sitoutumaan tähän rooliin pidemmäksi aikaa."`);
-      setIsLoadingRedFlag(false);
-    }, 2000);
+    fetchToolResult("red-flag", { redFlagIssue }, setRedFlagResult, setIsLoadingRedFlag);
   };
 
   const generateReference = (e: React.FormEvent) => {
     e.preventDefault();
     if (!refPersonName || !refSkill) return;
-    setIsLoadingRef(true);
-    setTimeout(() => {
-      setRefResult(`Hei ${refPersonName},\n\nToivottavasti sinulle kuuluu hyvää! Meillä oli aikanaan todella hienoa tehdä töitä yhdessä, ja arvostan edelleen sinulta oppimaani.\n\nOlen parhaillaan kääntämässä uutta lehteä urallani ja kartoitan uusia haasteita. Koska tunnet työtapani parhaiten, haluaisin kysyä, olisitko valmis toimimaan suosittelijanani? Etsin erityisesti rooleja, joissa vaaditaan kykyä ${refSkill}, ja yhteiset projektimme tukevat tätä loistavasti.\n\nYksi lyhyt lause LinkedIniin suosituksena, tai pelkkä lupa antaa puhelinnumerosi rekrytoijalle auttaisi minua valtavasti. Ei tietenkään mitään paineita, jos aikataulusi on nyt tiukka!\n\nYstävällisin terveisin,\n[Nimesi]`);
-      setIsLoadingRef(false);
-    }, 1500);
+    fetchToolResult("reference", { refPersonName, refSkill }, setRefResult, setIsLoadingRef);
   };
 
   const generateHeadhunterMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!hhRole || !hhValue) return;
-    setIsLoadingHh(true);
-    setTimeout(() => {
-      setHhResult(`Hei [Headhunterin Nimi],\n\nHuomasin, että olet aktiivisesti tekemisissä ${hhRole} -tason suorahakujen ja rekrytointien kanssa. Verkostoituminen oman alan huippuammattilaisten kanssa on aina kannattavaa, joten halusin esittäytyä lyhyesti.\n\nOlen itse erikoistunut tuottamaan yrityksille arvoa erityisesti näin: ${hhValue}. Olen parhaillaan tilanteessa, jossa pidän avoimin mielin silmällä uusia, vaativia asiantuntija- ja johtotason haasteita.\n\nOlisi hienoa verkostoitua täällä LinkedInissä. Jos teillä on nyt tai tulevaisuudessa pöydällä hakuja, joihin taustani voisi tuoda kaivattua tulosta, juttelen mielelläni aiheesta lisää.\n\nYstävällisin terveisin,\n[Nimesi]\n[Linkki Portfolioon tai CV:seen]`);
-      setIsLoadingHh(false);
-    }, 2000);
+    fetchToolResult("headhunter", { hhRole, hhValue }, setHhResult, setIsLoadingHh);
   };
 
   if (isAuthChecking) {
@@ -172,7 +180,6 @@ export default function ExtraToolsPage() {
   const InputClass = `w-full rounded-2xl border px-6 py-5 text-base outline-none transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-black/50 border-white/10 text-white placeholder:text-gray-600' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'}`;
   const LabelClass = `mb-3 block text-sm font-bold ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`;
 
-  // Helper-funktio aktiivisen tabin rullaamiseksi näkyviin (UX-parannus mobiilille)
   const handleTabClick = (tab: ToolTab, e: React.MouseEvent<HTMLButtonElement>) => {
     setActiveTab(tab);
     const target = e.currentTarget;
@@ -183,7 +190,6 @@ export default function ExtraToolsPage() {
     }
   };
 
-  // Työkalujen määrittely App-tyylistä ruudukkoa varten
   const tools = [
     { id: "linkedin-magnet", icon: "🚀", title: "LinkedIn", activeClass: "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-blue-500" },
     { id: "headhunter", icon: "💎", title: "Headhunterit", activeClass: "bg-slate-800 text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] border-slate-600" },
@@ -298,7 +304,7 @@ export default function ExtraToolsPage() {
               </div>
             )}
 
-            {/* HEADHUNTER-MAGNEETTI (UUSI) */}
+            {/* HEADHUNTER-MAGNEETTI */}
             {activeTab === "headhunter" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
                 <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>💎 Headhunter-Magneetti</h2>
