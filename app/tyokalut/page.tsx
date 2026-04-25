@@ -155,8 +155,19 @@ export default function ExtraToolsPage() {
             {activeTab === "hidden-jobs" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
                 <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Luo vastustamaton avoin hakemus</h2>
-                <p className={`text-lg mb-10 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Yli 70% työpaikoista ei koskaan tule julkiseen hakuun. Iske kiinni yrityksiin, jotka kiinnostavat sinua.</p>
+                <p className={`text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Piilotyöpaikat ovat yritysten tarpeita, joita ei ole vielä julkaistu avoimeksi hauksi. Ole askeleen edellä.</p>
                 
+                {/* VINKKIBOKSI */}
+                <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-purple-500/5 border-purple-500/20' : 'bg-purple-50 border-purple-200'}`}>
+                  <h3 className={`text-xl font-bold mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
+                    <span>💡</span> Mitä ovat piilotyöpaikat ja miten niitä haetaan?
+                  </h3>
+                  <p className={`leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Jopa <strong>70–80 % avoimista työpaikoista</strong> ei koskaan päädy julkisiin hakuportaaleihin. Yritykset palkkaavat suositusten, verkostojen tai suorien yhteydenottojen kautta välttääkseen raskaat rekrytointiprosessit. Kun lähetät hyvän avoimen hakemuksen, <strong>et kilpaile satojen muiden kanssa</strong>. <br/><br/>
+                    <strong>Näin onnistut:</strong> Etsi yritys, jonka toiminnasta pidät. Selvitä LinkedInistä kuka vetää sinun alaasi (esim. Myyntijohtaja tai CTO) ja lähesty häntä suoraan. Älä pelkästään "kysy töitä", vaan tarjoa heille <em>ratkaisu johonkin heidän ongelmaansa</em>.
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   <form onSubmit={generateHiddenJobApp} className="space-y-6">
                     <div>
@@ -193,8 +204,19 @@ export default function ExtraToolsPage() {
             {activeTab === "calling-script" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
                 <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Erotu massasta soittamalla</h2>
-                <p className={`text-lg mb-10 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Jännittääkö soittaa rekrytoijalle? Tekoäly rakentaa sinulle luonnollisen hissipuheen, jonka voit lukea suoraan paperista.</p>
+                <p className={`text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Jännittääkö soittaa rekrytoijalle? Tekoäly rakentaa sinulle luonnollisen hissipuheen, jonka voit lukea suoraan paperista.</p>
                 
+                {/* VINKKIBOKSI */}
+                <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-indigo-500/5 border-indigo-500/20' : 'bg-indigo-50 border-indigo-200'}`}>
+                  <h3 className={`text-xl font-bold mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-700'}`}>
+                    <span>💡</span> Miksi rekrytoijalle soittaminen kannattaa?
+                  </h3>
+                  <p className={`leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Soittaminen on nopein tapa erottua paperipinosta ja muuttua kasvottomasta hakijasta aidoksi ihmiseksi. Hyvä puhelu jättää rekrytoijalle positiivisen muistijäljen, ja usein he kaivavat hakemuksesi esiin heti puhelun jälkeen.<br/><br/>
+                    <strong>Muista tämä:</strong> Älä soita vain kysyäksesi "tuliko hakemus perille" tai "mitä prosessissa tapahtuu seuraavaksi". Soita silloin, kun sinulla on <em>aito, fiksusti mietitty kysymys</em> itse työtehtävästä. Tämä osoittaa, että olet todella perehtynyt rooliin. Hymyile puhelun aikana – se nimittäin kuuluu äänestä!
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   <form onSubmit={generateCallScript} className="space-y-6">
                     <div>
@@ -231,8 +253,19 @@ export default function ExtraToolsPage() {
             {activeTab === "salary-negotiation" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
                 <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Älä jätä rahaa pöydälle</h2>
-                <p className={`text-lg mb-10 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Saitko tarjouksen, mutta palkka on liian pieni? Tekoäly muotoilee asiallisen mutta jämäkän vastatarjouksen.</p>
+                <p className={`text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Saitko tarjouksen, mutta palkka on liian pieni? Tekoäly muotoilee asiallisen mutta jämäkän vastatarjouksen.</p>
                 
+                {/* VINKKIBOKSI */}
+                <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-200'}`}>
+                  <h3 className={`text-xl font-bold mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`}>
+                    <span>💡</span> Palkkaneuvottelun kultaiset säännöt
+                  </h3>
+                  <p className={`leading-relaxed text-sm sm:text-base ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Palkasta neuvotteleminen ei ole ahneutta, se on odotettua ammattimaisuutta. Työnantajat jättävät usein ensimmäiseen tarjoukseensa tarkoituksella hieman neuvotteluvaraa. Jos hyväksyt ensimmäisen tarjouksen suoraan, saatat jättää tuhansia euroja pöydälle vuositasolla.<br/><br/>
+                    <strong>Näin onnistut:</strong> Älä koskaan perustele palkkapyyntöäsi omilla elinkustannuksillasi tai asuntolainallasi. Perustele se <em>markkinatasolla ja sillä suoralla arvolla, jonka tuot yritykselle</em>. Aseta vastatarjouksesi hieman todellista tavoitettasi korkeammalle, jotta teillä on tilaa kohdata sujuvasti puolivälissä.
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   <form onSubmit={generateSalaryCounter} className="space-y-6">
                     <div>
