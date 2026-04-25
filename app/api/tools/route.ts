@@ -20,43 +20,52 @@ export async function POST(req: Request) {
     // Valitaan oikea ohjeistus (prompt) sen mukaan, mitä työkalua käytetään
     switch (tool) {
       case "hidden-jobs":
-        systemPrompt = "Olet asiantunteva uravalmentaja. Kirjoita lyhyt, iskevä ja ammattimainen lähestymisviesti (esim. LinkedIn-viesti tai sähköposti) päättäjälle. Älä kerjää töitä, vaan tarjoa arvoa.";
-        userMessage = `Kohdeala/Yritys: ${data.targetIndustry}. Oma ydinosaamiseni: ${data.userCoreSkill}. Kirjoita valmis viesti.`;
+        systemPrompt = "Olet asiantunteva ja erittäin vakuuttava uravalmentaja. Kirjoita lyhyt, iskevä ja ammattimainen lähestymisviesti (esim. LinkedIn-yksityisviesti tai sähköposti) suoraan yrityksen päättäjälle. Älä missään nimessä kerjää töitä tai kuulosta epätoivoiselta. Keskity vain siihen arvoon ja ratkaisuun, jonka hakija tuo pöytään.";
+        userMessage = `Kohdeala/Yritys: ${data.targetIndustry}. Oma ydinosaamiseni: ${data.userCoreSkill}. Kirjoita minulle valmis lähestymisviesti suomeksi.`;
         break;
 
       case "calling-script":
-        systemPrompt = "Olet myyntivalmentaja. Kirjoita erittäin lyhyt ja luonnollinen puhelukäsikirjoitus työnhakijalle, joka soittaa rekrytoijalle. Käytä askelia: 1. Jäänmurtaja, 2. Koukku (kysymys yrityksen haasteista), 3. Vastaus. Kirjoita se puhekielellä.";
+        systemPrompt = "Olet kokenut B2B-myyntivalmentaja. Kirjoita erittäin lyhyt, luonnollinen ja rohkea puhelukäsikirjoitus työnhakijalle, joka soittaa rekrytoijalle tai palkkaavalle esihenkilölle. Käytä askelia: 1. Jäänmurtaja, 2. Koukku (arvoa tuottava kysymys yrityksen haasteista), 3. Vastaus (miten hakija ratkaisee ne). Kirjoita skripti puhekielellä ja lisää alkuun lyhyt kannustava lause (esim. 'Hengitä syvään...').";
         userMessage = `Kohdeyritys: ${data.callCompany}. Haettava rooli: ${data.callRole}.`;
         break;
 
       case "salary-negotiation":
-        systemPrompt = "Olet neuvotteluekspertti. Kirjoita asiallinen, mutta jämäkkä sähköpostivastaus palkkatarjoukseen. Tavoitteena on nostaa tarjousta kohti hakijan tavoitepalkkaa, perustellen sitä tuodulla lisäarvolla.";
-        userMessage = `Tarjottu palkka: ${data.offeredSalary}€. Oma tavoitepalkka: ${data.targetSalary}€. Muotoile vastatarjous.`;
+        systemPrompt = "Olet kova ja asiallinen neuvotteluekspertti. Kirjoita sähköpostivastaus liian matalaan palkkatarjoukseen. Sävy on erittäin kohtelias, mutta jämäkkä. Tavoitteena on nostaa tarjousta kohti hakijan tavoitepalkkaa, perustellen sitä tuodulla lisäarvolla ja markkinatasolla. Anna tekoälyn laskea ehdotettu 'puolivälin' kompromissisumma.";
+        userMessage = `Tarjottu palkka: ${data.offeredSalary}€. Oma tavoitepalkka: ${data.targetSalary}€. Muotoile vastatarjous suomeksi.`;
         break;
 
       case "linkedin-magnet":
-        systemPrompt = "Olet LinkedIn-asiantuntija. Kirjoita kaksi asiaa: 1. Lyhyt, arvoa korostava 'Tietoja' (About) teksti profiiliin. 2. Innostava postaus uutisvirtaan uuden työn etsimisestä. Älä käytä liikaa emojeita, pidä sävy asiantuntevana.";
-        userMessage = `Tavoiteltu rooli: ${data.linkedInRole}.`;
+        systemPrompt = `Olet huipputason LinkedIn-asiantuntija. Kirjoita kaksi asiaa hakijalle:
+        1. Lyhyt, arvoa korostava 'Tietoja' (About) teksti profiiliin (max 4 lausetta).
+        2. Innostava postaus uutisvirtaan uuden työn etsimisestä (hashtageineen). Älä käytä liikaa emojeita, pidä sävy asiantuntevana.
+        
+        TÄRKEÄÄ: Sinun ON EHDOTTOMASTI palautettava vastaus täsmälleen tässä muodossa, jotta järjestelmämme osaa lukea sen:
+        ABOUT:
+        [Kirjoita About-teksti tähän]
+
+        POST:
+        [Kirjoita uutisvirtapostaus tähän]`;
+        userMessage = `Tavoiteltu rooli on: ${data.linkedInRole}.`;
         break;
 
       case "career-pivot":
-        systemPrompt = "Olet uranvaihdoksen asiantuntija. Hakija on vaihtamassa alaa. Etsi piileviä, siirrettäviä taitoja vanhasta ammatista ja kerro 3 kohdan suunnitelma, miten myydä nämä taidot uudelle alalle.";
-        userMessage = `Vanha ammatti: ${data.oldJob}. Uusi tavoiteammatti: ${data.newJob}.`;
+        systemPrompt = "Olet uranvaihdoksen asiantuntija. Hakija on vaihtamassa täysin uuteen ammattiin. Etsi luovia, piileviä ja siirrettäviä taitoja vanhasta ammatista. Kirjoita innostava ja selkeä 3 kohdan suunnitelma (siltasuunnitelma), miten hakija voi myydä nämä taidot uudelle alalle.";
+        userMessage = `Vanha ammatti/kokemus: ${data.oldJob}. Uusi tavoiteammatti: ${data.newJob}. Kirjoita suunnitelma suomeksi.`;
         break;
 
       case "red-flag":
-        systemPrompt = "Olet kokenut rekrytoija. Hakijalla on taustassaan 'punainen lippu' (esim. potkut, tauko). Kirjoita lyhyt, noin 3 lauseen suora vastaus haastatteluun, joka kääntää tämän haasteen opituksi läksyksi ja vahvuudeksi.";
-        userMessage = `Ongelma taustassa: ${data.redFlagIssue}. Käännä tämä positiiviseksi oppimiskokemukseksi.`;
+        systemPrompt = "Olet kokenut rekrytoija ja urapsykologi. Hakijalla on taustassaan ns. 'punainen lippu' (esim. potkut, burnout, riitaantuminen, pitkä työttömyys). Kirjoita lyhyt, noin 3 lauseen suora ja rehellinen vastaus haastatteluun. Käännä tämä haaste vakuuttavasti opituksi läksyksi ja vahvuudeksi, ilman selittelyä tai katkeruutta.";
+        userMessage = `Ongelma taustassa: ${data.redFlagIssue}. Muotoile tähän täydellinen vastaus suomeksi.`;
         break;
 
       case "reference":
-        systemPrompt = "Kirjoita lämminhenkinen, mutta ammattimainen viesti entiselle esimiehelle tai kollegalle, jossa pyydetään häntä suosittelijaksi uutta työnhakua varten.";
-        userMessage = `Suosittelijan etunimi: ${data.refPersonName}. Taito, jota toivon hänen korostavan: ${data.refSkill}.`;
+        systemPrompt = "Olet ammattimainen urakonsultti. Kirjoita lämminhenkinen, kohtelias ja ammattimainen viesti entiselle esimiehelle tai kollegalle, jossa pyydetään häntä suosittelijaksi uutta työnhakua varten. Viestin voi lähettää esim. LinkedInissä tai sähköpostilla.";
+        userMessage = `Suosittelijan etunimi: ${data.refPersonName}. Taito, jota toivon hänen erityisesti korostavan minussa: ${data.refSkill}. Kirjoita viesti suomeksi.`;
         break;
 
       case "headhunter":
-        systemPrompt = "Olet suorahakukonsultti. Kirjoita erittäin ytimekäs LinkedIn-verkostoitumisviesti headhunterille. Älä liitä perinteistä CV:tä, vaan korosta hakijan tuottamaa ROI:ta ja arvoa.";
-        userMessage = `Nykyinen tittelini: ${data.hhRole}. Tuottamani lisäarvo yritykselle: ${data.hhValue}. Muotoile pitch.`;
+        systemPrompt = "Olet vaativa suorahakukonsultti (headhunter). Kirjoita erittäin ytimekäs ja houkutteleva LinkedIn-verkostoitumisviesti, jolla hakija voi lähestyä headhunteria. Älä liitä perinteistä CV-luetteloa, vaan korosta hakijan tuottamaa ROI:ta (Return on Investment) ja arvoa asiakasyrityksille.";
+        userMessage = `Nykyinen tittelini/tasoni: ${data.hhRole}. Tuottamani lisäarvo (ROI) yritykselle: ${data.hhValue}. Muotoile pitch suomeksi.`;
         break;
 
       default:
@@ -64,7 +73,7 @@ export async function POST(req: Request) {
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Käytetään edullista ja nopeaa mallia
+      model: "gpt-4o-mini", //gpt-4o-mini on erinomainen tähän: halpa ja erittäin nopea
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage }
