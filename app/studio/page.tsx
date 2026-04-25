@@ -108,6 +108,7 @@ const emptyForm = {
   skills: "",
   cards: "",
   hobbies: "",
+  projects: "",
 };
 
 const emptySearchProfile = {
@@ -466,7 +467,7 @@ function SectionShell({
               {title}
             </h2>
           </div>
-          {/* Mobiilin haitarinuoli */}
+          {/* Mobiilin haitarinuoli, jotta käyttäjä tajuaa että laatikon voi sulkea */}
           <div className={`sm:hidden flex items-center justify-center w-10 h-10 rounded-full border transition-transform group-open:rotate-180 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
             ▼
           </div>
@@ -524,7 +525,7 @@ function LabelClass(theme: "light" | "dark") {
   return `mb-3 block text-sm font-bold ml-1 transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-700'}`;
 }
 
-function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring, theme }: any) {
+function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring, onSalary, theme }: any) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
 
@@ -595,6 +596,15 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             }`}
           >
             {isActive ? "✓ Valittu" : "Valitse paikka"}
+          </button>
+
+          <button
+            type="button"
+            onClick={onSalary}
+            aria-label={`Tarkista palkkataso työpaikkaan ${job.title}`}
+            className="w-full sm:w-auto rounded-2xl border border-blue-500/50 bg-blue-500/10 px-6 py-5 sm:py-4 text-base font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white shadow-[0_0_15px_rgba(59,130,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+          >
+            💰 Palkka-arvio
           </button>
 
           <button
@@ -821,6 +831,7 @@ export default function Home() {
 
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
+  const [letterViewMode, setLetterViewMode] = useState<"edit" | "preview">("edit"); // UUSI
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
   const [letterTone, setLetterTone] = useState<LetterTone>("professional");
 
@@ -857,13 +868,37 @@ export default function Home() {
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
+  // UUDET MODAALIT TILAT
   const [sparringJob, setSparringJob] = useState<JobItem | null>(null);
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
   const [isSparringTyping, setIsSparringTyping] = useState(false);
+  
+  const [salaryJob, setSalaryJob] = useState<JobItem | null>(null);
+  const [teleprompterJob, setTeleprompterJob] = useState<JobItem | null>(null);
+  const [showSkillTranslator, setShowSkillTranslator] = useState(false);
+  const [showCareerPath, setShowCareerPath] = useState(false);
+  const [showPublicLink, setShowPublicLink] = useState(false);
+  const [emailTemplateModal, setEmailTemplateModal] = useState<{type: string, content: string} | null>(null);
+  
+  // Nämä ovat mock-arvoja ja -tiloja uusia ominaisuuksia varten
+  const [skillInput, setSkillInput] = useState("");
+  const [skillOutput, setSkillOutput] = useState("");
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [careerGoal, setCareerGoal] = useState("");
+  const [careerPlan, setCareerPlan] = useState<string[]>([]);
+  const [isPlanning, setIsPlanning] = useState(false);
+
   const chatEndRef = useRef<HTMLDivElement | null>(null); 
 
   const customStyle = customStyles[cvStyle];
+
+  // Profiilin valmiusasteen laskenta (Pelillistäminen)
+  const profileCompletion = useMemo(() => {
+    const fields = [form.name, form.phone, form.email, form.location, form.targetJob, form.education, form.experience, form.languages, form.skills, form.projects];
+    const filled = fields.filter(f => f && f.trim().length > 0).length;
+    return Math.round((filled / fields.length) * 100);
+  }, [form]);
 
   useEffect(() => {
     const session = getSession();
@@ -903,6 +938,7 @@ export default function Home() {
             skills: p.skills || "",
             cards: p.cards || "",
             hobbies: p.hobbies || "",
+            projects: p.projects || "",
           }));
           if (p.profile_image_url) setProfileImage(p.profile_image_url);
         }
@@ -991,6 +1027,7 @@ export default function Home() {
             skills: form.skills,
             cards: form.cards,
             hobbies: form.hobbies,
+            projects: form.projects,
             profile_image_url: profileImage
           })
         });
@@ -1224,6 +1261,7 @@ export default function Home() {
       skills: "B2B-myynti, Neuvottelutaidot, CRM-järjestelmät, Tiimityöskentely, Ongelmanratkaisu",
       cards: "B-ajokortti, Ensiapu 1",
       hobbies: "Padel, lukeminen, sijoittaminen",
+      projects: "Yrityksen X Verkkosivutupäivitys | 2020\n- Johdin tiimiä, joka uudisti koko verkkopalvelun ja kasvatti liidimäärää 40%.\n\nOma verkkokauppa (Sivuprojekti) | 2019-2021\n- Perustin ja pyöritin menestyksekästä verkkokauppaa, jossa vastasin koko prosessista hankinnasta asiakaspalveluun.",
     });
 
     setSearchProfile({
@@ -1290,8 +1328,8 @@ export default function Home() {
     }
   }
 
-  const downloadPdf = async () => {
-    const printContent = document.getElementById("cv-preview");
+  const downloadPdf = async (elementId: string = "cv-preview", isLetter: boolean = false) => {
+    const printContent = document.getElementById(elementId);
     if (!printContent) return;
 
     try {
@@ -1332,7 +1370,7 @@ export default function Home() {
           newStyle.innerHTML = safeCss;
           clonedDoc.head.appendChild(newStyle);
 
-          const previewEl = clonedDoc.getElementById("cv-preview");
+          const previewEl = clonedDoc.getElementById(elementId);
           if (previewEl) {
             previewEl.style.borderRadius = "0px";
             previewEl.style.boxShadow = "none";
@@ -1372,7 +1410,7 @@ export default function Home() {
         heightLeft -= pageHeight;
       }
 
-      pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
+      pdf.save(`duuniharava-${isLetter ? 'hakemus' : 'cv'}-${cvStyle}.pdf`);
       
       setMessage("PDF ladattu onnistuneesti koneellesi!");
       setTimeout(() => setMessage(""), 3500);
@@ -1385,11 +1423,10 @@ export default function Home() {
     }
   };
 
-  async function downloadDocx() {
+  async function downloadDocx(textToDownload: string, isLetter: boolean = false) {
     try {
-      const cvText = parsedCv.cvBody;
-      if (!cvText) {
-        setErrorMessage("Generoi ensin CV ennen DOCX-latausta.");
+      if (!textToDownload) {
+        setErrorMessage("Ei ladattavaa tekstiä.");
         return;
       }
 
@@ -1397,7 +1434,7 @@ export default function Home() {
       setMessage("");
       setErrorMessage("");
 
-      const lines = cvText
+      const lines = textToDownload
         .split("\n")
         .map((line) => line.trim())
         .filter(Boolean);
@@ -1407,8 +1444,8 @@ export default function Home() {
           {
             properties: {},
             children: lines.map((line, index) => {
-              const isMainTitle = index === 0;
-              const isSectionTitle =
+              const isMainTitle = index === 0 && !isLetter;
+              const isSectionTitle = !isLetter && (
                 line === line.toUpperCase() ||
                 [
                   "Profiili",
@@ -1418,7 +1455,10 @@ export default function Home() {
                   "Taidot",
                   "Kortit ja pätevyydet",
                   "Harrastukset",
-                ].includes(line);
+                  "Projektit",
+                  "Portfolio"
+                ].includes(line)
+              );
 
               if (isMainTitle) {
                 return new Paragraph({
@@ -1443,7 +1483,7 @@ export default function Home() {
       });
 
       const blob = await Packer.toBlob(doc);
-      saveAs(blob, "duuniharava-cv.docx");
+      saveAs(blob, `duuniharava-${isLetter ? 'hakemus' : 'cv'}.docx`);
       setMessage("DOCX ladattu.");
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
@@ -1946,6 +1986,22 @@ export default function Home() {
     }
   }
 
+  // Näytetään sähköpostimallin sisältö modaalissa
+  function handleEmailTemplate(type: "thanks" | "questions" | "linkedin") {
+    if (!activeJob) return;
+    
+    let content = "";
+    if (type === "thanks") {
+      content = `Hei [Rekrytoijan nimi],\n\nKiitos vielä mielenkiintoisesta haastattelusta ja mahdollisuudesta tutustua paremmin yritykseen ${activeJob.company || "yrityksessänne"}!\n\nKeskustelumme vahvisti entisestään kiinnostustani ${activeJob.title} -tehtävää kohtaan. Odotan innolla, että kuulen teistä hakuprosessin edetessä.\n\nYstävällisin terveisin,\n${form.name}`;
+    } else if (type === "questions") {
+      content = `Hei [Rekrytoijan nimi],\n\nHuomasin avoimen ${activeJob.title} -tehtävänne ja minulla heräsi pari lyhyttä kysymystä ennen hakemukseni lähettämistä.\n\n[Kirjoita tähän 1-2 täsmällistä kysymystä]\n\nKiitos jo etukäteen ajastanne!\n\nYstävällisin terveisin,\n${form.name}`;
+    } else if (type === "linkedin") {
+      content = `Hei [Rekrytoijan nimi], huomasin avoimen ${activeJob.title} -tehtävänne ${activeJob.company ? `${activeJob.company}lla` : "yrityksessänne"}. Olen erittäin kiinnostunut roolista ja laitoinkin jo hakemukseni tulemaan. Olisi hienoa verkostoitua täällä LinkedInissä! Ystävällisin terveisin, ${form.name}`;
+    }
+    
+    setEmailTemplateModal({ type, content });
+  }
+
   if (isAuthChecking) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#0F0F0F] text-white">
@@ -2192,6 +2248,26 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr]">
             <section className="space-y-4 sm:space-y-12">
+              
+              {/* PELILLISTÄMINEN: Profiilin valmiusaste */}
+              <div className="mb-4">
+                <div className="flex justify-between items-end mb-2">
+                  <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Profiilin valmiusaste</span>
+                  <span className="text-[#00BFA6] font-black text-xl">{profileCompletion}%</span>
+                </div>
+                <div className={`w-full h-3 rounded-full overflow-hidden ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-200'}`}>
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] transition-all duration-1000 ease-out"
+                    style={{ width: `${profileCompletion}%` }}
+                  />
+                </div>
+                {profileCompletion < 100 && (
+                  <p className={`text-xs mt-2 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Täyttämällä profiilin 100% valmiiksi, tekoäly tuottaa jopa 3x tarkempia hakemuksia.
+                  </p>
+                )}
+              </div>
+
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -2199,13 +2275,22 @@ export default function Home() {
                 description="Täytä tietosi huolellisesti tai lataa vanha CV:si. Näitä käytetään pohjana kaikessa tekoälyn tekemässä työssä."
                 theme={theme}
                 action={
-                  <button
-                    type="button"
-                    onClick={clearForm}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-gray-300 transition-all hover:bg-white/10 hover:border-red-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500"
-                  >
-                    Tyhjennä
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowCareerPath(true)}
+                      className="rounded-2xl border border-[#00BFA6]/40 bg-[#00BFA6]/10 px-6 py-3 text-sm font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                    >
+                      🗺️ Urapolku-navigaattori
+                    </button>
+                    <button
+                      type="button"
+                      onClick={clearForm}
+                      className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-gray-300 transition-all hover:bg-white/10 hover:border-red-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500"
+                    >
+                      Tyhjennä
+                    </button>
+                  </div>
                 }
               >
                 <form onSubmit={handleCvSubmit} className="space-y-8 mt-6">
@@ -2316,9 +2401,23 @@ export default function Home() {
                     />
                   </div>
 
+                  {/* UUSI OSIO: PROJEKTIT */}
+                  <div className="pt-4">
+                    <label htmlFor="input-projects" className={LabelClass(theme)}>Projektit & Portfoliolinkit <span className="text-[#00BFA6] font-normal lowercase">(Vapaaehtoinen)</span></label>
+                    <textarea
+                      id="input-projects"
+                      placeholder="Projektin nimi | Vuosi&#10;- Mitä teit ja mitä sait aikaan?&#10;- Linkki: https://..."
+                      value={form.projects}
+                      onChange={(e) => updateField("projects", e.target.value)}
+                      className={TextareaClass("min-h-[140px]", theme)}
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
                     <div>
-                      <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
+                      <div className="flex justify-between items-end mb-3">
+                        <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
+                      </div>
                       <textarea
                         id="input-languages"
                         placeholder="Suomi (äidinkieli), Englanti (sujuva)..."
@@ -2328,7 +2427,16 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="input-skills" className={LabelClass(theme)}>Osaaminen & Taidot</label>
+                      <div className="flex justify-between items-end mb-3">
+                        <label htmlFor="input-skills" className={LabelClass(theme)}>Osaaminen & Taidot</label>
+                        <button 
+                          type="button" 
+                          onClick={() => setShowSkillTranslator(true)}
+                          className="text-[#00BFA6] text-xs font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded"
+                        >
+                          ✨ Käännä ammattikielelle
+                        </button>
+                      </div>
                       <textarea
                         id="input-skills"
                         placeholder="Mitä taitoja sinulla on? (esim. asiakaspalvelu)"
@@ -2502,7 +2610,7 @@ export default function Home() {
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
-                    Oma CV (Esikatselu)
+                    Oma CV
                   </button>
                   <button
                     type="button"
@@ -2648,22 +2756,31 @@ export default function Home() {
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10 ${theme === 'dark' ? 'border-white/10 bg-white' : 'border-gray-200 bg-gray-50'}`} role="region" aria-label="CV Esikatselu">
+                        <div className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
                           <div className="min-w-[900px]">
                             <CvPreview
                               cvText={parsedCv.cvBody}
                               image={profileImage}
                               styleVariant={cvStyle}
                               customStyle={customStyle}
+                              mode="cv"
                             />
                           </div>
                         </div>
 
-                        {/* LATAUSNAPIT SIIRRETTY CV:N ALLE */}
+                        {/* LATAUSNAPIT */}
                         <div className="flex flex-col sm:flex-row gap-5 mt-24 pt-8 border-t border-white/10">
                           <button
                             type="button"
-                            onClick={downloadPdf}
+                            onClick={() => setShowPublicLink(true)}
+                            className="flex-1 rounded-2xl border border-blue-500/50 bg-blue-500/10 px-8 py-5 font-black text-lg text-blue-400 transition-all hover:bg-blue-500 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
+                          >
+                            🌐 JULKAISE VERKKOON
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => downloadPdf("cv-preview", false)}
                             disabled={downloadingPdf}
                             className="flex-1 rounded-2xl bg-[#00BFA6] text-black px-8 py-5 font-black text-lg transition-transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,191,166,0.3)] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                             aria-live="polite"
@@ -2673,7 +2790,7 @@ export default function Home() {
 
                           <button
                             type="button"
-                            onClick={downloadDocx}
+                            onClick={() => downloadDocx(parsedCv.cvBody, false)}
                             disabled={downloadingDocx}
                             className={`flex-1 rounded-2xl border-2 px-8 py-5 font-black transition-all hover:border-[#00BFA6] hover:text-[#00BFA6] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-zinc-800 bg-transparent text-zinc-400' : 'border-gray-300 bg-white text-gray-600'}`}
                             aria-live="polite"
@@ -2694,7 +2811,7 @@ export default function Home() {
                             </button>
                           </div>
 
-                          {/* UUDET PIKAVÄRIT */}
+                          {/* PIKAVÄRIT */}
                           <div className={`mb-10 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="Pikaväriteemat">
                             <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0369a1] ${theme === 'dark' ? 'border-white/10 hover:border-[#0369a1] hover:bg-white/5' : 'border-gray-200 hover:border-[#0369a1] hover:bg-gray-50'}`}>🌊 Merellinen</button>
                             <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] ${theme === 'dark' ? 'border-white/10 hover:border-[#10b981] hover:bg-white/5' : 'border-gray-200 hover:border-[#10b981] hover:bg-gray-50'}`}>🌲 Metsä</button>
@@ -2757,7 +2874,6 @@ export default function Home() {
                                     <option value="boxed">Laatikko</option>
                                   </select>
                                 </div>
-                                {/* UUDET MUOKKAUKSET ALLA */}
                                 <div>
                                   <label htmlFor="style-headingTransform" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikoiden tekstaus</label>
                                   <select id="style-headingTransform" value={customStyle.headingTransform || "uppercase"} onChange={(e) => updateCustomStyle("headingTransform", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
@@ -2898,59 +3014,6 @@ export default function Home() {
                                     <option value="to right">Vasemmalta oikealle</option>
                                     <option value="135deg">Viistosti (135deg)</option>
                                     <option value="circle">Ympyrä (Radial)</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label htmlFor="style-tagStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Tagien (Taidot) tyyli</label>
-                                  <select id="style-tagStyle" value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="solid">Täytetty</option>
-                                    <option value="outline">Reunukset (Outline)</option>
-                                    <option value="pill">Pillerit (Pyöreät)</option>
-                                    <option value="sharp">Terävät kulmat</option>
-                                    <option value="minimal">Minimaalinen viiva</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label htmlFor="style-headerStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yläpalkin tyyli</label>
-                                  <select id="style-headerStyle" value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="solid">Yksivärinen</option>
-                                    <option value="gradient">Liukuväri (Gradient)</option>
-                                    <option value="transparent">Läpinäkyvä</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label htmlFor="style-imageShape" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan muoto</label>
-                                  <select id="style-imageShape" value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="square">Neliö</option>
-                                    <option value="rounded">Pyöristetty</option>
-                                    <option value="circle">Ympyrä</option>
-                                    <option value="blob">Epäsymmetrinen (Blob)</option>
-                                    <option value="leaf">Lehti (Leaf)</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label htmlFor="style-imagePosition" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan sijainti</label>
-                                  <select id="style-imagePosition" value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="left">Vasemmalla</option>
-                                    <option value="center">Keskellä</option>
-                                    <option value="right">Oikealla</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label htmlFor="style-shadowStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Varjostukset & 3D</label>
-                                  <select id="style-shadowStyle" value={customStyle.shadowStyle || "none"} onChange={(e) => updateCustomStyle("shadowStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="none">Ei varjoja</option>
-                                    <option value="soft">Pehmeä varjo</option>
-                                    <option value="hard">Kova (Brutalistinen)</option>
-                                    <option value="3d">3D-syvyys</option>
-                                    <option value="neon">Neon-hohto</option>
-                                  </select>
-                                </div>
-                                <div>
-                                  <label htmlFor="style-showSeparators" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Erotinviivat osioiden välissä</label>
-                                  <select id="style-showSeparators" value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="yes">Kyllä, näytä viivat</option>
-                                    <option value="no">Ei, piilota viivat</option>
                                   </select>
                                 </div>
                               </div>
@@ -3333,6 +3396,7 @@ export default function Home() {
                                 onRemove={() => removeJob(job.id)}
                                 onUpdate={(patch: Partial<JobItem>) => updateJob(job.id, patch)}
                                 onSparring={() => startSparring(job)}
+                                onSalary={() => setSalaryJob(job)}
                                 theme={theme}
                               />
                             );
@@ -3460,10 +3524,23 @@ export default function Home() {
                     {letterResult ? (
                       <>
                         <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-[0_15px_50px_rgba(0,191,166,0.15)] mt-10 ${theme === 'dark' ? 'border-[#00BFA6]/40 bg-[#0A0A0A]' : 'border-[#00BFA6]/40 bg-white'}`}>
+                          
                           <div className={`mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 border-b pb-6 ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
-                            <label htmlFor="letter-editor" className={`text-2xl sm:text-3xl font-black block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                              Valmis hakemus
-                            </label>
+                            <div className={`flex rounded-2xl p-1 w-full sm:w-auto border ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-gray-100 border-gray-200'}`}>
+                              <button
+                                onClick={() => setLetterViewMode("edit")}
+                                className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "edit" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                              >
+                                ✍️ Muokkaa tekstiä
+                              </button>
+                              <button
+                                onClick={() => setLetterViewMode("preview")}
+                                className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "preview" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                              >
+                                📄 Visuaalinen esikatselu
+                              </button>
+                            </div>
+
                             <button
                               type="button"
                               onClick={saveEditedLetter}
@@ -3473,26 +3550,78 @@ export default function Home() {
                             </button>
                           </div>
 
-                          <textarea
-                            id="letter-editor"
-                            value={letterDraft}
-                            onChange={(e) => setLetterDraft(e.target.value)}
-                            className={`min-h-[500px] w-full rounded-3xl border p-6 sm:p-8 font-sans text-base sm:text-lg leading-relaxed outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-all resize-y shadow-inner ${theme === 'dark' ? 'border-white/5 bg-black/50 text-gray-200' : 'border-gray-200 bg-gray-50 text-gray-800'}`}
-                          />
+                          {letterViewMode === "edit" ? (
+                            <textarea
+                              id="letter-editor"
+                              value={letterDraft}
+                              onChange={(e) => setLetterDraft(e.target.value)}
+                              className={`min-h-[500px] w-full rounded-3xl border p-6 sm:p-8 font-sans text-base sm:text-lg leading-relaxed outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-all resize-y shadow-inner ${theme === 'dark' ? 'border-white/5 bg-black/50 text-gray-200' : 'border-gray-200 bg-gray-50 text-gray-800'}`}
+                            />
+                          ) : (
+                            <div className={`rounded-3xl border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="Hakemuksen Esikatselu">
+                              <div className="min-w-[900px]">
+                                <CvPreview
+                                  cvText={letterDraft}
+                                  image={profileImage}
+                                  styleVariant={cvStyle}
+                                  customStyle={customStyle}
+                                  mode="letter"
+                                />
+                              </div>
+                            </div>
+                          )}
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            copyText(
-                              letterDraft || parsedLetter,
-                              "Hakemus kopioitu leikepöydälle!"
-                            )
-                          }
-                          className={`mt-6 w-full rounded-3xl border px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${theme === 'dark' ? 'border-white/20 bg-white text-black' : 'border-gray-300 bg-gray-900 text-white'}`}
-                        >
-                          KOPIOI HAKEMUS LEIKEPÖYDÄLLE 📋
-                        </button>
+                        {/* UUDET: SÄHKÖPOSTIAUTOMAATIO & VIDEOTYÖKALU */}
+                        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className={`p-6 rounded-3xl border ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+                            <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
+                            <div className="flex flex-col gap-3">
+                              <button onClick={() => handleEmailTemplate("questions")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                                ✉️ Kysy lisätietoja tehtävästä
+                              </button>
+                              <button onClick={() => handleEmailTemplate("thanks")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                                ✉️ Kiitosviesti haastattelun jälkeen
+                              </button>
+                              <button onClick={() => handleEmailTemplate("linkedin")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                                🔗 LinkedIn-verkostoitumisviesti
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className={`p-6 rounded-3xl border flex flex-col justify-center items-center text-center ${theme === 'dark' ? 'bg-[#141414] border-[#FF6F3C]/30' : 'bg-orange-50 border-orange-200'}`}>
+                            <span className="text-4xl mb-3">🎥</span>
+                            <h4 className={`text-lg font-black mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Videohakemus-studio</h4>
+                            <p className={`text-sm mb-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tekoäly luo minuutin käsikirjoituksen ja avaa teleprompterin lukemista varten.</p>
+                            <button onClick={() => setTeleprompterJob(activeJob)} className="w-full rounded-xl bg-[#FF6F3C] text-black font-black py-3 hover:scale-105 transition-transform">
+                              AVAA TELEPROMPTER
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-5 mt-6">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              copyText(
+                                letterDraft || parsedLetter,
+                                "Hakemus kopioitu leikepöydälle!"
+                              )
+                            }
+                            className={`flex-1 rounded-3xl border px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${theme === 'dark' ? 'border-white/20 bg-white text-black' : 'border-gray-300 bg-gray-900 text-white'}`}
+                          >
+                            KOPIOI TEKSTI 📋
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => downloadPdf("letter-preview", true)}
+                            disabled={downloadingPdf || letterViewMode === "edit"}
+                            className={`flex-1 rounded-3xl px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${letterViewMode === "edit" ? 'bg-gray-600 text-gray-400 opacity-50 cursor-not-allowed' : 'bg-[#00BFA6] text-black'}`}
+                          >
+                            {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF-HAKEMUS"}
+                          </button>
+                        </div>
                       </>
                     ) : (
                       <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
@@ -3623,7 +3752,6 @@ export default function Home() {
                   </div>
                 ))}
                 
-                {/* UUSI KIRJOITTAA-ANIMAATIO */}
                 {isSparringTyping && (
                   <div className="flex justify-start" aria-label="Tekoäly kirjoittaa...">
                     <div className="bg-[#00BFA6]/10 border border-[#00BFA6]/20 rounded-3xl p-4 text-[#00BFA6] text-xl font-black flex gap-1 rounded-tl-sm" aria-hidden="true">
@@ -3634,7 +3762,6 @@ export default function Home() {
                   </div>
                 )}
                 
-                {/* Näkymätön div automaattista vieritystä varten */}
                 <div ref={chatEndRef} />
               </div>
 
@@ -3661,7 +3788,220 @@ export default function Home() {
             </div>
           </div>
         )}
-      </main>
-    </div>
-  );
-}
+
+        {/* UUDET MODAALIT */}
+
+        {/* 1. Osaamisen kääntäjä */}
+        {showSkillTranslator && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>✨ Käännä ammattikielelle</h3>
+                <button onClick={() => setShowSkillTranslator(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
+              </div>
+              <div className="p-6 sm:p-8 space-y-6">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Kerro omin sanoin, mitä teet vapaa-ajallasi (esim. harrastukset, perhearki, yhdistystoiminta). Tekoäly kääntää sen CV-kelpoisiksi taidoiksi.</p>
+                <textarea
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                  placeholder="Esim. Hoidan 3 lapsen arjen aikataulut, treenit ja budjetin..."
+                  className={`w-full min-h-[120px] rounded-2xl border px-5 py-4 outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-black/50 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
+                />
+                {skillOutput && (
+                  <div className={`p-5 rounded-2xl border ${theme === 'dark' ? 'bg-[#00BFA6]/10 border-[#00BFA6]/30 text-gray-200' : 'bg-[#00BFA6]/10 border-[#00BFA6]/30 text-gray-800'}`}>
+                    <p className="text-xs font-bold text-[#00BFA6] uppercase mb-2">Johdetut taidot:</p>
+                    <p>{skillOutput}</p>
+                    <button 
+                      onClick={() => {
+                        updateField("skills", form.skills ? form.skills + ", " + skillOutput : skillOutput);
+                        setShowSkillTranslator(false);
+                      }}
+                      className="mt-4 w-full bg-[#00BFA6] text-black font-black py-3 rounded-xl hover:scale-[1.02] transition-transform"
+                    >
+                      LISÄÄ CV:SEEN
+                    </button>
+                  </div>
+                )}
+                {!skillOutput && (
+                  <button 
+                    onClick={() => {
+                      setIsTranslating(true);
+                      setTimeout(() => {
+                        setSkillOutput("Ajanhallinta, Budjetointi, Organisointikyky, Paineensietokyky");
+                        setIsTranslating(false);
+                      }, 1500);
+                    }}
+                    disabled={!skillInput || isTranslating}
+                    className="w-full bg-white text-black font-black py-4 rounded-xl disabled:opacity-50 hover:bg-gray-200 transition-colors"
+                  >
+                    {isTranslating ? "Käännetään..." : "ANALYSOI"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 2. Urapolku-navigaattori */}
+        {showCareerPath && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🗺️ Urapolku-navigaattori</h3>
+                <button onClick={() => setShowCareerPath(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
+              </div>
+              <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Mikä on unelmatyösi 3-5 vuoden päästä? Tekoäly tekee sinulle askel askeleelta -suunnitelman, miten pääset nykyisestä tilanteesta sinne.</p>
+                <input
+                  value={careerGoal}
+                  onChange={(e) => setCareerGoal(e.target.value)}
+                  placeholder="Esim. IT-projektipäällikkö"
+                  className={`w-full rounded-2xl border px-5 py-4 outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-black/50 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
+                />
+                
+                {careerPlan.length > 0 && (
+                  <div className="space-y-4">
+                    {careerPlan.map((step, idx) => (
+                      <div key={idx} className={`p-5 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                        <div className="flex items-start gap-4">
+                          <div className="w-8 h-8 rounded-full bg-[#00BFA6]/20 text-[#00BFA6] font-black flex items-center justify-center shrink-0">{idx + 1}</div>
+                          <p className={`pt-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{step}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {!careerPlan.length && (
+                  <button 
+                    onClick={() => {
+                      setIsPlanning(true);
+                      setTimeout(() => {
+                        setCareerPlan([
+                          "Käy 2 kuukauden ilmainen ketterän kehityksen (Scrum) verkkokurssi.",
+                          "Päivitä CV:si tavoittelemaan ensin 'Junior IT-asiantuntija' -rooleja. Korosta nykyistä asiakaspalvelutaustaasi kommunikaatiotaitona.",
+                          "Pyri ottamaan nykyisessä tai seuraavassa työssäsi pieniä vastuita projektien vetämisestä (esim. tiimin sisäiset kehityshankkeet)."
+                        ]);
+                        setIsPlanning(false);
+                      }, 2000);
+                    }}
+                    disabled={!careerGoal || isPlanning}
+                    className="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl disabled:opacity-50 hover:scale-[1.02] transition-transform"
+                  >
+                    {isPlanning ? "Piirretään karttaa..." : "LUO SUUNNITELMA"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Julkinen linkki -modaali */}
+        {showPublicLink && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-lg shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🌐 Julkinen profiili</h3>
+                <button onClick={() => setShowPublicLink(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
+              </div>
+              <div className="p-6 sm:p-8 space-y-6">
+                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Voit jakaa tämän linkin suoraan rekrytoijille. Se näyttää luomasi CV:n kauniina, mobiilioptimoituna verkkosivuna.</p>
+                
+                <div className={`flex items-center justify-between p-4 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                  <span className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Julkisuus päällä</span>
+                  <div className="w-12 h-6 bg-[#00BFA6] rounded-full p-1 flex justify-end">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className={`text-xs font-bold uppercase mb-2 block ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Oma linkkisi</label>
+                  <input
+                    readOnly
+                    value={`https://duuniharava.fi/p/${form.name ? form.name.toLowerCase().replace(/ /g, '-') : 'profiili'}`}
+                    className={`w-full rounded-xl border px-5 py-4 outline-none ${theme === 'dark' ? 'bg-black/50 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`}
+                  />
+                </div>
+                
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://duuniharava.fi/p/${form.name ? form.name.toLowerCase().replace(/ /g, '-') : 'profiili'}`);
+                    setShowPublicLink(false);
+                    setMessage("Linkki kopioitu leikepöydälle!");
+                    setTimeout(() => setMessage(""), 2500);
+                  }}
+                  className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-colors border border-gray-300"
+                >
+                  KOPIOI LINKKI
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Sähköpostimallin modaali */}
+        {emailTemplateModal && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  {emailTemplateModal.type === 'thanks' && "✉️ Kiitosviesti"}
+                  {emailTemplateModal.type === 'questions' && "✉️ Kysy lisätietoja"}
+                  {emailTemplateModal.type === 'linkedin' && "🔗 Verkostoitumisviesti"}
+                </h3>
+                <button onClick={() => setEmailTemplateModal(null)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
+              </div>
+              <div className="p-6 sm:p-8 space-y-6">
+                <textarea
+                  readOnly
+                  value={emailTemplateModal.content}
+                  className={`w-full min-h-[250px] rounded-2xl border px-6 py-5 outline-none resize-none leading-relaxed ${theme === 'dark' ? 'bg-black/50 border-white/10 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
+                />
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(emailTemplateModal.content);
+                    setEmailTemplateModal(null);
+                    setMessage("Viesti kopioitu leikepöydälle!");
+                    setTimeout(() => setMessage(""), 2500);
+                  }}
+                  className="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl hover:scale-[1.02] transition-transform"
+                >
+                  KOPIOI LEIKEPÖYDÄLLE
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 5. Palkkaneuvottelija modaali */}
+        {salaryJob && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-blue-500/30' : 'bg-white border-blue-200'}`}>
+              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>💰 Palkka-arvio</h3>
+                <button onClick={() => setSalaryJob(null)} className="text-gray-500 hover:text-blue-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
+              </div>
+              <div className="p-6 sm:p-8 space-y-6 text-center">
+                <p className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{salaryJob.title}</p>
+                <div className="py-8">
+                  <p className="text-sm uppercase tracking-widest text-blue-500 font-bold mb-2">Markkinapalkka (Arvio)</p>
+                  <p className={`text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3200<span className="text-3xl text-gray-500 font-medium"> - </span>3800<span className="text-2xl text-blue-500">€</span></p>
+                </div>
+                <div className={`p-5 rounded-2xl border text-left ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-gray-300' : 'bg-blue-50 border-blue-100 text-gray-700'}`}>
+                  <p className="font-bold mb-2 text-blue-500">Miten perustelet pyyntösi?</p>
+                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                    <li>Korosta aikaisempaa tulosvastuutasi.</li>
+                    <li>Sijainti ({salaryJob.location || "Pääkaupunkiseutu"}) nostaa palkkatasoa hieman.</li>
+                  </ul>
+                </div>
+                <button onClick={() => setSalaryJob(null)} className="w-full bg-blue-500 text-white font-black py-4 rounded-xl hover:bg-blue-600 transition-colors">
+                  SULJE
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 6. Teleprompter (Videohakemus) */}
+        {teleprompterJob && (
+          <div className="fixed inset-0 z-[300]
