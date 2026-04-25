@@ -55,7 +55,7 @@ type CvPreviewProps = {
   image?: string;
   styleVariant?: CvStyleVariant;
   customStyle?: CvCustomStyle;
-  mode?: "cv" | "letter"; // UUSI TILA HAKEMUSKIRJEELLE
+  mode?: "cv" | "letter";
 };
 
 // Ikonit yhteystiedoille
@@ -91,6 +91,11 @@ function isHeading(line: string) {
   return line === line.toUpperCase() || headingNames.includes(line.toUpperCase());
 }
 
+// Apufunktiot osioiden tunnistamiseen
+const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET", "HARRASTUKSET"].includes(title.toUpperCase());
+const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS", "PROJEKTIT", "PORTFOLIO"].includes(title.toUpperCase());
+const isProfileSection = (title: string) => ["PROFIILI", "TIIVISTELMÄ", "TAVOITE"].includes(title.toUpperCase());
+
 export default function CvPreview({
   cvText,
   image,
@@ -114,7 +119,6 @@ export default function CvPreview({
   const email = mode === "cv" ? (lines[2] || "") : "";
   const location = mode === "cv" ? (lines[3] || "") : "";
   
-  // Kirjetilassa ei ole puhelinta/sähköpostia alussa samalla tavalla, parsitaan ne
   let contactInfoLetter = { phone: "", email: "", location: "" };
   if (mode === "letter") {
       contactInfoLetter.phone = lines.find(l => l.match(/04[0-9]/) || l.match(/\+358/)) || "";
@@ -148,7 +152,6 @@ export default function CvPreview({
     }
   }
 
-  // --- DYNAAMISET TYYLIT ---
   const getFontFamily = () => {
     switch(customStyle.fontFamily) {
       case 'classic': return '"Times New Roman", Times, serif';
@@ -385,7 +388,6 @@ export default function CvPreview({
     );
   }
 
-  // Kuvien asettelulogiikka
   const imagePos = customStyle.imagePosition || "left";
   const isImgRight = imagePos === "right";
   const isImgCenter = imagePos === "center";
@@ -492,7 +494,7 @@ export default function CvPreview({
                         {paragraph}
                       </p>
                     );
-                  })}
+                  });}
                   {/* Allekirjoitus */}
                   <div className="mt-12 pt-8" style={{ borderTop: `2px solid ${customStyle.accentColor}30` }}>
                     <p className="font-bold" style={{ color: customStyle.accentColor }}>Ystävällisin terveisin,</p>
