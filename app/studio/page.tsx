@@ -170,6 +170,16 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     sidebarGradientDirection: "135deg",
     shadowStyle: "soft",
     contactSpacing: 40,
+    iconStyle: "outline",
+    timelineStyle: "solid",
+    itemSpacing: 16,
+    headerFontWeight: "black",
+    imageBorderWidth: 4,
+    headingSize: 16,
+    contactSize: 14,
+    headingTransform: "uppercase",
+    imageFilter: "none",
+    sidebarBorder: false,
   },
   classic: {
     sidebarBg: "#f5f5f4",
@@ -204,6 +214,16 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     sidebarGradientDirection: "none",
     shadowStyle: "none",
     contactSpacing: 40,
+    iconStyle: "solid",
+    timelineStyle: "none",
+    itemSpacing: 20,
+    headerFontWeight: "bold",
+    imageBorderWidth: 0,
+    headingSize: 18,
+    contactSize: 14,
+    headingTransform: "uppercase",
+    imageFilter: "none",
+    sidebarBorder: true,
   },
   compact: {
     sidebarBg: "#f8fafc",
@@ -238,6 +258,16 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     sidebarGradientDirection: "none",
     shadowStyle: "none",
     contactSpacing: 32,
+    iconStyle: "none",
+    timelineStyle: "dashed",
+    itemSpacing: 12,
+    headerFontWeight: "black",
+    imageBorderWidth: 2,
+    headingSize: 16,
+    contactSize: 13,
+    headingTransform: "none",
+    imageFilter: "none",
+    sidebarBorder: false,
   },
   bold: {
     sidebarBg: "#1e1b4b",
@@ -272,6 +302,16 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     sidebarGradientDirection: "135deg",
     shadowStyle: "hard",
     contactSpacing: 40,
+    iconStyle: "solid",
+    timelineStyle: "dotted",
+    itemSpacing: 24,
+    headerFontWeight: "black",
+    imageBorderWidth: 6,
+    headingSize: 18,
+    contactSize: 15,
+    headingTransform: "uppercase",
+    imageFilter: "none",
+    sidebarBorder: false,
   },
 };
 
@@ -426,13 +466,13 @@ function SectionShell({
               {title}
             </h2>
           </div>
-          {/* Mobiilin haitarinuoli, jotta käyttäjä tajuaa että laatikon voi sulkea */}
+          {/* Mobiilin haitarinuoli */}
           <div className={`sm:hidden flex items-center justify-center w-10 h-10 rounded-full border transition-transform group-open:rotate-180 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
             ▼
           </div>
         </div>
         
-        {/* Action nappi (esim Tyhjennä) - piilotetaan kun haitari on kiinni */}
+        {/* Action nappi (esim Tyhjennä) */}
         <div className="w-full sm:w-auto hidden group-open:block" onClick={(e) => e.stopPropagation()}>
           {action}
         </div>
@@ -1312,11 +1352,26 @@ export default function Home() {
       });
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
       pdf.setFillColor(customStyle.mainBg);
-      pdf.rect(0, 0, pdfWidth, pdfHeight, "F");
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      pdf.rect(0, 0, pdfWidth, pageHeight, "F");
+      pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = position - pageHeight;
+        pdf.addPage();
+        pdf.setFillColor(customStyle.mainBg);
+        pdf.rect(0, 0, pdfWidth, pageHeight, "F");
+        pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
       pdf.save(`duuniharava-cv-${cvStyle}.pdf`);
       
       setMessage("PDF ladattu onnistuneesti koneellesi!");
@@ -1924,7 +1979,7 @@ export default function Home() {
         .light-theme .from-zinc-900\\/50 { --tw-gradient-from: #F3F4F6 !important; }
         .light-theme .bg-black\\/80 { background-color: rgba(255, 255, 255, 0.8) !important; }
         
-        /* Poikkeukset nappeihin, joissa pitää säilyttää värit (esim vihreä/oranssi nappi text-white) */
+        /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
       <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32 sm:pb-10 transition-colors duration-300">
@@ -2702,6 +2757,55 @@ export default function Home() {
                                     <option value="boxed">Laatikko</option>
                                   </select>
                                 </div>
+                                {/* UUDET MUOKKAUKSET ALLA */}
+                                <div>
+                                  <label htmlFor="style-headingTransform" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikoiden tekstaus</label>
+                                  <select id="style-headingTransform" value={customStyle.headingTransform || "uppercase"} onChange={(e) => updateCustomStyle("headingTransform", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="uppercase">KAIKKI ISOLLA (Uppercase)</option>
+                                    <option value="none">Normaali koko (None)</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-headerFontWeight" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikoiden paksuus</label>
+                                  <select id="style-headerFontWeight" value={customStyle.headerFontWeight || "black"} onChange={(e) => updateCustomStyle("headerFontWeight", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="normal">Normaali (Normal)</option>
+                                    <option value="medium">Puolilihava (Medium)</option>
+                                    <option value="bold">Lihava (Bold)</option>
+                                    <option value="black">Erittäin paksu (Black)</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-timelineStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Aikajanan viiva (Työkokemus)</label>
+                                  <select id="style-timelineStyle" value={customStyle.timelineStyle || "solid"} onChange={(e) => updateCustomStyle("timelineStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="solid">Yhtenäinen</option>
+                                    <option value="dashed">Katkoviiva</option>
+                                    <option value="dotted">Pisteviiva</option>
+                                    <option value="none">Piilotettu</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-iconStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yhteystietojen ikonit</label>
+                                  <select id="style-iconStyle" value={customStyle.iconStyle || "outline"} onChange={(e) => updateCustomStyle("iconStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="outline">Ääriviivat (Outline)</option>
+                                    <option value="solid">Täytetyt (Solid)</option>
+                                    <option value="none">Piilotettu</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-imageFilter" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan filtteri</label>
+                                  <select id="style-imageFilter" value={customStyle.imageFilter || "none"} onChange={(e) => updateCustomStyle("imageFilter", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="none">Normaali (Värillinen)</option>
+                                    <option value="grayscale">Mustavalkoinen (Grayscale)</option>
+                                    <option value="sepia">Seepia (Vintage)</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-sidebarBorder" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin erotinviiva</label>
+                                  <select id="style-sidebarBorder" value={customStyle.sidebarBorder ? "yes" : "no"} onChange={(e) => updateCustomStyle("sidebarBorder", e.target.value === "yes")} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="no">Ei viivaa</option>
+                                    <option value="yes">Näytä viiva</option>
+                                  </select>
+                                </div>
                               </div>
                             </div>
 
@@ -2746,7 +2850,7 @@ export default function Home() {
 
                             {/* KUVIOINTI & YKSITYISKOHDAT */}
                             <div>
-                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Kuviointi & Yksityiskohdat</h4>
+                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Kuviointi & Taustat</h4>
                               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 <div>
                                   <label htmlFor="style-pattern" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalueen kuviointi</label>
@@ -2856,6 +2960,22 @@ export default function Home() {
                             <div>
                               <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Mitat & Välit</h4>
                               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                                <div>
+                                  <label htmlFor="range-headingSize" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikoiden koko ({customStyle.headingSize || 16}px)</label>
+                                  <input id="range-headingSize" type="range" min={12} max={32} value={customStyle.headingSize || 16} onChange={(e) => updateCustomStyle("headingSize", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                </div>
+                                <div>
+                                  <label htmlFor="range-contactSize" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yhteystietojen koko ({customStyle.contactSize || 14}px)</label>
+                                  <input id="range-contactSize" type="range" min={10} max={18} value={customStyle.contactSize || 14} onChange={(e) => updateCustomStyle("contactSize", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                </div>
+                                <div>
+                                  <label htmlFor="range-itemSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Luetteloiden välistys ({customStyle.itemSpacing || 12}px)</label>
+                                  <input id="range-itemSpacing" type="range" min={4} max={32} value={customStyle.itemSpacing || 12} onChange={(e) => updateCustomStyle("itemSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                </div>
+                                <div>
+                                  <label htmlFor="range-imageBorderWidth" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan kehyksen paksuus ({customStyle.imageBorderWidth || 0}px)</label>
+                                  <input id="range-imageBorderWidth" type="range" min={0} max={10} value={customStyle.imageBorderWidth || 0} onChange={(e) => updateCustomStyle("imageBorderWidth", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                </div>
                                 <div>
                                   <label htmlFor="range-contactSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yhteystietojen yläväli ({customStyle.contactSpacing || 40}px)</label>
                                   <input id="range-contactSpacing" type="range" min={0} max={120} value={customStyle.contactSpacing || 40} onChange={(e) => updateCustomStyle("contactSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
