@@ -488,6 +488,20 @@ function SectionShell({
   );
 }
 
+function StatCard({ title, value, description, theme }: { title: string; value: string; description: string; theme: "light" | "dark"; }) {
+  return (
+    <div className={`rounded-[30px] border p-8 sm:p-10 shadow-xl transition-all duration-300 hover:-translate-y-2 w-full flex flex-col justify-center ${theme === 'dark' ? 'border-white/10 bg-[#141414] hover:border-[#00BFA6]/50' : 'border-gray-200 bg-white hover:border-[#00BFA6]/50'}`}>
+      <p className={`text-[12px] font-bold uppercase tracking-[0.24em] transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+        {title}
+      </p>
+      <p className={`mt-4 text-5xl font-black tracking-tight transition-colors ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+        {value}
+      </p>
+      <p className={`mt-3 text-sm leading-relaxed transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{description}</p>
+    </div>
+  );
+}
+
 function InputClass(theme: "light" | "dark") {
   return `w-full rounded-2xl border px-6 py-5 text-base outline-none transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] min-h-[60px] ${
     theme === "dark"
@@ -1087,15 +1101,6 @@ export default function Home() {
     jobSort,
     showFavoritesOnly,
   ]);
-
-  const dashboardStats = useMemo(() => {
-    const total = jobs.length;
-    const applied = jobs.filter((job) => job.status === "applied").length;
-    const interview = jobs.filter((job) => job.status === "interview").length;
-    const favorites = jobs.filter((job) => job.favorite).length;
-
-    return { total, applied, interview, favorites };
-  }, [jobs]);
 
   function updateField(key: keyof typeof emptyForm, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -2062,6 +2067,9 @@ export default function Home() {
           <a href="#studio-tulokset" className={`flex flex-col items-center gap-1 text-xs font-bold text-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1`}>
             <span className="text-xl" aria-hidden="true">✨</span> Tulokset
           </a>
+          <button onClick={() => router.push('/tyokalut')} className={`flex flex-col items-center gap-1 text-xs font-bold text-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg p-1`}>
+            <span className="text-xl" aria-hidden="true">🛠️</span> Ekstrat
+          </button>
         </nav>
 
         <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-zinc-900/50 to-transparent" aria-labelledby="hero-heading">
@@ -2077,6 +2085,12 @@ export default function Home() {
               </div>
               
               <div className="flex flex-col sm:flex-row items-center gap-4 sm:w-auto">
+                <button
+                  onClick={() => router.push('/tyokalut')}
+                  className="rounded-2xl border border-purple-500/30 bg-purple-500/10 px-6 py-3 text-sm font-black text-purple-400 hover:bg-purple-500/20 hover:text-purple-300 transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500"
+                >
+                  🛠️ TYÖKALUPAKKI
+                </button>
                 <button
                   onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
                   className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
