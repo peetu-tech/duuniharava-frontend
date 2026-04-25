@@ -394,6 +394,7 @@ function priorityRank(priority: JobPriority) {
 // --- KOMPONENTIT ---
 
 function SectionShell({
+  id,
   step,
   title,
   description,
@@ -401,6 +402,7 @@ function SectionShell({
   children,
   theme
 }: {
+  id?: string;
   step: string;
   title: string;
   description?: string;
@@ -409,25 +411,42 @@ function SectionShell({
   theme: "light" | "dark";
 }) {
   return (
-    <section aria-labelledby={`section-heading-${step}`} className={`mb-12 sm:mb-16 rounded-[40px] border p-6 sm:p-14 shadow-2xl backdrop-blur-xl transition-colors ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}>
-      <div className={`mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-        <div>
-          <p className="text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
-            {step}
-          </p>
-          <h2 id={`section-heading-${step}`} className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight md:text-[38px] transition-colors ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            {title}
-          </h2>
-          {description ? (
-            <p className={`mt-4 max-w-2xl text-base sm:text-lg leading-relaxed transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              {description}
+    <details 
+      id={id} 
+      className={`group mb-8 sm:mb-16 rounded-[32px] sm:rounded-[40px] border p-6 sm:p-14 shadow-2xl backdrop-blur-xl transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`} 
+      open
+    >
+      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-b pb-6 sm:pb-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-xl [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+        <div className="w-full sm:w-auto flex justify-between items-center">
+          <div>
+            <p className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
+              {step}
             </p>
-          ) : null}
+            <h2 id={`section-heading-${step}`} className={`mt-2 sm:mt-3 text-2xl sm:text-4xl font-black tracking-tight md:text-[38px] transition-colors ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              {title}
+            </h2>
+          </div>
+          {/* Mobiilin haitarinuoli, jotta käyttäjä tajuaa että laatikon voi sulkea */}
+          <div className={`sm:hidden flex items-center justify-center w-10 h-10 rounded-full border transition-transform group-open:rotate-180 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
+            ▼
+          </div>
         </div>
-        <div className="w-full sm:w-auto">{action}</div>
+        
+        {/* Action nappi (esim Tyhjennä) - piilotetaan kun haitari on kiinni */}
+        <div className="w-full sm:w-auto hidden group-open:block" onClick={(e) => e.stopPropagation()}>
+          {action}
+        </div>
+      </summary>
+
+      <div className="mt-8 animate-in fade-in duration-300">
+        {description ? (
+          <p className={`mb-8 max-w-2xl text-base sm:text-lg leading-relaxed transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            {description}
+          </p>
+        ) : null}
+        {children}
       </div>
-      {children}
-    </section>
+    </details>
   );
 }
 
@@ -1908,7 +1927,21 @@ export default function Home() {
         /* Poikkeukset nappeihin, joissa pitää säilyttää värit (esim vihreä/oranssi nappi text-white) */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32 sm:pb-10 transition-colors duration-300">
+        
+        {/* MOBIILIN PIKANAVIGOINTI (Näkyy vain puhelimella) */}
+        <nav className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center p-3 pb-safe border-t sm:hidden backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`} aria-label="Mobiilin pikavalikko">
+          <a href="#hakijan-tiedot" className={`flex flex-col items-center gap-1 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+            <span className="text-xl" aria-hidden="true">👤</span> Tiedot
+          </a>
+          <a href="#tyonhaku" className={`flex flex-col items-center gap-1 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+            <span className="text-xl" aria-hidden="true">🔍</span> Hae
+          </a>
+          <a href="#studio-tulokset" className={`flex flex-col items-center gap-1 text-xs font-bold text-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1`}>
+            <span className="text-xl" aria-hidden="true">✨</span> Tulokset
+          </a>
+        </nav>
+
         <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-zinc-900/50 to-transparent" aria-labelledby="hero-heading">
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
@@ -1972,7 +2005,26 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="grid gap-6 w-full">
+              {/* MOBIILIN PIKATILASTOT (Korvaa isot pallot puhelimella) */}
+              <div className={`flex lg:hidden justify-between items-center rounded-3xl p-5 border shadow-sm ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`} aria-label="Työnhaun tilastot">
+                <div className="text-center">
+                  <p className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{jobs.length}</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Työpaikat</p>
+                </div>
+                <div className={`w-px h-8 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`} aria-hidden="true"></div>
+                <div className="text-center">
+                  <p className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>4</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Tyylit</p>
+                </div>
+                <div className={`w-px h-8 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`} aria-hidden="true"></div>
+                <div className="text-center">
+                  <p className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Sävyt</p>
+                </div>
+              </div>
+
+              {/* DESKTOP TILASTOT (Alkuperäiset) */}
+              <div className="hidden lg:grid gap-6 w-full" aria-hidden="true">
                 <StatCard
                   title="TYÖPAIKAT"
                   value={jobs.length.toString()}
@@ -2084,8 +2136,9 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr]">
-            <section className="space-y-12">
+            <section className="space-y-4 sm:space-y-12">
               <SectionShell
+                id="hakijan-tiedot"
                 step="Vaihe 1"
                 title="Hakijan tiedot"
                 description="Täytä tietosi huolellisesti tai lataa vanha CV:si. Näitä käytetään pohjana kaikessa tekoälyn tekemässä työssä."
@@ -2270,6 +2323,7 @@ export default function Home() {
               </SectionShell>
 
               <SectionShell
+                id="tyonhaku"
                 step="Vaihe 2"
                 title="Hakuprofiili & Työnhaku"
                 description="Kerro tekoälylle, millaista työtä haluat. Se hakee voimassa olevat paikat puolestasi."
@@ -2371,12 +2425,12 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section className="space-y-10 lg:sticky lg:top-8 lg:self-start">
-              <div className="rounded-[32px] border border-white/10 bg-[#141414] p-8 sm:p-10 shadow-2xl backdrop-blur-xl transition-all">
+            <section id="studio-tulokset" className="space-y-10 lg:sticky lg:top-8 lg:self-start scroll-mt-24">
+              <div className={`rounded-[32px] sm:rounded-[40px] border p-8 sm:p-10 shadow-2xl backdrop-blur-xl transition-all ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className="sticky top-0 z-40 bg-[#141414] pt-2 sm:pt-0 mb-10 flex overflow-x-auto whitespace-nowrap pb-4 gap-5 snap-x border-b border-white/5 custom-scrollbar"
+                  className={`sticky top-0 z-40 pt-2 sm:pt-0 mb-10 flex overflow-x-auto whitespace-nowrap pb-4 gap-5 snap-x border-b custom-scrollbar ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
@@ -2390,7 +2444,7 @@ export default function Home() {
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "cv"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
-                        : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
+                        : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
                     Oma CV (Esikatselu)
@@ -2405,7 +2459,7 @@ export default function Home() {
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "job"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
-                        : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
+                        : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
                     Työpaikat
@@ -2420,7 +2474,7 @@ export default function Home() {
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "letter"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
-                        : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
+                        : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
                     Hakemukset
@@ -2435,7 +2489,7 @@ export default function Home() {
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C] ${
                       tab === "tips"
                         ? "bg-[#FF6F3C] text-black shadow-[0_0_20px_rgba(255,111,60,0.4)]"
-                        : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
+                        : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
                     Vinkit
@@ -2445,9 +2499,9 @@ export default function Home() {
                 {tab === "cv" && (
                   <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-10 overflow-hidden animate-in fade-in duration-500">
                     {parsedCv.cvBody && activeJob && (
-                      <div className="flex flex-col sm:flex-row gap-5 bg-black/40 p-6 rounded-3xl border border-white/10">
+                      <div className={`flex flex-col sm:flex-row gap-5 p-6 rounded-3xl border ${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
                         <div className="flex-1">
-                          <p className="text-base text-gray-400 mb-3">Valittu työpaikka: <strong className="text-white text-lg">{activeJob.title}</strong></p>
+                          <p className={`text-base mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Valittu työpaikka: <strong className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeJob.title}</strong></p>
                           <button
                             type="button"
                             onClick={createTailoredCv}
@@ -2464,8 +2518,8 @@ export default function Home() {
                     )}
 
                     {activeJobCvVariants.length > 0 && (
-                      <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-                        <h3 className="mb-5 text-xl font-bold text-white">
+                      <div className={`rounded-[28px] border p-6 sm:p-8 ${theme === 'dark' ? 'bg-white/[0.03] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                        <h3 className={`mb-5 text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Tallennetut CV-versiot
                         </h3>
                         <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
@@ -2474,15 +2528,15 @@ export default function Home() {
                               key={cv.id}
                               type="button"
                               onClick={() => setCvResult(`CV_BODY:\n${cv.content}`)}
-                              className="w-full rounded-2xl border border-white/10 bg-black/50 px-6 py-5 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]"
+                              className={`w-full rounded-2xl border px-6 py-5 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-black/50' : 'border-gray-200 bg-white'}`}
                             >
                               <p className="font-bold text-lg text-[#00BFA6] truncate">
                                 {cv.jobTitle}
                               </p>
-                              <p className="text-base font-medium text-white truncate mt-1">
+                              <p className={`text-base font-medium truncate mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {cv.companyName}
                               </p>
-                              <p className="mt-2 text-xs text-gray-500">
+                              <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                                 {new Date(cv.createdAt).toLocaleString("fi-FI")}
                               </p>
                             </button>
@@ -2498,7 +2552,7 @@ export default function Home() {
                             <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#00BFA6]">
                               Kuntotarkastus arvosana
                             </h2>
-                            <p className="mt-3 text-6xl font-black text-white">
+                            <p className={`mt-3 text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               {parsedCv.score}
                             </p>
                           </div>
@@ -2509,7 +2563,7 @@ export default function Home() {
                             <h2 className="mb-6 text-sm font-black uppercase tracking-widest text-[#FF6F3C]">
                               Muutosraportti / Parannukset
                             </h2>
-                            <ul className="space-y-4 pl-6 text-lg text-gray-200">
+                            <ul className={`space-y-4 pl-6 text-lg ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
                               {parsedCv.report.map((item, index) => (
                                 <li key={index} className="list-disc break-words leading-relaxed">
                                   {item}
@@ -2523,8 +2577,8 @@ export default function Home() {
                         <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-8 sm:p-12 shadow-xl">
                           <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div>
-                              <label htmlFor="cv-text-editor" className="text-2xl font-black text-white block">Muokkaa CV-tekstiä</label>
-                              <p className="text-sm text-gray-400 mt-1">Tekoälyn tuottama luonnos. Voit muokata tekstiä täysin vapaasti tässä ennen latausta.</p>
+                              <label htmlFor="cv-text-editor" className={`text-2xl font-black block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Muokkaa CV-tekstiä</label>
+                              <p className={`text-sm mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tekoälyn tuottama luonnos. Voit muokata tekstiä täysin vapaasti tässä ennen latausta.</p>
                             </div>
                           </div>
                           <textarea
@@ -2534,12 +2588,12 @@ export default function Home() {
                               const prefix = cvResult.split("CV_BODY:")[0] || "";
                               setCvResult(prefix + "CV_BODY:\n" + e.target.value);
                             }}
-                            className="min-h-[400px] w-full rounded-3xl border border-white/10 bg-black/50 p-6 font-mono text-sm leading-relaxed text-gray-200 outline-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                            className={`min-h-[400px] w-full rounded-3xl border p-6 font-mono text-sm leading-relaxed outline-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-black/50 text-gray-200' : 'border-gray-200 bg-white text-gray-800'}`}
                           />
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div className="rounded-[40px] border border-white/10 bg-white p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10" role="region" aria-label="CV Esikatselu">
+                        <div className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10 ${theme === 'dark' ? 'border-white/10 bg-white' : 'border-gray-200 bg-gray-50'}`} role="region" aria-label="CV Esikatselu">
                           <div className="min-w-[900px]">
                             <CvPreview
                               cvText={parsedCv.cvBody}
@@ -2566,7 +2620,7 @@ export default function Home() {
                             type="button"
                             onClick={downloadDocx}
                             disabled={downloadingDocx}
-                            className="flex-1 rounded-2xl border-2 border-zinc-800 bg-transparent px-8 py-5 font-black text-zinc-400 transition-all hover:border-white hover:text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white"
+                            className={`flex-1 rounded-2xl border-2 px-8 py-5 font-black transition-all hover:border-[#00BFA6] hover:text-[#00BFA6] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-zinc-800 bg-transparent text-zinc-400' : 'border-gray-300 bg-white text-gray-600'}`}
                             aria-live="polite"
                           >
                             {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
@@ -2574,24 +2628,24 @@ export default function Home() {
                         </div>
 
                         {/* --- CANVA TASON EDITOR --- */}
-                        <div className="rounded-[32px] border border-white/10 bg-[#0A0A0A] p-8 md:p-10 mt-16 shadow-2xl">
-                          <div className="flex flex-wrap items-center justify-between gap-6 mb-8 border-b border-white/5 pb-6">
+                        <div className={`rounded-[32px] border p-8 md:p-10 mt-16 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
+                          <div className={`flex flex-wrap items-center justify-between gap-6 mb-8 border-b pb-6 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
                             <div>
-                              <p className="text-xl font-black text-white tracking-tight">Värit ja Teema</p>
-                              <p className="mt-2 text-base text-gray-400">Pikavalinnat väreille tai säädä itse.</p>
+                              <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Värit ja Teema</p>
+                              <p className={`mt-2 text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Pikavalinnat väreille tai säädä itse.</p>
                             </div>
-                            <button type="button" onClick={resetCurrentStyle} className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-[#00BFA6]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                            <button type="button" onClick={resetCurrentStyle} className={`rounded-2xl border px-6 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-[#00BFA6]/50' : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-[#00BFA6]/50'}`}>
                               Palauta oletukset
                             </button>
                           </div>
 
                           {/* UUDET PIKAVÄRIT */}
-                          <div className="mb-10 flex flex-wrap gap-3 border-b border-white/5 pb-8" role="group" aria-label="Pikaväriteemat">
-                            <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#0369a1] hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0369a1]">🌊 Merellinen</button>
-                            <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#10b981] hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]">🌲 Metsä</button>
-                            <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#d97706] hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d97706]">🍂 Syksy</button>
-                            <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#7c3aed] hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed]">🔮 Kyber</button>
-                            <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className="rounded-xl px-5 py-3 text-sm font-bold border border-white/10 hover:border-[#14b8a6] hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14b8a6]">🌑 Tumma Tyyli</button>
+                          <div className={`mb-10 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="Pikaväriteemat">
+                            <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0369a1] ${theme === 'dark' ? 'border-white/10 hover:border-[#0369a1] hover:bg-white/5' : 'border-gray-200 hover:border-[#0369a1] hover:bg-gray-50'}`}>🌊 Merellinen</button>
+                            <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] ${theme === 'dark' ? 'border-white/10 hover:border-[#10b981] hover:bg-white/5' : 'border-gray-200 hover:border-[#10b981] hover:bg-gray-50'}`}>🌲 Metsä</button>
+                            <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d97706] ${theme === 'dark' ? 'border-white/10 hover:border-[#d97706] hover:bg-white/5' : 'border-gray-200 hover:border-[#d97706] hover:bg-gray-50'}`}>🍂 Syksy</button>
+                            <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed] ${theme === 'dark' ? 'border-white/10 hover:border-[#7c3aed] hover:bg-white/5' : 'border-gray-200 hover:border-[#7c3aed] hover:bg-gray-50'}`}>🔮 Kyber</button>
+                            <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14b8a6] ${theme === 'dark' ? 'border-white/10 hover:border-[#14b8a6] hover:bg-white/5' : 'border-gray-200 hover:border-[#14b8a6] hover:bg-gray-50'}`}>🌑 Tumma Tyyli</button>
                           </div>
 
                           <div className="mb-10 flex flex-wrap gap-4" role="group" aria-label="CV:n asettelutyylit">
@@ -2601,7 +2655,7 @@ export default function Home() {
                                 type="button"
                                 aria-pressed={cvStyle === variant}
                                 onClick={() => setCvStyle(variant)}
-                                className={`rounded-2xl px-6 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${cvStyle === variant ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105" : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"}`}
+                                className={`rounded-2xl px-6 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${cvStyle === variant ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] scale-105" : (theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1")}`}
                               >
                                 {variant === "modern" && "Moderni"}
                                 {variant === "classic" && "Klassinen"}
@@ -2614,11 +2668,11 @@ export default function Home() {
                           <div className="space-y-12">
                             {/* TYPOGRAFIA & ASETTELU */}
                             <div>
-                              <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Asettelu & Typografia</h4>
+                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Asettelu & Typografia</h4>
                               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 <div>
-                                  <label htmlFor="style-layout" className="mb-3 block text-sm font-bold text-gray-400">Asettelu (Layout)</label>
-                                  <select id="style-layout" value={customStyle.layout || "left-sidebar"} onChange={(e) => updateCustomStyle("layout", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-layout" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Asettelu (Layout)</label>
+                                  <select id="style-layout" value={customStyle.layout || "left-sidebar"} onChange={(e) => updateCustomStyle("layout", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="left-sidebar">Vasen sivupalkki</option>
                                     <option value="right-sidebar">Oikea sivupalkki</option>
                                     <option value="top-header">Yläpalkki (Koko leveys)</option>
@@ -2627,8 +2681,8 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-fontFamily" className="mb-3 block text-sm font-bold text-gray-400">Fonttiperhe</label>
-                                  <select id="style-fontFamily" value={customStyle.fontFamily || "modern"} onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-fontFamily" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Fonttiperhe</label>
+                                  <select id="style-fontFamily" value={customStyle.fontFamily || "modern"} onChange={(e) => updateCustomStyle("fontFamily", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="modern">Moderni (Sans-serif)</option>
                                     <option value="classic">Klassinen (Serif)</option>
                                     <option value="mono">Koodari (Monospace)</option>
@@ -2640,8 +2694,8 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-headingStyle" className="mb-3 block text-sm font-bold text-gray-400">Otsikoiden tyyli</label>
-                                  <select id="style-headingStyle" value={customStyle.headingStyle || "simple"} onChange={(e) => updateCustomStyle("headingStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-headingStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikoiden tyyli</label>
+                                  <select id="style-headingStyle" value={customStyle.headingStyle || "simple"} onChange={(e) => updateCustomStyle("headingStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="simple">Yksinkertainen</option>
                                     <option value="underline">Alleviivaus</option>
                                     <option value="highlight">Korostusväri taustalla</option>
@@ -2653,50 +2707,50 @@ export default function Home() {
 
                             {/* VÄRIT */}
                             <div>
-                              <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Värimaailma</h4>
+                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Värimaailma</h4>
                               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                                 <div>
-                                  <label htmlFor="color-sidebarBg" className="mb-3 block text-xs font-bold text-gray-400">Sivupalkki Bg</label>
-                                  <input id="color-sidebarBg" type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-sidebarBg" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkki Bg</label>
+                                  <input id="color-sidebarBg" type="color" value={customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-sidebarBg2" className="mb-3 block text-xs font-bold text-gray-400">Sivupalkki Bg 2</label>
-                                  <input id="color-sidebarBg2" type="color" value={customStyle.sidebarBg2 || customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg2", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-sidebarBg2" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkki Bg 2</label>
+                                  <input id="color-sidebarBg2" type="color" value={customStyle.sidebarBg2 || customStyle.sidebarBg} onChange={(e) => updateCustomStyle("sidebarBg2", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-sidebarText" className="mb-3 block text-xs font-bold text-gray-400">Sivupalkki Txt</label>
-                                  <input id="color-sidebarText" type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-sidebarText" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkki Txt</label>
+                                  <input id="color-sidebarText" type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-mainBg" className="mb-3 block text-xs font-bold text-gray-400">Pääalue Bg</label>
-                                  <input id="color-mainBg" type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-mainBg" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalue Bg</label>
+                                  <input id="color-mainBg" type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-mainBg2" className="mb-3 block text-xs font-bold text-gray-400">Pääalue Bg 2</label>
-                                  <input id="color-mainBg2" type="color" value={customStyle.mainBg2 || customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg2", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-mainBg2" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalue Bg 2</label>
+                                  <input id="color-mainBg2" type="color" value={customStyle.mainBg2 || customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg2", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-mainText" className="mb-3 block text-xs font-bold text-gray-400">Pääalue Txt</label>
-                                  <input id="color-mainText" type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-mainText" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalue Txt</label>
+                                  <input id="color-mainText" type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-headingColor" className="mb-3 block text-xs font-bold text-gray-400">Otsikot</label>
-                                  <input id="color-headingColor" type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-headingColor" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikot</label>
+                                  <input id="color-headingColor" type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-accentColor" className="mb-3 block text-xs font-bold text-gray-400">Korosteväri</label>
-                                  <input id="color-accentColor" type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
+                                  <label htmlFor="color-accentColor" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Korosteväri</label>
+                                  <input id="color-accentColor" type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                               </div>
                             </div>
 
                             {/* KUVIOINTI & YKSITYISKOHDAT */}
                             <div>
-                              <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Kuviointi & Yksityiskohdat</h4>
+                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Kuviointi & Yksityiskohdat</h4>
                               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 <div>
-                                  <label htmlFor="style-pattern" className="mb-3 block text-sm font-bold text-gray-400">Pääalueen kuviointi</label>
-                                  <select id="style-pattern" value={customStyle.pattern || "none"} onChange={(e) => updateCustomStyle("pattern", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-pattern" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalueen kuviointi</label>
+                                  <select id="style-pattern" value={customStyle.pattern || "none"} onChange={(e) => updateCustomStyle("pattern", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="none">Ei kuviointia</option>
                                     <option value="dots">Pisteet (Dots)</option>
                                     <option value="lines">Vaakaviivat (Lines)</option>
@@ -2709,8 +2763,8 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-sidebarPattern" className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin kuviointi</label>
-                                  <select id="style-sidebarPattern" value={customStyle.sidebarPattern || "none"} onChange={(e) => updateCustomStyle("sidebarPattern", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-sidebarPattern" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin kuviointi</label>
+                                  <select id="style-sidebarPattern" value={customStyle.sidebarPattern || "none"} onChange={(e) => updateCustomStyle("sidebarPattern", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="none">Ei kuviointia</option>
                                     <option value="dots">Pisteet (Dots)</option>
                                     <option value="lines">Vaakaviivat (Lines)</option>
@@ -2723,8 +2777,8 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-mainGradient" className="mb-3 block text-sm font-bold text-gray-400">Pääalueen liukuväri (Suunta)</label>
-                                  <select id="style-mainGradient" value={customStyle.mainGradientDirection || "none"} onChange={(e) => updateCustomStyle("mainGradientDirection", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-mainGradient" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalueen liukuväri (Suunta)</label>
+                                  <select id="style-mainGradient" value={customStyle.mainGradientDirection || "none"} onChange={(e) => updateCustomStyle("mainGradientDirection", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="none">Ei liukuväriä</option>
                                     <option value="to bottom">Ylhäältä alas</option>
                                     <option value="to right">Vasemmalta oikealle</option>
@@ -2733,8 +2787,8 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-sidebarGradient" className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin liukuväri (Suunta)</label>
-                                  <select id="style-sidebarGradient" value={customStyle.sidebarGradientDirection || "none"} onChange={(e) => updateCustomStyle("sidebarGradientDirection", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-sidebarGradient" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin liukuväri (Suunta)</label>
+                                  <select id="style-sidebarGradient" value={customStyle.sidebarGradientDirection || "none"} onChange={(e) => updateCustomStyle("sidebarGradientDirection", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="none">Ei liukuväriä</option>
                                     <option value="to bottom">Ylhäältä alas</option>
                                     <option value="to right">Vasemmalta oikealle</option>
@@ -2743,8 +2797,8 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-tagStyle" className="mb-3 block text-sm font-bold text-gray-400">Tagien (Taidot) tyyli</label>
-                                  <select id="style-tagStyle" value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-tagStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Tagien (Taidot) tyyli</label>
+                                  <select id="style-tagStyle" value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="solid">Täytetty</option>
                                     <option value="outline">Reunukset (Outline)</option>
                                     <option value="pill">Pillerit (Pyöreät)</option>
@@ -2753,16 +2807,16 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-headerStyle" className="mb-3 block text-sm font-bold text-gray-400">Yläpalkin tyyli</label>
-                                  <select id="style-headerStyle" value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-headerStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yläpalkin tyyli</label>
+                                  <select id="style-headerStyle" value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="solid">Yksivärinen</option>
                                     <option value="gradient">Liukuväri (Gradient)</option>
                                     <option value="transparent">Läpinäkyvä</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-imageShape" className="mb-3 block text-sm font-bold text-gray-400">Kuvan muoto</label>
-                                  <select id="style-imageShape" value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-imageShape" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan muoto</label>
+                                  <select id="style-imageShape" value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="square">Neliö</option>
                                     <option value="rounded">Pyöristetty</option>
                                     <option value="circle">Ympyrä</option>
@@ -2771,16 +2825,16 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-imagePosition" className="mb-3 block text-sm font-bold text-gray-400">Kuvan sijainti</label>
-                                  <select id="style-imagePosition" value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-imagePosition" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan sijainti</label>
+                                  <select id="style-imagePosition" value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="left">Vasemmalla</option>
                                     <option value="center">Keskellä</option>
                                     <option value="right">Oikealla</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-shadowStyle" className="mb-3 block text-sm font-bold text-gray-400">Varjostukset & 3D</label>
-                                  <select id="style-shadowStyle" value={customStyle.shadowStyle || "none"} onChange={(e) => updateCustomStyle("shadowStyle", e.target.value as any)} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-shadowStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Varjostukset & 3D</label>
+                                  <select id="style-shadowStyle" value={customStyle.shadowStyle || "none"} onChange={(e) => updateCustomStyle("shadowStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="none">Ei varjoja</option>
                                     <option value="soft">Pehmeä varjo</option>
                                     <option value="hard">Kova (Brutalistinen)</option>
@@ -2789,8 +2843,8 @@ export default function Home() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-showSeparators" className="mb-3 block text-sm font-bold text-gray-400">Erotinviivat osioiden välissä</label>
-                                  <select id="style-showSeparators" value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className="w-full rounded-2xl border border-white/10 bg-[#141414] px-5 py-4 text-sm font-bold text-white outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6]">
+                                  <label htmlFor="style-showSeparators" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Erotinviivat osioiden välissä</label>
+                                  <select id="style-showSeparators" value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="yes">Kyllä, näytä viivat</option>
                                     <option value="no">Ei, piilota viivat</option>
                                   </select>
@@ -2800,50 +2854,50 @@ export default function Home() {
 
                             {/* MITAT & VÄLIT */}
                             <div>
-                              <h4 className="text-[#00BFA6] font-bold text-xs uppercase tracking-widest mb-5 border-b border-white/10 pb-3">Mitat & Välit</h4>
+                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Mitat & Välit</h4>
                               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                                 <div>
-                                  <label htmlFor="range-contactSpacing" className="mb-3 block text-sm font-bold text-gray-400">Yhteystietojen yläväli ({customStyle.contactSpacing || 40}px)</label>
+                                  <label htmlFor="range-contactSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yhteystietojen yläväli ({customStyle.contactSpacing || 40}px)</label>
                                   <input id="range-contactSpacing" type="range" min={0} max={120} value={customStyle.contactSpacing || 40} onChange={(e) => updateCustomStyle("contactSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-patternOpacity" className="mb-3 block text-sm font-bold text-gray-400">Kuvioinnin vahvuus ({customStyle.patternOpacity || 5}%)</label>
+                                  <label htmlFor="range-patternOpacity" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvioinnin vahvuus ({customStyle.patternOpacity || 5}%)</label>
                                   <input id="range-patternOpacity" type="range" min={1} max={30} value={customStyle.patternOpacity || 5} onChange={(e) => updateCustomStyle("patternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-sidebarPatternOpacity" className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin kuvioinnin vahvuus ({customStyle.sidebarPatternOpacity || 5}%)</label>
+                                  <label htmlFor="range-sidebarPatternOpacity" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin kuvioinnin vahvuus ({customStyle.sidebarPatternOpacity || 5}%)</label>
                                   <input id="range-sidebarPatternOpacity" type="range" min={1} max={30} value={customStyle.sidebarPatternOpacity || 5} onChange={(e) => updateCustomStyle("sidebarPatternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-pagePadding" className="mb-3 block text-sm font-bold text-gray-400">Sivun sisämarginaalit ({customStyle.pagePadding || 48}px)</label>
+                                  <label htmlFor="range-pagePadding" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivun sisämarginaalit ({customStyle.pagePadding || 48}px)</label>
                                   <input id="range-pagePadding" type="range" min={20} max={80} value={customStyle.pagePadding || 48} onChange={(e) => updateCustomStyle("pagePadding", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-sidebarWidth" className="mb-3 block text-sm font-bold text-gray-400">Sivupalkin leveys ({customStyle.sidebarWidth}px)</label>
+                                  <label htmlFor="range-sidebarWidth" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin leveys ({customStyle.sidebarWidth}px)</label>
                                   <input id="range-sidebarWidth" type="range" min={180} max={340} value={customStyle.sidebarWidth} onChange={(e) => updateCustomStyle("sidebarWidth", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-nameSize" className="mb-3 block text-sm font-bold text-gray-400">Nimen koko ({customStyle.nameSize}px)</label>
+                                  <label htmlFor="range-nameSize" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Nimen koko ({customStyle.nameSize}px)</label>
                                   <input id="range-nameSize" type="range" min={28} max={64} value={customStyle.nameSize} onChange={(e) => updateCustomStyle("nameSize", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-bodySize" className="mb-3 block text-sm font-bold text-gray-400">Tekstin koko ({customStyle.bodySize}px)</label>
+                                  <label htmlFor="range-bodySize" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Tekstin koko ({customStyle.bodySize}px)</label>
                                   <input id="range-bodySize" type="range" min={12} max={20} value={customStyle.bodySize} onChange={(e) => updateCustomStyle("bodySize", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-borderRadius" className="mb-3 block text-sm font-bold text-gray-400">Sisälaatikoiden pyöreys ({customStyle.borderRadius}px)</label>
+                                  <label htmlFor="range-borderRadius" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sisälaatikoiden pyöreys ({customStyle.borderRadius}px)</label>
                                   <input id="range-borderRadius" type="range" min={0} max={40} value={customStyle.borderRadius} onChange={(e) => updateCustomStyle("borderRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-lineHeight" className="mb-3 block text-sm font-bold text-gray-400">Riviväli ({customStyle.lineHeight})</label>
+                                  <label htmlFor="range-lineHeight" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Riviväli ({customStyle.lineHeight})</label>
                                   <input id="range-lineHeight" type="range" min={1.2} max={2} step={0.05} value={customStyle.lineHeight} onChange={(e) => updateCustomStyle("lineHeight", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-sectionSpacing" className="mb-3 block text-sm font-bold text-gray-400">Osioiden väli ({customStyle.sectionSpacing}px)</label>
+                                  <label htmlFor="range-sectionSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Osioiden väli ({customStyle.sectionSpacing}px)</label>
                                   <input id="range-sectionSpacing" type="range" min={8} max={60} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div className="sm:col-span-3">
-                                  <label htmlFor="range-imageRadius" className="mb-3 block text-sm font-bold text-gray-400">Kuvan pyöristys ({customStyle.imageRadius}px)</label>
+                                  <label htmlFor="range-imageRadius" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan pyöristys ({customStyle.imageRadius}px)</label>
                                   <input id="range-imageRadius" type="range" min={0} max={40} value={customStyle.imageRadius} onChange={(e) => updateCustomStyle("imageRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                               </div>
@@ -2853,10 +2907,10 @@ export default function Home() {
 
                       </>
                     ) : (
-                      <div className="rounded-[32px] sm:rounded-[40px] border-2 border-dashed border-white/10 bg-black/40 p-12 sm:p-20 text-center font-medium text-gray-500">
+                      <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`} role="status" aria-live="polite">
                         <div className="text-5xl mb-6" aria-hidden="true">📄</div>
-                        <p className="text-xl font-bold text-white mb-2">Ei esikatselua vielä</p>
-                        <p className="text-base text-gray-400">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
+                        <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei esikatselua vielä</p>
+                        <p className="text-base">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
                       </div>
                     )}
                   </div>
