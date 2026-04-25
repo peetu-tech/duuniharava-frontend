@@ -467,13 +467,11 @@ function SectionShell({
               {title}
             </h2>
           </div>
-          {/* Mobiilin haitarinuoli, jotta käyttäjä tajuaa että laatikon voi sulkea */}
           <div className={`sm:hidden flex items-center justify-center w-10 h-10 rounded-full border transition-transform group-open:rotate-180 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
             ▼
           </div>
         </div>
         
-        {/* Action nappi (esim Tyhjennä) */}
         <div className="w-full sm:w-auto hidden group-open:block" onClick={(e) => e.stopPropagation()}>
           {action}
         </div>
@@ -570,7 +568,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           </p>
         </div>
 
-        {/* MOBIILIOPTIMOITU NAPPIRIVISTÖ */}
         <div className="flex flex-col sm:flex-row flex-wrap gap-4 w-full lg:w-auto pt-6 lg:pt-0 border-t border-transparent lg:border-none mt-4 lg:mt-0">
           <button
             type="button"
@@ -831,7 +828,7 @@ export default function Home() {
 
   const [mode, setMode] = useState<"improve" | "create">("improve");
   const [tab, setTab] = useState<Tab>("cv");
-  const [letterViewMode, setLetterViewMode] = useState<"edit" | "preview">("edit"); // UUSI
+  const [letterViewMode, setLetterViewMode] = useState<"edit" | "preview">("edit");
   const [cvStyle, setCvStyle] = useState<CvStyleVariant>("modern");
   const [letterTone, setLetterTone] = useState<LetterTone>("professional");
 
@@ -868,7 +865,6 @@ export default function Home() {
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
-  // UUDET MODAALIT TILAT
   const [sparringJob, setSparringJob] = useState<JobItem | null>(null);
   const [sparringMessage, setSparringMessage] = useState("");
   const [sparringChat, setSparringChat] = useState<{role: "ai" | "user", text: string}[]>([]);
@@ -881,7 +877,6 @@ export default function Home() {
   const [showPublicLink, setShowPublicLink] = useState(false);
   const [emailTemplateModal, setEmailTemplateModal] = useState<{type: string, content: string} | null>(null);
   
-  // Nämä ovat mock-arvoja ja -tiloja uusia ominaisuuksia varten
   const [skillInput, setSkillInput] = useState("");
   const [skillOutput, setSkillOutput] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
@@ -893,7 +888,6 @@ export default function Home() {
 
   const customStyle = customStyles[cvStyle];
 
-  // Profiilin valmiusasteen laskenta (Pelillistäminen)
   const profileCompletion = useMemo(() => {
     const fields = [form.name, form.phone, form.email, form.location, form.targetJob, form.education, form.experience, form.languages, form.skills, form.projects];
     const filled = fields.filter(f => f && f.trim().length > 0).length;
@@ -3723,288 +3717,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* HAASTATTELUSIMULAATTORI MODAALI */}
-        {sparringJob && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div 
-              role="dialog" 
-              aria-modal="true" 
-              aria-labelledby="modal-title"
-              className={`border rounded-[32px] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col h-[80vh] animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}
-            >
-              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'bg-white/[0.02] border-white/5' : 'bg-gray-50 border-gray-100'}`}>
-                <div>
-                  <h3 id="modal-title" className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🎤 Haastattelusimulaattori</h3>
-                  <p className="text-sm text-[#00BFA6] mt-1 font-bold">{sparringJob.title} @ {sparringJob.company || "Yritys"}</p>
-                </div>
-                <button onClick={() => setSparringJob(null)} aria-label="Sulje simulaattori" className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl bg-black/5 hover:bg-black/10 w-12 h-12 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">✕</button>
-              </div>
-              
-              <div className={`flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 custom-scrollbar ${theme === 'dark' ? '' : 'bg-gray-50'}`} aria-live="polite">
-                {sparringChat.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
-                    <div className={`max-w-[85%] rounded-3xl p-6 ${msg.role === 'ai' ? (theme === 'dark' ? 'bg-[#00BFA6]/10 border border-[#00BFA6]/20 text-gray-200' : 'bg-[#00BFA6]/10 border border-[#00BFA6]/30 text-gray-800') : (theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-900 text-white')} ${msg.role === 'ai' ? 'rounded-tl-sm' : 'rounded-tr-sm'}`}>
-                      <p className={`text-xs font-black mb-3 tracking-widest uppercase ${msg.role === 'ai' ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
-                        {msg.role === 'ai' ? '🤖 Rekrytoija' : '👤 Sinä'}
-                      </p>
-                      <p className="leading-relaxed text-[15px]">{msg.text}</p>
-                    </div>
-                  </div>
-                ))}
-                
-                {isSparringTyping && (
-                  <div className="flex justify-start" aria-label="Tekoäly kirjoittaa...">
-                    <div className="bg-[#00BFA6]/10 border border-[#00BFA6]/20 rounded-3xl p-4 text-[#00BFA6] text-xl font-black flex gap-1 rounded-tl-sm" aria-hidden="true">
-                      <span className="animate-bounce" style={{animationDelay: "0s"}}>.</span>
-                      <span className="animate-bounce" style={{animationDelay: "0.2s"}}>.</span>
-                      <span className="animate-bounce" style={{animationDelay: "0.4s"}}>.</span>
-                    </div>
-                  </div>
-                )}
-                
-                <div ref={chatEndRef} />
-              </div>
-
-              <div className={`p-6 sm:p-8 border-t ${theme === 'dark' ? 'border-white/5 bg-black/50' : 'border-gray-200 bg-white'}`}>
-                <form onSubmit={sendSparringMessage} className="flex gap-4">
-                  <label htmlFor="chat-input" className="sr-only">Viestisi</label>
-                  <input 
-                    id="chat-input"
-                    value={sparringMessage} 
-                    onChange={e => setSparringMessage(e.target.value)} 
-                    placeholder="Kirjoita vastauksesi tähän..." 
-                    className={`flex-1 rounded-2xl border px-6 py-4 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-colors ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`} 
-                    disabled={isSparringTyping}
-                  />
-                  <button 
-                    type="submit" 
-                    disabled={!sparringMessage.trim() || isSparringTyping} 
-                    className="bg-[#00BFA6] text-black font-black px-8 rounded-2xl disabled:opacity-50 hover:scale-[1.05] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
-                  >
-                    LÄHETÄ
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* UUDET MODAALIT */}
-
-        {/* 1. Osaamisen kääntäjä */}
-        {showSkillTranslator && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
-              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>✨ Käännä ammattikielelle</h3>
-                <button onClick={() => setShowSkillTranslator(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
-              </div>
-              <div className="p-6 sm:p-8 space-y-6">
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Kerro omin sanoin, mitä teet vapaa-ajallasi (esim. harrastukset, perhearki, yhdistystoiminta). Tekoäly kääntää sen CV-kelpoisiksi taidoiksi.</p>
-                <textarea
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  placeholder="Esim. Hoidan 3 lapsen arjen aikataulut, treenit ja budjetin..."
-                  className={`w-full min-h-[120px] rounded-2xl border px-5 py-4 outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-black/50 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
-                />
-                {skillOutput && (
-                  <div className={`p-5 rounded-2xl border ${theme === 'dark' ? 'bg-[#00BFA6]/10 border-[#00BFA6]/30 text-gray-200' : 'bg-[#00BFA6]/10 border-[#00BFA6]/30 text-gray-800'}`}>
-                    <p className="text-xs font-bold text-[#00BFA6] uppercase mb-2">Johdetut taidot:</p>
-                    <p>{skillOutput}</p>
-                    <button 
-                      onClick={() => {
-                        updateField("skills", form.skills ? form.skills + ", " + skillOutput : skillOutput);
-                        setShowSkillTranslator(false);
-                      }}
-                      className="mt-4 w-full bg-[#00BFA6] text-black font-black py-3 rounded-xl hover:scale-[1.02] transition-transform"
-                    >
-                      LISÄÄ CV:SEEN
-                    </button>
-                  </div>
-                )}
-                {!skillOutput && (
-                  <button 
-                    onClick={() => {
-                      setIsTranslating(true);
-                      setTimeout(() => {
-                        setSkillOutput("Ajanhallinta, Budjetointi, Organisointikyky, Paineensietokyky");
-                        setIsTranslating(false);
-                      }, 1500);
-                    }}
-                    disabled={!skillInput || isTranslating}
-                    className="w-full bg-white text-black font-black py-4 rounded-xl disabled:opacity-50 hover:bg-gray-200 transition-colors"
-                  >
-                    {isTranslating ? "Käännetään..." : "ANALYSOI"}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 2. Urapolku-navigaattori */}
-        {showCareerPath && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
-              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🗺️ Urapolku-navigaattori</h3>
-                <button onClick={() => setShowCareerPath(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
-              </div>
-              <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Mikä on unelmatyösi 3-5 vuoden päästä? Tekoäly tekee sinulle askel askeleelta -suunnitelman, miten pääset nykyisestä tilanteesta sinne.</p>
-                <input
-                  value={careerGoal}
-                  onChange={(e) => setCareerGoal(e.target.value)}
-                  placeholder="Esim. IT-projektipäällikkö"
-                  className={`w-full rounded-2xl border px-5 py-4 outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-black/50 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
-                />
-                
-                {careerPlan.length > 0 && (
-                  <div className="space-y-4">
-                    {careerPlan.map((step, idx) => (
-                      <div key={idx} className={`p-5 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                        <div className="flex items-start gap-4">
-                          <div className="w-8 h-8 rounded-full bg-[#00BFA6]/20 text-[#00BFA6] font-black flex items-center justify-center shrink-0">{idx + 1}</div>
-                          <p className={`pt-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{step}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                
-                {!careerPlan.length && (
-                  <button 
-                    onClick={() => {
-                      setIsPlanning(true);
-                      setTimeout(() => {
-                        setCareerPlan([
-                          "Käy 2 kuukauden ilmainen ketterän kehityksen (Scrum) verkkokurssi.",
-                          "Päivitä CV:si tavoittelemaan ensin 'Junior IT-asiantuntija' -rooleja. Korosta nykyistä asiakaspalvelutaustaasi kommunikaatiotaitona.",
-                          "Pyri ottamaan nykyisessä tai seuraavassa työssäsi pieniä vastuita projektien vetämisestä (esim. tiimin sisäiset kehityshankkeet)."
-                        ]);
-                        setIsPlanning(false);
-                      }, 2000);
-                    }}
-                    disabled={!careerGoal || isPlanning}
-                    className="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl disabled:opacity-50 hover:scale-[1.02] transition-transform"
-                  >
-                    {isPlanning ? "Piirretään karttaa..." : "LUO SUUNNITELMA"}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 3. Julkinen linkki -modaali */}
-        {showPublicLink && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-lg shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
-              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🌐 Julkinen profiili</h3>
-                <button onClick={() => setShowPublicLink(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
-              </div>
-              <div className="p-6 sm:p-8 space-y-6">
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Voit jakaa tämän linkin suoraan rekrytoijille. Se näyttää luomasi CV:n kauniina, mobiilioptimoituna verkkosivuna.</p>
-                
-                <div className={`flex items-center justify-between p-4 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                  <span className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Julkisuus päällä</span>
-                  <div className="w-12 h-6 bg-[#00BFA6] rounded-full p-1 flex justify-end">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className={`text-xs font-bold uppercase mb-2 block ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Oma linkkisi</label>
-                  <input
-                    readOnly
-                    value={`https://duuniharava.fi/p/${form.name ? form.name.toLowerCase().replace(/ /g, '-') : 'profiili'}`}
-                    className={`w-full rounded-xl border px-5 py-4 outline-none ${theme === 'dark' ? 'bg-black/50 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`}
-                  />
-                </div>
-                
-                <button 
-                  onClick={() => {
-                    navigator.clipboard.writeText(`https://duuniharava.fi/p/${form.name ? form.name.toLowerCase().replace(/ /g, '-') : 'profiili'}`);
-                    setShowPublicLink(false);
-                    setMessage("Linkki kopioitu leikepöydälle!");
-                    setTimeout(() => setMessage(""), 2500);
-                  }}
-                  className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-gray-200 transition-colors border border-gray-300"
-                >
-                  KOPIOI LINKKI
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 4. Sähköpostimallin modaali */}
-        {emailTemplateModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
-              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  {emailTemplateModal.type === 'thanks' && "✉️ Kiitosviesti"}
-                  {emailTemplateModal.type === 'questions' && "✉️ Kysy lisätietoja"}
-                  {emailTemplateModal.type === 'linkedin' && "🔗 Verkostoitumisviesti"}
-                </h3>
-                <button onClick={() => setEmailTemplateModal(null)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
-              </div>
-              <div className="p-6 sm:p-8 space-y-6">
-                <textarea
-                  readOnly
-                  value={emailTemplateModal.content}
-                  className={`w-full min-h-[250px] rounded-2xl border px-6 py-5 outline-none resize-none leading-relaxed ${theme === 'dark' ? 'bg-black/50 border-white/10 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
-                />
-                <button 
-                  onClick={() => {
-                    navigator.clipboard.writeText(emailTemplateModal.content);
-                    setEmailTemplateModal(null);
-                    setMessage("Viesti kopioitu leikepöydälle!");
-                    setTimeout(() => setMessage(""), 2500);
-                  }}
-                  className="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl hover:scale-[1.02] transition-transform"
-                >
-                  KOPIOI LEIKEPÖYDÄLLE
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* 5. Palkkaneuvottelija modaali */}
-        {salaryJob && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-blue-500/30' : 'bg-white border-blue-200'}`}>
-              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>💰 Palkka-arvio</h3>
-                <button onClick={() => setSalaryJob(null)} className="text-gray-500 hover:text-blue-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
-              </div>
-              <div className="p-6 sm:p-8 space-y-6 text-center">
-                <p className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{salaryJob.title}</p>
-                <div className="py-8">
-                  <p className="text-sm uppercase tracking-widest text-blue-500 font-bold mb-2">Markkinapalkka (Arvio)</p>
-                  <p className={`text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3200<span className="text-3xl text-gray-500 font-medium"> - </span>3800<span className="text-2xl text-blue-500">€</span></p>
-                </div>
-                <div className={`p-5 rounded-2xl border text-left ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-gray-300' : 'bg-blue-50 border-blue-100 text-gray-700'}`}>
-                  <p className="font-bold mb-2 text-blue-500">Miten perustelet pyyntösi?</p>
-                  <ul className="list-disc pl-5 space-y-1 text-sm">
-                    <li>Korosta aikaisempaa tulosvastuutasi.</li>
-                    <li>Sijainti ({salaryJob.location || "Pääkaupunkiseutu"}) nostaa palkkatasoa hieman.</li>
-                  </ul>
-                </div>
-                <button onClick={() => setSalaryJob(null)} className="w-full bg-blue-500 text-white font-black py-4 rounded-xl hover:bg-blue-600 transition-colors">
-                  SULJE
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 6. Teleprompter (Videohakemus) */}
-        {teleprompterJob && (
-          <div className="fixed inset-0 z-[300]{/* 5. Palkkaneuvottelija modaali */}
         {salaryJob && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-blue-500/30' : 'bg-white border-blue-200'}`}>
