@@ -4004,4 +4004,44 @@ export default function Home() {
 
         {/* 6. Teleprompter (Videohakemus) */}
         {teleprompterJob && (
-          <div className="fixed inset-0 z-[300]
+          <div className="fixed inset-0 z-[300]{/* 6. Teleprompter (Videohakemus) */}
+        {teleprompterJob && (
+          <div className="fixed inset-0 z-[300] flex flex-col bg-black text-white p-4 sm:p-8 animate-in slide-in-from-bottom-10">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h3 className="font-black text-2xl sm:text-3xl text-[#FF6F3C]">🎥 Videohakemus-studio</h3>
+                <p className="text-gray-400 mt-2">Lue teksti suoraan kameralle. Puhu hitaasti ja selkeästi.</p>
+              </div>
+              <button 
+                onClick={() => setTeleprompterJob(null)} 
+                className="text-gray-400 hover:text-white font-black text-2xl bg-white/10 hover:bg-white/20 w-12 h-12 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6F3C]"
+                aria-label="Sulje teleprompter"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto bg-[#141414] rounded-[32px] sm:rounded-[40px] border border-white/10 p-8 sm:p-16 flex flex-col items-center custom-scrollbar">
+              <div className="max-w-4xl space-y-12 text-3xl sm:text-5xl font-black leading-[1.6] text-gray-300 text-center py-20">
+                <p className="text-white">Hei! Olen {form.name || "[Nimesi]"}, ja haen teille <span className="text-[#FF6F3C]">{teleprompterJob.title}</span> -tehtävään.</p>
+                <p>Olen seurannut yrityksenne {teleprompterJob.company || "[Yrityksen nimi]"} toimintaa jo pitkään, ja arvostan erityisesti tapaanne toimia alalla.</p>
+                <p>Taustani ansiosta minulla on vahva kokemus juuri niistä asioista, joita ilmoituksessanne peräänkuulutitte.</p>
+                <p>Uskon, että asenteeni ja osaamiseni tekisivät minusta loistavan lisäyksen tiimiinne.</p>
+                <p className="text-[#00BFA6]">Kiitos ajastanne, ja toivottavasti pääsemme jatkamaan keskustelua haastattelussa!</p>
+              </div>
+            </div>
+            
+            <div className="mt-8 flex justify-center gap-4">
+              <button 
+                onClick={() => alert("Teleprompterin automaattinen rullaus tulee saataville seuraavassa päivityksessä!")}
+                className="bg-[#FF6F3C] text-black font-black px-10 py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.4)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-black"
+              >
+                ▶️ ALOITA RULLAUS
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
