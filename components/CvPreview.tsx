@@ -487,14 +487,13 @@ export default function CvPreview({
                 // HAKEMUSKIRJEEN RENDERÖINTI
                 <div className="opacity-90" style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: getTextAlign(), fontSize: `${customStyle.bodySize + 1}px` }}>
                   {contentLines.map((paragraph, idx) => {
-                    // Poistetaan tuplarivinvaihdot renderöinnistä
                     if (!paragraph.trim()) return null;
                     return (
                       <p key={idx} className="leading-relaxed">
                         {paragraph}
                       </p>
                     );
-                  });}
+                  })}
                   {/* Allekirjoitus */}
                   <div className="mt-12 pt-8" style={{ borderTop: `2px solid ${customStyle.accentColor}30` }}>
                     <p className="font-bold" style={{ color: customStyle.accentColor }}>Ystävällisin terveisin,</p>
