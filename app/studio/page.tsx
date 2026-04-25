@@ -2111,7 +2111,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* MOBIILIN PIKATILASTOT */}
+              {/* MOBIILIN PIKATILASTOT (Korvaa isot pallot puhelimella) */}
               <div className={`flex lg:hidden justify-between items-center rounded-3xl p-5 border shadow-sm ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`} aria-label="Työnhaun tilastot">
                 <div className="text-center">
                   <p className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{jobs.length}</p>
@@ -2129,7 +2129,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* DESKTOP TILASTOT */}
+              {/* DESKTOP TILASTOT (Alkuperäiset) */}
               <div className="hidden lg:grid gap-6 w-full" aria-hidden="true">
                 <StatCard
                   title="TYÖPAIKAT"
@@ -3009,6 +3009,59 @@ export default function Home() {
                                     <option value="to right">Vasemmalta oikealle</option>
                                     <option value="135deg">Viistosti (135deg)</option>
                                     <option value="circle">Ympyrä (Radial)</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-tagStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Tagien (Taidot) tyyli</label>
+                                  <select id="style-tagStyle" value={customStyle.tagStyle || "solid"} onChange={(e) => updateCustomStyle("tagStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="solid">Täytetty</option>
+                                    <option value="outline">Reunukset (Outline)</option>
+                                    <option value="pill">Pillerit (Pyöreät)</option>
+                                    <option value="sharp">Terävät kulmat</option>
+                                    <option value="minimal">Minimaalinen viiva</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-headerStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yläpalkin tyyli</label>
+                                  <select id="style-headerStyle" value={customStyle.headerStyle || "solid"} onChange={(e) => updateCustomStyle("headerStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="solid">Yksivärinen</option>
+                                    <option value="gradient">Liukuväri (Gradient)</option>
+                                    <option value="transparent">Läpinäkyvä</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-imageShape" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan muoto</label>
+                                  <select id="style-imageShape" value={customStyle.imageShape || "rounded"} onChange={(e) => updateCustomStyle("imageShape", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="square">Neliö</option>
+                                    <option value="rounded">Pyöristetty</option>
+                                    <option value="circle">Ympyrä</option>
+                                    <option value="blob">Epäsymmetrinen (Blob)</option>
+                                    <option value="leaf">Lehti (Leaf)</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-imagePosition" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan sijainti</label>
+                                  <select id="style-imagePosition" value={customStyle.imagePosition || "left"} onChange={(e) => updateCustomStyle("imagePosition", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="left">Vasemmalla</option>
+                                    <option value="center">Keskellä</option>
+                                    <option value="right">Oikealla</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-shadowStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Varjostukset & 3D</label>
+                                  <select id="style-shadowStyle" value={customStyle.shadowStyle || "none"} onChange={(e) => updateCustomStyle("shadowStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="none">Ei varjoja</option>
+                                    <option value="soft">Pehmeä varjo</option>
+                                    <option value="hard">Kova (Brutalistinen)</option>
+                                    <option value="3d">3D-syvyys</option>
+                                    <option value="neon">Neon-hohto</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label htmlFor="style-showSeparators" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Erotinviivat osioiden välissä</label>
+                                  <select id="style-showSeparators" value={customStyle.showSeparators ? "yes" : "no"} onChange={(e) => updateCustomStyle("showSeparators", e.target.value === "yes")} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
+                                    <option value="yes">Kyllä, näytä viivat</option>
+                                    <option value="no">Ei, piilota viivat</option>
                                   </select>
                                 </div>
                               </div>
@@ -4020,23 +4073,3 @@ export default function Home() {
               <div className="max-w-4xl space-y-12 text-3xl sm:text-5xl font-black leading-[1.6] text-gray-300 text-center py-20">
                 <p className="text-white">Hei! Olen {form.name || "[Nimesi]"}, ja haen teille <span className="text-[#FF6F3C]">{teleprompterJob.title}</span> -tehtävään.</p>
                 <p>Olen seurannut yrityksenne {teleprompterJob.company || "[Yrityksen nimi]"} toimintaa jo pitkään, ja arvostan erityisesti tapaanne toimia alalla.</p>
-                <p>Taustani ansiosta minulla on vahva kokemus juuri niistä asioista, joita ilmoituksessanne peräänkuulutitte.</p>
-                <p>Uskon, että asenteeni ja osaamiseni tekisivät minusta loistavan lisäyksen tiimiinne.</p>
-                <p className="text-[#00BFA6]">Kiitos ajastanne, ja toivottavasti pääsemme jatkamaan keskustelua haastattelussa!</p>
-              </div>
-            </div>
-            
-            <div className="mt-8 flex justify-center gap-4">
-              <button 
-                onClick={() => alert("Teleprompterin automaattinen rullaus tulee saataville seuraavassa päivityksessä!")}
-                className="bg-[#FF6F3C] text-black font-black px-10 py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.4)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-black"
-              >
-                ▶️ ALOITA RULLAUS
-              </button>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
