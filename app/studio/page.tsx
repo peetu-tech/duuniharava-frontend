@@ -4004,7 +4004,36 @@ export default function Home() {
 
         {/* 6. Teleprompter (Videohakemus) */}
         {teleprompterJob && (
-          <div className="fixed inset-0 z-[300]{/* 6. Teleprompter (Videohakemus) */}
+          <div className="fixed inset-0 z-[300]{/* 5. Palkkaneuvottelija modaali */}
+        {salaryJob && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-blue-500/30' : 'bg-white border-blue-200'}`}>
+              <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+                <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>💰 Palkka-arvio</h3>
+                <button onClick={() => setSalaryJob(null)} className="text-gray-500 hover:text-blue-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
+              </div>
+              <div className="p-6 sm:p-8 space-y-6 text-center">
+                <p className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{salaryJob.title}</p>
+                <div className="py-8">
+                  <p className="text-sm uppercase tracking-widest text-blue-500 font-bold mb-2">Markkinapalkka (Arvio)</p>
+                  <p className={`text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3200<span className="text-3xl text-gray-500 font-medium"> - </span>3800<span className="text-2xl text-blue-500">€</span></p>
+                </div>
+                <div className={`p-5 rounded-2xl border text-left ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-gray-300' : 'bg-blue-50 border-blue-100 text-gray-700'}`}>
+                  <p className="font-bold mb-2 text-blue-500">Miten perustelet pyyntösi?</p>
+                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                    <li>Korosta aikaisempaa tulosvastuutasi.</li>
+                    <li>Sijainti ({salaryJob.location || "Pääkaupunkiseutu"}) nostaa palkkatasoa hieman.</li>
+                  </ul>
+                </div>
+                <button onClick={() => setSalaryJob(null)} className="w-full bg-blue-500 text-white font-black py-4 rounded-xl hover:bg-blue-600 transition-colors">
+                  SULJE
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 6. Teleprompter (Videohakemus) */}
         {teleprompterJob && (
           <div className="fixed inset-0 z-[300] flex flex-col bg-black text-white p-4 sm:p-8 animate-in slide-in-from-bottom-10">
             <div className="flex justify-between items-center mb-8">
