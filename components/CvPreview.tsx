@@ -91,7 +91,7 @@ function isHeading(line: string) {
   return line === line.toUpperCase() || headingNames.includes(line.toUpperCase());
 }
 
-// Apufunktiot osioiden tunnistamiseen
+// TÄSSÄ OVAT NE PUUTTUVAT APUFUNKTIOT, JOTKA KORJAAVAT VERCEL-VIRHEEN!
 const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET", "HARRASTUKSET"].includes(title.toUpperCase());
 const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS", "PROJEKTIT", "PORTFOLIO"].includes(title.toUpperCase());
 const isProfileSection = (title: string) => ["PROFIILI", "TIIVISTELMÄ", "TAVOITE"].includes(title.toUpperCase());
