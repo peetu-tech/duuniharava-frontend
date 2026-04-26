@@ -35,12 +35,10 @@ export async function POST(req: Request) {
         .single();
         
       if (!profile?.is_pro) {
-        // MUUTETTU: Raja laskettu kolmesta yhteen (1)
         if (profile && profile.api_usage_count >= 1) {
           return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
         }
         
-        // Kasvatetaan laskuria heti onnistuneen tarkistuksen jälkeen
         await supabaseAdmin
           .from("profiles")
           .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
@@ -84,16 +82,20 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-          // KORJATTU: Lisätty erittäin tiukka sääntö oikeinkirjoituksesta ja keksityistä nimistä
-          content: "Olet huipputason suomalainen ura-asiantuntija ja rekrytoija. Tehtäväsi on luoda tai parantaa suomalaisia ansioluetteloita (CV). Kirjoitat erinomaista, ytimekästä ja ammattimaista suomea. Et koskaan keksi työkokemusta, taitoja tai saavutuksia, joita hakija ei ole itse antanut. Vältät tekoälylle tyypillisiä ylisanoja (esim. 'innovatiivinen', 'dynaaminen').\n\nTÄRKEÄ SÄÄNTÖ: Olet absoluuttisen tarkka oikeinkirjoituksesta. Varmista, että kaikki erisnimet, kaupungit (esim. Helsinki) ja yritykset on kirjoitettu 100% oikein ja kieliopillisesti täydellisesti. Älä koskaan muuta käyttäjän syöttämiä nimiä väärään muotoon. Noudatat annettua vastausformaattia kirjaimellisesti.",
+          content: `Olet huipputason suomalainen ura-asiantuntija ja rekrytoija. Tehtäväsi on luoda tai parantaa suomalaisia ansioluetteloita (CV). Kirjoitat erinomaista, ytimekästä ja ammattimaista suomea. 
+
+TÄRKEÄT SÄÄNNÖT:
+1. TOTUUDENMUKAISUUS: Et koskaan keksi työkokemusta, taitoja tai saavutuksia, joita hakija ei ole itse antanut.
+2. EI KLISEITÄ: Älä IKINÄ käytä sanoja: 'innovatiivinen', 'dynaaminen', 'tiimipelaaja', 'tiimityöskentelijä', 'motivoitunut', 'kuten CV:stäni näkyy'. Korvaa nämä aina konkreettisilla teoilla ja asiatekstillä.
+3. OIKEINKIRJOITUS: Ole absoluuttisen tarkka. Varmista, että paikkakunnat (esim. Helsinki, Tampere), nimet ja yritykset on kirjoitettu 100 % oikein. Älä muuta käyttäjän antamia nimiä tai paikkoja keksittyihin muotoihin.
+4. RAKENNE: Noudata annettua vastausformaattia kirjaimellisesti.`,
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      // KORJATTU: Lämpötila laskettu 0.5 -> 0.3 hallusinaatioiden estämiseksi
-      temperature: 0.3,
+      temperature: 0.3, // Hallusinaatioiden minimoimiseksi ja tarkkuuden maksimoimiseksi
     });
 
     const output =
