@@ -2172,8 +2172,15 @@ export default function Home() {
         });
 
         if (res.ok) {
-          alert("Tili poistettu onnistuneesti. Tervetuloa takaisin milloin vain!");
-          window.location.href = "/";
+          // 1. Tyhjennetään session varmuuden vuoksi paikallisesti
+          if (typeof window !== "undefined") {
+            localStorage.clear(); // Poistaa mahdolliset tallennetut session-tiedot
+          }
+
+          alert("Tili poistettu onnistuneesti. Toivottavasti nähdään pian uudestaan!");
+          
+          // 2. TÄMÄ VIE TAKAISIN MYYNTISIVULLE (Etusivulle)
+          window.location.href = "/"; 
         } else {
           const errorData = await res.json();
           alert(errorData.error || "Poisto epäonnistui. Ota yhteys tukeen.");
