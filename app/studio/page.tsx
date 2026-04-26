@@ -798,57 +798,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   );
 }
 
-// --- UUDET MODAALIT (MAKSUMUURI & ASETUKSET) ---
-function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, onClose: () => void, theme: "light" | "dark", onUpgrade: () => void }) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className={`w-full max-w-lg rounded-[40px] border-2 shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden ${theme === 'dark' ? 'bg-[#0A0A0A] border-[#00BFA6]/50' : 'bg-white border-[#00BFA6]'}`}>
-        
-        {/* YLÄOSA - Gradientti ja Rasti */}
-        <div className="bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] p-8 text-center relative">
-          <button 
-            onClick={onClose} 
-            className="absolute top-5 right-5 text-black hover:text-white transition-colors z-[600] p-2 focus-visible:outline-none"
-            aria-label="Sulje"
-          >
-            <span className="font-black text-2xl">✕</span>
-          </button>
-          
-          <span className="text-6xl mb-4 block drop-shadow-md">⭐</span>
-          <h2 className="text-3xl font-black text-black tracking-tight">Päivitä Pro -tasolle</h2>
-          <p className="text-black/80 font-bold mt-2">Tämä ominaisuus vaatii Duuniharava Pro -tilauksen.</p>
-        </div>
-
-        {/* ALAOSA - Sisältö ja hinta */}
-        <div className="p-8 space-y-6">
-          <ul className={`space-y-4 font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Rajattomat tekoälyhakemukset</li>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Rajaton CV:n räätälöinti työn mukaan</li>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Edistynyt AI-Taikasauva (Inline AI)</li>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Haastattelusimulaattori & Teleprompter</li>
-          </ul>
-          
-          <div className="pt-6 border-t border-gray-500/20 text-center">
-            <p className={`text-4xl font-black mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-              9,90 € <span className="text-sm text-gray-500 font-bold">/ kk</span>
-            </p>
-            <button 
-              onClick={onUpgrade} 
-              className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-5 rounded-2xl text-xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_10px_30px_rgba(0,191,166,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black"
-            >
-              AVAA KAIKKI OMINAISUUDET
-            </button>
-            <p className="text-xs text-gray-500 mt-4">Peruuta milloin tahansa yhdellä painalluksella.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
 // --- PÄÄKOMPONENTTI ---
 export default function Home() {
   const router = useRouter();
@@ -4182,48 +4131,52 @@ function SettingsModal({
   );
 }
 
-function PaywallModal({ 
-  isOpen, 
-  onClose, 
-  theme, 
-  onUpgrade 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
-  theme: "light" | "dark"; 
-  onUpgrade: () => void; 
-}) {
+// --- UUDET MODAALIT (MAKSUMUURI & ASETUKSET) ---
+function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, onClose: () => void, theme: "light" | "dark", onUpgrade: () => void }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[600] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300">
-      <div className={`w-full max-w-md rounded-[40px] border p-10 shadow-2xl text-center ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+      <div className={`w-full max-w-lg rounded-[40px] border-2 shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden ${theme === 'dark' ? 'bg-[#0A0A0A] border-[#00BFA6]/50' : 'bg-white border-[#00BFA6]'}`}>
         
-        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#00BFA6]/10 text-[#00BFA6]">
-          <span className="text-4xl">🚀</span>
-        </div>
-
-        <h2 className="mb-4 text-3xl font-black tracking-tight text-gray-900 dark:text-white">Hups! Kokeilu käytetty</h2>
-        
-        <p className="mb-8 text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-          Olet käyttänyt ilmaisen kokeilusi (1/1). Päivitä PRO-tasolle, niin saat rajoittamattoman pääsyn kaikkiin työkaluihin.
-        </p>
-
-        <div className="space-y-4">
+        {/* YLÄOSA - Gradientti ja Rasti */}
+        <div className="bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] p-8 text-center relative">
           <button 
-            onClick={onUpgrade}
-            className="w-full rounded-2xl bg-[#00BFA6] py-4 text-lg font-black text-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#00BFA6]/20"
+            onClick={onClose} 
+            className="absolute top-5 right-5 text-black hover:text-white transition-colors z-[600] p-2 focus-visible:outline-none"
+            aria-label="Sulje"
           >
-            PÄIVITY PRO-TASOLLE ✨
+            <span className="font-black text-2xl">✕</span>
           </button>
           
-          <button 
-            onClick={onClose}
-            className="w-full py-2 text-sm font-bold text-gray-500 hover:text-gray-700 dark:hover:text-white transition-colors"
-          >
-            Palaa takaisin
-          </button>
+          <span className="text-6xl mb-4 block drop-shadow-md">⭐</span>
+          <h2 className="text-3xl font-black text-black tracking-tight">Päivitä Pro -tasolle</h2>
+          <p className="text-black/80 font-bold mt-2">Tämä ominaisuus vaatii Duuniharava Pro -tilauksen.</p>
         </div>
+
+        {/* ALAOSA - Sisältö ja hinta */}
+        <div className="p-8 space-y-6">
+          <ul className={`space-y-4 font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Rajattomat tekoälyhakemukset</li>
+            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Rajaton CV:n räätälöinti työn mukaan</li>
+            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Edistynyt AI-Taikasauva (Inline AI)</li>
+            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Haastattelusimulaattori & Teleprompter</li>
+          </ul>
+          
+          <div className="pt-6 border-t border-gray-500/20 text-center">
+            <p className={`text-4xl font-black mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+              9,90 € <span className="text-sm text-gray-500 font-bold">/ kk</span>
+            </p>
+            <button 
+              onClick={onUpgrade} 
+              className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-5 rounded-2xl text-xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_10px_30px_rgba(0,191,166,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black"
+            >
+              AVAA KAIKKI OMINAISUUDET
+            </button>
+            <p className="text-xs text-gray-500 mt-4">Peruuta milloin tahansa yhdellä painalluksella.</p>
+          </div>
+        </div>
+
       </div>
     </div>
   );
