@@ -3576,117 +3576,113 @@ export default function Home() {
                     )}
 
                     {letterResult ? (
-                      <>
-                        <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-[0_15px_50px_rgba(0,191,166,0.15)] mt-10 ${theme === 'dark' ? 'border-[#00BFA6]/40 bg-[#0A0A0A]' : 'border-[#00BFA6]/40 bg-white'}`}>
-                          
-                          <div className={`mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 border-b pb-6 ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
-                            <div className={`flex rounded-2xl p-1 w-full sm:w-auto border ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-gray-100 border-gray-200'}`}>
-                              <button
-                                onClick={() => setLetterViewMode("edit")}
-                                className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "edit" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
-                              >
-                                ✍️ Muokkaa tekstiä
-                              </button>
-                              <button
-                                onClick={() => setLetterViewMode("preview")}
-                                className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "preview" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
-                              >
-                                📄 Visuaalinen esikatselu
-                              </button>
-                            </div>
+                  <>
+                    <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-[0_15px_50px_rgba(0,191,166,0.15)] mt-10 ${theme === 'dark' ? 'border-[#00BFA6]/40 bg-[#0A0A0A]' : 'border-[#00BFA6]/40 bg-white'}`}>
+                      
+                      <div className={`mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 border-b pb-6 ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
+                        <div className={`flex rounded-2xl p-1 w-full sm:w-auto border ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-gray-100 border-gray-200'}`}>
+                          <button
+                            onClick={() => setLetterViewMode("edit")}
+                            className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "edit" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                          >
+                            ✍️ Muokkaa tekstiä
+                          </button>
+                          <button
+                            onClick={() => setLetterViewMode("preview")}
+                            className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "preview" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                          >
+                            📄 Visuaalinen esikatselu
+                          </button>
+                        </div>
 
-                            <button
-                              type="button"
-                              onClick={saveEditedLetter}
-                              className="w-full sm:w-auto rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-4 sm:py-3.5 text-base font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
-                            >
-                              Tallenna muokkaukset
-                            </button>
-                          </div>
+                        <button
+                          type="button"
+                          onClick={saveEditedLetter}
+                          className="w-full sm:w-auto rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-4 sm:py-3.5 text-base font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                        >
+                          Tallenna muokkaukset
+                        </button>
+                      </div>
 
-                          {letterViewMode === "edit" ? (
-                            <textarea
-                              id="letter-editor"
-                              value={letterDraft}
-                              onChange={(e) => setLetterDraft(e.target.value)}
-                              className={`min-h-[500px] w-full rounded-3xl border p-6 sm:p-8 font-sans text-base sm:text-lg leading-relaxed outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-all resize-y shadow-inner ${theme === 'dark' ? 'border-white/5 bg-black/50 text-gray-200' : 'border-gray-200 bg-gray-50 text-gray-800'}`}
+                      {letterViewMode === "edit" ? (
+                        <textarea
+                          id="letter-editor"
+                          value={letterDraft}
+                          onChange={(e) => setLetterDraft(e.target.value)}
+                          className={`min-h-[500px] w-full rounded-3xl border p-6 sm:p-8 font-sans text-base sm:text-lg leading-relaxed outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-all resize-y shadow-inner ${theme === 'dark' ? 'border-white/5 bg-black/50 text-gray-200' : 'border-gray-200 bg-gray-50 text-gray-800'}`}
+                        />
+                      ) : (
+                        <div className={`rounded-3xl border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="Hakemuksen Esikatselu">
+                          <div className="min-w-[900px]">
+                            <CvPreview
+                              cvText={letterDraft}
+                              image={profileImage}
+                              styleVariant={cvStyle}
+                              customStyle={customStyle}
+                              mode="letter"
                             />
-                          ) : (
-                            <div className={`rounded-3xl border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="Hakemuksen Esikatselu">
-                              <div className="min-w-[900px]">
-                                <CvPreview
-                                  cvText={letterDraft}
-                                  image={profileImage}
-                                  styleVariant={cvStyle}
-                                  customStyle={customStyle}
-                                  mode="letter"
-                                />
-                              </div>
-                            </div>
-                          )}
+                          </div>
                         </div>
+                      )}
 
-                        {/* UUDET: SÄHKÖPOSTIAUTOMAATIO & VIDEOTYÖKALU */}
-                        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className={`p-6 rounded-3xl border ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
-                            <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
-                            <div className="flex flex-col gap-3">
-                              <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                                ✉️ Kysy lisätietoja tehtävästä
-                              </button>
-                              <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                                ✉️ Kiitosviesti haastattelun jälkeen
-                              </button>
-                              <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                                🔗 LinkedIn-verkostoitumisviesti
-                              </button>
-                            </div>
-
-                          <div className={`p-6 rounded-3xl border flex flex-col justify-center items-center text-center ${theme === 'dark' ? 'bg-[#141414] border-[#FF6F3C]/30' : 'bg-orange-50 border-orange-200'}`}>
-                            <span className="text-4xl mb-3">🎥</span>
-                            <h4 className={`text-lg font-black mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Videohakemus-studio</h4>
-                            <p className={`text-sm mb-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tekoäly luo minuutin käsikirjoituksen ja avaa teleprompterin lukemista varten.</p>
-                            <button onClick={() => setTeleprompterJob(activeJob)} className="w-full rounded-xl bg-[#FF6F3C] text-black font-black py-3 hover:scale-105 transition-transform">
-                              AVAA TELEPROMPTER
+                      {/* UUDET: SÄHKÖPOSTIAUTOMAATIO & VIDEOTYÖKALU */}
+                      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className={`p-6 rounded-3xl border ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+                          <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
+                          <div className="flex flex-col gap-3">
+                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              ✉️ Kysy lisätietoja tehtävästä
+                            </button>
+                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              ✉️ Kiitosviesti haastattelun jälkeen
+                            </button>
+                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              🔗 LinkedIn-verkostoitumisviesti
                             </button>
                           </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-5 mt-6">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              copyText(
-                                letterDraft || parsedLetter,
-                                "Hakemus kopioitu leikepöydälle!"
-                              )
-                            }
-                            className={`flex-1 rounded-3xl border px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${theme === 'dark' ? 'border-white/20 bg-white text-black' : 'border-gray-300 bg-gray-900 text-white'}`}
-                          >
-                            KOPIOI TEKSTI 📋
-
-                          <button
-                            type="button"
-                            onClick={() => downloadPdf("letter-preview", true)}
-                            disabled={downloadingPdf || letterViewMode === "edit"}
-                            className={`flex-1 rounded-3xl px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${letterViewMode === "edit" ? 'bg-gray-600 text-gray-400 opacity-50 cursor-not-allowed' : 'bg-[#00BFA6] text-black'}`}
-                          >
-                            {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF-HAKEMUS"}
+                        <div className={`p-6 rounded-3xl border flex flex-col justify-center items-center text-center ${theme === 'dark' ? 'bg-[#141414] border-[#FF6F3C]/30' : 'bg-orange-50 border-orange-200'}`}>
+                          <span className="text-4xl mb-3">🎥</span>
+                          <h4 className={`text-lg font-black mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Videohakemus-studio</h4>
+                          <p className={`text-sm mb-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tekoäly luo minuutin käsikirjoituksen ja avaa teleprompterin lukemista varten.</p>
+                          <button onClick={() => setTeleprompterJob(activeJob)} className="w-full rounded-xl bg-[#FF6F3C] text-black font-black py-3 hover:scale-105 transition-transform">
+                            AVAA TELEPROMPTER
                           </button>
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
-                      <div className="text-5xl mb-6" aria-hidden="true">✍️</div>
-                      <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Hakemus puuttuu</p>
-                      <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
+
+                      <div className="flex flex-col sm:flex-row gap-5 mt-6">
+                        <button
+                          type="button"
+                          onClick={() => copyText(letterDraft || parsedLetter, "Hakemus kopioitu leikepöydälle!")}
+                          className={`flex-1 rounded-3xl border px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${theme === 'dark' ? 'border-white/20 bg-white text-black' : 'border-gray-300 bg-gray-900 text-white'}`}
+                        >
+                          KOPIOI TEKSTI 📋
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => downloadPdf("letter-preview", true)}
+                          disabled={downloadingPdf || letterViewMode === "edit"}
+                          className={`flex-1 rounded-3xl px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${letterViewMode === "edit" ? 'bg-gray-600 text-gray-400 opacity-50 cursor-not-allowed' : 'bg-[#00BFA6] text-black'}`}
+                        >
+                          {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF-HAKEMUS"}
+                        </button>
+                      </div>
                     </div>
-                  )}
+                  </>
+                ) : (
+                  <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
+                    <div className="text-5xl mb-6" aria-hidden="true">✍️</div>
+                    <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Hakemus puuttuu</p>
+                    <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
+                  </div>
+                )}
 
                 {/* VINKIT TAB */}
                 {tab === "tips" && (
-                  <div id="panel-tips" role="tabpanel" aria-labelledby="tab-tips" className="space-y-10 animate-in fade-in duration-500">
+                  <div id="panel-tips" role="tabpanel" aria-labelledby="tab-tips" className="space-y-10 animate-in fade-in duration-500 mt-10">
                     <div className={`rounded-[32px] sm:rounded-[40px] border p-8 sm:p-12 shadow-[0_15px_50px_rgba(255,111,60,0.1)] ${theme === 'dark' ? 'border-[#FF6F3C]/30 bg-[#FF6F3C]/5' : 'border-[#FF6F3C]/30 bg-white'}`}>
                       <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Työnhaun Tehovinkit 🚀</h2>
                       <p className="text-lg text-gray-400 mb-10">Lue nämä ohjeet ennen kuin lähetät seuraavan hakemuksesi, niin parannat mahdollisuuksiasi jopa 80%.</p>
