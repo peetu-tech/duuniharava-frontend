@@ -3679,8 +3679,8 @@ export default function Home() {
                     <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
                   </div>
                 )}
-              </div> {/* TÄMÄ PUUTTUI: Sulkee Hakemus-välilehden sisältölaatikon */}
-            )}       {/* TÄMÄ PUUTTUI: Sulkee "tab === letter" -ehdon */}
+              </div>
+            )}
 
             {/* VINKIT TAB */}
             {tab === "tips" && (
