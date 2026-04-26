@@ -4123,22 +4123,85 @@ function SettingsModal({
 }
 
 function PaywallModal({ 
-  isOpen, onClose, theme, onUpgrade 
+  isOpen, 
+  onClose, 
+  theme, 
+  onUpgrade 
 }: { 
-  isOpen: boolean; onClose: () => void; theme: "light" | "dark"; onUpgrade: () => void; 
+  isOpen: boolean; 
+  onClose: () => void; 
+  theme: "light" | "dark"; 
+  onUpgrade: () => void; 
 }) {
   if (!isOpen) return null;
+
+  // Lista ominaisuuksista, jotka esitellään
+  const features = [
+    { icon: "✨", title: "Taikasauva-editori", desc: "Muokkaa tekstiä lennosta tekoälyllä suoraan esikatselussa." },
+    { icon: "📄", title: "Rajattomat asiakirjat", desc: "Luo ja räätälöi niin monta CV:tä ja hakemusta kuin tarvitset." },
+    { icon: "🎯", title: "Täydellinen räätälöinti", desc: "Räätälöi CV:si automaattisesti vastaamaan työpaikkailmoituksen vaatimuksia." },
+    { icon: "🎤", title: "Haastattelusimulaattori", desc: "Harjoittele työhaastattelua varten räätälöidyillä kysymyksillä." },
+  ];
+
   return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className={`w-full max-w-lg rounded-[40px] border-2 shadow-2xl animate-in zoom-in-95 overflow-hidden ${theme === 'dark' ? 'bg-[#0A0A0A] border-[#00BFA6]/50 text-white' : 'bg-white border-[#00BFA6] text-gray-900'}`}>
-        <div className="bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] p-8 text-center relative text-black">
-          <button onClick={onClose} className="absolute top-5 right-5 text-black hover:text-white font-black text-2xl z-[600]">✕</button>
-          <span className="text-6xl mb-4 block drop-shadow-md">⭐</span>
-          <h2 className="text-3xl font-black tracking-tight">Päivitä Pro -tasolle</h2>
-          <p className="font-bold mt-2 opacity-90">Olet käyttänyt ilmaisen kokeilusi (1/1).</p>
+    <div className="fixed inset-0 z-[600] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+      <div className={`w-full max-w-2xl rounded-[40px] border p-2 shadow-2xl animate-in zoom-in-95 duration-400 overflow-hidden ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
+        
+        {/* Yläosa - Gradientti tausta ja otsikko */}
+        <div className="bg-gradient-to-br from-[#00BFA6] to-[#009581] rounded-[32px] p-10 text-center relative overflow-hidden">
+          {/* Koristeympyrä taustalla */}
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+          
+          <button onClick={onClose} className="absolute top-6 right-6 text-black/60 hover:text-white transition-colors z-10 p-2 focus-visible:outline-none">
+            <span className="font-black text-2xl">✕</span>
+          </button>
+          
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white mb-6 backdrop-blur-sm">
+            <span className="text-4xl🚀">🚀</span>
+          </div>
+          
+          <h2 className="text-4xl font-black text-white tracking-tighter mb-3">Vapauta täysi potentiaalisi</h2>
+          <p className="text-white/90 text-lg font-medium max-w-md mx-auto leading-relaxed">
+            Olet käyttänyt ilmaisen kokeilusi (1/1). Päivitä PRO-tasolle ja tee työhaustasi helpompaa ja tehokkaampaa.
+          </p>
         </div>
-        <div className="p-8 text-center">
-           <button onClick={onUpgrade} className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-lg">AVAA KAIKKI OMINAISUUDET</button>
+
+        {/* Alaosa - Ominaisuuslista ja tilausnappi */}
+        <div className="p-8 sm:p-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 mb-10">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#00BFA6]/10 text-2xl">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg mb-0.5">{feature.title}</h4>
+                  <p className="text-sm opacity-70 leading-relaxed">{feature.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className={`p-6 rounded-3xl border text-center ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+            <p className="text-5xl font-black tracking-tight mb-2">
+              9,90 € <span className="text-lg opacity-60 font-bold">/ kk</span>
+            </p>
+            <p className="text-sm opacity-60 mb-6 font-medium">Laskutetaan kuukausittain. Peruuta milloin tahansa.</p>
+            
+            <button 
+              onClick={onUpgrade}
+              className="w-full rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#00DF9F] py-5 text-xl font-black text-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#00BFA6]/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#00BFA6]/50"
+            >
+              ALOITA PRO-TILAUS ✨
+            </button>
+            
+            <button 
+              onClick={onClose}
+              className="mt-4 text-sm font-bold opacity-60 hover:opacity-100 transition-opacity p-2"
+            >
+              Ehkä myöhemmin
+            </button>
+          </div>
         </div>
       </div>
     </div>
