@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const { userId, mode, ...formParams } = body;
 
     // ==========================================
-    // 🔒 PORTINVARTIJA
+    // 🔒 PORTINVARTIJA (RAJOITUS: 1 KOKEILU)
     // ==========================================
     if (userId) {
       const { data: profile } = await supabaseAdmin
@@ -35,10 +35,12 @@ export async function POST(req: Request) {
         .single();
         
       if (!profile?.is_pro) {
-        if (profile && profile.api_usage_count >= 3) {
+        // MUUTETTU: Raja laskettu kolmesta yhteen (1)
+        if (profile && profile.api_usage_count >= 1) {
           return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
         }
         
+        // Kasvatetaan laskuria heti onnistuneen tarkistuksen jälkeen
         await supabaseAdmin
           .from("profiles")
           .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
