@@ -2138,65 +2138,76 @@ export default function Home() {
         
         {/* MOBIILIN PIKANAVIGOINTI (Näkyy vain puhelimella) */}
         <nav className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center p-3 pb-safe border-t sm:hidden backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`} aria-label="Mobiilin pikavalikko">
-          <a href="#hakijan-tiedot" className={`flex flex-col items-center gap-1 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+          <a href="#hakijan-tiedot" className={`flex flex-col items-center gap-1 text-[10px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
             <span className="text-xl" aria-hidden="true">👤</span> Tiedot
           </a>
-          <a href="#tyonhaku" className={`flex flex-col items-center gap-1 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+          <a href="#tyonhaku" className={`flex flex-col items-center gap-1 text-[10px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
             <span className="text-xl" aria-hidden="true">🔍</span> Hae
           </a>
-          <a href="#studio-tulokset" className={`flex flex-col items-center gap-1 text-xs font-bold text-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1`}>
+          <a href="#studio-tulokset" className={`flex flex-col items-center gap-1 text-[10px] font-bold text-[#00BFA6]`}>
             <span className="text-xl" aria-hidden="true">✨</span> Tulokset
           </a>
           
-          {/* UUSI: PRO-nappi mobiiliin, jos ei ole vielä pro */}
+          {/* UUSI: PRO-nappi mobiiliin (sykkivä) */}
           {!isPro ? (
-            <button onClick={() => setShowPaywall(true)} className={`flex flex-col items-center gap-1 text-[10px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6F3C] rounded-lg p-1`}>
+            <button onClick={() => setShowPaywall(true)} className="flex flex-col items-center gap-1 text-[10px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none">
               <span className="text-xl" aria-hidden="true">⭐</span> PRO
             </button>
           ) : (
-            <button onClick={() => router.push('/tyokalut')} className={`flex flex-col items-center gap-1 text-[10px] font-bold text-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg p-1`}>
+            <button onClick={() => router.push('/tyokalut')} className="flex flex-col items-center gap-1 text-[10px] font-bold text-purple-500 focus-visible:outline-none">
               <span className="text-xl" aria-hidden="true">🛠️</span> Ekstrat
             </button>
           )}
         </nav>
 
+        {/* HEADER (Tietokone) */}
         <nav className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0F0F0F]/80 border-white/10' : 'bg-white/80 border-gray-200'}`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <span className="font-black text-2xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
-              <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden sm:block">Studio</div>
+              
+              {/* UUSI: Näyttää Pro-tagin, jos käyttäjä on maksanut */}
+              {isPro ? (
+                <span className="hidden sm:inline-block px-3 py-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black tracking-widest uppercase rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]">
+                  Pro Jäsen
+                </span>
+              ) : (
+                <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden sm:block">Studio</div>
+              )}
             </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:w-auto">
-              {/* UUSI: Asetukset-nappi yläpalkkiin */}
+              
+              {/* UUSI: PRO-nappi työpöydälle */}
+              {!isPro && (
+                <button 
+                  onClick={() => setShowPaywall(true)} 
+                  className="hidden md:flex bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black px-6 py-2 rounded-xl text-sm font-black hover:scale-105 transition-transform shadow-[0_0_15px_rgba(0,191,166,0.3)]"
+                >
+                  ⭐ PÄIVITÄ PRO
+                </button>
+              )}
+
               <button
                 onClick={() => setShowSettings(true)}
-                className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                className="rounded-2xl border border-white/10 px-4 py-2 text-xs sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none"
               >
                 ⚙️ ASETUKSET
               </button>
 
               <button
                 onClick={() => router.push('/tyokalut')}
-                className="rounded-2xl border border-purple-500/30 bg-purple-500/10 px-6 py-3 text-sm font-black text-purple-400 hover:bg-purple-500/20 hover:text-purple-300 transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500"
+                className="hidden sm:inline-block rounded-2xl border border-purple-500/30 bg-purple-500/10 px-4 py-2 text-xs sm:text-sm font-black text-purple-400 hover:bg-purple-500/20 hover:text-purple-300 transition-all whitespace-nowrap focus-visible:outline-none"
               >
                 🛠️ TYÖKALUPAKKI
               </button>
+
               <button
                 onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                className="rounded-2xl border border-white/10 px-6 py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                className="rounded-2xl border border-white/10 px-4 py-2 text-xs sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none"
                 aria-label={theme === 'light' ? 'Vaihda tummaan teemaan' : 'Vaihda vaaleaan teemaan'}
               >
-                {theme === 'light' ? '🌙 TUMMA TEEMA' : '☀️ VAALEA TEEMA'}
-              </button>
-              <button
-                onClick={() => {
-                  clearSession();
-                  router.push("/login");
-                }}
-                className="rounded-2xl border border-white/10 px-8 py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
-              >
-                KIRJAUDU ULOS
+                {theme === 'light' ? '🌙 TUMMA' : '☀️ VAALEA'}
               </button>
             </div>
           </div>
