@@ -3186,7 +3186,7 @@ export default function Home() {
                   </div>
                 )}
 
-                {tab === "job" && (
+                {tab === "jobs" && (
                   <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 animate-in fade-in duration-500">
                     <div className={`rounded-[32px] border p-6 sm:p-10 space-y-8 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                       <h3 className={`text-2xl font-black border-b pb-5 ${theme === 'dark' ? 'text-white border-white/10' : 'text-gray-900 border-gray-100'}`}>
