@@ -2098,29 +2098,44 @@ export default function Home() {
 
   async function handlePortal() {
     const session = getSession();
-    if (!session || !session.user.email) {
-      alert("Sähköpostia ei löytynyt. Kirjaudu uudelleen sisään.");
+    
+    // 1. Varmistetaan, että istunto ja sähköposti löytyvät
+    if (!session || !session.user?.email) {
+      alert("Istuntoa tai sähköpostia ei löytynyt. Kirjaudu uudelleen sisään.");
       return;
     }
 
     try {
+      // 2. Kutsutaan backendin portaali-reittiä
       const res = await fetch("/api/portal", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: session.user.email })
+        headers: { 
+          "Content-Type": "application/json" 
+        },
+        body: JSON.stringify({ 
+          userEmail: session.user.email 
+        })
       });
       
       const data = await res.json();
-      console.log("Stripe Portal vastaus:", data); // Näkyy selaimen konsolissa
+      console.log("Stripe Portal vastaus:", data);
       
+      // 3. Jos saadaan URL, ohjataan käyttäjä sinne
       if (data.url) {
         window.location.href = data.url;
       } else {
-        // TÄMÄ ON UUTTA: Näyttää tarkan virheen
-        alert("Portaalin avaus epäonnistui: " + (data.error || "Tuntematon virhe"));
+        // Jos backend palauttaa virheen (esim. Customeria ei löydy)
+        const errorMsg = data.error || "Tuntematon virhe portaalin avauksessa.";
+        alert("Portaalin avaus epäonnistui: " + errorMsg);
+        
+        // Jos virhe on se, ettei asiakasta löydy, käyttäjä ei todennäköisesti ole vielä tilaaja
+        if (errorMsg.includes("ei löytynyt")) {
+          console.warn("Käyttäjällä ei ole vielä Stripe-asiakkuutta. Hänen on ensin ostettava Pro.");
+        }
       }
     } catch (e: any) {
-      console.error(e);
+      // 4. Käsitellään verkkoyhteysvirheet tai muut kaatumiset
+      console.error("Yhteysvirhe API-reittiin:", e);
       alert("Virhe portaalin latauksessa: " + e.message);
     }
   }
