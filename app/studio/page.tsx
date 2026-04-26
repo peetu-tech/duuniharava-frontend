@@ -1567,14 +1567,15 @@ export default function Home() {
   }
 
   async function handleLogout() {
-  // 1. Tyhjennetään session (auth-helperisi mukaan)
   if (typeof window !== "undefined") {
-    localStorage.clear(); 
-    // Jos sinulla on käytössä clearSession-funktio lib-tiedostossa, kutsu sitä tässä:
-    // clearSession();
+    localStorage.clear();
+    sessionStorage.clear(); // Lisätty varmuuden vuoksi
+    
+    // Jos sinulla on käytössä aiemmin luomamme clearSession, ota se käyttöön:
+    // clearSession(); 
   }
   
-  // 2. Ohjataan takaisin myyntisivulle
+  // Heitetään käyttäjä takaisin myyntisivulle
   window.location.href = "/";
 }
 
