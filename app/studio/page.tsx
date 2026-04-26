@@ -2120,11 +2120,13 @@ export default function Home() {
     
     // 1. Varmistetaan, että istunto ja sähköposti löytyvät
     if (!session || !session.user?.email) {
-      alert("Istuntoa tai sähköpostia ei löytynyt. Kirjaudu uudelleen sisään.");
+      setErrorMessage("Istuntoa tai sähköpostia ei löytynyt. Kirjaudu uudelleen sisään.");
       return;
     }
 
     try {
+      setMessage("avataan tilausasetuksia...");
+      
       // 2. Kutsutaan backendin portaali-reittiä
       const res = await fetch("/api/portal", {
         method: "POST",
@@ -2137,25 +2139,16 @@ export default function Home() {
       });
       
       const data = await res.json();
-      console.log("Stripe Portal vastaus:", data);
       
-      // 3. Jos saadaan URL, ohjataan käyttäjä sinne
+      // 3. Jos Stripe antoi linkin, hypätään sinne
       if (data.url) {
         window.location.href = data.url;
       } else {
-        // Jos backend palauttaa virheen (esim. Customeria ei löydy)
-        const errorMsg = data.error || "Tuntematon virhe portaalin avauksessa.";
-        alert("Portaalin avaus epäonnistui: " + errorMsg);
-        
-        // Jos virhe on se, ettei asiakasta löydy, käyttäjä ei todennäköisesti ole vielä tilaaja
-        if (errorMsg.includes("ei löytynyt")) {
-          console.warn("Käyttäjällä ei ole vielä Stripe-asiakkuutta. Hänen on ensin ostettava Pro.");
-        }
+        setErrorMessage(data.error || "Hallintaportaalia ei voitu avata.");
       }
-    } catch (e: any) {
-      // 4. Käsitellään verkkoyhteysvirheet tai muut kaatumiset
-      console.error("Yhteysvirhe API-reittiin:", e);
-      alert("Virhe portaalin latauksessa: " + e.message);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Yhteysvirhe tilausasetuksiin.");
     }
   }
   return (
