@@ -2726,9 +2726,9 @@ export default function Home() {
                     type="button"
                     role="tab"
                     id="tab-letter"
-                    aria-selected={tab === "letter"} // <--- VIRHE TÄSSÄ (rivi 2729)
+                    aria-selected={tab === "cv"}
                     aria-controls="panel-letter"
-                    onClick={() => setTab("letter")} // <--- JA TÄSSÄ (rivi 2731)
+                    onClick={() => setTab("cv")}
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "letter"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
