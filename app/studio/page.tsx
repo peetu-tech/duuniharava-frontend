@@ -856,7 +856,7 @@ function SettingsModal({
   isPro, 
   onPortal, 
   onDeleteAccount, 
-  onLogout 
+  onLogout // <--- 1. TÄSSÄ
 }: { 
   isOpen: boolean; 
   onClose: () => void; 
@@ -864,22 +864,20 @@ function SettingsModal({
   isPro: boolean; 
   onPortal: () => void; 
   onDeleteAccount: () => void;
-  onLogout: () => void; 
+  onLogout: () => void; // <--- 2. TÄSSÄ (Tyypin on oltava täsmälleen tämä)
 }) {
   if (!isOpen) return null;
   
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
       <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-        
-        {/* Otsikko */}
         <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
           <h2 className="text-2xl font-black">Tilin asetukset</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus-visible:outline-none">✕</button>
         </div>
 
         <div className="space-y-8">
-          {/* JÄSENYYS */}
+          {/* Jäsenyys-osio ennallaan... */}
           <div className={`p-6 rounded-2xl border ${isPro ? (theme === 'dark' ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : 'border-[#00BFA6]/30 bg-[#00BFA6]/5') : (theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50')}`}>
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
             <div className="flex justify-between items-center">
@@ -894,7 +892,7 @@ function SettingsModal({
             </div>
           </div>
 
-          {/* KIRJAUTUMISTIEDOT JA ULOSKIRJAUDU */}
+          {/* Kirjautumistiedot ja Logout-nappi */}
           <div className="space-y-4">
             <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Kirjautumistiedot</h3>
             <div className={`p-5 rounded-xl border flex flex-col gap-4 ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
@@ -913,7 +911,7 @@ function SettingsModal({
             </div>
           </div>
 
-          {/* POISTONAPPI */}
+          {/* Poistonappi */}
           <div className="pt-6 border-t border-red-500/20 text-center sm:text-left">
             <button 
               onClick={onDeleteAccount} 
