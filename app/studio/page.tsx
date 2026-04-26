@@ -4065,11 +4065,10 @@ export default function Home() {
 
   </main>
     </div>
- )}
+ {/* TÄMÄ ON SE SPARRING-OSION VIIMEINEN SULKU */}
+    )}
 
-   {/* --- TÄSTÄ ALKAA KORJATTU LOPPU --- */}
-
-    {/* MODAALIEN KUTSUT (Näiden TÄYTYY olla pääfunktion sisällä, ennen </main>) */}
+    {/* 1. MODAALIEN KUTSUT (Vain kerran tässä, Home-funktion sisällä) */}
     <SettingsModal 
       isOpen={showSettings} 
       onClose={() => setShowSettings(false)} 
@@ -4090,32 +4089,7 @@ export default function Home() {
       </main>
     </div>
   );
-} // <--- TÄMÄ SULKU LOPETTAA PÄÄKOMPONENTIN (Home). Tämän jälkeen ei saa olla mitään muuta koodia kuin uusia funktioita.
-
-{/* --- TÄSTÄ ALKAA KORJATTU LOPPUOSA --- */}
-
-    {/* 1. MODAALIEN KUTSUT (Nämä ovat VIELÄ Home-funktion sisällä) */}
-    <SettingsModal 
-      isOpen={showSettings} 
-      onClose={() => setShowSettings(false)} 
-      theme={theme} 
-      isPro={isPro} 
-      onPortal={handlePortal} 
-      onDeleteAccount={handleDeleteAccount}
-      onLogout={handleLogout} 
-    />
-
-    <PaywallModal 
-      isOpen={showPaywall} 
-      onClose={() => setShowPaywall(false)} 
-      theme={theme} 
-      onUpgrade={handleUpgradeToPro} 
-    />
-
-      </main>
-    </div>
-  );
-} // <--- TÄMÄ SULKU LOPETTAA PÄÄKOMPONENTIN (Home). Tämän jälkeen tiedostossa on vain uusia funktioita.
+} // <--- TÄMÄ ON HOME-FUNKTION AINOA LOPPU.
 
 // ------------------------------------------------------------------
 // 2. MODAALIEN MÄÄRITTELYT (Nämä ovat Home-funktion ULKOPUOLELLA)
@@ -4137,7 +4111,7 @@ function SettingsModal({
         </div>
         <div className="space-y-8">
           <div className={`p-6 rounded-2xl border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100')}`}>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Jäsenyys</p>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
             <div className="flex justify-between items-center">
               <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}</span>
               {isPro && <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline">Hallitse</button>}
@@ -4181,8 +4155,7 @@ function PaywallModal({
           </ul>
           <div className="pt-6 border-t border-gray-500/20 text-center">
             <p className={`text-4xl font-black mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>9,90 € <span className="text-sm text-gray-500 font-bold">/ kk</span></p>
-            <button onClick={onUpgrade} className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-5 rounded-2xl text-xl hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-[#00BFA6]/20">AVAA KAIKKI OMINAISUUDET</button>
-            <p className="text-xs text-gray-500 mt-4">Peruuta milloin tahansa yhdellä painalluksella.</p>
+            <button onClick={onUpgrade} className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-5 rounded-2xl text-xl hover:scale-105 active:scale-95 transition-transform shadow-lg">AVAA KAIKKI OMINAISUUDET</button>
           </div>
         </div>
       </div>
