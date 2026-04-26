@@ -36,7 +36,7 @@ type ParsedCvResult = {
   cvBody: string;
 };
 
-type Tab = "cv" | "jobs" | "tips" | "tools";
+type Tab = "cv" | "jobs" | "tips" | "hakemus";
 type CvStyleVariant = "modern" | "classic" | "compact" | "bold";
 type LetterTone = "professional" | "warm" | "sales";
 type JobStatus =
