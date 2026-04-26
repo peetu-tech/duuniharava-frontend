@@ -798,7 +798,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   );
 }
 
-// --- UUDET MODAALIT (MAKSUMUURI & ASETUKSET) ---
 function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, onClose: () => void, theme: "light" | "dark", onUpgrade: () => void }) {
   if (!isOpen) return null;
   return (
