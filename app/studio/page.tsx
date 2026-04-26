@@ -16,7 +16,7 @@ import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession } from "../../lib/supabaseAuth";
 
-// --- SUPABASE ASETUKSET ---
+// --- SUPABASE ASETUKSET --- 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
