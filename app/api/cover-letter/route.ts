@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const selectedTone = safeTone(tone);
 
     // ==========================================
-    // 🔒 PORTINVARTIJA
+    // 🔒 PORTINVARTIJA (RAJOITUS: 1 KOKEILU)
     // ==========================================
     if (userId) {
       const { data: profile } = await supabaseAdmin
@@ -45,8 +45,8 @@ export async function POST(req: Request) {
         .single();
         
       if (!profile?.is_pro) {
-        // Estetään, jos on käyttänyt vähintään 3 kertaa
-        if (profile && profile.api_usage_count >= 3) {
+        // MUUTETTU: Estetään, jos on käyttänyt vähintään 1 kerran
+        if (profile && profile.api_usage_count >= 1) {
           return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
         }
         
