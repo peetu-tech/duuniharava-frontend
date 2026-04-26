@@ -1566,6 +1566,18 @@ export default function Home() {
     }
   }
 
+  async function handleLogout() {
+  // 1. Tyhjennetään session (auth-helperisi mukaan)
+  if (typeof window !== "undefined") {
+    localStorage.clear(); 
+    // Jos sinulla on käytössä clearSession-funktio lib-tiedostossa, kutsu sitä tässä:
+    // clearSession();
+  }
+  
+  // 2. Ohjataan takaisin myyntisivulle
+  window.location.href = "/";
+}
+
   function handleCvFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
