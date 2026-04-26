@@ -805,7 +805,12 @@ function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, 
     <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
       <div className={`w-full max-w-lg rounded-[40px] border-2 shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden ${theme === 'dark' ? 'bg-[#0A0A0A] border-[#00BFA6]/50' : 'bg-white border-[#00BFA6]'}`}>
         <div className="bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] p-8 text-center relative">
-          <button onClick={onClose} className="absolute top-4 right-4 text-black hover:text-white font-black text-xl focus-visible:outline-none">✕</button>
+         <button 
+  onClick={onClose} 
+  className="absolute top-4 right-4 text-black hover:text-white font-black text-xl focus-visible:outline-none relative z-[600] cursor-pointer p-2"
+>
+  ✕
+</button>
           <span className="text-6xl mb-4 block drop-shadow-md">⭐</span>
           <h2 className="text-3xl font-black text-black tracking-tight">Päivitä Pro -tasolle</h2>
           <p className="text-black/80 font-bold mt-2">Tämä ominaisuus vaatii Duuniharava Pro -tilauksen.</p>
