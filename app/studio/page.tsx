@@ -2188,29 +2188,40 @@ export default function Home() {
       `}} />
       <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32 sm:pb-10 transition-colors duration-300">
         
-        {/* MOBIILIN PIKANAVIGOINTI (Näkyy vain puhelimella) */}
-        <nav className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center p-3 pb-safe border-t sm:hidden backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`} aria-label="Mobiilin pikavalikko">
-          <a href="#hakijan-tiedot" className={`flex flex-col items-center gap-1 text-[10px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-            <span className="text-xl" aria-hidden="true">👤</span> Tiedot
-          </a>
-          <a href="#tyonhaku" className={`flex flex-col items-center gap-1 text-[10px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-            <span className="text-xl" aria-hidden="true">🔍</span> Hae
-          </a>
-          <a href="#studio-tulokset" className={`flex flex-col items-center gap-1 text-[10px] font-bold text-[#00BFA6]`}>
-            <span className="text-xl" aria-hidden="true">✨</span> Tulokset
-          </a>
-          
-          {/* UUSI: PRO-nappi mobiiliin (sykkivä) */}
-          {!isPro ? (
-            <button onClick={() => setShowPaywall(true)} className="flex flex-col items-center gap-1 text-[10px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none">
-              <span className="text-xl" aria-hidden="true">⭐</span> PRO
-            </button>
-          ) : (
-            <button onClick={() => router.push('/tyokalut')} className="flex flex-col items-center gap-1 text-[10px] font-bold text-purple-500 focus-visible:outline-none">
-              <span className="text-xl" aria-hidden="true">🛠️</span> Ekstrat
-            </button>
-          )}
-        </nav>
+    {/* MOBIILIN PIKANAVIGOINTI (5 NAPPIA) */}
+<nav className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center p-2 pb-safe border-t sm:hidden backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`} aria-label="Mobiilin pikavalikko">
+  
+  {/* 1. TIEDOT */}
+  <a href="#hakijan-tiedot" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+    <span className="text-lg" aria-hidden="true">👤</span> Tiedot
+  </a>
+
+  {/* 2. HAKU */}
+  <a href="#tyonhaku" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+    <span className="text-lg" aria-hidden="true">🔍</span> Haku
+  </a>
+
+  {/* 3. TULOKSET */}
+  <a href="#studio-tulokset" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold text-[#00BFA6]`}>
+    <span className="text-lg" aria-hidden="true">✨</span> Tulokset
+  </a>
+
+  {/* 4. TYÖKALUT (Aina näkyvissä) */}
+  <button onClick={() => setTab("tips")} className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${tab === 'tips' ? 'text-[#FF6F3C]' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}>
+    <span className="text-lg" aria-hidden="true">🛠️</span> Työkalut
+  </button>
+
+  {/* 5. PRO TAI ASETUKSET */}
+  {!isPro ? (
+    <button onClick={() => setShowPaywall(true)} className="flex flex-1 flex-col items-center gap-1 text-[9px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none">
+      <span className="text-lg" aria-hidden="true">⭐</span> PRO
+    </button>
+  ) : (
+    <button onClick={() => setShowSettings(true)} className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${showSettings ? 'text-[#00BFA6]' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}>
+      <span className="text-lg" aria-hidden="true">⚙️</span> Säädöt
+    </button>
+  )}
+</nav>
 
         {/* HEADER (Tietokone) */}
         <nav className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0F0F0F]/80 border-white/10' : 'bg-white/80 border-gray-200'}`}>
