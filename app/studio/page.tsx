@@ -4187,10 +4187,18 @@ export default function Home() {
     )}
 
     {/* UUDET MODAALIT (ASETUKSET & MAKSUMUURI) */}
-    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} theme={theme} isPro={isPro} onPortal={handlePortal} />
-    <PaywallModal isOpen={showPaywall} onClose={() => setShowPaywall(false)} theme={theme} onUpgrade={handleUpgradeToPro} />
+<SettingsModal 
+  isOpen={showSettings} 
+  onClose={() => setShowSettings(false)} 
+  theme={theme} 
+  isPro={isPro} 
+  onPortal={handlePortal}
+  onDeleteAccount={handleDeleteAccount} // <--- LISÄÄ TÄMÄ RIVI!
+/>
 
-    </main>
-  </div>
-);
-}
+<PaywallModal 
+  isOpen={showPaywall} 
+  onClose={() => setShowPaywall(false)} 
+  theme={theme} 
+  onUpgrade={handleUpgradeToPro} 
+/>
