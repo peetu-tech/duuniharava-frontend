@@ -2062,34 +2062,6 @@ export default function Home() {
     }, 2000);
   }
 
-  async function handleUpgradeToPro() {
-    const session = getSession();
-    if (!session) {
-        setErrorMessage("Kirjaudu sisään päivittääksesi Pro-tasolle.");
-        return;
-    }
-    
-    try {
-      setMessage("Ohjataan suojattuun maksuun...");
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          userId: session.user.id,
-          userEmail: session.user.email
-        }),
-      });
-      
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url; 
-      } else {
-        setErrorMessage("Maksuikkunan avaus epäonnistui.");
-      }
-    } catch (error) {
-      setErrorMessage("Virhe yhteydessä maksupalveluun.");
-    }
-  }
 
   async function handleUpgradeToPro() {
      // ... tässä on koodia
