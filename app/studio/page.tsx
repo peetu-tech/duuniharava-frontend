@@ -2729,7 +2729,7 @@ export default function Home() {
                     aria-selected={tab === "hakemus"} 
                     onClick={() => setTab("hakemus")}
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
-                      tab === "cv"
+                      tab === "hakemus"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
