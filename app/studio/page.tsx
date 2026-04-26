@@ -2726,9 +2726,8 @@ export default function Home() {
                     type="button"
                     role="tab"
                     id="tab-letter"
-                    aria-selected={tab === "cv"}
-                    aria-controls="panel-letter"
-                    onClick={() => setTab("cv")}
+                    aria-selected={tab === "hakemus"} 
+                    onClick={() => setTab("hakemus")}
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "cv"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
@@ -3461,7 +3460,7 @@ export default function Home() {
                   </div>
                 )}
 
-                {tab === "cv" && (
+                {tab === "hakemus" && (
                   <div id="panel-letter" role="tabpanel" aria-labelledby="tab-letter" className="space-y-10 animate-in fade-in duration-500">
                     <div className="rounded-[32px] sm:rounded-[40px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-6 sm:p-12 relative overflow-hidden shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
                       <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none leading-none" aria-hidden="true">”</div>
