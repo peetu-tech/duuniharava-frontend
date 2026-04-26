@@ -3664,7 +3664,6 @@ export default function Home() {
                             className={`flex-1 rounded-3xl border px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${theme === 'dark' ? 'border-white/20 bg-white text-black' : 'border-gray-300 bg-gray-900 text-white'}`}
                           >
                             KOPIOI TEKSTI 📋
-                          </button>
 
                           <button
                             type="button"
@@ -3675,7 +3674,6 @@ export default function Home() {
                             {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF-HAKEMUS"}
                           </button>
                         </div>
-                      </>
                     ) : (
                       <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
                         <div className="text-5xl mb-6" aria-hidden="true">✍️</div>
