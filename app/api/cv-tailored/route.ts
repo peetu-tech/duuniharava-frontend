@@ -1,7 +1,12 @@
+import { NextResponse } from "next/server"; // Käytetään tätä yhtenäisyyden vuoksi
+import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { buildTailoredCvPrompt } from "@/lib/prompts";
 
-// Huom! Ei "use client" -tunnistetta, koska tämä on backend/API-reitti.
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,13 +15,39 @@ const openai = new OpenAI({
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return Response.json(
+      return NextResponse.json(
         { error: "OPENAI_API_KEY puuttuu palvelimen ympäristömuuttujista." },
         { status: 500 }
       );
     }
 
     const body = await req.json();
+    const { userId, ...formParams } = body;
+
+    // ==========================================
+    // 🔒 PORTINVARTIJA (RAJOITUS: 1 KOKEILU)
+    // ==========================================
+    if (userId) {
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("is_pro, api_usage_count")
+        .eq("id", userId)
+        .single();
+        
+      if (!profile?.is_pro) {
+        // Estetään, jos on käyttänyt vähintään 1 kerran
+        if (profile && profile.api_usage_count >= 1) {
+          return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
+        }
+        
+        // Lisätään laskuriin +1
+        await supabaseAdmin
+          .from("profiles")
+          .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
+          .eq("id", userId);
+      }
+    }
+    // ==========================================
 
     const prompt = buildTailoredCvPrompt({
       currentCv: body.currentCv,
@@ -25,9 +56,8 @@ export async function POST(req: Request) {
       jobAd: body.jobAd,
     });
 
-    // Korjattu OpenAI kutsun syntaksi ja vaihdettu tehokkaaseen gpt-4o malliin
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Käytetään lippulaivamallia parhaan räätälöintilaadun takaamiseksi
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -39,17 +69,17 @@ export async function POST(req: Request) {
           content: prompt,
         },
       ],
-      temperature: 0.5, // Pidetään hieman matalampana (0.5), jotta CV pysyy tiukasti faktoissa
+      temperature: 0.5,
     });
 
     const output =
       response.choices[0]?.message?.content?.trim() ||
       "CV_BODY:\nKohdistetun CV:n luonti epäonnistui (Tekoäly palautti tyhjän vastauksen).";
 
-    return Response.json({ output });
-  } catch (error) {
+    return NextResponse.json({ output });
+  } catch (error: any) {
     console.error("Tailored CV route error:", error);
-    return Response.json(
+    return NextResponse.json(
       { error: "Työpaikkaan sopivan CV-version luonti epäonnistui teknisen virheen vuoksi." },
       { status: 500 }
     );
