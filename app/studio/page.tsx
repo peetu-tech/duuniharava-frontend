@@ -911,7 +911,7 @@ export default function Home() {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [hasSession, setHasSession] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light"); // 'dark' muuttui 'light'
   
   // UUDET TILAT
   const [isPro, setIsPro] = useState(false);
