@@ -3631,17 +3631,16 @@ export default function Home() {
                           <div className={`p-6 rounded-3xl border ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                             <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
                             <div className="flex flex-col gap-3">
-                              <button onClick={() => handleEmailTemplate("questions")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
                                 ✉️ Kysy lisätietoja tehtävästä
                               </button>
-                              <button onClick={() => handleEmailTemplate("thanks")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
                                 ✉️ Kiitosviesti haastattelun jälkeen
                               </button>
-                              <button onClick={() => handleEmailTemplate("linkedin")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
                                 🔗 LinkedIn-verkostoitumisviesti
                               </button>
                             </div>
-                          </div>
 
                           <div className={`p-6 rounded-3xl border flex flex-col justify-center items-center text-center ${theme === 'dark' ? 'bg-[#141414] border-[#FF6F3C]/30' : 'bg-orange-50 border-orange-200'}`}>
                             <span className="text-4xl mb-3">🎥</span>
