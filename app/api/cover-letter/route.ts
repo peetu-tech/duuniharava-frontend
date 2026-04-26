@@ -34,9 +34,6 @@ export async function POST(req: Request) {
     const { userId, cvText, jobTitle, companyName, jobAd, tone, name, phone, email, location, targetJob } = body;
     const selectedTone = safeTone(tone);
 
-    // ==========================================
-    // 🔒 PORTINVARTIJA (RAJOITUS: 1 KOKEILU)
-    // ==========================================
     if (userId) {
       const { data: profile } = await supabaseAdmin
         .from("profiles")
@@ -45,19 +42,16 @@ export async function POST(req: Request) {
         .single();
         
       if (!profile?.is_pro) {
-        // MUUTETTU: Estetään, jos on käyttänyt vähintään 1 kerran
         if (profile && profile.api_usage_count >= 1) {
           return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
         }
         
-        // Lisätään laskuriin +1
         await supabaseAdmin
           .from("profiles")
           .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
           .eq("id", userId);
       }
     }
-    // ==========================================
 
     const basePrompt = buildCoverLetterPrompt({
       name: name || "",
@@ -89,9 +83,10 @@ TÄRKEIMMÄT SÄÄNNÖT, JOITA SINUN ON NOUDATETTAVA:
 1. KIELLETYT KLISEET: Älä IKINÄ käytä sanoja tai fraaseja kuten "Olen erittäin motivoitunut", "Innovatiivinen", "Dynaaminen", "Kuten CV:stäni näkyy", "Olen tiimipelaaja" tai "Kirjoitan hakeakseni".
 2. SUOMALAINEN TYÖKULTTUURI: Ole suorapuheinen, rehellinen ja itsevarma, mutta vältä jenkkityylistä ylimielisyyttä ja liiallista hehkutusta.
 3. TOTUUDENMUKAISUUS: ÄLÄ keksi kokemusta, taitoja tai numeroita, joita hakija ei ole antanut. Käytä vain annettua dataa ja yhdistä se älykkäästi työpaikkailmoituksen tarpeisiin.
-4. RAKENNE JA MUOTOILU: Kirjoita sujuvaa leipätekstiä. ÄLÄ käytä ranskalaisia viivoja (bullet pointteja). Jaa teksti maksimissaan 3-4 lyhyeen kappaleeseen. Kukaan ei jaksa lukea pitkiä tekstimassoja.
-5. VAHVA ALOITUS & LOPETUS: Aloita heti asiaan menevällä "koukulla" (esim. hakijan paras saavutus, ydinosaaminen tai miksi hän on täydellinen match juuri tähän rooliin). Lopeta aktiiviseen ja luontevaan toimintakehotteeseen (CTA), esim. ehdottamalla lyhyttä puhelua.
+4. RAKENNE JA MUOTOILU: Kirjoita sujuvaa leipätekstiä. ÄLÄ käytä ranskalaisia viivoja (bullet pointteja). Jaa teksti maksimissaan 3-4 lyhyeen kappaleeseen.
+5. VAHVA ALOITUS & LOPETUS: Aloita heti asiaan menevällä "koukulla". Lopeta aktiiviseen ja luontevaan toimintakehotteeseen (CTA).
 6. ${toneInstructions[selectedTone]}
+7. OIKEINKIRJOITUS JA TARKKUUS: Ole absoluuttisen tarkka oikeinkirjoituksesta. Varmista, että paikkakunnat (kuten Helsinki, Tampere), nimet ja yritykset on kirjoitettu täysin oikein. Älä koskaan muuta käyttäjän antamia nimiä tai paikkoja keksittyihin muotoihin (kuten "Heldifin").
 
 HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen rivinvaihto. Tämä on kriittistä sovelluksen toiminnan kannalta.`
         },
@@ -100,7 +95,7 @@ HUOM: Aloita vastauksesi AINA täsmälleen sanalla "HAKEMUS:" ja sen jälkeen ri
           content: basePrompt,
         },
       ],
-      temperature: 0.6, 
+      temperature: 0.4, // Laskettu tarkkuuden parantamiseksi
     });
 
     const output =
