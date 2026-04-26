@@ -3675,13 +3675,14 @@ export default function Home() {
                           </button>
                         </div>
                       </div>
-                    ) : (
-                      <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
-                        <div className="text-5xl mb-6" aria-hidden="true">✍️</div>
-                        <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Hakemus puuttuu</p>
-                        <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
-                      </div>
-                    )}
+                    </>
+                  ) : (
+                    <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
+                      <div className="text-5xl mb-6" aria-hidden="true">✍️</div>
+                      <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Hakemus puuttuu</p>
+                      <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
+                    </div>
+                  )}
 
                 {/* VINKIT TAB */}
                 {tab === "tips" && (
