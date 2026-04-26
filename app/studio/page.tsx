@@ -2206,10 +2206,13 @@ export default function Home() {
     <span className="text-lg" aria-hidden="true">✨</span> Tulokset
   </a>
 
-  {/* 4. TYÖKALUT (Aina näkyvissä) */}
-  <button onClick={() => setTab("tips")} className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${tab === 'tips' ? 'text-[#FF6F3C]' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}>
-    <span className="text-lg" aria-hidden="true">🛠️</span> Työkalut
-  </button>
+  {/* 4. TYÖKALUT (Mobiilissa) */}
+<button 
+  onClick={() => router.push('/tyokalut')} // TÄMÄ on se tärkeä muutos!
+  className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}
+>
+  <span className="text-lg" aria-hidden="true">🛠️</span> Työkalut
+</button>
 
   {/* 5. PRO TAI ASETUKSET */}
   {!isPro ? (
