@@ -1394,19 +1394,6 @@ export default function Home() {
     }
   };
 
-      pdf.save(`duuniharava-${isLetter ? 'hakemus' : 'cv'}-${cvStyle}.pdf`);
-      
-      setMessage("PDF ladattu onnistuneesti koneellesi!");
-      setTimeout(() => setMessage(""), 3500);
-
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
-    } finally {
-      setDownloadingPdf(false);
-    }
-  };
-
   async function downloadDocx(textToDownload: string, isLetter: boolean = false) {
     try {
       if (!textToDownload) {
