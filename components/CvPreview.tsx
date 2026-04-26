@@ -301,7 +301,7 @@ export default function CvPreview({
 
           if (isMainPoint && parts.length >= 2) {
             return (
-              <div key={idx} className={`relative`} style={{ textAlign: getTextAlign() }}>
+              <div key={idx} className={`relative break-inside-avoid`} style={{ textAlign: getTextAlign() }}>
                 {customStyle.headingAlign !== 'center' && !isMinimalist && tStyle !== "none" && (
                   <div className="absolute -left-[23px] top-1.5 w-4 h-4 rounded-full border-4 bg-white" style={{ borderColor: customStyle.accentColor }} aria-hidden="true" />
                 )}
@@ -319,7 +319,7 @@ export default function CvPreview({
           }
 
           return (
-            <p key={idx} className={`relative leading-relaxed opacity-80 ${item.startsWith("-") ? 'pl-5' : ''}`} style={{ fontSize: `${customStyle.bodySize}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
+            <p key={idx} className={`relative leading-relaxed opacity-80 break-inside-avoid ${item.startsWith("-") ? 'pl-5' : ''}`} style={{ fontSize: `${customStyle.bodySize}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
               {item.startsWith("-") && <span className="absolute left-0 top-0 font-bold" style={{ color: customStyle.accentColor }} aria-hidden="true">•</span>}
               {item.replace(/^- /, '')}
             </p>
@@ -331,7 +331,7 @@ export default function CvPreview({
 
   const renderProfileHook = (items: string[]) => {
     return (
-      <div className={`relative p-6 mt-4 overflow-hidden ${getShadowClass()}`} style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}`, borderRadius: `${customStyle.borderRadius}px` }}>
+      <div className={`relative p-6 mt-4 overflow-hidden break-inside-avoid ${getShadowClass()}`} style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}`, borderRadius: `${customStyle.borderRadius}px` }}>
         <div className="absolute -top-4 -left-2 opacity-10 font-serif" style={{ fontSize: "80px", color: customStyle.accentColor }} aria-hidden="true">"</div>
         <div className="relative z-10 opacity-90 font-medium italic" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: `${customStyle.bodySize + 1}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
           {items.map((line, j) => <p key={j}>{line}</p>)}
@@ -358,7 +358,7 @@ export default function CvPreview({
     }
 
     return (
-      <div style={{ textAlign: align as any, marginBottom: '24px' }}>
+      <div className="break-after-avoid" style={{ textAlign: align as any, marginBottom: '24px' }}>
         <h2 className={`tracking-[0.2em] font-${fWeight}`} style={css}>
           {title}
         </h2>
@@ -381,9 +381,9 @@ export default function CvPreview({
 
     return (
       <div className={`font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`} style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: `${customStyle.contactSize || 14}px` }}>
-        {renderPhone && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Phone style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Puhelinnumero: </span>{renderPhone}</span></div>}
-        {renderEmail && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Mail style={iconStyleChoice as any} /></span>} <span className="break-all"><span className="sr-only">Sähköposti: </span>{renderEmail}</span></div>}
-        {renderLocation && <div className="flex items-center gap-3" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.MapPin style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Sijainti: </span>{renderLocation}</span></div>}
+        {renderPhone && <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Phone style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Puhelinnumero: </span>{renderPhone}</span></div>}
+        {renderEmail && <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Mail style={iconStyleChoice as any} /></span>} <span className="break-all"><span className="sr-only">Sähköposti: </span>{renderEmail}</span></div>}
+        {renderLocation && <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.MapPin style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Sijainti: </span>{renderLocation}</span></div>}
       </div>
     );
   }
@@ -399,13 +399,14 @@ export default function CvPreview({
     >
       <div 
         id={mode === "cv" ? "cv-preview" : "letter-preview"} 
-        className="w-full flex flex-col"
+        // POISTETTU: min-h-[1132px] jotta CV voi venyä dynaamisesti!
+        className="w-full flex flex-col h-full min-h-screen"
         style={{ color: customStyle.mainText, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
       >
         
         {/* YLÄPALKKI / MINIMALISTINEN */}
         {(isTopHeader || isMinimalist) && (
-          <header className={`flex items-center gap-10 relative ${isImgRight ? 'flex-row-reverse' : 'flex-row'}`} style={{ padding: `${padding}px`, ...(isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()) }}>
+          <header className={`flex items-center gap-10 relative break-inside-avoid ${isImgRight ? 'flex-row-reverse' : 'flex-row'}`} style={{ padding: `${padding}px`, ...(isMinimalist ? { borderBottom: `4px solid ${customStyle.accentColor}` } : getHeaderStyle()) }}>
             {image && (
               <img src={image} alt="Profiilikuva" className={`relative z-10 object-cover border-white/20 ${getShadowClass()}`} style={{ width: '160px', height: '160px', borderRadius: getImageBorderRadius(), alignSelf: isImgCenter ? 'center' : 'auto', borderWidth: `${customStyle.imageBorderWidth !== undefined ? customStyle.imageBorderWidth : 4}px`, filter: customStyle.imageFilter === "grayscale" ? "grayscale(100%)" : (customStyle.imageFilter === "sepia" ? "sepia(80%)" : "none") }} />
             )}
@@ -420,7 +421,7 @@ export default function CvPreview({
           </header>
         )}
 
-        <div className={`flex flex-1 ${isTopHeader || isMinimalist ? 'flex-col' : (isRightSidebar ? 'flex-row-reverse' : 'flex-row')} min-h-[1132px]`}>
+        <div className={`flex flex-1 ${isTopHeader || isMinimalist ? 'flex-col' : (isRightSidebar ? 'flex-row-reverse' : 'flex-row')} h-full min-h-screen`}>
           
           {/* SIVUPALKKI */}
           {(!isTopHeader && !isMinimalist) && (
@@ -428,16 +429,16 @@ export default function CvPreview({
               <div className="absolute inset-0 z-0" style={{ ...getPatternStyle("sidebar") }} aria-hidden="true" />
               <div className="relative z-10 flex flex-col h-full" style={{ padding: `${padding}px`, color: customStyle.sidebarText }}>
                 {image && (
-                  <img src={image} alt="Profiilikuva" className={`mb-12 aspect-square w-full object-cover border-white/10 ${getShadowClass()}`} style={{ borderRadius: getImageBorderRadius(), borderWidth: `${customStyle.imageBorderWidth !== undefined ? customStyle.imageBorderWidth : 4}px`, filter: customStyle.imageFilter === "grayscale" ? "grayscale(100%)" : (customStyle.imageFilter === "sepia" ? "sepia(80%)" : "none") }} />
+                  <img src={image} alt="Profiilikuva" className={`mb-12 aspect-square w-full object-cover border-white/10 break-inside-avoid ${getShadowClass()}`} style={{ borderRadius: getImageBorderRadius(), borderWidth: `${customStyle.imageBorderWidth !== undefined ? customStyle.imageBorderWidth : 4}px`, filter: customStyle.imageFilter === "grayscale" ? "grayscale(100%)" : (customStyle.imageFilter === "sepia" ? "sepia(80%)" : "none") }} />
                 )}
 
-                <div style={{ textAlign: getTextAlign() }}>
+                <div className="break-inside-avoid" style={{ textAlign: getTextAlign() }}>
                   <h1 style={{ fontSize: `${customStyle.nameSize * 0.75}px`, lineHeight: 1.1, fontWeight: 900, letterSpacing: "-0.02em" }}>{name}</h1>
                   {roleLine && mode === "cv" && <p className="mt-4 text-sm font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>{roleLine}</p>}
                   {mode === "letter" && <p className="mt-4 text-sm font-bold tracking-widest uppercase opacity-90" style={{ color: customStyle.accentColor }}>TYÖHAKEMUS</p>}
                 </div>
 
-                <div style={{ marginTop: `${customStyle.contactSpacing !== undefined ? customStyle.contactSpacing : 40}px`, marginBottom: '56px' }}>
+                <div className="break-inside-avoid" style={{ marginTop: `${customStyle.contactSpacing !== undefined ? customStyle.contactSpacing : 40}px`, marginBottom: '56px' }}>
                   {renderHeading("Yhteystiedot")}
                   <ContactInfo isDarkBg={true} />
                 </div>
@@ -445,7 +446,7 @@ export default function CvPreview({
                 {mode === "cv" && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: `${customStyle.sectionSpacing}px`, marginTop: 'auto' }}>
                     {sections.filter(s => isTagSection(s.title)).map((section, i) => (
-                      <div key={i}>
+                      <div key={i} className="break-inside-avoid">
                         {renderHeading(section.title)}
                         {renderTags(section.items)}
                       </div>
@@ -462,7 +463,7 @@ export default function CvPreview({
               
               {mode === "cv" ? (
                 sections.filter(s => (isTopHeader || isMinimalist) ? true : !isTagSection(s.title)).map((section, index) => (
-                  <section key={index} className={isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}>
+                  <section key={index} className={`break-inside-avoid ${isTwoColumn && (isTopHeader || isMinimalist) ? 'break-inside-avoid' : ''}`}>
                     
                     {renderHeading(section.title)}
                     
@@ -478,7 +479,7 @@ export default function CvPreview({
                       renderTags(section.items)
                     ) : (
                       <div className="opacity-80" style={{ display: 'flex', flexDirection: 'column', gap: '12px', textAlign: getTextAlign() }}>
-                        {section.items.map((line, j) => <p key={j}>{line}</p>)}
+                        {section.items.map((line, j) => <p key={j} className="break-inside-avoid">{line}</p>)}
                       </div>
                     )}
                   </section>
@@ -489,13 +490,13 @@ export default function CvPreview({
                   {contentLines.map((paragraph, idx) => {
                     if (!paragraph.trim()) return null;
                     return (
-                      <p key={idx} className="leading-relaxed">
+                      <p key={idx} className="leading-relaxed break-inside-avoid">
                         {paragraph}
                       </p>
                     );
                   })}
                   {/* Allekirjoitus */}
-                  <div className="mt-12 pt-8" style={{ borderTop: `2px solid ${customStyle.accentColor}30` }}>
+                  <div className="mt-12 pt-8 break-inside-avoid" style={{ borderTop: `2px solid ${customStyle.accentColor}30` }}>
                     <p className="font-bold" style={{ color: customStyle.accentColor }}>Ystävällisin terveisin,</p>
                     <p className="mt-2 text-xl font-black">{name}</p>
                   </div>
