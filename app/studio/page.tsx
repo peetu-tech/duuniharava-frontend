@@ -4065,65 +4065,65 @@ export default function Home() {
 
   </main>
     </div>
+ )}
+
+    {/* 1. MODAALIEN KUTSUT (Nämä ovat Home-funktion sisällä) */}
+    <SettingsModal 
+      isOpen={showSettings} 
+      onClose={() => setShowSettings(false)} 
+      theme={theme} 
+      isPro={isPro} 
+      onPortal={handlePortal} 
+      onDeleteAccount={handleDeleteAccount}
+      onLogout={handleLogout} 
+    />
+
+    <PaywallModal 
+      isOpen={showPaywall} 
+      onClose={() => setShowPaywall(false)} 
+      theme={theme} 
+      onUpgrade={handleUpgradeToPro} 
+    />
+
+      </main>
+    </div>
   );
-} // <--- TÄMÄ SULKU ON KAIKKEIN TÄRKEIN. Se sulkee pääsivun.
+} // <--- TÄMÄ ON HOME-FUNKTION AINOA LOPPU. Kaikki tämän alapuolella on erillisiä funktioita.
 
 // ---------------------------------------------------------
-// TÄSTÄ ALASPÄIN ON "PUHDAS ALUE" FUNKTIOILLE
+// 2. MODAALIEN MÄÄRITTELYT (VAIN KERRAN KUTAKIN)
 // ---------------------------------------------------------
 
 function SettingsModal({ 
-  isOpen, 
-  onClose, 
-  theme, 
-  isPro, 
-  onPortal, 
-  onDeleteAccount, 
-  onLogout 
+  isOpen, onClose, theme, isPro, onPortal, onDeleteAccount, onLogout 
 }: { 
-  isOpen: boolean; 
-  onClose: () => void; 
-  theme: "light" | "dark"; 
-  isPro: boolean; 
-  onPortal: () => void; 
-  onDeleteAccount: () => void;
-  onLogout: () => void; 
+  isOpen: boolean; onClose: () => void; theme: "light" | "dark"; isPro: boolean; 
+  onPortal: () => void; onDeleteAccount: () => void; onLogout: () => void; 
 }) {
   if (!isOpen) return null;
-  
   return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200 text-gray-900">
       <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
         <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white">Tilin asetukset</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black">✕</button>
+          <h2 className="text-2xl font-black">Tilin asetukset</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus:outline-none">✕</button>
         </div>
-
         <div className="space-y-8">
-          <div className={`p-6 rounded-2xl border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50')}`}>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Jäsenyys</p>
+          <div className={`p-6 rounded-2xl border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100')}`}>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
             <div className="flex justify-between items-center">
-              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
-                {isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}
-              </span>
-              {isPro && (
-                <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline">Hallitse</button>
-              )}
+              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}</span>
+              {isPro && <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline">Hallitse</button>}
             </div>
           </div>
-
           <div className="space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Käyttäjätili</h3>
+            <h3 className="text-sm font-black uppercase text-gray-500">Käyttäjätili</h3>
             <div className={`p-5 rounded-xl border flex flex-col gap-4 ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
-              <p className="font-bold opacity-80 text-gray-900 dark:text-white truncate">{getSession()?.user?.email || "Ei tiedossa"}</p>
               <button onClick={onLogout} className={`w-full py-3 rounded-xl font-black text-xs border ${theme === 'dark' ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-gray-200 shadow-sm text-gray-900'}`}>👋 KIRJAUDU ULOS</button>
             </div>
           </div>
-
           <div className="pt-6 border-t border-red-500/20 text-center">
-            <button onClick={onDeleteAccount} className="text-red-500 text-xs font-bold hover:underline opacity-60">
-              Poista käyttäjätili ja tilaus välittömästi
-            </button>
+            <button onClick={onDeleteAccount} className="text-red-500 text-xs font-bold hover:underline opacity-60">Poista tili ja tilaus välittömästi</button>
           </div>
         </div>
       </div>
@@ -4131,52 +4131,31 @@ function SettingsModal({
   );
 }
 
-// --- UUDET MODAALIT (MAKSUMUURI & ASETUKSET) ---
-function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, onClose: () => void, theme: "light" | "dark", onUpgrade: () => void }) {
+function PaywallModal({ 
+  isOpen, onClose, theme, onUpgrade 
+}: { 
+  isOpen: boolean; onClose: () => void; theme: "light" | "dark"; onUpgrade: () => void; 
+}) {
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className={`w-full max-w-lg rounded-[40px] border-2 shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden ${theme === 'dark' ? 'bg-[#0A0A0A] border-[#00BFA6]/50' : 'bg-white border-[#00BFA6]'}`}>
-        
-        {/* YLÄOSA - Gradientti ja Rasti */}
+      <div className={`w-full max-w-lg rounded-[40px] border-2 shadow-2xl animate-in zoom-in-95 overflow-hidden ${theme === 'dark' ? 'bg-[#0A0A0A] border-[#00BFA6]/50' : 'bg-white border-[#00BFA6]'}`}>
         <div className="bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] p-8 text-center relative">
-          <button 
-            onClick={onClose} 
-            className="absolute top-5 right-5 text-black hover:text-white transition-colors z-[600] p-2 focus-visible:outline-none"
-            aria-label="Sulje"
-          >
-            <span className="font-black text-2xl">✕</span>
-          </button>
-          
-          <span className="text-6xl mb-4 block drop-shadow-md">⭐</span>
-          <h2 className="text-3xl font-black text-black tracking-tight">Päivitä Pro -tasolle</h2>
-          <p className="text-black/80 font-bold mt-2">Tämä ominaisuus vaatii Duuniharava Pro -tilauksen.</p>
+          <button onClick={onClose} className="absolute top-5 right-5 text-black hover:text-white font-black text-2xl z-[600]">✕</button>
+          <span className="text-6xl mb-4 block">⭐</span>
+          <h2 className="text-3xl font-black text-black">Päivitä Pro -tasolle</h2>
+          <p className="text-black/80 font-bold mt-2">Olet käyttänyt ilmaisen kokeilusi (1/1).</p>
         </div>
-
-        {/* ALAOSA - Sisältö ja hinta */}
         <div className="p-8 space-y-6">
           <ul className={`space-y-4 font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Rajattomat tekoälyhakemukset</li>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Rajaton CV:n räätälöinti työn mukaan</li>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Edistynyt AI-Taikasauva (Inline AI)</li>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6] text-xl">✓</span> Haastattelusimulaattori & Teleprompter</li>
+            <li className="flex items-center gap-3"><span className="text-[#00BFA6]">✓</span> Rajattomat tekoälyhakemukset</li>
+            <li className="flex items-center gap-3"><span className="text-[#00BFA6]">✓</span> Edistynyt AI-Taikasauva</li>
           </ul>
-          
           <div className="pt-6 border-t border-gray-500/20 text-center">
-            <p className={`text-4xl font-black mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-              9,90 € <span className="text-sm text-gray-500 font-bold">/ kk</span>
-            </p>
-            <button 
-              onClick={onUpgrade} 
-              className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-5 rounded-2xl text-xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_10px_30px_rgba(0,191,166,0.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black"
-            >
-              AVAA KAIKKI OMINAISUUDET
-            </button>
-            <p className="text-xs text-gray-500 mt-4">Peruuta milloin tahansa yhdellä painalluksella.</p>
+            <p className={`text-4xl font-black mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>9,90 € <span className="text-sm text-gray-500">/ kk</span></p>
+            <button onClick={onUpgrade} className="w-full bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black font-black py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-lg">AVAA KAIKKI OMINAISUUDET</button>
           </div>
         </div>
-
       </div>
     </div>
   );
