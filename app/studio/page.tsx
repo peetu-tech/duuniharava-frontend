@@ -3674,7 +3674,6 @@ export default function Home() {
                             {downloadingPdf ? "Luodaan PDF..." : "LATAA PDF-HAKEMUS"}
                           </button>
                         </div>
-                      </>
                     ) : (
                       <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
                         <div className="text-5xl mb-6" aria-hidden="true">✍️</div>
@@ -3682,8 +3681,6 @@ export default function Home() {
                         <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
                       </div>
                     )}
-                  </div>
-                )}
 
                 {/* VINKIT TAB */}
                 {tab === "tips" && (
