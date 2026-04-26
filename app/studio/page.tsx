@@ -2164,37 +2164,62 @@ export default function Home() {
     }
   }
 
-  async function handleDeleteAccount() {
-  const session = getSession();
-  if (!session?.user?.email) return;
+  function SettingsModal({ isOpen, onClose, theme, isPro, onPortal, onDeleteAccount }: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  theme: "light" | "dark", 
+  isPro: boolean, 
+  onPortal: () => void,
+  onDeleteAccount: () => void 
+}) {
+  if (!isOpen) return null;
 
-  const confirm1 = confirm("VAROITUS: Kaikki tietosi ja Pro-tilauksesi poistetaan välittömästi. Tätä ei voi peruuttaa.");
-  if (!confirm1) return;
+  return (
+    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+      <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+        
+        <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
+          <h2 className="text-2xl font-black">Tilin asetukset</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus-visible:outline-none">✕</button>
+        </div>
 
-  const confirm2 = prompt("Kirjoita 'POISTA' vahvistaaksesi.");
-  if (confirm2 !== "POISTA") return;
+        <div className="space-y-8">
+          {/* TILAUS-OSIO */}
+          <div className={`p-6 rounded-2xl border ${isPro ? (theme === 'dark' ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : 'border-[#00BFA6]/30 bg-[#00BFA6]/5') : (theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50')}`}>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
+            <div className="flex justify-between items-center">
+              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
+                {isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}
+              </span>
+              {isPro && (
+                <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline hover:opacity-80 transition focus-visible:outline-none">
+                  Hallitse / Peruuta
+                </button>
+              )}
+            </div>
+          </div>
 
-  try {
-    setMessage("Poistetaan tiliä ja peruutetaan tilausta...");
-    
-    const res = await fetch("/api/delete-account", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        userId: session.user.id,
-        userEmail: session.user.email 
-      }),
-    });
+          {/* SÄHKÖPOSTI */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Kirjautumistiedot</h3>
+            <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+              <p className="font-bold opacity-80">{getSession()?.user?.email || "Ei tiedossa"}</p>
+            </div>
+          </div>
 
-    if (res.ok) {
-      alert("Tili poistettu onnistuneesti.");
-      window.location.href = "/"; // Heitetään takaisin etusivulle
-    } else {
-      alert("Virhe poistossa. Ole yhteydessä tukeen.");
-    }
-  } catch (err) {
-    alert("Yhteysvirhe.");
-  }
+          {/* POISTO-OSIO (Päivitetty!) */}
+          <div className="pt-6 border-t border-red-500/20 text-center sm:text-left">
+            <button 
+              onClick={onDeleteAccount} 
+              className="text-red-500 text-sm font-bold hover:underline focus-visible:outline-none"
+            >
+              Poista käyttäjätili ja tilaus välittömästi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
   return (
     <div className={theme === 'light' ? 'light-theme' : ''}>
