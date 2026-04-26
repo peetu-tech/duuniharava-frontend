@@ -849,83 +849,6 @@ function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, 
   );
 }
 
-function SettingsModal({ 
-  isOpen, 
-  onClose, 
-  theme, 
-  isPro, 
-  onPortal, 
-  onDeleteAccount, 
-  onLogout // <--- 1. TÄSSÄ
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
-  theme: "light" | "dark"; 
-  isPro: boolean; 
-  onPortal: () => void; 
-  onDeleteAccount: () => void;
-  onLogout: () => void; // <--- 2. TÄSSÄ (Tyypin on oltava täsmälleen tämä)
-}) {
-  if (!isOpen) return null;
-  
-  return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-        <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
-          <h2 className="text-2xl font-black">Tilin asetukset</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus-visible:outline-none">✕</button>
-        </div>
-
-        <div className="space-y-8">
-          {/* Jäsenyys-osio ennallaan... */}
-          <div className={`p-6 rounded-2xl border ${isPro ? (theme === 'dark' ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : 'border-[#00BFA6]/30 bg-[#00BFA6]/5') : (theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50')}`}>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
-            <div className="flex justify-between items-center">
-              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
-                {isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}
-              </span>
-              {isPro && (
-                <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline hover:opacity-80 transition focus-visible:outline-none">
-                  Hallitse / Peruuta
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Kirjautumistiedot ja Logout-nappi */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Kirjautumistiedot</h3>
-            <div className={`p-5 rounded-xl border flex flex-col gap-4 ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
-              <p className="font-bold opacity-80">{getSession()?.user?.email || "Ei tiedossa"}</p>
-              
-              <button 
-                onClick={onLogout}
-                className={`w-full py-3 rounded-xl font-black text-xs transition-all border ${
-                  theme === 'dark' 
-                    ? 'bg-white/10 border-white/10 hover:bg-white/20 text-white' 
-                    : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-900 shadow-sm'
-                }`}
-              >
-                👋 KIRJAUDU ULOS
-              </button>
-            </div>
-          </div>
-
-          {/* Poistonappi */}
-          <div className="pt-6 border-t border-red-500/20 text-center sm:text-left">
-            <button 
-              onClick={onDeleteAccount} 
-              className="text-red-500 text-sm font-bold hover:underline focus-visible:outline-none"
-            >
-              Poista käyttäjätili ja tilaus välittömästi
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // --- PÄÄKOMPONENTTI ---
 export default function Home() {
   const router = useRouter();
@@ -2226,63 +2149,6 @@ export default function Home() {
     }
     // --- LISÄYS PÄÄTTYY ---
 
-  function SettingsModal({ isOpen, onClose, theme, isPro, onPortal, onDeleteAccount }: { 
-  isOpen: boolean, 
-  onClose: () => void, 
-  theme: "light" | "dark", 
-  isPro: boolean, 
-  onPortal: () => void,
-  onDeleteAccount: () => void 
-}) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-        
-        <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
-          <h2 className="text-2xl font-black">Tilin asetukset</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus-visible:outline-none">✕</button>
-        </div>
-
-        <div className="space-y-8">
-          {/* TILAUS-OSIO */}
-          <div className={`p-6 rounded-2xl border ${isPro ? (theme === 'dark' ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : 'border-[#00BFA6]/30 bg-[#00BFA6]/5') : (theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50')}`}>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
-            <div className="flex justify-between items-center">
-              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
-                {isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}
-              </span>
-              {isPro && (
-                <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline hover:opacity-80 transition focus-visible:outline-none">
-                  Hallitse / Peruuta
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* SÄHKÖPOSTI */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Kirjautumistiedot</h3>
-            <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
-              <p className="font-bold opacity-80">{getSession()?.user?.email || "Ei tiedossa"}</p>
-            </div>
-          </div>
-
-          {/* POISTO-OSIO (Päivitetty!) */}
-          <div className="pt-6 border-t border-red-500/20 text-center sm:text-left">
-            <button 
-              onClick={onDeleteAccount} 
-              className="text-red-500 text-sm font-bold hover:underline focus-visible:outline-none"
-            >
-              Poista käyttäjätili ja tilaus välittömästi
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
   return (
     <div className={theme === 'light' ? 'light-theme' : ''}>
       <style dangerouslySetInnerHTML={{__html: `
@@ -4248,25 +4114,80 @@ export default function Home() {
       </div>
     )}
 
-   {/* UUDET MODAALIT (ASETUKSET & MAKSUMUURI) */}
-    <SettingsModal 
-      isOpen={showSettings} 
-      onClose={() => setShowSettings(false)} 
-      theme={theme} 
-      isPro={isPro} 
-      onPortal={handlePortal} 
-      onDeleteAccount={handleDeleteAccount}
-      onLogout={handleLogout} // <--- TÄMÄ OLI SE PUUTTUVA RIVI
-    />
-    
-    <PaywallModal 
-      isOpen={showPaywall} 
-      onClose={() => setShowPaywall(false)} 
-      theme={theme} 
-      onUpgrade={handleUpgradeToPro} 
-    />
+  function SettingsModal({ 
+  isOpen, 
+  onClose, 
+  theme, 
+  isPro, 
+  onPortal, 
+  onDeleteAccount, 
+  onLogout 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  theme: "light" | "dark"; 
+  isPro: boolean; 
+  onPortal: () => void; 
+  onDeleteAccount: () => void;
+  onLogout: () => void; 
+}) {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+      <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+        
+        <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
+          <h2 className="text-2xl font-black">Tilin asetukset</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus-visible:outline-none">✕</button>
+        </div>
 
-      </main>
+        <div className="space-y-8">
+          {/* JÄSENYYS */}
+          <div className={`p-6 rounded-2xl border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50')}`}>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
+            <div className="flex justify-between items-center">
+              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
+                {isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}
+              </span>
+              {isPro && (
+                <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline hover:opacity-80 transition focus-visible:outline-none">
+                  Hallitse / Peruuta
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* KIRJAUTUMISTIEDOT & LOGOUT */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Käyttäjätili</h3>
+            <div className={`p-5 rounded-xl border flex flex-col gap-4 ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+              <p className="font-bold opacity-80 truncate">{getSession()?.user?.email || "Ei tiedossa"}</p>
+              
+              <button 
+                onClick={onLogout}
+                className={`w-full py-3 rounded-xl font-black text-xs transition-all border ${
+                  theme === 'dark' 
+                    ? 'bg-white/10 border-white/10 hover:bg-white/20 text-white' 
+                    : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-900 shadow-sm'
+                }`}
+              >
+                👋 KIRJAUDU ULOS
+              </button>
+            </div>
+          </div>
+
+          {/* POISTO */}
+          <div className="pt-6 border-t border-red-500/20 text-center sm:text-left">
+            <button 
+              onClick={onDeleteAccount} 
+              className="text-red-500 text-xs font-bold hover:underline focus-visible:outline-none opacity-60 hover:opacity-100 transition-opacity"
+            >
+              Poista käyttäjätili ja tilaus välittömästi
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
