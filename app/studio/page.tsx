@@ -1353,15 +1353,21 @@ export default function Home() {
             previewEl.style.top = "0";
             previewEl.style.left = "0";
 
-            // --- TÄSSÄ ON MATEMATIIKKA TAUSTAN VENYTTÄMISEEN ---
-            // A4-paperin suhdeluku on 297/210. Kun leveys on 800px, korkeus on n. 1131.4px
-            const a4HeightPx = 800 * (297 / 210); 
-            const currentHeight = previewEl.scrollHeight;
-            const totalPages = Math.ceil(currentHeight / a4HeightPx);
+            // --- KORJAUS 1: TEKSTIN TODELLINEN PITUUS JA PELIVARA ---
+            // Vapautetaan korkeus väliaikaisesti, jotta saamme oikean lukeman
+            previewEl.style.height = "auto";
+            previewEl.style.minHeight = "0px";
             
-            // Pakotetaan CV:n korkeus tasan sivumäärän kerrannaiseksi
+            const a4HeightPx = 800 * (297 / 210); // A4-korkeus pikseleinä (n. 1131.4px)
+            const contentHeight = previewEl.scrollHeight; // Tekstin todellinen pituus
+            
+            // Lasketaan tarvittavat sivut, annetaan 20px pelivaraa ennen kuin hypätään uudelle sivulle
+            let totalPages = Math.ceil((contentHeight - 20) / a4HeightPx);
+            if (totalPages < 1) totalPages = 1;
+
+            // Nyt pakotetaan CV:n korkeus tasan sivumäärän kerrannaiseksi
             previewEl.style.minHeight = `${totalPages * a4HeightPx}px`;
-            // ----------------------------------------------------
+            // --------------------------------------------------------
           }
         },
       });
@@ -1389,7 +1395,9 @@ export default function Home() {
       pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
       heightLeft -= pageHeight;
 
-      while (heightLeft > 0) {
+      // --- KORJAUS 2: ESTETÄÄN TYHJÄ SIVU DESIMAALIVIRHEEN TAKIA ---
+      // Muutettu heightLeft > 0 muotoon heightLeft > 1
+      while (heightLeft > 1) {
         position = position - pageHeight;
         pdf.addPage();
         pdf.setFillColor(customStyle.mainBg);
@@ -1397,6 +1405,7 @@ export default function Home() {
         pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
         heightLeft -= pageHeight;
       }
+      // -------------------------------------------------------------
 
       pdf.save(`duuniharava-${isLetter ? 'hakemus' : 'cv'}-${cvStyle}.pdf`);
       
