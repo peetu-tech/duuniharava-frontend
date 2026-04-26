@@ -2127,42 +2127,62 @@ export default function Home() {
     }
   }
 
-  async function handlePortal() {
-    const session = getSession();
-    
-    // 1. Varmistetaan, että istunto ja sähköposti löytyvät
-    if (!session || !session.user?.email) {
-      setErrorMessage("Istuntoa tai sähköpostia ei löytynyt. Kirjaudu uudelleen sisään.");
-      return;
+  // --- LISÄÄ NÄMÄ FUNKTIOT TÄHÄN ---
+
+    async function handlePortal() {
+      const session = getSession();
+      if (!session?.user?.email) return;
+      try {
+        setMessage("Avataan tilausasetuksia...");
+        const res = await fetch("/api/portal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userEmail: session.user.email }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          setErrorMessage(data.error || "Hallintaportaalia ei voitu avata.");
+        }
+      } catch (err) {
+        setErrorMessage("Yhteysvirhe tilausasetuksiin.");
+      }
     }
 
-    try {
-      setMessage("avataan tilausasetuksia...");
-      
-      // 2. Kutsutaan backendin portaali-reittiä
-      const res = await fetch("/api/portal", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json" 
-        },
-        body: JSON.stringify({ 
-          userEmail: session.user.email 
-        })
-      });
-      
-      const data = await res.json();
-      
-      // 3. Jos Stripe antoi linkin, hypätään sinne
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setErrorMessage(data.error || "Hallintaportaalia ei voitu avata.");
+    async function handleDeleteAccount() {
+      const session = getSession();
+      if (!session?.user?.id || !session?.user?.email) return;
+
+      const confirm1 = confirm("VAROITUS: Kaikki tietosi ja Pro-tilauksesi poistetaan välittömästi. Tätä ei voi peruuttaa.");
+      if (!confirm1) return;
+
+      const confirm2 = prompt("Kirjoita 'POISTA' vahvistaaksesi poiston.");
+      if (confirm2 !== "POISTA") return;
+
+      try {
+        setMessage("Poistetaan tiliä ja peruutetaan tilausta...");
+        const res = await fetch("/api/delete-account", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            userId: session.user.id,
+            userEmail: session.user.email 
+          }),
+        });
+
+        if (res.ok) {
+          alert("Tili poistettu onnistuneesti. Tervetuloa takaisin milloin vain!");
+          window.location.href = "/";
+        } else {
+          const errorData = await res.json();
+          alert(errorData.error || "Poisto epäonnistui. Ota yhteys tukeen.");
+        }
+      } catch (err) {
+        alert("Yhteysvirhe poiston aikana.");
       }
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Yhteysvirhe tilausasetuksiin.");
     }
-  }
+    // --- LISÄYS PÄÄTTYY ---
 
   function SettingsModal({ isOpen, onClose, theme, isPro, onPortal, onDeleteAccount }: { 
   isOpen: boolean, 
