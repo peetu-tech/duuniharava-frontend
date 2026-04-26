@@ -4226,15 +4226,17 @@ export default function Home() {
       </div>
     )}
 
-    {/* UUDET MODAALIT (ASETUKSET & MAKSUMUURI) */}
+   {/* UUDET MODAALIT (ASETUKSET & MAKSUMUURI) */}
     <SettingsModal 
       isOpen={showSettings} 
       onClose={() => setShowSettings(false)} 
       theme={theme} 
       isPro={isPro} 
       onPortal={handlePortal} 
-      onDeleteAccount={handleDeleteAccount} 
+      onDeleteAccount={handleDeleteAccount}
+      onLogout={handleLogout} // <--- TÄMÄ OLI SE PUUTTUVA RIVI
     />
+    
     <PaywallModal 
       isOpen={showPaywall} 
       onClose={() => setShowPaywall(false)} 
@@ -4245,4 +4247,4 @@ export default function Home() {
       </main>
     </div>
   );
-} // <--- TÄMÄ sulkee koko StudioPage-funktion
+}
