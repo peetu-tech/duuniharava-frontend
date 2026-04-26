@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"; // Käytetään tätä yhtenäisyyden vuoksi
+import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { buildTailoredCvPrompt } from "@/lib/prompts";
@@ -24,9 +24,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { userId, ...formParams } = body;
 
-    // ==========================================
-    // 🔒 PORTINVARTIJA (RAJOITUS: 1 KOKEILU)
-    // ==========================================
     if (userId) {
       const { data: profile } = await supabaseAdmin
         .from("profiles")
@@ -35,19 +32,16 @@ export async function POST(req: Request) {
         .single();
         
       if (!profile?.is_pro) {
-        // Estetään, jos on käyttänyt vähintään 1 kerran
         if (profile && profile.api_usage_count >= 1) {
           return NextResponse.json({ error: "LIMIT_REACHED" }, { status: 403 });
         }
         
-        // Lisätään laskuriin +1
         await supabaseAdmin
           .from("profiles")
           .update({ api_usage_count: (profile?.api_usage_count || 0) + 1 })
           .eq("id", userId);
       }
     }
-    // ==========================================
 
     const prompt = buildTailoredCvPrompt({
       currentCv: body.currentCv,
@@ -62,14 +56,14 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "Olet asiantunteva suomalainen ura-asiantuntija, jonka tehtävänä on räätälöidä olemassa oleva CV täydellisesti vastaamaan kohdetyöpaikan vaatimuksia. Sinun on korostettava hakijan aitoa, relevanttia kokemusta ja taitoja. Et koskaan keksi uutta kokemusta tai asioita, joita alkuperäisessä CV:ssä ei ole. Kirjoitat luonnollista, selkeää ja uskottavaa suomea.",
+            "Olet asiantunteva suomalainen ura-asiantuntija, jonka tehtävänä on räätälöidä olemassa oleva CV täydellisesti vastaamaan kohdetyöpaikan vaatimuksia. Sinun on korostettava hakijan aitoa, relevanttia kokemusta ja taitoja. Et koskaan keksi uutta kokemusta. Kirjoitat luonnollista, selkeää ja uskottavaa suomea. TÄRKEÄÄ: Ole absoluuttisen tarkka oikeinkirjoituksesta. Älä koskaan kirjoita nimiä tai kaupunkeja (kuten Helsinki) väärin tai muuta niitä outoihin muotoihin. Pidä kaikki faktatiedot täsmälleen sellaisina kuin ne on annettu.",
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      temperature: 0.5,
+      temperature: 0.3, // Laskettu hallusinaatioiden minimoimiseksi
     });
 
     const output =
