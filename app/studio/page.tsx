@@ -2711,9 +2711,9 @@ export default function Home() {
                     type="button"
                     role="tab"
                     id="tab-job"
-                    aria-selected={tab === "job"}
+                    aria-selected={tab === "jobs"} // <--- NYT OIKEIN
                     aria-controls="panel-job"
-                    onClick={() => setTab("job")}
+                    onClick={() => setTab("jobs")} // <--- NYT OIKEIN
                     className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "job"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
