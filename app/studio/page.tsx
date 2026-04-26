@@ -1727,9 +1727,9 @@ export default function Home() {
       setJobs((prev) => [...newJobs, ...prev]);
       if (!activeJobId && newJobs[0]) {
         setActiveJobId(newJobs[0].id);
-      }
-      setTab("job");
-      setMessage("Työpaikkaehdotukset lisätty.");
+    }
+    setTab("jobs"); // <--- NYT ON OIKEIN!
+    setMessage("Työpaikkaehdotukset lisätty.");
 
       const session = getSession();
       if(session) {
