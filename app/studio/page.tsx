@@ -1298,7 +1298,6 @@ export default function Home() {
     const printContent = document.getElementById(elementId);
     if (!printContent) return;
 
-    // KORJAUS 1: Otetaan nykyinen skrollaus talteen ja rullataan ruutu aivan ylös sekunniksi
     const originalScrollY = window.scrollY;
     const originalScrollX = window.scrollX;
     window.scrollTo(0, 0);
@@ -1320,6 +1319,7 @@ export default function Home() {
         backgroundColor: customStyle.mainBg,
         scrollX: 0,
         scrollY: 0,
+        windowWidth: 800,
         onclone: (clonedDoc) => {
           let safeCss = "";
           for (let i = 0; i < document.styleSheets.length; i++) {
@@ -1347,12 +1347,21 @@ export default function Home() {
           if (previewEl) {
             previewEl.style.borderRadius = "0px";
             previewEl.style.boxShadow = "none";
-            // KORJAUS 2: Pakotetaan CV-klooni aivan vasempaan yläkulmaan tasan 800px levyisenä!
             previewEl.style.width = "800px";
             previewEl.style.margin = "0";
             previewEl.style.position = "fixed";
             previewEl.style.top = "0";
             previewEl.style.left = "0";
+
+            // --- TÄSSÄ ON MATEMATIIKKA TAUSTAN VENYTTÄMISEEN ---
+            // A4-paperin suhdeluku on 297/210. Kun leveys on 800px, korkeus on n. 1131.4px
+            const a4HeightPx = 800 * (297 / 210); 
+            const currentHeight = previewEl.scrollHeight;
+            const totalPages = Math.ceil(currentHeight / a4HeightPx);
+            
+            // Pakotetaan CV:n korkeus tasan sivumäärän kerrannaiseksi
+            previewEl.style.minHeight = `${totalPages * a4HeightPx}px`;
+            // ----------------------------------------------------
           }
         },
       });
@@ -1399,11 +1408,9 @@ export default function Home() {
       setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
     } finally {
       setDownloadingPdf(false);
-      // KORJAUS 3: Palautetaan sivu sille kohdalle, missä käyttäjä oli
       window.scrollTo(originalScrollX, originalScrollY);
     }
   };
-
   async function downloadDocx(textToDownload: string, isLetter: boolean = false) {
     try {
       if (!textToDownload) {
