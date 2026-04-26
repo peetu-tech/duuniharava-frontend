@@ -856,21 +856,23 @@ function SettingsModal({
   isPro, 
   onPortal, 
   onDeleteAccount, 
-  onLogout // 1. LISÄTTY TÄHÄN
+  onLogout 
 }: { 
-  isOpen: boolean, 
-  onClose: () => void, 
-  theme: "light" | "dark", 
-  isPro: boolean, 
-  onPortal: () => void,
-  onDeleteAccount: () => void,
-  onLogout: () => void // 2. LISÄTTY TYYPPIIN
+  isOpen: boolean; 
+  onClose: () => void; 
+  theme: "light" | "dark"; 
+  isPro: boolean; 
+  onPortal: () => void; 
+  onDeleteAccount: () => void;
+  onLogout: () => void; 
 }) {
   if (!isOpen) return null;
   
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
       <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+        
+        {/* Otsikko */}
         <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
           <h2 className="text-2xl font-black">Tilin asetukset</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus-visible:outline-none">✕</button>
