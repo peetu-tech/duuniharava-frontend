@@ -4181,3 +4181,96 @@ function SettingsModal({
     </div>
   );
 }
+
+function PaywallModal({ 
+  isOpen, 
+  onClose, 
+  theme, 
+  onUpgrade 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  theme: "light" | "dark"; 
+  onUpgrade: () => void; 
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[600] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+      <div className={`w-full max-w-md rounded-[40px] border p-10 shadow-2xl text-center ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+        
+        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#00BFA6]/10 text-[#00BFA6]">
+          <span className="text-4xl">🚀</span>
+        </div>
+
+        <h2 className="mb-4 text-3xl font-black tracking-tight">Hups! Kokeilu käytetty</h2>
+        
+        <p className="mb-8 opacity-70 font-medium leading-relaxed">
+          Olet käyttänyt ilmaisen kokeilusi (1/1). Päivitä PRO-tasolle, niin saat rajoittamattoman pääsyn kaikkiin työkaluihin.
+        </p>
+
+        <div className="space-y-4">
+          <button 
+            onClick={onUpgrade}
+            className="w-full rounded-2xl bg-[#00BFA6] py-4 text-lg font-black text-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#00BFA6]/20"
+          >
+            PÄIVITY PRO-TASOLLE ✨
+          </button>
+          
+          <button 
+            onClick={onClose}
+            className="w-full py-2 text-sm font-bold opacity-50 hover:opacity-100 transition-opacity"
+          >
+            Palaa takaisin
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+function PaywallModal({ 
+  isOpen, 
+  onClose, 
+  theme, 
+  onUpgrade 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  theme: "light" | "dark"; 
+  onUpgrade: () => void; 
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[600] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+      <div className={`w-full max-w-md rounded-[40px] border p-10 shadow-2xl text-center ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+        
+        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#00BFA6]/10 text-[#00BFA6]">
+          <span className="text-4xl">🚀</span>
+        </div>
+
+        <h2 className="mb-4 text-3xl font-black tracking-tight text-gray-900 dark:text-white">Hups! Kokeilu käytetty</h2>
+        
+        <p className="mb-8 text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+          Olet käyttänyt ilmaisen kokeilusi (1/1). Päivitä PRO-tasolle, niin saat rajoittamattoman pääsyn kaikkiin työkaluihin.
+        </p>
+
+        <div className="space-y-4">
+          <button 
+            onClick={onUpgrade}
+            className="w-full rounded-2xl bg-[#00BFA6] py-4 text-lg font-black text-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#00BFA6]/20"
+          >
+            PÄIVITY PRO-TASOLLE ✨
+          </button>
+          
+          <button 
+            onClick={onClose}
+            className="w-full py-2 text-sm font-bold text-gray-500 hover:text-gray-700 dark:hover:text-white transition-colors"
+          >
+            Palaa takaisin
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
