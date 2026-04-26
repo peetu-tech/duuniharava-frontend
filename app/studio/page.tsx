@@ -2091,6 +2091,11 @@ export default function Home() {
     }
   }
 
+  async function handleUpgradeToPro() {
+     // ... tässä on koodia
+  }
+
+  // 👇 TÄSSÄ SE ON! KORVAA TÄMÄ KOKO FUNKTIO UUDELLA 👇
   async function handlePortal() {
     try {
       const res = await fetch("/api/portal", {
