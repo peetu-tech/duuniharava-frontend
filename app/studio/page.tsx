@@ -2207,23 +2207,20 @@ export default function Home() {
   </a>
 
   {/* 4. TYÖKALUT (Mobiilissa) */}
-<button 
-  onClick={() => router.push('/tyokalut')} // TÄMÄ on se tärkeä muutos!
-  className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}
->
-  <span className="text-lg" aria-hidden="true">🛠️</span> Työkalut
-</button>
+  <button 
+    onClick={() => router.push('/tyokalut')} 
+    className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}
+  >
+    <span className="text-lg" aria-hidden="true">🛠️</span> Työkalut
+  </button>
 
-  {/* 5. PRO TAI ASETUKSET */}
-  {!isPro ? (
-    <button onClick={() => setShowPaywall(true)} className="flex flex-1 flex-col items-center gap-1 text-[9px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none">
-      <span className="text-lg" aria-hidden="true">⭐</span> PRO
-    </button>
-  ) : (
-    <button onClick={() => setShowSettings(true)} className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${showSettings ? 'text-[#00BFA6]' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}>
-      <span className="text-lg" aria-hidden="true">⚙️</span> Säädöt
-    </button>
-  )}
+  {/* 5. PRO (Pysyy aina tässä) */}
+  <button 
+    onClick={() => setShowPaywall(true)} 
+    className="flex flex-1 flex-col items-center gap-1 text-[9px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none"
+  >
+    <span className="text-lg" aria-hidden="true">⭐</span> PRO
+  </button>
 </nav>
 
         {/* HEADER (Tietokone) */}
