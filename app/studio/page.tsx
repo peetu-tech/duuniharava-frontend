@@ -849,8 +849,16 @@ function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, 
   );
 }
 
-function SettingsModal({ isOpen, onClose, theme, isPro, onPortal }: { isOpen: boolean, onClose: () => void, theme: "light" | "dark", isPro: boolean, onPortal: () => void }) {
+function SettingsModal({ isOpen, onClose, theme, isPro, onPortal, onDeleteAccount }: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  theme: "light" | "dark", 
+  isPro: boolean, 
+  onPortal: () => void,
+  onDeleteAccount: () => void // Lisätty tämä uusi propsi
+}) {
   if (!isOpen) return null;
+  
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
       <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
@@ -881,9 +889,13 @@ function SettingsModal({ isOpen, onClose, theme, isPro, onPortal }: { isOpen: bo
             </div>
           </div>
 
+          {/* POISTONAPPI - Päivitetty teksti ja toiminto */}
           <div className="pt-6 border-t border-red-500/20 text-center sm:text-left">
-            <button onClick={() => { if(confirm("Haluatko varmasti poistaa tilisi ja datasi? Tätä ei voi peruuttaa.")) alert("Pyyntö vastaanotettu. Tili poistetaan 24h kuluessa."); }} className="text-red-500 text-sm font-bold hover:underline focus-visible:outline-none">
-              Poista käyttäjätili ja tiedot
+            <button 
+              onClick={onDeleteAccount} 
+              className="text-red-500 text-sm font-bold hover:underline focus-visible:outline-none"
+            >
+              Poista käyttäjätili ja tilaus välittömästi
             </button>
           </div>
         </div>
