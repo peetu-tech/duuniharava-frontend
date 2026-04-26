@@ -4067,7 +4067,9 @@ export default function Home() {
     </div>
  )}
 
-    {/* 1. MODAALIEN KUTSUT (Nämä ovat Home-funktion sisällä) */}
+   {/* --- TÄSTÄ ALKAA KORJATTU LOPPU --- */}
+
+    {/* MODAALIEN KUTSUT (Näiden TÄYTYY olla pääfunktion sisällä, ennen </main>) */}
     <SettingsModal 
       isOpen={showSettings} 
       onClose={() => setShowSettings(false)} 
@@ -4088,10 +4090,10 @@ export default function Home() {
       </main>
     </div>
   );
-} // <--- TÄMÄ ON HOME-FUNKTION AINOA LOPPU. Kaikki tämän alapuolella on erillisiä funktioita.
+} // <--- TÄMÄ SULKU LOPETTAA PÄÄKOMPONENTIN (Home). Tämän jälkeen ei saa olla mitään muuta koodia kuin uusia funktioita.
 
 // ---------------------------------------------------------
-// 2. MODAALIEN MÄÄRITTELYT (VAIN KERRAN KUTAKIN)
+// 2. MODAALIEN MÄÄRITTELYT (Nämä tulevat Home-funktion ulkopuolelle)
 // ---------------------------------------------------------
 
 function SettingsModal({ 
@@ -4102,11 +4104,11 @@ function SettingsModal({
 }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200 text-gray-900">
+    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200 text-gray-900 font-sans">
       <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
         <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
           <h2 className="text-2xl font-black">Tilin asetukset</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black focus:outline-none">✕</button>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black">✕</button>
         </div>
         <div className="space-y-8">
           <div className={`p-6 rounded-2xl border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100')}`}>
@@ -4138,18 +4140,18 @@ function PaywallModal({
 }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200 font-sans">
       <div className={`w-full max-w-lg rounded-[40px] border-2 shadow-2xl animate-in zoom-in-95 overflow-hidden ${theme === 'dark' ? 'bg-[#0A0A0A] border-[#00BFA6]/50' : 'bg-white border-[#00BFA6]'}`}>
-        <div className="bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] p-8 text-center relative">
-          <button onClick={onClose} className="absolute top-5 right-5 text-black hover:text-white font-black text-2xl z-[600]">✕</button>
+        <div className="bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] p-8 text-center relative text-black">
+          <button onClick={onClose} className="absolute top-5 right-5 text-black hover:text-white font-black text-2xl">✕</button>
           <span className="text-6xl mb-4 block">⭐</span>
-          <h2 className="text-3xl font-black text-black">Päivitä Pro -tasolle</h2>
-          <p className="text-black/80 font-bold mt-2">Olet käyttänyt ilmaisen kokeilusi (1/1).</p>
+          <h2 className="text-3xl font-black">Päivitä Pro -tasolle</h2>
+          <p className="font-bold mt-2">Olet käyttänyt ilmaisen kokeilusi (1/1).</p>
         </div>
         <div className="p-8 space-y-6">
           <ul className={`space-y-4 font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
             <li className="flex items-center gap-3"><span className="text-[#00BFA6]">✓</span> Rajattomat tekoälyhakemukset</li>
-            <li className="flex items-center gap-3"><span className="text-[#00BFA6]">✓</span> Edistynyt AI-Taikasauva</li>
+            <li className="flex items-center gap-3"><span className="text-[#00BFA6]">✓</span> Rajaton CV:n räätälöinti työn mukaan</li>
           </ul>
           <div className="pt-6 border-t border-gray-500/20 text-center">
             <p className={`text-4xl font-black mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>9,90 € <span className="text-sm text-gray-500">/ kk</span></p>
