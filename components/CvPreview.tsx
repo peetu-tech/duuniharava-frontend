@@ -132,14 +132,14 @@ export default function CvPreview({
     contentLines.shift();
   }
 
-  const sections: { title: string; items: string[] }[] = [];
+  const rawSections: { title: string; items: string[] }[] = [];
   let currentSection = { title: "", items: [] as string[] };
 
   if (mode === "cv") {
     contentLines.forEach((line) => {
       if (isHeading(line)) {
         if (currentSection.title || currentSection.items.length > 0) {
-          sections.push(currentSection);
+          rawSections.push(currentSection);
         }
         currentSection = { title: line, items: [] };
       } else {
@@ -147,9 +147,25 @@ export default function CvPreview({
       }
     });
     if (currentSection.title || currentSection.items.length > 0) {
-      sections.push(currentSection);
+      rawSections.push(currentSection);
     }
   }
+
+  // --- ÄLYKÄS SUODATIN: Poistaa tekoälyn "Ei tietoa" -hallusinaatiot ---
+  const sections = rawSections.filter(section => {
+    if (section.items.length === 0) return false;
+    const joinedText = section.items.join(" ").toLowerCase();
+    
+    // Jos teksti sisältää näitä, kyseinen osio (esim. Harrastukset) piilotetaan
+    if (joinedText.includes("[ei ") || 
+        joinedText.includes("ei ole") || 
+        joinedText === "-" || 
+        joinedText === "") {
+      return false;
+    }
+    return true;
+  });
+  // ---------------------------------------------------------------------
 
   const getFontFamily = () => {
     switch(customStyle.fontFamily) {
@@ -378,8 +394,6 @@ export default function CvPreview({
     const renderEmail = mode === "cv" ? email : contactInfoLetter.email;
     const renderLocation = mode === "cv" ? location : contactInfoLetter.location;
 
-    // Fiksu katkaisu sähköpostille: Selain saa luvan katkaista tekstin 
-    // mieluiten @-merkin kohdalta, jolloin se ei katkea keskeltä nimeä.
     const formatEmail = (emailStr: string) => {
       return emailStr.split('@').map((part, i, arr) => (
         <React.Fragment key={i}>
