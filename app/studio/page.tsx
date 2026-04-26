@@ -2151,6 +2151,39 @@ export default function Home() {
       setErrorMessage("Yhteysvirhe tilausasetuksiin.");
     }
   }
+
+  async function handleDeleteAccount() {
+  const session = getSession();
+  if (!session?.user?.email) return;
+
+  const confirm1 = confirm("VAROITUS: Kaikki tietosi ja Pro-tilauksesi poistetaan välittömästi. Tätä ei voi peruuttaa.");
+  if (!confirm1) return;
+
+  const confirm2 = prompt("Kirjoita 'POISTA' vahvistaaksesi.");
+  if (confirm2 !== "POISTA") return;
+
+  try {
+    setMessage("Poistetaan tiliä ja peruutetaan tilausta...");
+    
+    const res = await fetch("/api/delete-account", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        userId: session.user.id,
+        userEmail: session.user.email 
+      }),
+    });
+
+    if (res.ok) {
+      alert("Tili poistettu onnistuneesti.");
+      window.location.href = "/"; // Heitetään takaisin etusivulle
+    } else {
+      alert("Virhe poistossa. Ole yhteydessä tukeen.");
+    }
+  } catch (err) {
+    alert("Yhteysvirhe.");
+  }
+}
   return (
     <div className={theme === 'light' ? 'light-theme' : ''}>
       <style dangerouslySetInnerHTML={{__html: `
