@@ -1937,7 +1937,7 @@ export default function Home() {
       };
 
       setSavedLetters((prev) => [savedLetter, ...prev]);
-      setTab("letter");
+      setTab("cv"); // Muuta "letter" -> "cv"
       setMessage("Hakemus luotu valittuun työpaikkaan.");
       setTimeout(() => setMessage(""), 2500);
 
