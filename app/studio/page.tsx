@@ -2064,48 +2064,66 @@ export default function Home() {
 
 
   async function handleUpgradeToPro() {
-     // ... tässä on koodia
+    const session = getSession();
+    if (!session || !session.user.email) {
+        setErrorMessage("Kirjaudu sisään päivittääksesi Pro-tasolle.");
+        return;
+    }
+    
+    try {
+      setMessage("Ohjataan suojattuun maksuun...");
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          userId: session.user.id,
+          userEmail: session.user.email
+        }),
+      });
+      
+      const data = await res.json();
+      console.log("Stripe Checkout vastaus:", data); // Näkyy selaimen konsolissa (F12)
+      
+      if (data.url) {
+        window.location.href = data.url; 
+      } else {
+        // TÄMÄ ON UUTTA: Näyttää tarkan virheen ruudulla
+        setErrorMessage("Stripe virhe: " + (data.error || "Maksuikkunan avaus epäonnistui."));
+      }
+    } catch (error: any) {
+      console.error(error);
+      setErrorMessage("Virhe yhteydessä maksupalveluun: " + error.message);
+    }
   }
 
-  // 👇 TÄSSÄ SE ON! KORVAA TÄMÄ KOKO FUNKTIO UUDELLA 👇
   async function handlePortal() {
+    const session = getSession();
+    if (!session || !session.user.email) {
+      alert("Sähköpostia ei löytynyt. Kirjaudu uudelleen sisään.");
+      return;
+    }
+
     try {
       const res = await fetch("/api/portal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: getSession()?.user.id })
+        body: JSON.stringify({ userEmail: session.user.email })
       });
+      
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else alert("Portaalin avaus epäonnistui.");
-    } catch (e) {
-      alert("Virhe portaalin latauksessa");
+      console.log("Stripe Portal vastaus:", data); // Näkyy selaimen konsolissa
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        // TÄMÄ ON UUTTA: Näyttää tarkan virheen
+        alert("Portaalin avaus epäonnistui: " + (data.error || "Tuntematon virhe"));
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert("Virhe portaalin latauksessa: " + e.message);
     }
   }
-
-  function handleEmailTemplate(type: "thanks" | "questions" | "linkedin") {
-    if (!activeJob) return;
-    
-    let content = "";
-    if (type === "thanks") {
-      content = `Hei [Rekrytoijan nimi],\n\nKiitos vielä mielenkiintoisesta haastattelusta ja mahdollisuudesta tutustua paremmin yritykseen ${activeJob.company || "yrityksessänne"}!\n\nKeskustelumme vahvisti entisestään kiinnostustani ${activeJob.title} -tehtävää kohtaan. Odotan innolla, että kuulen teistä hakuprosessin edetessä.\n\nYstävällisin terveisin,\n${form.name}`;
-    } else if (type === "questions") {
-      content = `Hei [Rekrytoijan nimi],\n\nHuomasin avoimen ${activeJob.title} -tehtävänne ja minulla heräsi pari lyhyttä kysymystä ennen hakemukseni lähettämistä.\n\n[Kirjoita tähän 1-2 täsmällistä kysymystä]\n\nKiitos jo etukäteen ajastanne!\n\nYstävällisin terveisin,\n${form.name}`;
-    } else if (type === "linkedin") {
-      content = `Hei [Rekrytoijan nimi], huomasin avoimen ${activeJob.title} -tehtävänne ${activeJob.company ? `${activeJob.company}lla` : "yrityksessänne"}. Olen erittäin kiinnostunut roolista ja laitoinkin jo hakemukseni tulemaan. Olisi hienoa verkostoitua täällä LinkedInissä! Ystävällisin terveisin, ${form.name}`;
-    }
-    
-    setEmailTemplateModal({ type, content });
-  }
-
-  if (isAuthChecking) {
-    return (
-      <main className="grid min-h-screen place-items-center bg-[#0F0F0F] text-white">
-        <p className="text-[#00BFA6] font-black text-2xl animate-pulse tracking-widest uppercase" aria-live="polite">Ladataan studiota...</p>
-      </main>
-    );
-  }
-
   return (
     <div className={theme === 'light' ? 'light-theme' : ''}>
       <style dangerouslySetInnerHTML={{__html: `
