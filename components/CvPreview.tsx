@@ -91,7 +91,6 @@ function isHeading(line: string) {
   return line === line.toUpperCase() || headingNames.includes(line.toUpperCase());
 }
 
-// TÄSSÄ OVAT NE PUUTTUVAT APUFUNKTIOT, JOTKA KORJAAVAT VERCEL-VIRHEEN!
 const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET", "HARRASTUKSET"].includes(title.toUpperCase());
 const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS", "PROJEKTIT", "PORTFOLIO"].includes(title.toUpperCase());
 const isProfileSection = (title: string) => ["PROFIILI", "TIIVISTELMÄ", "TAVOITE"].includes(title.toUpperCase());
@@ -379,11 +378,44 @@ export default function CvPreview({
     const renderEmail = mode === "cv" ? email : contactInfoLetter.email;
     const renderLocation = mode === "cv" ? location : contactInfoLetter.location;
 
+    // Fiksu katkaisu sähköpostille: Selain saa luvan katkaista tekstin 
+    // mieluiten @-merkin kohdalta, jolloin se ei katkea keskeltä nimeä.
+    const formatEmail = (emailStr: string) => {
+      return emailStr.split('@').map((part, i, arr) => (
+        <React.Fragment key={i}>
+          {part}
+          {i < arr.length - 1 && <span className="inline-block">@<wbr /></span>}
+        </React.Fragment>
+      ));
+    };
+
     return (
       <div className={`font-medium ${isDarkBg ? 'opacity-90' : 'opacity-80'}`} style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: `${customStyle.contactSize || 14}px` }}>
-        {renderPhone && <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Phone style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Puhelinnumero: </span>{renderPhone}</span></div>}
-        {renderEmail && <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.Mail style={iconStyleChoice as any} /></span>} <span className="break-all"><span className="sr-only">Sähköposti: </span>{renderEmail}</span></div>}
-        {renderLocation && <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>{iconStyleChoice !== "none" && <span style={{ color: customStyle.accentColor }}><Icons.MapPin style={iconStyleChoice as any} /></span>} <span><span className="sr-only">Sijainti: </span>{renderLocation}</span></div>}
+        
+        {renderPhone && (
+          <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>
+            {iconStyleChoice !== "none" && <span className="shrink-0" style={{ color: customStyle.accentColor }}><Icons.Phone style={iconStyleChoice as any} /></span>} 
+            <span><span className="sr-only">Puhelinnumero: </span>{renderPhone}</span>
+          </div>
+        )}
+        
+        {renderEmail && (
+          <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>
+            {iconStyleChoice !== "none" && <span className="shrink-0" style={{ color: customStyle.accentColor }}><Icons.Mail style={iconStyleChoice as any} /></span>} 
+            <span style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+              <span className="sr-only">Sähköposti: </span>
+              {formatEmail(renderEmail)}
+            </span>
+          </div>
+        )}
+        
+        {renderLocation && (
+          <div className="flex items-center gap-3 break-inside-avoid" style={{ justifyContent: getTextAlign() }}>
+            {iconStyleChoice !== "none" && <span className="shrink-0" style={{ color: customStyle.accentColor }}><Icons.MapPin style={iconStyleChoice as any} /></span>} 
+            <span><span className="sr-only">Sijainti: </span>{renderLocation}</span>
+          </div>
+        )}
+
       </div>
     );
   }
@@ -399,7 +431,6 @@ export default function CvPreview({
     >
       <div 
         id={mode === "cv" ? "cv-preview" : "letter-preview"} 
-        // POISTETTU: min-h-[1132px] jotta CV voi venyä dynaamisesti!
         className="w-full flex flex-col h-full min-h-screen"
         style={{ color: customStyle.mainText, fontFamily: getFontFamily(), ...getPatternStyle("main") }}
       >
