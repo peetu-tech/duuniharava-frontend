@@ -1313,6 +1313,11 @@ export default function Home() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: customStyle.mainBg,
+        // --- TÄSSÄ ON KORJAUS LEIKKAUTUMISEEN ---
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 800,
+        // ----------------------------------------
         onclone: (clonedDoc) => {
           let safeCss = "";
           for (let i = 0; i < document.styleSheets.length; i++) {
@@ -1375,6 +1380,19 @@ export default function Home() {
         pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, imgHeight);
         heightLeft -= pageHeight;
       }
+
+      pdf.save(`duuniharava-${isLetter ? 'hakemus' : 'cv'}-${cvStyle}.pdf`);
+      
+      setMessage("PDF ladattu onnistuneesti koneellesi!");
+      setTimeout(() => setMessage(""), 3500);
+
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
 
       pdf.save(`duuniharava-${isLetter ? 'hakemus' : 'cv'}-${cvStyle}.pdf`);
       
