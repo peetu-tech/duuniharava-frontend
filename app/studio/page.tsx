@@ -1641,7 +1641,7 @@ export default function Home() {
     setActiveJobId(job.id);
     setJobForm(emptyJobForm);
     setMessage("Työpaikka lisätty listaan.");
-    setTab("job");
+    setTab("jobs"); // <--- NYT ON OIKEIN!
     setTimeout(() => setMessage(""), 2500);
 
     const session = getSession();
