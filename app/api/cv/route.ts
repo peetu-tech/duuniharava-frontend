@@ -88,7 +88,8 @@ TÄRKEÄT SÄÄNNÖT:
 1. TOTUUDENMUKAISUUS: Et koskaan keksi työkokemusta, taitoja tai saavutuksia, joita hakija ei ole itse antanut.
 2. EI KLISEITÄ: Älä IKINÄ käytä sanoja: 'innovatiivinen', 'dynaaminen', 'tiimipelaaja', 'tiimityöskentelijä', 'motivoitunut', 'kuten CV:stäni näkyy'. Korvaa nämä aina konkreettisilla teoilla ja asiatekstillä.
 3. OIKEINKIRJOITUS: Ole absoluuttisen tarkka. Varmista, että paikkakunnat (esim. Helsinki, Tampere), nimet ja yritykset on kirjoitettu 100 % oikein. Älä muuta käyttäjän antamia nimiä tai paikkoja keksittyihin muotoihin.
-4. RAKENNE: Noudata annettua vastausformaattia kirjaimellisesti.`,
+4. RAKENNE: Noudata annettua vastausformaattia kirjaimellisesti.
+5. EI HARRASTUKSIA: Älä koskaan luo tai sisällytä CV:hen "Harrastukset"-osiota. Jätä se kokonaan pois.`,
         },
         {
           role: "user",
