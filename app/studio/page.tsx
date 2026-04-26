@@ -1294,9 +1294,14 @@ export default function Home() {
     }
   }
 
-  const downloadPdf = async (elementId: string = "cv-preview", isLetter: boolean = false) => {
+ const downloadPdf = async (elementId: string = "cv-preview", isLetter: boolean = false) => {
     const printContent = document.getElementById(elementId);
     if (!printContent) return;
+
+    // KORJAUS 1: Otetaan nykyinen skrollaus talteen ja rullataan ruutu aivan ylös sekunniksi
+    const originalScrollY = window.scrollY;
+    const originalScrollX = window.scrollX;
+    window.scrollTo(0, 0);
 
     try {
       setDownloadingPdf(true);
@@ -1313,11 +1318,8 @@ export default function Home() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: customStyle.mainBg,
-        // --- TÄSSÄ ON KORJAUS LEIKKAUTUMISEEN ---
         scrollX: 0,
         scrollY: 0,
-        windowWidth: 800,
-        // ----------------------------------------
         onclone: (clonedDoc) => {
           let safeCss = "";
           for (let i = 0; i < document.styleSheets.length; i++) {
@@ -1345,6 +1347,12 @@ export default function Home() {
           if (previewEl) {
             previewEl.style.borderRadius = "0px";
             previewEl.style.boxShadow = "none";
+            // KORJAUS 2: Pakotetaan CV-klooni aivan vasempaan yläkulmaan tasan 800px levyisenä!
+            previewEl.style.width = "800px";
+            previewEl.style.margin = "0";
+            previewEl.style.position = "fixed";
+            previewEl.style.top = "0";
+            previewEl.style.left = "0";
           }
         },
       });
@@ -1391,6 +1399,8 @@ export default function Home() {
       setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
     } finally {
       setDownloadingPdf(false);
+      // KORJAUS 3: Palautetaan sivu sille kohdalle, missä käyttäjä oli
+      window.scrollTo(originalScrollX, originalScrollY);
     }
   };
 
