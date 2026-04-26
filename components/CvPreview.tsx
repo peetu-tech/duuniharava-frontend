@@ -82,7 +82,6 @@ const headingNames = [
   "KIELITAITO",
   "TAIDOT",
   "KORTIT JA PÄTEVYYDET",
-  "HARRASTUKSET",
   "PROJEKTIT",
   "PORTFOLIO",
 ];
@@ -91,7 +90,7 @@ function isHeading(line: string) {
   return line === line.toUpperCase() || headingNames.includes(line.toUpperCase());
 }
 
-const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET", "HARRASTUKSET"].includes(title.toUpperCase());
+const isTagSection = (title: string) => ["TAIDOT", "KIELITAITO", "KORTIT JA PÄTEVYYDET"].includes(title.toUpperCase());
 const isTimelineSection = (title: string) => ["TYÖKOKEMUS", "KOULUTUS", "PROJEKTIT", "PORTFOLIO"].includes(title.toUpperCase());
 const isProfileSection = (title: string) => ["PROFIILI", "TIIVISTELMÄ", "TAVOITE"].includes(title.toUpperCase());
 
@@ -151,12 +150,16 @@ export default function CvPreview({
     }
   }
 
-  // --- ÄLYKÄS SUODATIN: Poistaa tekoälyn "Ei tietoa" -hallusinaatiot ---
+  // --- ÄLYKÄS SUODATIN: Piilottaa tyhjät ja poistaa Harrastukset ---
   const sections = rawSections.filter(section => {
+    // ESTETÄÄN HARRASTUKSET KOKONAAN:
+    if (section.title.toUpperCase().includes("HARRASTUKSET")) {
+      return false; 
+    }
+
     if (section.items.length === 0) return false;
     const joinedText = section.items.join(" ").toLowerCase();
     
-    // Jos teksti sisältää näitä, kyseinen osio (esim. Harrastukset) piilotetaan
     if (joinedText.includes("[ei ") || 
         joinedText.includes("ei ole") || 
         joinedText === "-" || 
