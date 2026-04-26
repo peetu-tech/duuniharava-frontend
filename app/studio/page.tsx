@@ -849,13 +849,22 @@ function PaywallModal({ isOpen, onClose, theme, onUpgrade }: { isOpen: boolean, 
   );
 }
 
-function SettingsModal({ isOpen, onClose, theme, isPro, onPortal, onDeleteAccount }: { 
+function SettingsModal({ 
+  isOpen, 
+  onClose, 
+  theme, 
+  isPro, 
+  onPortal, 
+  onDeleteAccount, 
+  onLogout // 1. LISÄTTY TÄHÄN
+}: { 
   isOpen: boolean, 
   onClose: () => void, 
   theme: "light" | "dark", 
   isPro: boolean, 
   onPortal: () => void,
-  onDeleteAccount: () => void // Lisätty tämä uusi propsi
+  onDeleteAccount: () => void,
+  onLogout: () => void // 2. LISÄTTY TYYPPIIN
 }) {
   if (!isOpen) return null;
   
@@ -868,6 +877,7 @@ function SettingsModal({ isOpen, onClose, theme, isPro, onPortal, onDeleteAccoun
         </div>
 
         <div className="space-y-8">
+          {/* JÄSENYYS */}
           <div className={`p-6 rounded-2xl border ${isPro ? (theme === 'dark' ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : 'border-[#00BFA6]/30 bg-[#00BFA6]/5') : (theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50')}`}>
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Nykyinen jäsenyys</p>
             <div className="flex justify-between items-center">
@@ -882,14 +892,26 @@ function SettingsModal({ isOpen, onClose, theme, isPro, onPortal, onDeleteAccoun
             </div>
           </div>
 
-          <div className="space-y-2">
+          {/* KIRJAUTUMISTIEDOT JA ULOSKIRJAUDU */}
+          <div className="space-y-4">
             <h3 className="text-sm font-black uppercase tracking-widest text-gray-500">Kirjautumistiedot</h3>
-            <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+            <div className={`p-5 rounded-xl border flex flex-col gap-4 ${theme === 'dark' ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
               <p className="font-bold opacity-80">{getSession()?.user?.email || "Ei tiedossa"}</p>
+              
+              <button 
+                onClick={onLogout}
+                className={`w-full py-3 rounded-xl font-black text-xs transition-all border ${
+                  theme === 'dark' 
+                    ? 'bg-white/10 border-white/10 hover:bg-white/20 text-white' 
+                    : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-900 shadow-sm'
+                }`}
+              >
+                👋 KIRJAUDU ULOS
+              </button>
             </div>
           </div>
 
-          {/* POISTONAPPI - Päivitetty teksti ja toiminto */}
+          {/* POISTONAPPI */}
           <div className="pt-6 border-t border-red-500/20 text-center sm:text-left">
             <button 
               onClick={onDeleteAccount} 
