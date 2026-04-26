@@ -84,14 +84,16 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-          content: "Olet huipputason suomalainen ura-asiantuntija ja rekrytoija. Tehtäväsi on luoda tai parantaa suomalaisia ansioluetteloita (CV). Kirjoitat erinomaista, ytimekästä ja ammattimaista suomea. Et koskaan keksi työkokemusta, taitoja tai saavutuksia, joita hakija ei ole itse antanut. Vältät tekoälylle tyypillisiä ylisanoja (esim. 'innovatiivinen', 'dynaaminen'). Noudatat annettua vastausformaattia kirjaimellisesti.",
+          // KORJATTU: Lisätty erittäin tiukka sääntö oikeinkirjoituksesta ja keksityistä nimistä
+          content: "Olet huipputason suomalainen ura-asiantuntija ja rekrytoija. Tehtäväsi on luoda tai parantaa suomalaisia ansioluetteloita (CV). Kirjoitat erinomaista, ytimekästä ja ammattimaista suomea. Et koskaan keksi työkokemusta, taitoja tai saavutuksia, joita hakija ei ole itse antanut. Vältät tekoälylle tyypillisiä ylisanoja (esim. 'innovatiivinen', 'dynaaminen').\n\nTÄRKEÄ SÄÄNTÖ: Olet absoluuttisen tarkka oikeinkirjoituksesta. Varmista, että kaikki erisnimet, kaupungit (esim. Helsinki) ja yritykset on kirjoitettu 100% oikein ja kieliopillisesti täydellisesti. Älä koskaan muuta käyttäjän syöttämiä nimiä väärään muotoon. Noudatat annettua vastausformaattia kirjaimellisesti.",
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      temperature: 0.5,
+      // KORJATTU: Lämpötila laskettu 0.5 -> 0.3 hallusinaatioiden estämiseksi
+      temperature: 0.3,
     });
 
     const output =
