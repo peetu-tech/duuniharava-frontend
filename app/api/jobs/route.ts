@@ -3,7 +3,6 @@ import OpenAI from "openai";
 import fetch from "node-fetch";
 import { HttpsProxyAgent } from "https-proxy-agent";
 
-// TÄMÄ ON KRIITTINEN LISÄYS: Pidentää Vercelin aikarajaa, jotta tekoäly ehtii vastata ennen aikakatkaisua!
 export const maxDuration = 60;
 
 const openai = new OpenAI({
@@ -16,6 +15,14 @@ const proxyAgent = process.env.FIXIE_URL
 
 const TYOMARKKINATORI_URL = "https://api.ahtp.fi/kipa/p67/v2/jobpostings";
 
+// APUFUNKTIO: Purkaa Työmarkkinatorin kieliobjektit (esim. { fi: "Teksti", en: "Text" }) puhtaaksi tekstiksi
+function getLocText(field: any): string {
+  if (!field) return "";
+  if (typeof field === "string") return field;
+  // Kokeillaan ensin suomea, sitten ruotsia/englantia
+  return field.fi || field.FI || field.sv || field.SV || field.en || field.EN || "";
+}
+
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -23,13 +30,16 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const searchTerms = [body.targetJob, body.desiredRoles, body.keywords].filter(Boolean).join(" ");
+    
+    // Yhdistetään kaikki käyttäjän syöttämät toiveet yhdeksi isoksi hakusanakentäksi
+    const searchTerms = [body.targetJob, body.desiredRoles, body.keywords, body.desiredLocation].filter(Boolean).join(" ");
+    const searchKeywords = searchTerms.toLowerCase().split(/[\s,]+/).filter(w => w.length > 2); // Pilkotaan sanoiksi ("myynti", "pirkanmaa", "b2b")
     
     let rawJobs: any[] = [];
     const tmKey = process.env.TYOMARKKINATORI_API_KEY;
 
     // ==========================================================
-    // VAIHE 1: HAKU TYÖMARKKINATORILTA
+    // VAIHE 1: HAKU TYÖMARKKINATORILTA JA ESIHARAVOINTI
     // ==========================================================
     if (tmKey) {
       try {
@@ -39,9 +49,7 @@ export async function POST(req: Request) {
 
         const payload = {
           onlyStatus: "PUBLISHED",
-          created: {
-            from: recentDate.toISOString()
-          }
+          created: { from: recentDate.toISOString() }
         };
 
         const tmResponse = await fetch(TYOMARKKINATORI_URL, {
@@ -56,6 +64,7 @@ export async function POST(req: Request) {
 
         if (tmResponse.ok) {
           const textData = await tmResponse.text();
+          
           const allParsedJobs = textData
             .split('\n')
             .filter(line => line.trim().length > 0)
@@ -64,9 +73,42 @@ export async function POST(req: Request) {
             })
             .filter(Boolean);
 
-          // 15 paikkaa on AI:lle tarpeeksi ja säästää prosessointiaikaa valtavasti
-          rawJobs = allParsedJobs.slice(0, 15);
-          console.log(`✅ Työmarkkinatorilta lähetetään ${rawJobs.length} paikkaa AI:lle.`);
+          console.log(`✅ Työmarkkinatorilta löytyi ${allParsedJobs.length} paikkaa. Pisteytetään...`);
+
+          // ESIHARAVA: Pisteytetään työpaikat käyttäjän hakusanojen perusteella
+          let scoredJobs = allParsedJobs.map(job => {
+            const title = getLocText(job.position?.title);
+            const company = getLocText(job.client?.company) || getLocText(job.owner?.company);
+            const desc = getLocText(job.position?.jobDescription) || getLocText(job.position?.marketingDescription);
+            const loc = getLocText(job.location?.workplacePostOffice) || job.location?.municipalities?.[0] || "";
+
+            const fullText = `${title} ${company} ${desc} ${loc}`.toLowerCase();
+            let score = 0;
+
+            searchKeywords.forEach(kw => {
+              if (fullText.includes(kw)) score += 1;
+            });
+
+            return { job, score, title, company, desc, loc };
+          });
+
+          // Otetaan vain ne, joissa on edes jotain osumaa, ja järjestetään parhaat ylös
+          scoredJobs = scoredJobs.filter(j => j.score > 0).sort((a, b) => b.score - a.score);
+
+          // Jos hakusanoilla ei löytynyt yhtään mitään, otetaan tuoreimmat
+          if (scoredJobs.length === 0) {
+            console.log("⚠️ Hakusanoilla ei löytynyt osumia, otetaan tuoreimmat.");
+            scoredJobs = allParsedJobs.slice(0, 15).map(job => ({
+              job,
+              title: getLocText(job.position?.title),
+              company: getLocText(job.client?.company) || getLocText(job.owner?.company),
+              desc: getLocText(job.position?.jobDescription),
+              loc: getLocText(job.location?.workplacePostOffice) || job.location?.municipalities?.[0] || ""
+            }));
+          }
+
+          rawJobs = scoredJobs.slice(0, 15);
+          console.log(`✅ Tekoälylle lähetetään ${rawJobs.length} parhaiten osuvaa paikkaa.`);
         } else {
           console.error("❌ Työmarkkinatori API virhe:", tmResponse.status);
         }
@@ -82,54 +124,43 @@ export async function POST(req: Request) {
     // VAIHE 2: RIKASTETAAN TAI GENEROIDAAN
     // ==========================================
     if (rawJobs.length > 0) {
-      const jobsForAI = rawJobs.map((job: any) => {
-        // TÄMÄ ON SE KORJAUS: Turvallinen tekstien purku (Estää .substring virheen)
-        const titleRaw = job.position?.title?.FI || job.position?.title || "Avoin työpaikka";
-        const title = typeof titleRaw === 'string' ? titleRaw : "Avoin työpaikka";
-
-        const companyRaw = job.client?.company?.FI || job.client?.company || job.owner?.company?.FI || job.owner?.company || "Tuntematon yritys";
-        const company = typeof companyRaw === 'string' ? companyRaw : "Tuntematon yritys";
-
-        const descRaw = job.position?.jobDescription?.FI || job.position?.jobDescription || "";
-        // Tarkistetaan, että kuvaus on OIKESTI string ennen kuin käytetään .substring()
-        const description = typeof descRaw === 'string' ? descRaw.substring(0, 600) : "";
-
-        return {
-          id: job.metadata?.externalId || job.id || Math.random().toString(36).substr(2, 9),
-          title,
-          company,
-          location: job.location?.workplacePostOffice || job.location?.municipalities?.[0] || "Suomi",
-          description,
-          url: job.application?.url?.FI || job.application?.url || `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${job.metadata?.externalId || job.id}`,
-          deadline: job.application?.expires || ""
-        };
-      });
+      const jobsForAI = rawJobs.map((j: any) => ({
+        id: j.job.metadata?.externalId || j.job.id || Math.random().toString(36).substr(2, 9),
+        title: j.title || "Avoin työpaikka",
+        company: j.company || "Tuntematon yritys",
+        location: j.loc || "Suomi",
+        description: j.desc.substring(0, 600), // Teksti on nyt turvallisesti purettu!
+        url: getLocText(j.job.application?.url) || `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${j.job.metadata?.externalId || j.job.id}`,
+        deadline: j.job.application?.expires || ""
+      }));
 
       aiPrompt = `
 Olet rekrytointikonsultti. Tässä on hakijan profiili:
 - Etsii töitä: ${searchTerms}
-- Alue: ${body.desiredLocation || 'Suomi'}
 
-Tässä on lista aitoja työpaikkoja (JSON):
+Tässä on 15 aitoa ja hakijalle esisuodatettua työpaikkaa (JSON):
 ${JSON.stringify(jobsForAI)}
 
-Valitse listasta 3-5 parhaiten hakijalle sopivaa työpaikkaa. Palauta VAIN JSON-objekti avaimella "jobs", jossa on nämä kentät:
+Valitse näistä 3-5 parhaiten hakijalle sopivaa työpaikkaa.
+HUOMIO SIJAINNISTA: Jos sijainti on pelkkä numero (esim. 285 tai 837), se on kuntakoodi. Etsi silloin oikea kaupunki kuvauksesta tai jätä kaupungiksi alue (esim. Pirkanmaa).
+
+Palauta VAIN JSON-objekti avaimella "jobs", jossa on nämä kentät:
 {
   "jobs": [
     {
       "title": "Sama kuin syötteessä",
       "company": "Sama kuin syötteessä",
-      "location": "Sama kuin syötteessä",
+      "location": "Sama kuin syötteessä (korjaa kuntakoodi kaupungiksi, jos osaat)",
       "type": "Kokoaikainen tai Osa-aikainen",
       "summary": "Myyvä 2 lauseen tiivistelmä",
       "adText": "Alkuperäinen kuvaus siistittynä",
       "url": "Sama kuin syötteessä",
       "whyFit": "Miksi hakija sopii tähän",
       "source": "Työmarkkinatori",
-      "matchScore": 85,
+      "matchScore": 95,
       "status": "interested",
-      "priority": "medium",
-      "salary": "Sopimuksen mukaan",
+      "priority": "high",
+      "salary": "Lue kuvauksesta tai Sopimuksen mukaan",
       "deadline": "Sama kuin syötteessä",
       "notes": ""
     }
