@@ -17,6 +17,7 @@ const TYOMARKKINATORI_URL = "https://api.ahtp.fi/kipa/p67/v2/jobpostings";
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
+      console.error("❌ OpenAI avain puuttuu.");
       return NextResponse.json({ error: "OpenAI avain puuttuu." }, { status: 500 });
     }
 
@@ -26,14 +27,15 @@ export async function POST(req: Request) {
     let rawJobs: any[] = [];
 
     // ==========================================================
-    // VAIHE 1: HAKU TYÖMARKKINATORIN TUOTANTO-APIsta (YAML-määrittelyn mukaisesti)
+    // VAIHE 1: HAKU TYÖMARKKINATORIN TUOTANTO-APIsta
     // ==========================================================
     const tmKey = process.env.TYOMARKKINATORI_API_KEY;
 
     if (tmKey) {
       try {
+        console.log("🔍 Haetaan Työmarkkinatorilta...");
         const recentDate = new Date();
-        recentDate.setDate(recentDate.getDate() - 5); // Haetaan max 5 pv vanhat
+        recentDate.setDate(recentDate.getDate() - 14); // Haetaan 14 pv sisällä julkaistut osumien maksimoimiseksi
 
         const payload = {
           onlyStatus: "PUBLISHED",
@@ -42,10 +44,9 @@ export async function POST(req: Request) {
           }
         };
 
-        // Kutsutaan Työmarkkinatoria käyttäen proxyä, jos se on asennettu
         const tmResponse = await fetch(TYOMARKKINATORI_URL, {
           method: "POST",
-          agent: proxyAgent as any, // Tästä KEHA näkee sinun staattisen IP-osoitteesi!
+          agent: proxyAgent as any,
           headers: {
             "KIPA-Subscription-Key": tmKey,
             "Content-Type": "application/json",
@@ -55,8 +56,6 @@ export async function POST(req: Request) {
 
         if (tmResponse.ok) {
           const textData = await tmResponse.text();
-          
-          // PARSITAAN NDJSON
           const allParsedJobs = textData
             .split('\n')
             .filter(line => line.trim().length > 0)
@@ -65,14 +64,17 @@ export async function POST(req: Request) {
             })
             .filter(Boolean);
 
-          // Otetaan 60 tuoreinta AI:ta varten
           rawJobs = allParsedJobs.slice(0, 60);
+          console.log(`✅ Työmarkkinatorilta löytyi ${allParsedJobs.length} paikkaa, joista ${rawJobs.length} lähetetään tekoälylle perattavaksi.`);
         } else {
-          console.error("Työmarkkinatori API virhe:", tmResponse.status, await tmResponse.text());
+          const errText = await tmResponse.text();
+          console.error(`❌ Työmarkkinatori API virhe (${tmResponse.status}):`, errText);
         }
       } catch (e) {
-        console.error("Virhe aitojen työpaikkojen haussa:", e);
+        console.error("❌ Virhe aitojen työpaikkojen haussa:", e);
       }
+    } else {
+      console.warn("⚠️ TYOMARKKINATORI_API_KEY puuttuu .env tiedostosta. Käytetään vain tekoälysimulaatiota.");
     }
 
     let aiPrompt = "";
@@ -93,31 +95,28 @@ export async function POST(req: Request) {
       }));
 
       aiPrompt = `
-Olet rekrytointikonsultti. Tässä on käyttäjän profiili ja toiveet:
+Olet rekrytointikonsultti. Tässä on hakijan profiili:
 - Etsii töitä: ${searchTerms}
 - Alue: ${body.desiredLocation || 'Suomi'}
 - Kokemus: ${body.experience || 'Ei määritelty'}
-- Taidot: ${body.skills || 'Ei määritelty'}
 
-Tässä on lista AITOJA ja TUOREITA avoimia työpaikkoja Suomesta (JSON):
+Tässä on lista AITOJA ja TUOREITA avoimia työpaikkoja (JSON):
 ${JSON.stringify(jobsForAI)}
 
-TEHTÄVÄSI:
-Valitse listasta 2-5 työpaikkaa, jotka sopivat parhaiten käyttäjän toiveisiin (erityisesti sijainti ja ala).
-Palauta JSON-objekti avaimella "jobs", jossa valitut työpaikat on rikastettu näin:
+Valitse listasta 3-5 työpaikkaa, jotka sopivat parhaiten hakijalle. Palauta VAIN JSON-objekti avaimella "jobs", jossa valitut työpaikat on tässä muodossa:
 {
   "jobs": [
     {
       "title": "Sama kuin syötteessä",
       "company": "Sama kuin syötteessä",
       "location": "Sama kuin syötteessä",
-      "type": "Kokoaikainen/Osa-aikainen (päättele kuvauksesta)",
-      "summary": "Myyvä 2 lauseen tiivistelmä miksi tämä kiinnostaisi hakijaa",
-      "adText": "Alkuperäinen kuvaus tiivistettynä",
+      "type": "Kokoaikainen tai Osa-aikainen",
+      "summary": "Myyvä 2 lauseen tiivistelmä tehtävästä",
+      "adText": "Alkuperäinen kuvaus siistittynä",
       "url": "Sama kuin syötteessä",
-      "whyFit": "Miksi tämä hakija sopii tähän paikkaan (hyödynnä profiilia)?",
+      "whyFit": "Miksi hakija sopii tähän paikkaan (henkilökohtainen arvio)",
       "source": "Työmarkkinatori",
-      "matchScore": Numero 50-99 (arvioi osumatarkkuus),
+      "matchScore": 85,
       "status": "interested",
       "priority": "medium",
       "salary": "Sopimuksen mukaan",
@@ -128,23 +127,46 @@ Palauta JSON-objekti avaimella "jobs", jossa valitut työpaikat on rikastettu n�
 }`;
     } else {
       isFallback = true;
+      console.log("⚠️ Aitoja työpaikkoja ei saatu. Siirrytään tekoälysimulaatioon (Fallback).");
       aiPrompt = `
-Työmarkkinatorilta ei saatu juuri nyt dataa haulle: "${searchTerms}".
-Luo hakijalle 4 realistista simuloitua työpaikkaa Suomesta hänen toiveidensa perusteella:
-- Toive: ${body.desiredRoles || body.targetJob}
+Työmarkkinatorilta ei saatu juuri nyt dataa haulle.
+Luo hakijalle 4 realistista simuloitua avointa työpaikkaa Suomesta hänen toiveidensa perusteella:
+- Toive: ${searchTerms || body.desiredRoles || body.targetJob || 'Avoimet työpaikat'}
 - Alue: ${body.desiredLocation || 'Suomi'}
 
-Palauta VAIN JSON-objekti avaimella "jobs". Muotoile se Duuniharavan käyttöliittymään sopivaksi.`;
+Palauta VAIN TÄSMÄLLEEN tämä JSON-rakenne avaimella "jobs" täytettynä:
+{
+  "jobs": [
+    {
+      "title": "Ammattinimike",
+      "company": "Realistinen keksitty yritys Oy",
+      "location": "Kaupunki",
+      "type": "Kokoaikainen",
+      "summary": "Lyhyt myyvä tiivistelmä",
+      "adText": "Pitkä ja aito työpaikkailmoituksen teksti",
+      "url": "https://tyomarkkinatori.fi/simuloitu",
+      "whyFit": "Miksi hakija sopii tähän",
+      "source": "Tekoäly-simulaatio",
+      "matchScore": 90,
+      "status": "interested",
+      "priority": "medium",
+      "salary": "Esim. 2500-3500 €/kk",
+      "deadline": "2024-12-31",
+      "notes": ""
+    }
+  ]
+}`;
     }
 
     // ==========================================
     // VAIHE 3: OPENAI KUTSU
     // ==========================================
+    console.log("🧠 Pyydetään OpenAI:ta muodostamaan vastaus...");
     const aiResponse = await openai.chat.completions.create({
       model: "gpt-4o",
       response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: "Olet rekrytoinnin asiantuntija. Palautat vain validia JSON-dataa." },
+        { role: "system", content: "Olet apuri, joka palauttaa vain validia JSON-dataa." },
         { role: "user", content: aiPrompt }
       ],
       temperature: isFallback ? 0.7 : 0.2,
@@ -156,15 +178,16 @@ Palauta VAIN JSON-objekti avaimella "jobs". Muotoile se Duuniharavan käyttölii
       const parsed = JSON.parse(rawOutput);
       if (parsed.jobs && Array.isArray(parsed.jobs)) {
         finalOutput = JSON.stringify(parsed.jobs);
+        console.log(`✅ OpenAI palautti ${parsed.jobs.length} valmista työpaikkaa.`);
       }
     } catch (e) {
-      console.error("JSON parse error from AI:", e);
+      console.error("❌ JSON parse error from AI:", e);
     }
 
     return NextResponse.json({ output: finalOutput });
 
   } catch (error: any) {
-    console.error("Jobs route error:", error);
+    console.error("❌ Jobs route error:", error);
     return NextResponse.json({ error: "Työpaikkojen haku epäonnistui." }, { status: 500 });
   }
 }
