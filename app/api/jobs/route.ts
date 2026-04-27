@@ -100,6 +100,7 @@ export async function POST(req: Request) {
             console.log("⚠️ Hakusanoilla ei löytynyt osumia, otetaan tuoreimmat.");
             scoredJobs = allParsedJobs.slice(0, 15).map(job => ({
               job,
+              score: 0, // <--- TÄMÄ RIVI PUUTTUI! Nyt TypeScript on tyytyväinen.
               title: getLocText(job.position?.title),
               company: getLocText(job.client?.company) || getLocText(job.owner?.company),
               desc: getLocText(job.position?.jobDescription),
@@ -129,7 +130,8 @@ export async function POST(req: Request) {
         title: j.title || "Avoin työpaikka",
         company: j.company || "Tuntematon yritys",
         location: j.loc || "Suomi",
-        description: j.desc.substring(0, 600), // Teksti on nyt turvallisesti purettu!
+        // Laitetaan turvallinen pätkiminen varmuuden vuoksi
+        description: j.desc ? j.desc.substring(0, 600) : "",
         url: getLocText(j.job.application?.url) || `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${j.job.metadata?.externalId || j.job.id}`,
         deadline: j.job.application?.expires || ""
       }));
