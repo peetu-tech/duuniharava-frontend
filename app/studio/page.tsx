@@ -880,6 +880,10 @@ export default function Home() {
   const [showHelp, setShowHelp] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [showMoreCvFields, setShowMoreCvFields] = useState(false);
+  const [showMoreSearchFields, setShowMoreSearchFields] = useState(false);
+  const [showManualJobForm, setShowManualJobForm] = useState(false);
+  const [showJobFilters, setShowJobFilters] = useState(false);
   
   const [isPro, setIsPro] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -1453,6 +1457,10 @@ export default function Home() {
     setJobSort("newest");
     setShowFavoritesOnly(false);
     setCustomStyles(defaultCustomStyles);
+    setShowMoreCvFields(false);
+    setShowMoreSearchFields(false);
+    setShowManualJobForm(false);
+    setShowJobFilters(false);
     const session = getSession();
     if (session) {
       localStorage.removeItem(getStudioStorageKey(session.user.id));
@@ -2788,77 +2796,95 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  {/* UUSI OSIO: PROJEKTIT */}
-                  <div className="pt-3 sm:pt-4">
-                    <label htmlFor="input-projects" className={LabelClass(theme)}>Projektit & Portfoliolinkit <span className="text-[#00BFA6] font-normal lowercase">(Vapaaehtoinen)</span></label>
-                    <textarea
-                      id="input-projects"
-                      placeholder="Projektin nimi | Vuosi&#10;- Mitä teit ja mitä sait aikaan?&#10;- Linkki: https://..."
-                      value={form.projects}
-                      onChange={(e) => updateField("projects", e.target.value)}
-                      className={TextareaClass("min-h-[140px]", theme)}
-                    />
-                    <FieldHint theme={theme}>
-                      Tämä kohta auttaa erityisesti silloin, jos työkokemusta on vähemmän. Tänne sopivat myös omat projektit, portfoliojutut ja sivutyöt.
-                    </FieldHint>
-                  </div>
+                  <div className={`rounded-[28px] border p-4 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreCvFields((prev) => !prev)}
+                      className={`flex w-full items-center justify-between rounded-2xl px-1 py-1 text-left text-sm sm:text-base font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                      aria-expanded={showMoreCvFields}
+                    >
+                      <span>Lisää tietoja CV:hen</span>
+                      <span className="text-[#00BFA6]">{showMoreCvFields ? "Piilota" : "Avaa"}</span>
+                    </button>
+                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Projektit, kielet, taidot, kortit ja profiilikuva.
+                    </p>
 
-                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2 pt-8">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-end mb-3">
-                        <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
+                    {showMoreCvFields && (
+                      <div className="mt-6 space-y-8">
+                        <div className="pt-1">
+                          <label htmlFor="input-projects" className={LabelClass(theme)}>Projektit & Portfoliolinkit <span className="text-[#00BFA6] font-normal lowercase">(Vapaaehtoinen)</span></label>
+                          <textarea
+                            id="input-projects"
+                            placeholder="Projektin nimi | Vuosi&#10;- Mitä teit ja mitä sait aikaan?&#10;- Linkki: https://..."
+                            value={form.projects}
+                            onChange={(e) => updateField("projects", e.target.value)}
+                            className={TextareaClass("min-h-[140px]", theme)}
+                          />
+                          <FieldHint theme={theme}>
+                            Tämä kohta auttaa erityisesti silloin, jos työkokemusta on vähemmän. Tänne sopivat myös omat projektit, portfoliojutut ja sivutyöt.
+                          </FieldHint>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-end mb-3">
+                              <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
+                            </div>
+                            <textarea
+                              id="input-languages"
+                              placeholder="Suomi (äidinkieli), Englanti (sujuva)..."
+                              value={form.languages}
+                              onChange={(e) => updateField("languages", e.target.value)}
+                              className={TextareaClass("min-h-[140px]", theme)}
+                            />
+                            <FieldHint theme={theme}>
+                              Kirjoita kieli ja taso mahdollisimman selkeästi, esimerkiksi sujuva, hyvä tai perusteet.
+                            </FieldHint>
+                          </div>
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-end mb-3">
+                              <label htmlFor="input-skills" className={LabelClass(theme)}>Osaaminen & Taidot</label>
+                              <button 
+                                type="button" 
+                                onClick={() => setShowSkillTranslator(true)}
+                                className="text-[#00BFA6] text-xs font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded"
+                              >
+                                ✨ Käännä ammattikielelle
+                              </button>
+                            </div>
+                            <textarea
+                              id="input-skills"
+                              placeholder="Mitä taitoja sinulla on? (esim. asiakaspalvelu)"
+                              value={form.skills}
+                              onChange={(e) => updateField("skills", e.target.value)}
+                              className={TextareaClass("min-h-[140px]", theme)}
+                            />
+                            <FieldHint theme={theme}>
+                              Kirjoita tähän sekä pehmeät että tekniset taidot. Jos et ole varma sanamuodoista, käytä vieressä olevaa ammattikielen kääntäjää.
+                            </FieldHint>
+                          </div>
+                        </div>
+
+                        <div className="pt-1">
+                          <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
+                          <textarea
+                            id="input-cards"
+                            placeholder="Työturvallisuuskortti, B-ajokortti..."
+                            value={form.cards}
+                            onChange={(e) => updateField("cards", e.target.value)}
+                            className={TextareaClass("min-h-[120px]", theme)}
+                          />
+                          <FieldHint theme={theme}>
+                            Lisää tähän kaikki kortit, luvat ja pätevyydet jotka voivat auttaa työnhaussa. Esimerkiksi hygieniapassi, työturvallisuuskortti tai ajokortti.
+                          </FieldHint>
+                        </div>
+
+                        <div className="pt-1">
+                          <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
+                        </div>
                       </div>
-                      <textarea
-                        id="input-languages"
-                        placeholder="Suomi (äidinkieli), Englanti (sujuva)..."
-                        value={form.languages}
-                        onChange={(e) => updateField("languages", e.target.value)}
-                        className={TextareaClass("min-h-[140px]", theme)}
-                      />
-                      <FieldHint theme={theme}>
-                        Kirjoita kieli ja taso mahdollisimman selkeästi, esimerkiksi sujuva, hyvä tai perusteet.
-                      </FieldHint>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-end mb-3">
-                        <label htmlFor="input-skills" className={LabelClass(theme)}>Osaaminen & Taidot</label>
-                        <button 
-                          type="button" 
-                          onClick={() => setShowSkillTranslator(true)}
-                          className="text-[#00BFA6] text-xs font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded"
-                        >
-                          ✨ Käännä ammattikielelle
-                        </button>
-                      </div>
-                      <textarea
-                        id="input-skills"
-                        placeholder="Mitä taitoja sinulla on? (esim. asiakaspalvelu)"
-                        value={form.skills}
-                        onChange={(e) => updateField("skills", e.target.value)}
-                        className={TextareaClass("min-h-[140px]", theme)}
-                      />
-                      <FieldHint theme={theme}>
-                        Kirjoita tähän sekä pehmeät että tekniset taidot. Jos et ole varma sanamuodoista, käytä vieressä olevaa ammattikielen kääntäjää.
-                      </FieldHint>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 sm:pt-6">
-                    <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
-                    <textarea
-                      id="input-cards"
-                      placeholder="Työturvallisuuskortti, B-ajokortti..."
-                      value={form.cards}
-                      onChange={(e) => updateField("cards", e.target.value)}
-                      className={TextareaClass("min-h-[120px]", theme)}
-                    />
-                    <FieldHint theme={theme}>
-                      Lisää tähän kaikki kortit, luvat ja pätevyydet jotka voivat auttaa työnhaussa. Esimerkiksi hygieniapassi, työturvallisuuskortti tai ajokortti.
-                    </FieldHint>
-                  </div>
-
-                  <div className="pt-4 sm:pt-6">
-                    <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
+                    )}
                   </div>
 
                   <button
@@ -2954,37 +2980,54 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
-                    <div className="space-y-4">
-                      <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
-                      <input
-                        id="search-salaryWish"
-                        placeholder="Esim. 3000€ / kk"
-                        value={searchProfile.salaryWish}
-                        onChange={(e) =>
-                          updateSearchProfile("salaryWish", e.target.value)
-                        }
-                        className={InputClass(theme)}
-                      />
-                      <FieldHint theme={theme}>
-                        Jos et tiedä tarkkaa summaa, arvio riittää. Tällä voi rajata liian kauas meneviä ehdotuksia pois.
-                      </FieldHint>
-                    </div>
-                    <div className="space-y-4">
-                      <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja (erota pilkulla)</label>
-                      <input
-                        id="search-keywords"
-                        placeholder="Esim. englanti, joustava"
-                        value={searchProfile.keywords}
-                        onChange={(e) =>
-                          updateSearchProfile("keywords", e.target.value)
-                        }
-                        className={InputClass(theme)}
-                      />
-                      <FieldHint theme={theme}>
-                        Lisää tähän esimerkiksi kielet, ajokortti, asiakaspalvelu, etä, B2B tai muu tärkeä sana jonka haluat osuvan hakuun.
-                      </FieldHint>
-                    </div>
+                  <div className={`rounded-[28px] border p-4 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreSearchFields((prev) => !prev)}
+                      className={`flex w-full items-center justify-between rounded-2xl px-1 py-1 text-left text-sm sm:text-base font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                      aria-expanded={showMoreSearchFields}
+                    >
+                      <span>Tarkenna hakua</span>
+                      <span className="text-[#00BFA6]">{showMoreSearchFields ? "Piilota" : "Avaa"}</span>
+                    </button>
+                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Palkkatoive ja avainsanat ovat vapaaehtoisia.
+                    </p>
+
+                    {showMoreSearchFields && (
+                      <div className="mt-6 grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
+                        <div className="space-y-4">
+                          <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
+                          <input
+                            id="search-salaryWish"
+                            placeholder="Esim. 3000€ / kk"
+                            value={searchProfile.salaryWish}
+                            onChange={(e) =>
+                              updateSearchProfile("salaryWish", e.target.value)
+                            }
+                            className={InputClass(theme)}
+                          />
+                          <FieldHint theme={theme}>
+                            Jos et tiedä tarkkaa summaa, arvio riittää. Tällä voi rajata liian kauas meneviä ehdotuksia pois.
+                          </FieldHint>
+                        </div>
+                        <div className="space-y-4">
+                          <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja (erota pilkulla)</label>
+                          <input
+                            id="search-keywords"
+                            placeholder="Esim. englanti, joustava"
+                            value={searchProfile.keywords}
+                            onChange={(e) =>
+                              updateSearchProfile("keywords", e.target.value)
+                            }
+                            className={InputClass(theme)}
+                          />
+                          <FieldHint theme={theme}>
+                            Lisää tähän esimerkiksi kielet, ajokortti, asiakaspalvelu, etä, B2B tai muu tärkeä sana jonka haluat osuvan hakuun.
+                          </FieldHint>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-4 sm:pt-6">
@@ -3571,10 +3614,27 @@ export default function Home() {
                 {tab === "jobs" && (
                   <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-12 animate-in fade-in duration-500 pb-28 sm:pb-0">
                     <div className={`rounded-[32px] border p-7 sm:p-10 space-y-12 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
-                      <h3 className={`text-2xl font-black border-b pb-5 ${theme === 'dark' ? 'text-white border-white/10' : 'text-gray-900 border-gray-100'}`}>
-                        Lisää oma työpaikka seurantaan
-                      </h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between gap-4 border-b pb-5">
+                          <h3 className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            Lisää oma työpaikka seurantaan
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => setShowManualJobForm((prev) => !prev)}
+                            className={`sm:hidden rounded-full border px-4 py-2 text-xs font-black ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-700'}`}
+                            aria-expanded={showManualJobForm}
+                          >
+                            {showManualJobForm ? "Piilota" : "Avaa"}
+                          </button>
+                        </div>
+                        <p className={`text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Lisää käsin vain jos haluat tallentaa yksittäisen oman ilmoituksen.
+                        </p>
+                      </div>
 
+                      {(!isMobileViewport || showManualJobForm) && (
+                      <>
                       <div className="space-y-4">
                          <label htmlFor="job-title" className={LabelClass(theme)}>Otsikko</label>
                          <input
@@ -3723,6 +3783,8 @@ export default function Home() {
                       >
                         + TALLENNA SEURANTAAN
                       </button>
+                      </>
+                      )}
                     </div>
 
                     <div className={`space-y-10 pt-10 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
@@ -3739,6 +3801,18 @@ export default function Home() {
                         />
                       </div>
 
+                      <div className="mb-4 sm:hidden">
+                        <button
+                          type="button"
+                          onClick={() => setShowJobFilters((prev) => !prev)}
+                          className={`w-full rounded-2xl border px-5 py-4 text-sm font-black ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-700'}`}
+                          aria-expanded={showJobFilters}
+                        >
+                          {showJobFilters ? "Piilota suodattimet" : "Näytä suodattimet"}
+                        </button>
+                      </div>
+
+                      {(!isMobileViewport || showJobFilters) && (
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
                         <select
                           aria-label="Suodata statuksen mukaan"
@@ -3808,6 +3882,7 @@ export default function Home() {
                           {showFavoritesOnly ? "★ Vain suosikit" : "Näytä suosikit"}
                         </button>
                       </div>
+                      )}
 
                       {/* --- TINDER NÄKYMÄ --- */}
                       {filteredJobs.length === 0 ? (
