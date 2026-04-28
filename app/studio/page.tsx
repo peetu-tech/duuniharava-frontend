@@ -2449,7 +2449,7 @@ export default function Home() {
         /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-44 sm:pb-16 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-56 sm:pb-20 transition-colors duration-300">
         
     {/* MOBIILIN PIKANAVIGOINTI (5 NAPPIA) */}
 <nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-2 rounded-[28px] border p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:hidden backdrop-blur-2xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/92 border-white/10' : 'bg-white/92 border-gray-200 shadow-[0_18px_40px_rgba(0,0,0,0.12)]'}`} aria-label="Mobiilin pikavalikko">
@@ -4692,6 +4692,10 @@ export default function Home() {
       onUpgrade={handleUpgradeToPro} 
     />
 
+        <div
+          aria-hidden="true"
+          className="h-28 sm:hidden"
+        />
       </main> 
     </div>   
   );        
