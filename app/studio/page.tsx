@@ -885,6 +885,7 @@ export default function Home() {
   const [showManualJobForm, setShowManualJobForm] = useState(false);
   const [showJobFilters, setShowJobFilters] = useState(false);
   const [showCvAnalysis, setShowCvAnalysis] = useState(false);
+  const [showStyleStudio, setShowStyleStudio] = useState(false);
   
   const [isPro, setIsPro] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -1463,6 +1464,7 @@ export default function Home() {
     setShowManualJobForm(false);
     setShowJobFilters(false);
     setShowCvAnalysis(false);
+    setShowStyleStudio(false);
     const session = getSession();
     if (session) {
       localStorage.removeItem(getStudioStorageKey(session.user.id));
@@ -2447,46 +2449,46 @@ export default function Home() {
         /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32 sm:pb-10 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-44 sm:pb-16 transition-colors duration-300">
         
     {/* MOBIILIN PIKANAVIGOINTI (5 NAPPIA) */}
-<nav className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center p-2 pb-safe border-t sm:hidden backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`} aria-label="Mobiilin pikavalikko">
+<nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-2 rounded-[28px] border p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:hidden backdrop-blur-2xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/92 border-white/10' : 'bg-white/92 border-gray-200 shadow-[0_18px_40px_rgba(0,0,0,0.12)]'}`} aria-label="Mobiilin pikavalikko">
   
   {/* 1. TIEDOT */}
-  <a href="#hakijan-tiedot" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-    <span className="text-lg" aria-hidden="true">👤</span> Tiedot
+  <a href="#hakijan-tiedot" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+    <span className="text-xl" aria-hidden="true">👤</span> Tiedot
   </a>
 
   {/* 2. HAKU */}
-  <a href="#tyonhaku" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-    <span className="text-lg" aria-hidden="true">🔍</span> Haku
+  <a href="#tyonhaku" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+    <span className="text-xl" aria-hidden="true">🔍</span> Haku
   </a>
 
   {/* 3. TULOKSET */}
-  <a href="#studio-tulokset" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold text-[#00BFA6]`}>
-    <span className="text-lg" aria-hidden="true">✨</span> Tulokset
+  <a href="#studio-tulokset" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-[#00BFA6]/12 px-2 text-[10px] font-bold text-[#00BFA6]`}>
+    <span className="text-xl" aria-hidden="true">✨</span> Tulokset
   </a>
 
   {/* 4. TYÖKALUT (Mobiilissa) */}
   <button 
     onClick={() => router.push('/tyokalut')} 
-    className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}
+    className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'} focus-visible:outline-none`}
   >
-    <span className="text-lg" aria-hidden="true">🛠️</span> Työkalut
+    <span className="text-xl" aria-hidden="true">🛠️</span> Työkalut
   </button>
 
   {/* 5. PRO (Pysyy aina tässä) */}
   <button 
     onClick={() => setShowPaywall(true)} 
-    className="flex flex-1 flex-col items-center gap-1 text-[9px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none"
+    className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-[#FF6F3C]/12 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
   >
-    <span className="text-lg" aria-hidden="true">⭐</span> PRO
+    <span className="text-xl" aria-hidden="true">⭐</span> PRO
   </button>
 </nav>
 
         {/* HEADER (Tietokone) */}
         <nav className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0F0F0F]/80 border-white/10' : 'bg-white/80 border-gray-200'}`}>
-          <div className="w-full max-w-[1800px] mx-auto px-6 xl:px-10 py-4 flex justify-between items-center">
+          <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 xl:px-10 py-4 sm:py-5 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <span className="font-black text-2xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
               
@@ -2541,15 +2543,19 @@ export default function Home() {
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
           
-          <div className="relative mx-auto w-full max-w-[1800px] px-4 sm:px-8 xl:px-10 py-14 md:py-20">
+          <div className="relative mx-auto w-full max-w-[1800px] px-4 sm:px-8 xl:px-10 py-16 sm:py-20 lg:py-24">
             
-            <div className="grid gap-16 lg:items-center">
+            <div className="grid gap-10 sm:gap-14 lg:items-center">
               <div>
-                <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-8">
+                <h1 id="hero-heading" className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.98] mb-6 sm:mb-8">
                   Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
                 </h1>
 
-                <div className="flex flex-col sm:flex-row gap-5">
+                <p className={`mb-6 max-w-3xl text-base sm:text-lg leading-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
                   <button
                     type="button"
                     onClick={() => setShowHelp(!showHelp)}
@@ -2567,6 +2573,18 @@ export default function Home() {
                   >
                     Täytä esimerkki
                   </button>
+                </div>
+
+                <div className={`mt-6 sm:mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
+                    1. Täytä tärkeimmät tiedot
+                  </div>
+                  <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
+                    2. Muokkaa CV:tä omassa työtilassa
+                  </div>
+                  <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
+                    3. Avaa työkalut vasta kun tarvitset niitä
+                  </div>
                 </div>
               </div>
             </div>
@@ -2625,7 +2643,7 @@ export default function Home() {
           </section>
         )}
 
-        <div className="mx-auto w-full max-w-[1800px] px-4 sm:px-8 xl:px-10 py-16 md:py-20">
+        <div className="mx-auto w-full max-w-[1800px] px-4 sm:px-8 xl:px-10 py-20 sm:py-24">
           <div className="mb-12 flex flex-col gap-4 border-b border-white/5 pb-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5" role="group" aria-label="Valitse toiminto">
             <button
               type="button"
@@ -3136,6 +3154,31 @@ export default function Home() {
 
                 {tab === "cv" && (
                   <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-12 overflow-hidden animate-in fade-in duration-500">
+                    <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="max-w-3xl">
+                          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">CV-työtila</p>
+                          <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            Muokkaa CV:tä omassa rauhallisessa näkymässä
+                          </h3>
+                          <p className={`mt-3 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisätyökalut vasta kun niitä oikeasti tarvitset.
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-[520px]">
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
+                            1. Generoi CV
+                          </div>
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
+                            2. Muokkaa tekstiä
+                          </div>
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
+                            3. Lataa valmis tiedosto
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                     {parsedCv.cvBody && activeJob && (
                       <div className={`flex flex-col sm:flex-row gap-5 p-6 rounded-3xl border ${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
                         <div className="flex-1">
@@ -3233,7 +3276,7 @@ export default function Home() {
                         )}
 
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
-                        <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-12 shadow-xl">
+                        <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-10 xl:p-12 shadow-[0_18px_60px_rgba(0,191,166,0.12)]">
                           <div className={`mb-6 rounded-[28px] border p-4 sm:p-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/70'}`}>
                             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
                               Helpoin tapa muokata
@@ -3293,13 +3336,22 @@ export default function Home() {
                             id="cv-text-editor"
                             value={cvEditorText}
                             onChange={(e) => updateCvBody(e.target.value)}
-                            className={`min-h-[520px] w-full rounded-3xl border px-6 py-6 font-mono text-[15px] leading-8 outline-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] sm:min-h-[680px] ${theme === 'dark' ? 'border-white/10 bg-black/50 text-gray-100' : 'border-gray-200 bg-white text-gray-800'}`}
+                            className={`min-h-[380px] w-full rounded-3xl border px-5 py-5 font-mono text-[15px] leading-8 outline-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] sm:min-h-[560px] lg:min-h-[680px] ${theme === 'dark' ? 'border-white/10 bg-black/50 text-gray-100' : 'border-gray-200 bg-white text-gray-800'}`}
                           />
                         </div>
 
                         {/* CV PREVIEW */}
                         <div className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-12 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
-                          <div className="min-w-[900px]">
+                          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
+                              <h3 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Näin CV näyttää</h3>
+                            </div>
+                            <p className={`max-w-xl text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              Puhelimella voit vierittää esikatselua sivusuunnassa. Tärkein muokkaus tapahtuu aina yläpuolella tekstieditorissa.
+                            </p>
+                          </div>
+                          <div className="min-w-[320px] sm:min-w-[680px] xl:min-w-[900px]">
                             <CvPreview
                               cvText={parsedCv.cvBody}
                               image={profileImage}
@@ -3334,19 +3386,33 @@ export default function Home() {
                         </div>
 
                         {/* --- CANVA TASON EDITOR --- */}
-                        <div className={`rounded-[32px] border p-8 md:p-10 mt-16 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
-                          <div className={`flex flex-wrap items-center justify-between gap-6 mb-8 border-b pb-6 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-                            <div>
-                              <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Värit ja Teema</p>
-                              <p className={`mt-2 text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Pikavalinnat väreille tai säädä itse.</p>
+                        <div className={`rounded-[32px] border p-6 md:p-10 mt-16 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
+                          <div className={`flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+                            <div className="max-w-2xl">
+                              <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Värit ja teema</p>
+                              <p className={`mt-2 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Tämä on lisätyökalu. Avaa se, kun haluat hioa ulkoasua valmiin CV-sisällön jälkeen.
+                              </p>
                             </div>
-                            <button type="button" onClick={resetCurrentStyle} className={`rounded-2xl border px-6 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-[#00BFA6]/50' : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-[#00BFA6]/50'}`}>
-                              Palauta oletukset
-                            </button>
+                            <div className="flex flex-col gap-3 sm:flex-row">
+                              <button
+                                type="button"
+                                onClick={() => setShowStyleStudio((prev) => !prev)}
+                                className={`rounded-2xl border px-6 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-[#00BFA6]/50' : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-[#00BFA6]/50'}`}
+                                aria-expanded={showStyleStudio}
+                              >
+                                {showStyleStudio ? "Piilota tyylieditori" : "Avaa tyylieditori"}
+                              </button>
+                              <button type="button" onClick={resetCurrentStyle} className={`rounded-2xl border px-6 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-[#00BFA6]/50' : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-[#00BFA6]/50'}`}>
+                                Palauta oletukset
+                              </button>
+                            </div>
                           </div>
 
+                          {showStyleStudio && (
+                            <>
                           {/* PIKAVÄRIT */}
-                          <div className={`mb-10 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="Pikaväriteemat">
+                          <div className={`mb-10 mt-8 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="Pikaväriteemat">
                             <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0369a1] ${theme === 'dark' ? 'border-white/10 hover:border-[#0369a1] hover:bg-white/5' : 'border-gray-200 hover:border-[#0369a1] hover:bg-gray-50'}`}>🌊 Merellinen</button>
                             <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] ${theme === 'dark' ? 'border-white/10 hover:border-[#10b981] hover:bg-white/5' : 'border-gray-200 hover:border-[#10b981] hover:bg-gray-50'}`}>🌲 Metsä</button>
                             <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d97706] ${theme === 'dark' ? 'border-white/10 hover:border-[#d97706] hover:bg-white/5' : 'border-gray-200 hover:border-[#d97706] hover:bg-gray-50'}`}>🍂 Syksy</button>
@@ -3620,6 +3686,8 @@ export default function Home() {
                               </div>
                             </div>
                           </div>
+                            </>
+                          )}
                         </div>
 
                       </>
