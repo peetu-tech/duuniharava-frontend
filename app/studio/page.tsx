@@ -884,6 +884,7 @@ export default function Home() {
   const [showMoreSearchFields, setShowMoreSearchFields] = useState(false);
   const [showManualJobForm, setShowManualJobForm] = useState(false);
   const [showJobFilters, setShowJobFilters] = useState(false);
+  const [showCvAnalysis, setShowCvAnalysis] = useState(false);
   
   const [isPro, setIsPro] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -1461,6 +1462,7 @@ export default function Home() {
     setShowMoreSearchFields(false);
     setShowManualJobForm(false);
     setShowJobFilters(false);
+    setShowCvAnalysis(false);
     const session = getSession();
     if (session) {
       localStorage.removeItem(getStudioStorageKey(session.user.id));
@@ -3183,29 +3185,50 @@ export default function Home() {
 
                     {cvResult ? (
                       <>
-                        {parsedCv.score && (
-                          <div className="rounded-[32px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-8 text-center shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
-                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#00BFA6]">
-                              Kuntotarkastus arvosana
-                            </h2>
-                            <p className={`mt-3 text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                              {parsedCv.score}
+                        {(parsedCv.score || parsedCv.report.length > 0) && (
+                          <div className={`rounded-[28px] border p-4 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+                            <button
+                              type="button"
+                              onClick={() => setShowCvAnalysis((prev) => !prev)}
+                              className={`flex w-full items-center justify-between rounded-2xl px-1 py-1 text-left text-sm sm:text-base font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                              aria-expanded={showCvAnalysis}
+                            >
+                              <span>CV-analyysi ja muutosraportti</span>
+                              <span className="text-[#00BFA6]">{showCvAnalysis ? "Piilota" : "Avaa"}</span>
+                            </button>
+                            <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              Tämä on lisätieto. Tärkein työ tehdään alempana suoraan CV-tekstissä.
                             </p>
-                          </div>
-                        )}
 
-                        {parsedCv.report.length > 0 && (
-                          <div className="rounded-[32px] border border-[#FF6F3C]/30 bg-[#FF6F3C]/5 p-8 sm:p-10 shadow-[0_10px_30px_rgba(255,111,60,0.1)]">
-                            <h2 className="mb-6 text-sm font-black uppercase tracking-widest text-[#FF6F3C]">
-                              Muutosraportti / Parannukset
-                            </h2>
-                            <ul className={`space-y-4 pl-6 text-lg ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
-                              {parsedCv.report.map((item, index) => (
-                                <li key={index} className="list-disc break-words leading-relaxed">
-                                  {item}
-                                </li>
-                              ))}
-                            </ul>
+                            {showCvAnalysis && (
+                              <div className="mt-6 space-y-6">
+                                {parsedCv.score && (
+                                  <div className="rounded-[32px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-6 sm:p-8 text-center shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
+                                    <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#00BFA6]">
+                                      Kuntotarkastus arvosana
+                                    </h2>
+                                    <p className={`mt-3 text-5xl sm:text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                      {parsedCv.score}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {parsedCv.report.length > 0 && (
+                                  <div className="rounded-[32px] border border-[#FF6F3C]/30 bg-[#FF6F3C]/5 p-6 sm:p-10 shadow-[0_10px_30px_rgba(255,111,60,0.1)]">
+                                    <h2 className="mb-5 text-sm font-black uppercase tracking-widest text-[#FF6F3C]">
+                                      Muutosraportti / Parannukset
+                                    </h2>
+                                    <ul className={`space-y-4 pl-6 text-base sm:text-lg ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                                      {parsedCv.report.map((item, index) => (
+                                        <li key={index} className="list-disc break-words leading-relaxed">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )}
 
