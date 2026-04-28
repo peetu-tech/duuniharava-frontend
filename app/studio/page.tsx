@@ -3177,6 +3177,32 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
+
+                      <div className="mt-6 grid grid-cols-1 gap-3 sm:hidden">
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById("cv-text-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                          className={`rounded-2xl px-5 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'bg-[#00BFA6] text-black' : 'bg-[#00BFA6] text-black'}`}
+                        >
+                          Mene muokkaukseen
+                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => document.getElementById("cv-preview")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                            className={`rounded-2xl border px-4 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                          >
+                            Esikatselu
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowStyleStudio((prev) => !prev)}
+                            className={`rounded-2xl border px-4 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                          >
+                            {showStyleStudio ? "Piilota tyylit" : "Tyylit"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
                     {parsedCv.cvBody && activeJob && (
@@ -3341,7 +3367,7 @@ export default function Home() {
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-12 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
+                        <div id="cv-preview" className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-12 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
                           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
@@ -3409,7 +3435,7 @@ export default function Home() {
                             </div>
                           </div>
 
-                          {showStyleStudio && (
+                          {(!isMobileViewport || showStyleStudio) && (
                             <>
                           {/* PIKAVÄRIT */}
                           <div className={`mb-10 mt-8 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="Pikaväriteemat">
