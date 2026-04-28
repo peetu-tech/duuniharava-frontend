@@ -492,7 +492,8 @@ function SectionShell({
   description,
   action,
   children,
-  theme
+  theme,
+  defaultOpen = true,
 }: {
   id?: string;
   step: string;
@@ -501,12 +502,13 @@ function SectionShell({
   action?: React.ReactNode;
   children: React.ReactNode;
   theme: "light" | "dark";
+  defaultOpen?: boolean;
 }) {
   return (
     <details 
       id={id} 
       className={`group mb-10 sm:mb-16 rounded-[32px] sm:rounded-[40px] border p-7 sm:p-14 shadow-2xl backdrop-blur-xl transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`} 
-      open
+      open={defaultOpen}
     >
       <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-7 border-b pb-7 sm:pb-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-xl [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
         <div className="w-full sm:w-auto flex justify-between items-center">
@@ -877,6 +879,7 @@ export default function Home() {
   const [hasSession, setHasSession] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   
   const [isPro, setIsPro] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -1096,6 +1099,18 @@ export default function Home() {
     }
     loadDataFromDb();
   }, [router]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleResize = () => {
+      setIsMobileViewport(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (isAuthChecking || !hasSession) return;
@@ -2641,6 +2656,7 @@ export default function Home() {
                 title="Hakijan tiedot"
                 description="Täytä tietosi huolellisesti tai lataa vanha CV:si. Näitä käytetään pohjana kaikessa tekoälyn tekemässä työssä."
                 theme={theme}
+                defaultOpen
                 action={
                   <div className="flex gap-3">
                     <button
@@ -2681,7 +2697,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2 pt-6">
+                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2 pt-6">
                     <div className="space-y-4">
                        <label htmlFor="input-name" className={LabelClass(theme)}>Koko nimi</label>
                        <input
@@ -2724,7 +2740,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="pt-6">
+                  <div className="pt-4 sm:pt-6">
                     <div className="flex justify-between items-end mb-3">
                       <label htmlFor="input-targetJob" className={LabelClass(theme)}>Tavoiteltu rooli / ammatti</label>
                     </div>
@@ -2744,7 +2760,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  <div className="pt-6">
+                  <div className="pt-4 sm:pt-6">
                     <label htmlFor="input-education" className={LabelClass(theme)}>Koulutus</label>
                     <textarea
                       id="input-education"
@@ -2758,7 +2774,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  <div className="pt-6">
+                  <div className="pt-4 sm:pt-6">
                     <label htmlFor="input-experience" className={LabelClass(theme)}>Työkokemus</label>
                     <textarea
                       id="input-experience"
@@ -2773,7 +2789,7 @@ export default function Home() {
                   </div>
 
                   {/* UUSI OSIO: PROJEKTIT */}
-                  <div className="pt-4">
+                  <div className="pt-3 sm:pt-4">
                     <label htmlFor="input-projects" className={LabelClass(theme)}>Projektit & Portfoliolinkit <span className="text-[#00BFA6] font-normal lowercase">(Vapaaehtoinen)</span></label>
                     <textarea
                       id="input-projects"
@@ -2787,7 +2803,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2 pt-8">
+                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2 pt-8">
                     <div className="space-y-4">
                       <div className="flex justify-between items-end mb-3">
                         <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
@@ -2827,7 +2843,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="pt-6">
+                  <div className="pt-4 sm:pt-6">
                     <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
                     <textarea
                       id="input-cards"
@@ -2841,7 +2857,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  <div className="pt-6">
+                  <div className="pt-4 sm:pt-6">
                     <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
                   </div>
 
@@ -2862,6 +2878,7 @@ export default function Home() {
                 title="Hakuprofiili & Työnhaku"
                 description="Kerro tekoälylle, millaista työtä haluat. Se hakee voimassa olevat paikat puolestasi."
                 theme={theme}
+                defaultOpen={!isMobileViewport}
               >
                 <div className="space-y-12 mt-12">
                   <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
@@ -2904,7 +2921,7 @@ export default function Home() {
                      </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
                     <div className="space-y-4">
                       <label htmlFor="search-workType" className={LabelClass(theme)}>Kokoaikainen vai Osa-aikainen?</label>
                       <input
@@ -2937,7 +2954,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
                     <div className="space-y-4">
                       <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
                       <input
@@ -2970,7 +2987,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="pt-6">
+                  <div className="pt-4 sm:pt-6">
                     <button
                       type="button"
                       onClick={suggestJobs}
@@ -3569,7 +3586,7 @@ export default function Home() {
                          />
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-y-8 sm:gap-y-9 lg:gap-x-8 lg:gap-y-10 lg:grid-cols-2">
                         <div className="space-y-4">
                            <label htmlFor="job-company" className={LabelClass(theme)}>Yritys</label>
                            <input
@@ -3596,7 +3613,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-y-8 sm:gap-y-9 lg:gap-x-8 lg:gap-y-10 lg:grid-cols-2">
                         <div className="space-y-4">
                            <label htmlFor="job-type" className={LabelClass(theme)}>Työsuhde</label>
                            <input
@@ -3619,7 +3636,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-y-8 sm:gap-y-9 lg:gap-x-8 lg:gap-y-10 lg:grid-cols-2">
                         <div className="space-y-4">
                            <label htmlFor="job-salary" className={LabelClass(theme)}>Palkka</label>
                            <input
@@ -3644,7 +3661,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-y-8 sm:gap-y-9 lg:gap-x-8 lg:gap-y-10 lg:grid-cols-2">
                         <div className="space-y-4">
                            <label htmlFor="job-contactPerson" className={LabelClass(theme)}>Yhteyshenkilö</label>
                            <input
