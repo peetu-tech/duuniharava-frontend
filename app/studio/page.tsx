@@ -79,7 +79,9 @@ type SavedLetter = {
   jobTitle: string;
   companyName: string;
   content: string;
+  tone?: LetterTone;
   createdAt: string;
+  updatedAt?: string;
 };
 
 type SavedCvVariant = {
@@ -90,8 +92,6 @@ type SavedCvVariant = {
   content: string;
   createdAt: string;
 };
-
-const STORAGE_KEY = "duuniharava_state_v8";
 
 const emptyForm = {
   cvText: "",
@@ -135,6 +135,39 @@ const emptyJobForm = {
   contactEmail: "",
   companyWebsite: "",
 };
+
+type StudioDraftState = {
+  mode: "improve" | "create";
+  tab: Tab;
+  letterViewMode: "edit" | "preview";
+  cvStyle: CvStyleVariant;
+  letterTone: LetterTone;
+  theme: "light" | "dark";
+  form: typeof emptyForm;
+  searchProfile: typeof emptySearchProfile;
+  jobForm: typeof emptyJobForm;
+  jobs: JobItem[];
+  savedLetters: SavedLetter[];
+  savedCvVariants: SavedCvVariant[];
+  cvResult: string;
+  letterResult: string;
+  letterDraft: string;
+  profileImage: string;
+  jobFilter: string;
+  jobStatusFilter: "all" | JobStatus;
+  jobPriorityFilter: "all" | JobPriority;
+  jobSort: "match" | "deadline" | "priority" | "newest" | "company";
+  showFavoritesOnly: boolean;
+  activeJobId: string;
+  currentJobIndex: number;
+  customStyles: Record<CvStyleVariant, CvCustomStyle>;
+};
+
+const STORAGE_KEY = "duuniharava_state_v8";
+
+function getStudioStorageKey(userId: string) {
+  return `${STORAGE_KEY}_${userId}`;
+}
 
 const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
@@ -353,6 +386,25 @@ function safeMatchScore(value?: number) {
   return Math.max(1, Math.min(100, Math.round(value)));
 }
 
+function safeLetterTone(value: unknown): LetterTone {
+  if (value === "warm" || value === "sales" || value === "professional") {
+    return value;
+  }
+  return "professional";
+}
+
+function getLetterToneLabel(tone?: LetterTone) {
+  switch (tone) {
+    case "warm":
+      return "Lämmin";
+    case "sales":
+      return "Myyvä";
+    case "professional":
+    default:
+      return "Asiallinen";
+  }
+}
+
 function normalizeJob(partial: Partial<JobItem>): JobItem {
   return {
     id: partial.id || makeId(),
@@ -520,6 +572,26 @@ function TextareaClass(minHeight: string, theme: "light" | "dark") {
 
 function LabelClass(theme: "light" | "dark") {
   return `mb-3 block text-sm font-bold ml-1 transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-700'}`;
+}
+
+function FieldHint({
+  children,
+  theme,
+}: {
+  children: React.ReactNode;
+  theme: "light" | "dark";
+}) {
+  return (
+    <p
+      className={`mt-3 rounded-2xl border px-4 py-3 text-sm leading-6 ${
+        theme === "dark"
+          ? "border-white/10 bg-white/[0.03] text-gray-400"
+          : "border-gray-200 bg-gray-50 text-gray-600"
+      }`}
+    >
+      {children}
+    </p>
+  );
 }
 
 function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring, onSalary, onAtsScan, onInterviewPrep, theme }: any) {
@@ -884,6 +956,47 @@ export default function Home() {
     setHasSession(true);
     setIsAuthChecking(false);
 
+    try {
+      const stored = localStorage.getItem(getStudioStorageKey(session.user.id));
+      if (stored) {
+        const draft = JSON.parse(stored) as Partial<StudioDraftState>;
+        if (draft.mode) setMode(draft.mode);
+        if (draft.tab) setTab(draft.tab);
+        if (draft.letterViewMode) setLetterViewMode(draft.letterViewMode);
+        if (draft.cvStyle) setCvStyle(draft.cvStyle);
+        if (draft.letterTone) setLetterTone(draft.letterTone);
+        if (draft.theme) setTheme(draft.theme);
+        if (draft.form) setForm((prev) => ({ ...prev, ...draft.form }));
+        if (draft.searchProfile) {
+          setSearchProfile((prev) => ({ ...prev, ...draft.searchProfile }));
+        }
+        if (draft.jobForm) setJobForm((prev) => ({ ...prev, ...draft.jobForm }));
+        if (draft.jobs?.length) {
+          setJobs(draft.jobs.map((job) => normalizeJob(job)));
+        }
+        if (draft.savedLetters?.length) setSavedLetters(draft.savedLetters);
+        if (draft.savedCvVariants?.length) setSavedCvVariants(draft.savedCvVariants);
+        if (draft.cvResult) setCvResult(draft.cvResult);
+        if (draft.letterResult) setLetterResult(draft.letterResult);
+        if (draft.letterDraft) setLetterDraft(draft.letterDraft);
+        if (draft.profileImage) setProfileImage(draft.profileImage);
+        if (draft.jobFilter) setJobFilter(draft.jobFilter);
+        if (draft.jobStatusFilter) setJobStatusFilter(draft.jobStatusFilter);
+        if (draft.jobPriorityFilter) setJobPriorityFilter(draft.jobPriorityFilter);
+        if (draft.jobSort) setJobSort(draft.jobSort);
+        if (typeof draft.showFavoritesOnly === "boolean") {
+          setShowFavoritesOnly(draft.showFavoritesOnly);
+        }
+        if (draft.activeJobId) setActiveJobId(draft.activeJobId);
+        if (typeof draft.currentJobIndex === "number") {
+          setCurrentJobIndex(draft.currentJobIndex);
+        }
+        if (draft.customStyles) setCustomStyles(draft.customStyles);
+      }
+    } catch (error) {
+      console.error("Paikallisen studiotilan palautus epäonnistui", error);
+    }
+
     async function loadDataFromDb() {
       if (!session) return;
       const headers = getSupabaseHeaders();
@@ -956,7 +1069,9 @@ export default function Home() {
             jobTitle: l.job_title,
             companyName: l.company_name,
             content: l.content,
-            createdAt: l.created_at
+            tone: safeLetterTone(l.tone),
+            createdAt: l.created_at,
+            updatedAt: l.updated_at || l.created_at,
           })));
         }
 
@@ -1014,6 +1129,75 @@ export default function Home() {
   }, [form, profileImage, isAuthChecking, hasSession]);
 
   useEffect(() => {
+    if (isAuthChecking || !hasSession) return;
+    const session = getSession();
+    if (!session) return;
+
+    const draft: StudioDraftState = {
+      mode,
+      tab,
+      letterViewMode,
+      cvStyle,
+      letterTone,
+      theme,
+      form,
+      searchProfile,
+      jobForm,
+      jobs,
+      savedLetters,
+      savedCvVariants,
+      cvResult,
+      letterResult,
+      letterDraft,
+      profileImage,
+      jobFilter,
+      jobStatusFilter,
+      jobPriorityFilter,
+      jobSort,
+      showFavoritesOnly,
+      activeJobId,
+      currentJobIndex,
+      customStyles,
+    };
+
+    try {
+      localStorage.setItem(
+        getStudioStorageKey(session.user.id),
+        JSON.stringify(draft),
+      );
+    } catch (error) {
+      console.error("Paikallisen studiotilan tallennus epäonnistui", error);
+    }
+  }, [
+    activeJobId,
+    currentJobIndex,
+    customStyles,
+    cvResult,
+    cvStyle,
+    form,
+    hasSession,
+    isAuthChecking,
+    jobFilter,
+    jobForm,
+    jobPriorityFilter,
+    jobSort,
+    jobStatusFilter,
+    jobs,
+    letterDraft,
+    letterResult,
+    letterTone,
+    letterViewMode,
+    mode,
+    profileImage,
+    savedCvVariants,
+    savedLetters,
+    searchProfile,
+    showFavoritesOnly,
+    tab,
+    theme,
+  ]);
+
+  useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [sparringChat, isSparringTyping]);
 
@@ -1025,7 +1209,11 @@ export default function Home() {
 
   const activeJobLetters = useMemo(() => {
     if (!activeJobId) return [];
-    return savedLetters.filter((letter) => letter.jobId === activeJobId);
+    return savedLetters
+      .filter((letter) => letter.jobId === activeJobId)
+      .sort((a, b) =>
+        (b.updatedAt || b.createdAt).localeCompare(a.updatedAt || a.createdAt),
+      );
   }, [savedLetters, activeJobId]);
 
   const activeJobCvVariants = useMemo(() => {
@@ -1105,6 +1293,17 @@ export default function Home() {
     return filteredJobs[currentJobIndex] || null;
   }, [filteredJobs, currentJobIndex]);
 
+  useEffect(() => {
+    if (filteredJobs.length === 0 && currentJobIndex !== 0) {
+      setCurrentJobIndex(0);
+      return;
+    }
+
+    if (currentJobIndex > filteredJobs.length - 1) {
+      setCurrentJobIndex(Math.max(filteredJobs.length - 1, 0));
+    }
+  }, [currentJobIndex, filteredJobs.length]);
+
   // Päivitetään aktiivisen työpaikan ID aina, kun kortti vaihtuu
   useEffect(() => {
     if (activeJob) {
@@ -1143,6 +1342,11 @@ export default function Home() {
     if (patch.company !== undefined) dbPatch.company = patch.company;
     if (patch.location !== undefined) dbPatch.location = patch.location;
     if (patch.type !== undefined) dbPatch.type = patch.type;
+    if (patch.summary !== undefined) dbPatch.summary = patch.summary;
+    if (patch.adText !== undefined) dbPatch.ad_text = patch.adText;
+    if (patch.url !== undefined) dbPatch.url = patch.url;
+    if (patch.whyFit !== undefined) dbPatch.why_fit = patch.whyFit;
+    if (patch.source !== undefined) dbPatch.source = patch.source;
     if (patch.status !== undefined) dbPatch.status = patch.status;
     if (patch.priority !== undefined) dbPatch.priority = patch.priority;
     if (patch.favorite !== undefined) dbPatch.favorite = patch.favorite;
@@ -1150,6 +1354,10 @@ export default function Home() {
     if (patch.deadline !== undefined) dbPatch.deadline = patch.deadline || null;
     if (patch.appliedAt !== undefined) dbPatch.applied_at = patch.appliedAt || null;
     if (patch.notes !== undefined) dbPatch.notes = patch.notes;
+    if (patch.contactPerson !== undefined) dbPatch.contact_person = patch.contactPerson;
+    if (patch.contactEmail !== undefined) dbPatch.contact_email = patch.contactEmail;
+    if (patch.companyWebsite !== undefined) dbPatch.company_website = patch.companyWebsite;
+    if (patch.archived !== undefined) dbPatch.archived = patch.archived;
 
     fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, {
       method: "PATCH",
@@ -1216,7 +1424,12 @@ export default function Home() {
     setJobSort("newest");
     setShowFavoritesOnly(false);
     setCustomStyles(defaultCustomStyles);
-    localStorage.removeItem(STORAGE_KEY);
+    const session = getSession();
+    if (session) {
+      localStorage.removeItem(getStudioStorageKey(session.user.id));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   }
 
   function fillExample() {
@@ -1915,6 +2128,7 @@ export default function Home() {
 
       const output = data.output || data.error || "Jokin meni pieleen.";
       const parsed = parseCoverLetter(output);
+      const savedAt = new Date().toISOString();
 
       setLetterResult(output);
       setLetterDraft(parsed);
@@ -1925,7 +2139,9 @@ export default function Home() {
         jobTitle: activeJob.title,
         companyName: activeJob.company,
         content: parsed,
-        createdAt: new Date().toISOString(),
+        tone: letterTone,
+        createdAt: savedAt,
+        updatedAt: savedAt,
       };
 
       setSavedLetters((prev) => [savedLetter, ...prev]);
@@ -1936,7 +2152,16 @@ export default function Home() {
       if(session) {
         fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
           method: "POST", headers: getSupabaseHeaders(),
-          body: JSON.stringify({ id: savedLetter.id, user_id: session.user.id, job_id: savedLetter.jobId, job_title: savedLetter.jobTitle, company_name: savedLetter.companyName, content: savedLetter.content })
+          body: JSON.stringify({
+            id: savedLetter.id,
+            user_id: session.user.id,
+            job_id: savedLetter.jobId,
+            job_title: savedLetter.jobTitle,
+            company_name: savedLetter.companyName,
+            content: savedLetter.content,
+            tone: savedLetter.tone,
+            updated_at: savedLetter.updatedAt,
+          })
         });
       }
     } catch (error) {
@@ -1949,6 +2174,7 @@ export default function Home() {
 
   function saveEditedLetter() {
     if (!activeJob || !letterDraft.trim()) return;
+    const savedAt = new Date().toISOString();
 
     const savedLetter: SavedLetter = {
       id: makeId(),
@@ -1956,7 +2182,9 @@ export default function Home() {
       jobTitle: activeJob.title,
       companyName: activeJob.company,
       content: letterDraft.trim(),
-      createdAt: new Date().toISOString(),
+      tone: letterTone,
+      createdAt: savedAt,
+      updatedAt: savedAt,
     };
 
     setSavedLetters((prev) => [savedLetter, ...prev]);
@@ -1968,7 +2196,16 @@ export default function Home() {
     if(session) {
       fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
         method: "POST", headers: getSupabaseHeaders(),
-        body: JSON.stringify({ id: savedLetter.id, user_id: session.user.id, job_id: savedLetter.jobId, job_title: savedLetter.jobTitle, company_name: savedLetter.companyName, content: savedLetter.content })
+        body: JSON.stringify({
+          id: savedLetter.id,
+          user_id: session.user.id,
+          job_id: savedLetter.jobId,
+          job_title: savedLetter.jobTitle,
+          company_name: savedLetter.companyName,
+          content: savedLetter.content,
+          tone: savedLetter.tone,
+          updated_at: savedLetter.updatedAt,
+        })
       });
     }
   }
@@ -2486,6 +2723,9 @@ export default function Home() {
                       aria-describedby="targetJob-hint"
                     />
                     <p id="targetJob-hint" className="text-xs text-[#00BFA6] font-bold mt-3 ml-2">💡 Tekoäly kirjoittaa tämän perusteella sinulle myyvän "Hookin" (Profiilitekstin), jolla erotut muista.</p>
+                    <FieldHint theme={theme}>
+                      Kirjoita tähän se työ jota oikeasti tavoittelet juuri nyt. Tämä ohjaa sekä CV:n profiilitekstiä, työnhakua että hakemusten sävyä.
+                    </FieldHint>
                   </div>
 
                   <div className="pt-4">
@@ -2497,6 +2737,9 @@ export default function Home() {
                       onChange={(e) => updateField("education", e.target.value)}
                       className={TextareaClass("min-h-[140px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Lisää uusin koulutus ensin. Jos koulutusta on vähän, myös kurssit, sertifikaatit ja lyhyemmät valmennukset kannattaa kirjoittaa tähän.
+                    </FieldHint>
                   </div>
 
                   <div className="pt-4">
@@ -2508,6 +2751,9 @@ export default function Home() {
                       onChange={(e) => updateField("experience", e.target.value)}
                       className={TextareaClass("min-h-[180px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Kirjoita tähän mitä teit, mitä vastasit ja mitä sait aikaan. Jos sinulla on numeroita, tuloksia tai vastuuta, ne kannattaa lisätä tänne näkyviin.
+                    </FieldHint>
                   </div>
 
                   {/* UUSI OSIO: PROJEKTIT */}
@@ -2520,6 +2766,9 @@ export default function Home() {
                       onChange={(e) => updateField("projects", e.target.value)}
                       className={TextareaClass("min-h-[140px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Tämä kohta auttaa erityisesti silloin, jos työkokemusta on vähemmän. Tänne sopivat myös omat projektit, portfoliojutut ja sivutyöt.
+                    </FieldHint>
                   </div>
 
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
@@ -2534,6 +2783,9 @@ export default function Home() {
                         onChange={(e) => updateField("languages", e.target.value)}
                         className={TextareaClass("min-h-[140px]", theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Kirjoita kieli ja taso mahdollisimman selkeästi, esimerkiksi sujuva, hyvä tai perusteet.
+                      </FieldHint>
                     </div>
                     <div>
                       <div className="flex justify-between items-end mb-3">
@@ -2553,6 +2805,9 @@ export default function Home() {
                         onChange={(e) => updateField("skills", e.target.value)}
                         className={TextareaClass("min-h-[140px]", theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Kirjoita tähän sekä pehmeät että tekniset taidot. Jos et ole varma sanamuodoista, käytä vieressä olevaa ammattikielen kääntäjää.
+                      </FieldHint>
                     </div>
                   </div>
 
@@ -2565,6 +2820,9 @@ export default function Home() {
                       onChange={(e) => updateField("cards", e.target.value)}
                       className={TextareaClass("min-h-[120px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Lisää tähän kaikki kortit, luvat ja pätevyydet jotka voivat auttaa työnhaussa. Esimerkiksi hygieniapassi, työturvallisuuskortti tai ajokortti.
+                    </FieldHint>
                   </div>
 
                   <div className="pt-4">
@@ -2588,17 +2846,6 @@ export default function Home() {
                 title="Hakuprofiili & Työnhaku"
                 description="Kerro tekoälylle, millaista työtä haluat. Se hakee voimassa olevat paikat puolestasi."
                 theme={theme}
-                action={
-                  <button
-                    type="button"
-                    onClick={suggestJobs}
-                    disabled={loadingJobs}
-                    className="rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-4 text-base font-black text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50 shadow-[0_0_25px_rgba(0,191,166,0.3)] mt-2 sm:mt-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C]"
-                    aria-live="polite"
-                  >
-                    {loadingJobs ? "Etsitään..." : "2. EHDOTA TYÖPAIKKOJA"}
-                  </button>
-                }
               >
                 <div className="space-y-8 mt-8">
                   <div>
@@ -2612,6 +2859,9 @@ export default function Home() {
                       }
                       className={TextareaClass("min-h-[140px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Kirjoita tähän ihan suoraan millaisia rooleja oikeasti haet. Voit kirjoittaa useita vaihtoehtoja, esimerkiksi myyjä, asiakaspalvelu, varasto tai frontend.
+                    </FieldHint>
                   </div>
                   
                   <div>
@@ -2625,6 +2875,9 @@ export default function Home() {
                        }
                        className={InputClass(theme)}
                      />
+                     <FieldHint theme={theme}>
+                       Voit kirjoittaa kaupungin, maakunnan tai vaikka etätyön. Tämä helpottaa sitä, että ehdotukset tuntuvat oikeilta eivätkä liian kaukaisilta.
+                     </FieldHint>
                   </div>
 
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -2639,6 +2892,9 @@ export default function Home() {
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Esimerkiksi kokoaikainen, osa-aikainen, keikkatyö tai harjoittelu.
+                      </FieldHint>
                     </div>
                     <div>
                       <label htmlFor="search-shiftPreference" className={LabelClass(theme)}>Vuorotoive</label>
@@ -2651,6 +2907,9 @@ export default function Home() {
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Esimerkiksi päivätyö, ilta, yö tai joustava. Tämä suodattaa ehdotuksia järkevämmin.
+                      </FieldHint>
                     </div>
                   </div>
 
@@ -2666,6 +2925,9 @@ export default function Home() {
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Jos et tiedä tarkkaa summaa, arvio riittää. Tällä voi rajata liian kauas meneviä ehdotuksia pois.
+                      </FieldHint>
                     </div>
                     <div>
                       <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja (erota pilkulla)</label>
@@ -2678,7 +2940,25 @@ export default function Home() {
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Lisää tähän esimerkiksi kielet, ajokortti, asiakaspalvelu, etä, B2B tai muu tärkeä sana jonka haluat osuvan hakuun.
+                      </FieldHint>
                     </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <button
+                      type="button"
+                      onClick={suggestJobs}
+                      disabled={loadingJobs}
+                      className="w-full rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-6 text-lg sm:text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_0_25px_rgba(0,191,166,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C]"
+                      aria-live="polite"
+                    >
+                      {loadingJobs ? "Etsitään..." : "2. EHDOTA TYÖPAIKKOJA"}
+                    </button>
+                    <FieldHint theme={theme}>
+                      Kun painat tätä, studio hakee sinulle ehdotuksia tämän profiilin perusteella ja siirtää ne heti Työpaikat-välilehden kortteihin.
+                    </FieldHint>
                   </div>
                 </div>
               </SectionShell>
@@ -3202,8 +3482,8 @@ export default function Home() {
 
                 {/* --- TYÖPAIKAT TAB (TINDER-MALLI) --- */}
                 {tab === "jobs" && (
-                  <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 animate-in fade-in duration-500">
-                    <div className={`rounded-[32px] border p-6 sm:p-10 space-y-8 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
+                  <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 animate-in fade-in duration-500 pb-28 sm:pb-0">
+                    <div className={`rounded-[32px] border p-6 sm:p-10 space-y-10 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                       <h3 className={`text-2xl font-black border-b pb-5 ${theme === 'dark' ? 'text-white border-white/10' : 'text-gray-900 border-gray-100'}`}>
                         Lisää oma työpaikka seurantaan
                       </h3>
@@ -3330,6 +3610,9 @@ export default function Home() {
                            onChange={(e) => updateJobForm("summary", e.target.value)}
                            className={TextareaClass("min-h-[140px]", theme)}
                          />
+                         <FieldHint theme={theme}>
+                           Kirjoita tähän omin sanoin, miksi paikka kiinnostaa tai mitä haluat muistaa siitä myöhemmin.
+                         </FieldHint>
                       </div>
 
                       <div>
@@ -3341,6 +3624,9 @@ export default function Home() {
                            onChange={(e) => updateJobForm("adText", e.target.value)}
                            className={TextareaClass("min-h-[250px]", theme)}
                          />
+                         <FieldHint theme={theme}>
+                           Tämä on tärkein kenttä räätälöintiä varten. Mitä enemmän koko ilmoituksesta on täällä mukana, sitä parempi CV ja hakemus tästä syntyy.
+                         </FieldHint>
                       </div>
 
                       <button
@@ -3443,7 +3729,7 @@ export default function Home() {
                           <p className="text-base">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
                         </div>
                       ) : activeJob ? (
-                        <div className="relative">
+                        <div className="relative pb-24 sm:pb-0">
                           {/* Edistymispalkki */}
                           <div className="mb-4 flex justify-between items-center text-sm font-bold text-gray-500">
                             <span>Työpaikka {currentJobIndex + 1} / {filteredJobs.length}</span>
@@ -3468,7 +3754,7 @@ export default function Home() {
                           />
 
                           {/* Tinder-napit */}
-                          <div className="flex gap-4 mt-6">
+                          <div className={`sticky bottom-20 sm:static flex gap-4 mt-6 rounded-[28px] border p-3 backdrop-blur-xl sm:border-0 sm:bg-transparent sm:p-0 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]/95' : 'border-gray-200 bg-white/95 shadow-[0_10px_30px_rgba(0,0,0,0.08)]'}`}>
                             <button
                               onClick={handleSkipJob}
                               className="flex-1 py-6 rounded-[24px] border-2 border-red-500/50 bg-red-500/10 text-red-500 font-black text-xl hover:bg-red-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 shadow-xl"
@@ -3574,28 +3860,44 @@ export default function Home() {
                     {activeJobLetters.length > 0 && (
                       <div className={`rounded-[32px] border p-6 sm:p-8 mt-10 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                         <h3 className={`mb-6 text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Aiemmat hakemukset tähän paikkaan
+                          Hakemusversiot tähän paikkaan
                         </h3>
                         <div className="space-y-4 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
-                          {activeJobLetters.map((letter) => (
+                          {activeJobLetters.map((letter, index) => (
                             <button
                               key={letter.id}
                               type="button"
                               onClick={() => {
                                 setLetterResult(`HAKEMUS:\n${letter.content}`);
                                 setLetterDraft(letter.content);
+                                setLetterTone(safeLetterTone(letter.tone));
                               }}
                               className={`w-full rounded-2xl border px-6 py-5 text-left transition-all hover:border-[#00BFA6]/50 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(0,191,166,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-black/50' : 'border-gray-200 bg-gray-50'}`}
                             >
-                              <p className="font-bold text-lg text-[#00BFA6] truncate">
-                                {letter.jobTitle}
-                              </p>
+                              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div className="min-w-0">
+                                  <p className="font-bold text-lg text-[#00BFA6] truncate">
+                                    Versio {activeJobLetters.length - index}
+                                  </p>
+                                  <p className={`text-base font-medium truncate mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {letter.jobTitle}
+                                  </p>
+                                </div>
+                                <span className="inline-flex w-fit rounded-full bg-[#00BFA6]/10 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
+                                  {getLetterToneLabel(letter.tone)}
+                                </span>
+                              </div>
                               <p className={`text-base font-medium truncate mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {letter.companyName}
                               </p>
                               <p className={`mt-2 text-sm ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                                 Luotu: {new Date(letter.createdAt).toLocaleString("fi-FI")}
                               </p>
+                              {letter.updatedAt && letter.updatedAt !== letter.createdAt && (
+                                <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                                  Päivitetty: {new Date(letter.updatedAt).toLocaleString("fi-FI")}
+                                </p>
+                              )}
                             </button>
                           ))}
                         </div>

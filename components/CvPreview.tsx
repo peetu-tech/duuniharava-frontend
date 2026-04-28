@@ -349,7 +349,7 @@ export default function CvPreview({
 
   const renderProfileHook = (items: string[]) => {
     return (
-      <div className={`relative p-6 mt-4 overflow-hidden break-inside-avoid ${getShadowClass()}`} style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}`, borderRadius: `${customStyle.borderRadius}px` }}>
+      <div className={`relative p-6 mt-4 overflow-visible break-inside-avoid ${getShadowClass()}`} style={{ backgroundColor: `${customStyle.accentColor}08`, borderLeft: `4px solid ${customStyle.accentColor}`, borderRadius: `${customStyle.borderRadius}px` }}>
         <div className="absolute -top-4 -left-2 opacity-10 font-serif" style={{ fontSize: "80px", color: customStyle.accentColor }} aria-hidden="true">"</div>
         <div className="relative z-10 opacity-90 font-medium italic" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: `${customStyle.bodySize + 1}px`, color: customStyle.mainText, textAlign: getTextAlign() }}>
           {items.map((line, j) => <p key={j}>{line}</p>)}
