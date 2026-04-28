@@ -3189,7 +3189,7 @@ export default function Home() {
                         <div className="grid grid-cols-2 gap-3">
                           <button
                             type="button"
-                            onClick={() => document.getElementById("cv-preview")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                            onClick={() => document.getElementById("cv-preview-panel")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                             className={`rounded-2xl border px-4 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
                           >
                             Esikatselu
@@ -3367,7 +3367,7 @@ export default function Home() {
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div id="cv-preview" className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-12 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
+                        <div id="cv-preview-panel" className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-12 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
                           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
