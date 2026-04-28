@@ -2547,7 +2547,7 @@ export default function Home() {
 
         {/* --- OHJE-OSIO --- */}
         {showHelp && (
-          <section id="help-section" className="max-w-7xl mx-auto px-8 mt-12 animate-in fade-in slide-in-from-top-6" aria-labelledby="help-heading">
+          <section id="help-section" className="max-w-7xl mx-auto px-4 sm:px-8 mt-12 animate-in fade-in slide-in-from-top-6" aria-labelledby="help-heading">
             <div className="rounded-[40px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-10 sm:p-16 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
                 <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
@@ -2597,7 +2597,7 @@ export default function Home() {
           </section>
         )}
 
-        <div className="mx-auto max-w-7xl px-8 py-16 md:py-20 lg:px-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-8 py-16 md:py-20 lg:px-12">
           <div className="mb-10 flex flex-wrap items-center gap-5 border-b border-white/5 pb-6" role="group" aria-label="Valitse toiminto">
             <button
               type="button"
@@ -2630,7 +2630,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr]">
+          <div className="grid grid-cols-1 gap-14 xl:grid-cols-[1fr_1.1fr]">
             <section className="space-y-10 sm:space-y-14">
               <SectionShell
                 id="hakijan-tiedot"
@@ -2678,8 +2678,8 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 pt-6">
-                    <div>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2 pt-6">
+                    <div className="space-y-4">
                        <label htmlFor="input-name" className={LabelClass(theme)}>Koko nimi</label>
                        <input
                          id="input-name"
@@ -2689,7 +2689,7 @@ export default function Home() {
                          className={InputClass(theme)}
                        />
                     </div>
-                    <div>
+                    <div className="space-y-4">
                        <label htmlFor="input-phone" className={LabelClass(theme)}>Puhelin</label>
                        <input
                          id="input-phone"
@@ -2699,7 +2699,7 @@ export default function Home() {
                          className={InputClass(theme)}
                        />
                     </div>
-                    <div>
+                    <div className="space-y-4">
                        <label htmlFor="input-email" className={LabelClass(theme)}>Sähköposti</label>
                        <input
                          id="input-email"
@@ -2709,7 +2709,7 @@ export default function Home() {
                          className={InputClass(theme)}
                        />
                     </div>
-                    <div>
+                    <div className="space-y-4">
                        <label htmlFor="input-location" className={LabelClass(theme)}>Paikkakunta</label>
                        <input
                          id="input-location"
@@ -2782,8 +2782,8 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 pt-8">
-                    <div>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2 pt-8">
+                    <div className="space-y-4">
                       <div className="flex justify-between items-end mb-3">
                         <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
                       </div>
@@ -2798,7 +2798,7 @@ export default function Home() {
                         Kirjoita kieli ja taso mahdollisimman selkeästi, esimerkiksi sujuva, hyvä tai perusteet.
                       </FieldHint>
                     </div>
-                    <div>
+                    <div className="space-y-4">
                       <div className="flex justify-between items-end mb-3">
                         <label htmlFor="input-skills" className={LabelClass(theme)}>Osaaminen & Taidot</label>
                         <button 
@@ -2891,8 +2891,8 @@ export default function Home() {
                      </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2">
-                    <div>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2">
+                    <div className="space-y-4">
                       <label htmlFor="search-workType" className={LabelClass(theme)}>Kokoaikainen vai Osa-aikainen?</label>
                       <input
                         id="search-workType"
@@ -2907,7 +2907,7 @@ export default function Home() {
                         Esimerkiksi kokoaikainen, osa-aikainen, keikkatyö tai harjoittelu.
                       </FieldHint>
                     </div>
-                    <div>
+                    <div className="space-y-4">
                       <label htmlFor="search-shiftPreference" className={LabelClass(theme)}>Vuorotoive</label>
                       <input
                         id="search-shiftPreference"
@@ -2924,8 +2924,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2">
-                    <div>
+                  <div className="grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-2">
+                    <div className="space-y-4">
                       <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
                       <input
                         id="search-salaryWish"
@@ -2940,7 +2940,7 @@ export default function Home() {
                         Jos et tiedä tarkkaa summaa, arvio riittää. Tällä voi rajata liian kauas meneviä ehdotuksia pois.
                       </FieldHint>
                     </div>
-                    <div>
+                    <div className="space-y-4">
                       <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja (erota pilkulla)</label>
                       <input
                         id="search-keywords"
@@ -3548,8 +3548,8 @@ export default function Home() {
                          />
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2">
-                        <div>
+                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                        <div className="space-y-4">
                            <label htmlFor="job-company" className={LabelClass(theme)}>Yritys</label>
                            <input
                              id="job-company"
@@ -3561,7 +3561,7 @@ export default function Home() {
                              className={InputClass(theme)}
                            />
                         </div>
-                        <div>
+                        <div className="space-y-4">
                            <label htmlFor="job-location" className={LabelClass(theme)}>Sijainti</label>
                            <input
                              id="job-location"
@@ -3575,8 +3575,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2">
-                        <div>
+                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                        <div className="space-y-4">
                            <label htmlFor="job-type" className={LabelClass(theme)}>Työsuhde</label>
                            <input
                              id="job-type"
@@ -3586,7 +3586,7 @@ export default function Home() {
                              className={InputClass(theme)}
                            />
                         </div>
-                        <div>
+                        <div className="space-y-4">
                            <label htmlFor="job-url" className={LabelClass(theme)}>Linkki</label>
                            <input
                              id="job-url"
@@ -3598,8 +3598,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2">
-                        <div>
+                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                        <div className="space-y-4">
                            <label htmlFor="job-salary" className={LabelClass(theme)}>Palkka</label>
                            <input
                              id="job-salary"
@@ -3609,7 +3609,7 @@ export default function Home() {
                              className={InputClass(theme)}
                            />
                         </div>
-                        <div>
+                        <div className="space-y-4">
                            <label htmlFor="job-deadline" className={LabelClass(theme)}>Deadline</label>
                            <input
                              id="job-deadline"
@@ -3623,8 +3623,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2">
-                        <div>
+                      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+                        <div className="space-y-4">
                            <label htmlFor="job-contactPerson" className={LabelClass(theme)}>Yhteyshenkilö</label>
                            <input
                              id="job-contactPerson"
@@ -3636,7 +3636,7 @@ export default function Home() {
                              className={InputClass(theme)}
                            />
                         </div>
-                        <div>
+                        <div className="space-y-4">
                            <label htmlFor="job-contactEmail" className={LabelClass(theme)}>Sähköposti</label>
                            <input
                              id="job-contactEmail"
@@ -3701,14 +3701,14 @@ export default function Home() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 mb-8">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
                         <select
                           aria-label="Suodata statuksen mukaan"
                           value={jobStatusFilter}
                           onChange={(e) =>
                             setJobStatusFilter(e.target.value as "all" | JobStatus)
                           }
-                          className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
+                          className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[58px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
                         >
                           <option value="all">Kaikki tilat</option>
                           <option value="saved">Tallennettu</option>
@@ -3727,7 +3727,7 @@ export default function Home() {
                               e.target.value as "all" | JobPriority
                             )
                           }
-                          className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
+                          className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[58px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
                         >
                           <option value="all">Kaikki prio</option>
                           <option value="low">Matala</option>
@@ -3748,7 +3748,7 @@ export default function Home() {
                                 | "company"
                             )
                           }
-                          className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
+                          className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[58px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
                         >
                           <option value="newest">Uusimmat</option>
                           <option value="match">Match</option>
@@ -3761,7 +3761,7 @@ export default function Home() {
                           type="button"
                           aria-pressed={showFavoritesOnly}
                           onClick={() => setShowFavoritesOnly((prev) => !prev)}
-                          className={`w-full rounded-2xl px-5 py-4 text-xs sm:text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C] ${
+                          className={`w-full rounded-2xl px-5 py-4 text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C] min-h-[58px] ${
                             showFavoritesOnly
                               ? "bg-[#FF6F3C] text-white shadow-[0_0_20px_rgba(255,111,60,0.5)] scale-[1.02]"
                               : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
