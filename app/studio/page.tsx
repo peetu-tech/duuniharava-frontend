@@ -2461,7 +2461,7 @@ export default function Home() {
 
         {/* HEADER (Tietokone) */}
         <nav className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0F0F0F]/80 border-white/10' : 'bg-white/80 border-gray-200'}`}>
-          <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="w-full max-w-[1800px] mx-auto px-6 xl:px-10 py-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <span className="font-black text-2xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
               
@@ -2516,7 +2516,7 @@ export default function Home() {
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
           
-          <div className="relative mx-auto max-w-7xl px-8 py-14 md:py-20 lg:px-12">
+          <div className="relative mx-auto w-full max-w-[1800px] px-4 sm:px-8 xl:px-10 py-14 md:py-20">
             
             <div className="grid gap-16 lg:items-center">
               <div>
@@ -2550,7 +2550,7 @@ export default function Home() {
 
         {/* --- OHJE-OSIO --- */}
         {showHelp && (
-          <section id="help-section" className="max-w-7xl mx-auto px-4 sm:px-8 mt-12 animate-in fade-in slide-in-from-top-6" aria-labelledby="help-heading">
+          <section id="help-section" className="w-full max-w-[1800px] mx-auto px-4 sm:px-8 xl:px-10 mt-12 animate-in fade-in slide-in-from-top-6" aria-labelledby="help-heading">
             <div className="rounded-[40px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-10 sm:p-16 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
                 <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
@@ -2600,7 +2600,7 @@ export default function Home() {
           </section>
         )}
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-8 py-16 md:py-20 lg:px-12">
+        <div className="mx-auto w-full max-w-[1800px] px-4 sm:px-8 xl:px-10 py-16 md:py-20">
           <div className="mb-12 flex flex-col gap-4 border-b border-white/5 pb-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5" role="group" aria-label="Valitse toiminto">
             <button
               type="button"
@@ -2633,7 +2633,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-14 xl:grid-cols-[1fr_1.1fr]">
+          <div className="grid grid-cols-1 gap-14 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)] 2xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.35fr)]">
             <section className="space-y-10 sm:space-y-14">
               <SectionShell
                 id="hakijan-tiedot"
