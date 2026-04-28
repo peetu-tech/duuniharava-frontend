@@ -2665,7 +2665,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 pt-2">
+                  <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 pt-4">
                     <div>
                        <label htmlFor="input-name" className={LabelClass(theme)}>Koko nimi</label>
                        <input
@@ -2823,7 +2823,7 @@ export default function Home() {
                 description="Kerro tekoÃ¤lylle, millaista tyÃ¶tÃ¤ haluat. Se hakee voimassa olevat paikat puolestasi."
                 theme={theme}
               >
-                <div className="space-y-8 mt-8">
+                <div className="space-y-10 mt-10">
                   <div>
                     <label htmlFor="search-roles" className={LabelClass(theme)}>MinkÃ¤ alan tÃ¶itÃ¤ etsit?</label>
                     <textarea
@@ -2850,7 +2850,7 @@ export default function Home() {
                      />
                   </div>
 
-                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
                     <div>
                       <label htmlFor="search-workType" className={LabelClass(theme)}>Kokoaikainen vai Osa-aikainen?</label>
                       <input
@@ -2877,7 +2877,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
                     <div>
                       <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
                       <input
@@ -2934,11 +2934,11 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[32px] sm:rounded-[40px] border p-8 sm:p-10 shadow-2xl backdrop-blur-xl transition-all ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-2xl backdrop-blur-xl transition-all ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
                 {/* VÃ„LILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`sticky top-0 z-40 pt-2 sm:pt-0 mb-10 flex overflow-x-auto whitespace-nowrap pb-4 gap-5 snap-x border-b custom-scrollbar ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
+                  className={`sticky top-0 z-40 pt-2 sm:pt-0 mb-12 flex overflow-x-auto whitespace-nowrap pb-5 gap-5 snap-x border-b custom-scrollbar ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
                   role="tablist"
                   aria-label="PÃ¤Ã¤toiminnot"
                 >
@@ -3004,7 +3004,7 @@ export default function Home() {
                 </div>
 
                 {tab === "cv" && (
-                  <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-10 overflow-hidden animate-in fade-in duration-500">
+                  <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-12 overflow-hidden animate-in fade-in duration-500">
                     {parsedCv.cvBody && activeJob && (
                       <div className={`flex flex-col sm:flex-row gap-5 p-6 rounded-3xl border ${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
                         <div className="flex-1">
@@ -3081,7 +3081,7 @@ export default function Home() {
                         )}
 
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
-                        <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-8 sm:p-12 shadow-xl">
+                        <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-7 sm:p-12 shadow-xl">
                           <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div>
                               <label htmlFor="cv-text-editor" className={`text-2xl font-black block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Muokkaa CV-tekstiÃ¤</label>
@@ -3100,7 +3100,7 @@ export default function Home() {
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-10 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
+                        <div className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-12 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
                           <div className="min-w-[900px]">
                             <CvPreview
                               cvText={parsedCv.cvBody}
@@ -3113,7 +3113,7 @@ export default function Home() {
                         </div>
 
                         {/* LATAUSNAPIT */}
-                        <div className="flex flex-col sm:flex-row gap-5 mt-24 pt-8 border-t border-white/10">
+                        <div className="flex flex-col sm:flex-row gap-5 mt-20 pt-10 border-t border-white/10">
                           <button
                             type="button"
                             onClick={() => downloadPdf("cv-preview", false)}
