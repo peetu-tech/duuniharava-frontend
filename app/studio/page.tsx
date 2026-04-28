@@ -886,6 +886,8 @@ export default function Home() {
   const [showJobFilters, setShowJobFilters] = useState(false);
   const [showCvAnalysis, setShowCvAnalysis] = useState(false);
   const [showStyleStudio, setShowStyleStudio] = useState(false);
+  const [showLetterHistory, setShowLetterHistory] = useState(false);
+  const [showLetterExtras, setShowLetterExtras] = useState(false);
   
   const [isPro, setIsPro] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -1465,6 +1467,8 @@ export default function Home() {
     setShowJobFilters(false);
     setShowCvAnalysis(false);
     setShowStyleStudio(false);
+    setShowLetterHistory(false);
+    setShowLetterExtras(false);
     const session = getSession();
     if (session) {
       localStorage.removeItem(getStudioStorageKey(session.user.id));
@@ -3730,6 +3734,51 @@ export default function Home() {
                 {/* --- TYÖPAIKAT TAB (TINDER-MALLI) --- */}
                 {tab === "jobs" && (
                   <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-12 animate-in fade-in duration-500 pb-28 sm:pb-0">
+                    <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="max-w-3xl">
+                          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Työpaikka-työtila</p>
+                          <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            Etsi, suodata ja tallenna paikat ilman turhaa skrollausta
+                          </h3>
+                          <p className={`mt-3 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Käytä ensin tekoälyn ehdotuksia. Lisää oma ilmoitus käsin vain silloin, kun haluat tallentaa jonkin yksittäisen paikan.
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-[520px]">
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>1. Ehdota työpaikkoja</div>
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>2. Suodata lista</div>
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>3. Tallenna parhaat</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 grid grid-cols-1 gap-3 sm:hidden">
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById("jobs-list-start")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                          className="rounded-2xl bg-[#00BFA6] px-5 py-4 text-sm font-black text-black"
+                        >
+                          Mene työpaikkalistaan
+                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setShowJobFilters((prev) => !prev)}
+                            className={`rounded-2xl border px-4 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                          >
+                            {showJobFilters ? "Piilota suodatus" : "Suodatus"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowManualJobForm((prev) => !prev)}
+                            className={`rounded-2xl border px-4 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                          >
+                            {showManualJobForm ? "Piilota lisäys" : "Lisää oma"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className={`rounded-[32px] border p-7 sm:p-10 space-y-12 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                       <div className="space-y-4">
                         <div className="flex items-center justify-between gap-4 border-b pb-5">
@@ -3904,7 +3953,7 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div className={`space-y-10 pt-10 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                    <div id="jobs-list-start" className={`space-y-10 pt-10 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-2">
                         <h3 className={`text-3xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Omat työpaikat
@@ -4055,6 +4104,51 @@ export default function Home() {
 
                 {tab === "hakemus" && (
                   <div id="panel-letter" role="tabpanel" aria-labelledby="tab-letter" className="space-y-10 animate-in fade-in duration-500">
+                    <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="max-w-3xl">
+                          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Hakemus-työtila</p>
+                          <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            Kirjoita hakemus ensin, avaa lisäjutut vasta myöhemmin
+                          </h3>
+                          <p className={`mt-3 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Valitse sävy, luo hakemus ja muokkaa tekstiä. Aiemmat versiot, videohakemus ja pikaviestit pysyvät alempana, etteivät ne sotke päätyötä.
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-[520px]">
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>1. Valitse sävy</div>
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>2. Luo hakemus</div>
+                          <div className={`rounded-2xl border px-4 py-4 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>3. Muokkaa ja lataa</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 grid grid-cols-1 gap-3 sm:hidden">
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById("letter-actions")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                          className="rounded-2xl bg-[#00BFA6] px-5 py-4 text-sm font-black text-black"
+                        >
+                          Mene hakemukseen
+                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setShowLetterHistory((prev) => !prev)}
+                            className={`rounded-2xl border px-4 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                          >
+                            {showLetterHistory ? "Piilota versiot" : "Versiot"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowLetterExtras((prev) => !prev)}
+                            className={`rounded-2xl border px-4 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
+                          >
+                            {showLetterExtras ? "Piilota lisät" : "Lisätyökalut"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="rounded-[32px] sm:rounded-[40px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-6 sm:p-12 relative overflow-hidden shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
                       <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none leading-none" aria-hidden="true">”</div>
                       <h3 className={`text-3xl font-black mb-8 relative z-10 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -4136,7 +4230,7 @@ export default function Home() {
                       </button>
                     </div>
 
-                    {activeJobLetters.length > 0 && (
+                    {activeJobLetters.length > 0 && (!isMobileViewport || showLetterHistory) && (
                       <div className={`rounded-[32px] border p-6 sm:p-8 mt-10 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                         <h3 className={`mb-6 text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Hakemusversiot tähän paikkaan
@@ -4185,7 +4279,7 @@ export default function Home() {
 
                     {letterResult ? (
                   <>
-                    <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-[0_15px_50px_rgba(0,191,166,0.15)] mt-10 ${theme === 'dark' ? 'border-[#00BFA6]/40 bg-[#0A0A0A]' : 'border-[#00BFA6]/40 bg-white'}`}>
+                    <div id="letter-actions" className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-[0_15px_50px_rgba(0,191,166,0.15)] mt-10 ${theme === 'dark' ? 'border-[#00BFA6]/40 bg-[#0A0A0A]' : 'border-[#00BFA6]/40 bg-white'}`}>
                       
                       <div className={`mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 border-b pb-6 ${theme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                         <div className={`flex rounded-2xl p-1 w-full sm:w-auto border ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-gray-100 border-gray-200'}`}>
@@ -4234,6 +4328,7 @@ export default function Home() {
                       )}
 
                       {/* UUDET: SÄHKÖPOSTIAUTOMAATIO & VIDEOTYÖKALU */}
+                      {(!isMobileViewport || showLetterExtras) && (
                       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className={`p-6 rounded-3xl border ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                           <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
@@ -4259,6 +4354,7 @@ export default function Home() {
                           </button>
                         </div>
                       </div>
+                      )}
 
                       <div className="flex flex-col sm:flex-row gap-5 mt-6">
                         <button
