@@ -109,7 +109,6 @@ export async function POST(req: Request) {
     // ==========================================================
     let googleJobsForAI: any[] = [];
     const googleApiKey = process.env.GOOGLE_API_KEY;
-    // Otan tuon aiemmin antamasi CX_ID:n fallbackiksi, jos se puuttuu envistä
     const googleCxId = process.env.GOOGLE_CX_ID || "1219b99e3495d43d8"; 
 
     if (googleApiKey && googleCxId) {
@@ -118,7 +117,8 @@ export async function POST(req: Request) {
         const googleUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(searchTerms)}&gl=fi`;
         
         const gRes = await fetch(googleUrl);
-        const gData = await gRes.json();
+        // TÄSSÄ ON KORJAUS: Lisätty ": any" jotta TypeScript pysyy tyytyväisenä
+        const gData: any = await gRes.json();
 
         if (gData.items && gData.items.length > 0) {
           googleJobsForAI = gData.items.slice(0, 5).map((item: any) => {
@@ -133,7 +133,7 @@ export async function POST(req: Request) {
               title: item.title,
               company: "Katso ilmoituksesta", 
               location: body.desiredLocation || "Suomi",
-              description: item.snippet, // Google antaa vain lyhyen esikatselun
+              description: item.snippet, 
               url: item.link,
               source: sourceDomain
             };
@@ -147,7 +147,7 @@ export async function POST(req: Request) {
       console.log("⚠️ GOOGLE_API_KEY puuttuu .env tiedostosta, ohitetaan muiden portaalien haku.");
     }
 
-    // Yhdistetään Työmarkkinatorin ja Googlen tulokset listaksi!
+    // Yhdistetään Työmarkkinatorin ja Googlen tulokset listaksi
     const combinedJobs = [...googleJobsForAI, ...tmJobsForAI];
 
     let aiPrompt = "";
