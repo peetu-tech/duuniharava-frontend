@@ -582,15 +582,18 @@ function FieldHint({
   theme: "light" | "dark";
 }) {
   return (
-    <p
-      className={`mt-4 rounded-2xl border px-5 py-4 text-sm leading-7 ${
+    <div
+      className={`mt-4 flex items-start gap-3 rounded-xl border-l-2 px-3 py-2 text-xs sm:text-sm leading-6 ${
         theme === "dark"
-          ? "border-white/10 bg-white/[0.03] text-gray-400"
-          : "border-gray-200 bg-gray-50 text-gray-600"
+          ? "border-[#00BFA6]/50 bg-transparent text-gray-500"
+          : "border-[#00BFA6]/40 bg-transparent text-gray-500"
       }`}
     >
-      {children}
-    </p>
+      <span className="mt-0.5 text-[11px] text-[#00BFA6]" aria-hidden="true">
+        Vinkki
+      </span>
+      <p>{children}</p>
+    </div>
   );
 }
 
@@ -2598,12 +2601,12 @@ export default function Home() {
         )}
 
         <div className="mx-auto max-w-7xl px-4 sm:px-8 py-16 md:py-20 lg:px-12">
-          <div className="mb-10 flex flex-wrap items-center gap-5 border-b border-white/5 pb-6" role="group" aria-label="Valitse toiminto">
+          <div className="mb-12 flex flex-col gap-4 border-b border-white/5 pb-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5" role="group" aria-label="Valitse toiminto">
             <button
               type="button"
               onClick={() => setMode("improve")}
               aria-pressed={mode === "improve"}
-              className={`rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+              className={`w-full rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 sm:w-auto sm:flex-1 sm:flex-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                 mode === "improve"
                   ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
                   : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
@@ -2616,7 +2619,7 @@ export default function Home() {
               type="button"
               onClick={() => setMode("create")}
               aria-pressed={mode === "create"}
-              className={`rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 flex-1 sm:flex-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+              className={`w-full rounded-2xl px-8 py-4 text-base font-bold transition-all duration-300 sm:w-auto sm:flex-1 sm:flex-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                 mode === "create"
                   ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
                   : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
@@ -2625,7 +2628,7 @@ export default function Home() {
               Luo täysin uusi CV
             </button>
 
-            <div className="ml-auto hidden text-base font-medium text-gray-500 lg:block" aria-live="polite">
+            <div className="text-sm font-medium text-gray-500 sm:ml-auto lg:block" aria-live="polite">
               Pilvitallennus aktiivinen (Supabase) ☁️
             </div>
           </div>
@@ -2733,7 +2736,9 @@ export default function Home() {
                       className={InputClass(theme)}
                       aria-describedby="targetJob-hint"
                     />
-                    <p id="targetJob-hint" className="text-xs text-[#00BFA6] font-bold mt-3 ml-2">💡 Tekoäly kirjoittaa tämän perusteella sinulle myyvän "Hookin" (Profiilitekstin), jolla erotut muista.</p>
+                    <p id="targetJob-hint" className="mt-3 ml-1 inline-flex rounded-full border border-[#00BFA6]/30 bg-[#00BFA6]/8 px-3 py-1.5 text-[11px] font-bold text-[#00BFA6]">
+                      Profiiliteksti rakentuu tämän perusteella
+                    </p>
                     <FieldHint theme={theme}>
                       Kirjoita tähän se työ jota oikeasti tavoittelet juuri nyt. Tämä ohjaa sekä CV:n profiilitekstiä, työnhakua että hakemusten sävyä.
                     </FieldHint>
@@ -2859,6 +2864,14 @@ export default function Home() {
                 theme={theme}
               >
                 <div className="space-y-12 mt-12">
+                  <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
+                      Helppo tapa aloittaa
+                    </p>
+                    <p className={`mt-3 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Täytä ensin vain kolme kohtaa: millaista työtä haet, miltä alueelta ja haluatko kokoaikaisen vai osa-aikaisen työn. Muut kentät ovat vain tarkennuksia.
+                    </p>
+                  </div>
                   <div className="space-y-4">
                     <label htmlFor="search-roles" className={LabelClass(theme)}>Minkä alan töitä etsit?</label>
                     <textarea
@@ -2994,7 +3007,7 @@ export default function Home() {
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`sticky top-0 z-40 pt-2 sm:pt-0 mb-14 flex overflow-x-auto whitespace-nowrap pb-6 gap-5 snap-x border-b custom-scrollbar ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
+                  className={`sticky top-0 z-40 pt-2 sm:pt-0 mb-14 flex overflow-x-auto whitespace-nowrap pb-6 gap-3 sm:gap-5 snap-x border-b custom-scrollbar ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
@@ -3005,7 +3018,7 @@ export default function Home() {
                     aria-selected={tab === "cv"}
                     aria-controls="panel-cv"
                     onClick={() => setTab("cv")}
-                    className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                    className={`rounded-2xl px-5 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "cv"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
@@ -3020,7 +3033,7 @@ export default function Home() {
                     aria-selected={tab === "jobs"}
                     aria-controls="panel-job"
                     onClick={() => setTab("jobs")}
-                    className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                    className={`rounded-2xl px-5 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "jobs"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
@@ -3034,7 +3047,7 @@ export default function Home() {
                     id="tab-letter"
                     aria-selected={tab === "hakemus"} 
                     onClick={() => setTab("hakemus")}
-                    className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                    className={`rounded-2xl px-5 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                       tab === "hakemus"
                         ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
@@ -3049,7 +3062,7 @@ export default function Home() {
                     aria-selected={tab === "tips"}
                     aria-controls="panel-tips"
                     onClick={() => setTab("tips")}
-                    className={`rounded-2xl px-8 py-4 text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C] ${
+                    className={`rounded-2xl px-5 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C] ${
                       tab === "tips"
                         ? "bg-[#FF6F3C] text-black shadow-[0_0_20px_rgba(255,111,60,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
@@ -3137,11 +3150,19 @@ export default function Home() {
                         )}
 
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
-                        <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-7 sm:p-12 shadow-xl">
+                        <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-12 shadow-xl">
+                          <div className={`mb-6 rounded-[28px] border p-4 sm:p-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/70'}`}>
+                            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
+                              Helpoin tapa muokata
+                            </p>
+                            <p className={`mt-2 text-sm leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Muokkaa tässä vain tekstiä. Esikatselu päivittyy automaattisesti alle, joten sinun ei tarvitse tallentaa erikseen joka muutoksen jälkeen.
+                            </p>
+                          </div>
                           <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                             <div className="max-w-2xl">
-                              <label htmlFor="cv-text-editor" className={`text-2xl font-black block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Muokkaa CV-tekstiä</label>
-                              <p className={`mt-2 text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Muokkaa koko CV:tä suoraan tässä. Kaikki esikatselussa näkyvä sisältö päivittyy samalla.</p>
+                              <label htmlFor="cv-text-editor" className={`text-2xl font-black block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Muokkaa CV:tä rauhassa</label>
+                              <p className={`mt-2 text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tämä on päämuokkausalue. Tee muutokset tähän, ja lopputulos näkyy heti esikatselussa.</p>
                             </div>
 
                             <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:grid-cols-1">
@@ -3170,7 +3191,7 @@ export default function Home() {
                             </div>
                           </div>
 
-                          <div className={`mb-6 grid grid-cols-2 gap-3 rounded-3xl border p-4 sm:grid-cols-4 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white/80'}`}>
+                          <div className={`mb-6 grid grid-cols-1 gap-3 rounded-3xl border p-4 sm:grid-cols-2 xl:grid-cols-4 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white/80'}`}>
                             <div>
                               <p className={`text-[11px] font-bold uppercase tracking-[0.18em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Rivejä</p>
                               <p className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cvEditorLineCount}</p>
