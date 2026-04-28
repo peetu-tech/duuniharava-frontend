@@ -91,7 +91,7 @@ type SavedCvVariant = {
   createdAt: string;
 };
 
-const STORAGE_KEY = "duuniharava_state_v8";
+const STORAGE_KEY = "duuniharava_state_v9"; // Päivitetty versio
 
 const emptyForm = {
   cvText: "",
@@ -519,7 +519,7 @@ function TextareaClass(minHeight: string, theme: "light" | "dark") {
 }
 
 function LabelClass(theme: "light" | "dark") {
-  return `mb-3 block text-sm font-bold ml-1 transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-700'}`;
+  return `mb-1 block text-sm font-bold ml-1 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`;
 }
 
 function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring, onSalary, onAtsScan, onInterviewPrep, theme }: any) {
@@ -579,15 +579,6 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             }`}
           >
             {job.favorite ? "★ Suosikki" : "☆ Suosikiksi"}
-          </button>
-
-          <button
-            type="button"
-            onClick={onSelect}
-            aria-pressed={isActive}
-            className={`w-full sm:w-auto rounded-2xl px-6 py-5 sm:py-4 text-base font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] hidden`} 
-          >
-            {isActive ? "✓ Valittu" : "Valitse paikka"}
           </button>
 
           <button
@@ -840,7 +831,6 @@ export default function Home() {
   const [jobs, setJobs] = useState<JobItem[]>([]);
   const [activeJobId, setActiveJobId] = useState<string>("");
   
-  // TINDER LOGIIKKA - LISÄTTY TILA TÄHÄN
   const [currentJobIndex, setCurrentJobIndex] = useState(0);
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
@@ -875,6 +865,34 @@ export default function Home() {
 
   const customStyle = customStyles[cvStyle];
 
+  // --- LOCALSTORAGE LATAUS ---
+  useEffect(() => {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        if (parsed.form) setForm(parsed.form);
+        if (parsed.searchProfile) setSearchProfile(parsed.searchProfile);
+        if (parsed.cvResult) setCvResult(parsed.cvResult);
+        if (parsed.letterResult) setLetterResult(parsed.letterResult);
+        if (parsed.letterDraft) setLetterDraft(parsed.letterDraft);
+      } catch (e) {
+        console.error("Virhe tallennetun tilan palautuksessa", e);
+      }
+    }
+  }, []);
+
+  // --- LOCALSTORAGE TALLENNUS JOKA KERTA KUN TIEDOT MUUTTUVAT ---
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      form,
+      searchProfile,
+      cvResult,
+      letterResult,
+      letterDraft
+    }));
+  }, [form, searchProfile, cvResult, letterResult, letterDraft]);
+
   useEffect(() => {
     const session = getSession();
     if (!session) {
@@ -901,19 +919,21 @@ export default function Home() {
         if (pData && pData.length > 0) {
           const p = pData[0];
           setIsPro(p.is_pro || false);
+          
+          // HUOM: Vältetään ylikirjoittamasta localStorage-tietoja tyhjillä, jos käyttäjä on kirjoittanut jotain
           setForm((prev) => ({
             ...prev,
-            name: p.full_name || "",
-            phone: p.phone || "",
-            email: p.email_address || "",
-            location: p.location || "",
-            targetJob: p.target_job || "",
-            education: p.education || "",
-            experience: p.experience || "",
-            languages: p.languages || "",
-            skills: p.skills || "",
-            cards: p.cards || "",
-            projects: p.projects || "",
+            name: prev.name || p.full_name || "",
+            phone: prev.phone || p.phone || "",
+            email: prev.email || p.email_address || "",
+            location: prev.location || p.location || "",
+            targetJob: prev.targetJob || p.target_job || "",
+            education: prev.education || p.education || "",
+            experience: prev.experience || p.experience || "",
+            languages: prev.languages || p.languages || "",
+            skills: prev.skills || p.skills || "",
+            cards: prev.cards || p.cards || "",
+            projects: prev.projects || p.projects || "",
           }));
           if (p.profile_image_url) setProfileImage(p.profile_image_url);
         }
@@ -1100,12 +1120,10 @@ export default function Home() {
     showFavoritesOnly,
   ]);
 
-  // Varmistetaan, että aktiivinen työpaikka päivittyy, kun swipe tapahtuu
   const activeJob = useMemo(() => {
     return filteredJobs[currentJobIndex] || null;
   }, [filteredJobs, currentJobIndex]);
 
-  // Päivitetään aktiivisen työpaikan ID aina, kun kortti vaihtuu
   useEffect(() => {
     if (activeJob) {
       setActiveJobId(activeJob.id);
@@ -2474,12 +2492,13 @@ export default function Home() {
                   </div>
 
                   <div className="pt-4">
-                    <div className="flex justify-between items-end mb-3">
+                    <div className="flex justify-between items-end mb-1">
                       <label htmlFor="input-targetJob" className={LabelClass(theme)}>Tavoiteltu rooli / ammatti</label>
                     </div>
+                    <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Mitä työtä haluat hakea? (esim. Myyntipäällikkö, Koodari)</p>
                     <input
                       id="input-targetJob"
-                      placeholder="Mitä työtä haluat hakea? (esim. Myyntipäällikkö, Koodari)"
+                      placeholder="Kirjoita unelmiesi rooli..."
                       value={form.targetJob}
                       onChange={(e) => updateField("targetJob", e.target.value)}
                       className={InputClass(theme)}
@@ -2490,9 +2509,10 @@ export default function Home() {
 
                   <div className="pt-4">
                     <label htmlFor="input-education" className={LabelClass(theme)}>Koulutus</label>
+                    <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Muotoile: Oppilaitos | Tutkinto | Vuosi</p>
                     <textarea
                       id="input-education"
-                      placeholder="Oppilaitos | Tutkinto | Valmistumisvuosi&#10;Esim. Helsingin Yliopisto | Kauppatieteiden maisteri | 2024"
+                      placeholder="Helsingin Yliopisto | Kauppatieteiden maisteri | 2024"
                       value={form.education}
                       onChange={(e) => updateField("education", e.target.value)}
                       className={TextareaClass("min-h-[140px]", theme)}
@@ -2501,9 +2521,10 @@ export default function Home() {
 
                   <div className="pt-4">
                     <label htmlFor="input-experience" className={LabelClass(theme)}>Työkokemus</label>
+                    <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Muotoile: Työnantaja | Titteli | Aika. Kerro ranskalaisilla viivoilla saavutuksesi.</p>
                     <textarea
                       id="input-experience"
-                      placeholder="Työnantaja | Työtehtävä | 01/2020 - 05/2022 (tai 'Nykyinen')&#10;- Lyhyt kuvaus työtehtävistäsi...&#10;- Toinen kuvaus..."
+                      placeholder="Työnantaja | Työtehtävä | 01/2020 - Nykyinen&#10;- Vastuualueet ja mitä sait aikaan..."
                       value={form.experience}
                       onChange={(e) => updateField("experience", e.target.value)}
                       className={TextareaClass("min-h-[180px]", theme)}
@@ -2513,9 +2534,10 @@ export default function Home() {
                   {/* UUSI OSIO: PROJEKTIT */}
                   <div className="pt-4">
                     <label htmlFor="input-projects" className={LabelClass(theme)}>Projektit & Portfoliolinkit <span className="text-[#00BFA6] font-normal lowercase">(Vapaaehtoinen)</span></label>
+                    <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Muotoile: Projektin nimi | Vuosi. Kerro mitä teit ja linkitä.</p>
                     <textarea
                       id="input-projects"
-                      placeholder="Projektin nimi | Vuosi&#10;- Mitä teit ja mitä sait aikaan?&#10;- Linkki: https://..."
+                      placeholder="Verkkosivuuudistus | 2023&#10;- Johdin tiimiä...&#10;- Linkki: https://..."
                       value={form.projects}
                       onChange={(e) => updateField("projects", e.target.value)}
                       className={TextareaClass("min-h-[140px]", theme)}
@@ -2524,19 +2546,20 @@ export default function Home() {
 
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 pt-4">
                     <div>
-                      <div className="flex justify-between items-end mb-3">
+                      <div className="flex justify-between items-end mb-1">
                         <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
                       </div>
+                      <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Esim. Suomi (äidinkieli), Englanti (Sujuva)</p>
                       <textarea
                         id="input-languages"
-                        placeholder="Suomi (äidinkieli), Englanti (sujuva)..."
+                        placeholder="Listaa kielet ja taso..."
                         value={form.languages}
                         onChange={(e) => updateField("languages", e.target.value)}
                         className={TextareaClass("min-h-[140px]", theme)}
                       />
                     </div>
                     <div>
-                      <div className="flex justify-between items-end mb-3">
+                      <div className="flex justify-between items-end mb-1">
                         <label htmlFor="input-skills" className={LabelClass(theme)}>Osaaminen & Taidot</label>
                         <button 
                           type="button" 
@@ -2546,9 +2569,10 @@ export default function Home() {
                           ✨ Käännä ammattikielelle
                         </button>
                       </div>
+                      <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Esim. B2B-myynti, Asiakaspalvelu, Tiimityö</p>
                       <textarea
                         id="input-skills"
-                        placeholder="Mitä taitoja sinulla on? (esim. asiakaspalvelu)"
+                        placeholder="Mitä erityistaitoja sinulla on?"
                         value={form.skills}
                         onChange={(e) => updateField("skills", e.target.value)}
                         className={TextareaClass("min-h-[140px]", theme)}
@@ -2558,9 +2582,10 @@ export default function Home() {
 
                   <div className="pt-4">
                     <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
+                    <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Esim. B-Ajokortti, Työturvallisuuskortti</p>
                     <textarea
                       id="input-cards"
-                      placeholder="Työturvallisuuskortti, B-ajokortti..."
+                      placeholder="Listaa kortit ja luvat..."
                       value={form.cards}
                       onChange={(e) => updateField("cards", e.target.value)}
                       className={TextareaClass("min-h-[120px]", theme)}
@@ -2603,9 +2628,10 @@ export default function Home() {
                 <div className="space-y-8 mt-8">
                   <div>
                     <label htmlFor="search-roles" className={LabelClass(theme)}>Minkä alan töitä etsit?</label>
+                    <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Kirjoita titteleitä (esim. Myyntineuvottelija, Koodari)</p>
                     <textarea
                       id="search-roles"
-                      placeholder="Esim. Myyntineuvottelija, Koodari, Siivooja..."
+                      placeholder="Listaa titteleitä..."
                       value={searchProfile.desiredRoles}
                       onChange={(e) =>
                         updateSearchProfile("desiredRoles", e.target.value)
@@ -2616,9 +2642,10 @@ export default function Home() {
                   
                   <div>
                      <label htmlFor="search-location" className={LabelClass(theme)}>Miltä alueelta?</label>
+                     <p className={`text-xs mb-3 font-medium ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Kirjoita kaupunki, maakunta tai "Etätyö"</p>
                      <input
                        id="search-location"
-                       placeholder="Esim. Uusimaa, Etätyö"
+                       placeholder="Esim. Uusimaa"
                        value={searchProfile.desiredLocation}
                        onChange={(e) =>
                          updateSearchProfile("desiredLocation", e.target.value)
@@ -2668,7 +2695,7 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja (erota pilkulla)</label>
+                      <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja</label>
                       <input
                         id="search-keywords"
                         placeholder="Esim. englanti, joustava"
@@ -3797,7 +3824,9 @@ export default function Home() {
           )}
         </section>
       </div>
-    </div>{/* MODAALIT */}
+    </div>
+
+    {/* MODAALIT */}
 
     {/* ATS SCANNER */}
     {atsJob && (
@@ -4043,6 +4072,9 @@ export default function Home() {
         </div>
         
         <div className="mt-8 flex justify-center gap-4">
+          <button 
+            onClick={() => alert("Teleprompterin automaattinen rullaus tulee saataville seuraavassa päivityksessä!")}
+            className="bg-[#FF6F3C] text-black font-black px-10 py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,111,60,0<div className="mt-8 flex justify-center gap-4">
           <button 
             onClick={() => alert("Teleprompterin automaattinen rullaus tulee saataville seuraavassa päivityksessä!")}
             className="bg-[#FF6F3C] text-black font-black px-10 py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.4)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-black"
