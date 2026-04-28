@@ -80,7 +80,7 @@ export async function POST(req: Request) {
           scoredJobs = scoredJobs.filter(j => j.score > 0).sort((a, b) => b.score - a.score);
 
           if (scoredJobs.length === 0) {
-            scoredJobs = allParsedJobs.slice(0, 15).map(job => ({
+            scoredJobs = allParsedJobs.slice(0, 30).map(job => ({
               job, score: 0,
               title: getLocText(job.position?.title),
               company: getLocText(job.client?.company) || getLocText(job.owner?.company),
@@ -89,12 +89,13 @@ export async function POST(req: Request) {
             }));
           }
 
-          tmJobsForAI = scoredJobs.slice(0, 10).map((j: any) => ({
+          // NOSTETTU: Otetaan jopa 25 parasta paikkaa Työmarkkinatorilta pohjaksi
+          tmJobsForAI = scoredJobs.slice(0, 25).map((j: any) => ({
             id: j.job.metadata?.externalId || j.job.id,
             title: j.title || "Avoin työpaikka",
             company: j.company || "Tuntematon yritys",
             location: j.loc || "Suomi",
-            description: j.desc ? j.desc.substring(0, 500) : "",
+            description: j.desc ? j.desc.substring(0, 400) : "", // Hieman lyhyempi kuvaus tekoälylle, säästää aikaa
             url: getLocText(j.job.application?.url) || `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${j.job.id}`,
             source: "Työmarkkinatori"
           }));
@@ -117,11 +118,11 @@ export async function POST(req: Request) {
         const googleUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(searchTerms)}&gl=fi`;
         
         const gRes = await fetch(googleUrl);
-        // TÄSSÄ ON KORJAUS: Lisätty ": any" jotta TypeScript pysyy tyytyväisenä
         const gData: any = await gRes.json();
 
         if (gData.items && gData.items.length > 0) {
-          googleJobsForAI = gData.items.slice(0, 5).map((item: any) => {
+          // NOSTETTU: Otetaan jopa 10 osumaa Googlelta
+          googleJobsForAI = gData.items.slice(0, 10).map((item: any) => {
             let sourceDomain = "Ulkoisesta palvelusta";
             if (item.link.includes("duunitori.fi")) sourceDomain = "Duunitori";
             if (item.link.includes("oikotie.fi")) sourceDomain = "Oikotie";
@@ -147,7 +148,7 @@ export async function POST(req: Request) {
       console.log("⚠️ GOOGLE_API_KEY puuttuu .env tiedostosta, ohitetaan muiden portaalien haku.");
     }
 
-    // Yhdistetään Työmarkkinatorin ja Googlen tulokset listaksi
+    // Yhdistetään Työmarkkinatorin ja Googlen tulokset listaksi (nyt jopa 35 paikkaa tekoälyn valittavaksi)
     const combinedJobs = [...googleJobsForAI, ...tmJobsForAI];
 
     let aiPrompt = "";
@@ -165,7 +166,9 @@ Olet rekrytointikonsultti. Tässä on hakijan profiili:
 Tässä on lista löydettyjä työpaikkoja (Työmarkkinatorilta ja muista palveluista):
 ${JSON.stringify(combinedJobs)}
 
-Valitse näistä 3-5 parhaiten hakijalle sopivaa työpaikkaa. Yritä ottaa mukaan tuloksia ERI lähteistä (source).
+Valitse näistä 10-15 parhaiten hakijalle sopivaa työpaikkaa. Yritä ottaa mukaan tuloksia ERI lähteistä (source).
+
+Laske jokaiselle valitsemallesi paikalle tarkka ja totuudenmukainen matchScore (1-100) sen perusteella, miten hyvin ilmoituksen tiedot vastaavat hakijan toiveita.
 
 ERITYISOHJEET (Jos source on Duunitori, Oikotie, Jobly tai LinkedIn):
 Näiden paikkojen kohdalla sinulla on vain lyhyt esikatseluteksti. Aseta näiden kohdalla adText-kentän arvoksi täsmälleen tämä: "Tämä työpaikka löytyi ulkoisesta palvelusta. Klikkaa alla olevaa painiketta avataksesi ilmoituksen, kopioi sen teksti ja tuo se Duuniharavaan analysoitavaksi!"
@@ -182,12 +185,12 @@ Palauta VAIN JSON-objekti avaimella "jobs", jossa on nämä kentät:
       "summary": "Myyvä 2 lauseen tiivistelmä",
       "adText": "Alkuperäinen kuvaus TAI yllä mainittu erikoisohje",
       "url": "Sama kuin syötteessä",
-      "whyFit": "Miksi hakija sopii",
-      "source": "Sama kuin syötteessä (esim. Duunitori tai Työmarkkinatori)",
-      "matchScore": 90,
+      "whyFit": "Miksi hakija sopii (perustele)",
+      "source": "Sama kuin syötteessä",
+      "matchScore": laskettu_arvosana_välillä_1_100,
       "status": "interested",
-      "priority": "high",
-      "salary": "Sopimuksen mukaan",
+      "priority": "medium",
+      "salary": "Lue kuvauksesta, muuten Sopimuksen mukaan",
       "deadline": "Lue kuvauksesta",
       "notes": ""
     }
@@ -196,7 +199,7 @@ Palauta VAIN JSON-objekti avaimella "jobs", jossa on nämä kentät:
     } else {
       isFallback = true;
       aiPrompt = `
-Työmarkkinatorilta ei saatu juuri nyt dataa haulle. Luo 4 simuloitua avointa työpaikkaa:
+Työmarkkinatorilta ei saatu juuri nyt dataa haulle. Luo 10 simuloitua avointa työpaikkaa:
 - Toive: ${searchTerms || body.desiredRoles || body.targetJob || 'Avoimet työpaikat'}
 - Alue: ${body.desiredLocation || 'Suomi'}
 
@@ -213,7 +216,7 @@ Palauta TÄSMÄLLEEN tämä JSON-rakenne avaimella "jobs":
       "url": "https://tyomarkkinatori.fi/",
       "whyFit": "Miksi hakija sopii",
       "source": "Tekoäly-simulaatio",
-      "matchScore": 90,
+      "matchScore": 85,
       "status": "interested",
       "priority": "medium",
       "salary": "Esim. 2500-3500 €/kk",
