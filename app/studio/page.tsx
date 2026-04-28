@@ -396,9 +396,9 @@ function safeLetterTone(value: unknown): LetterTone {
 function getLetterToneLabel(tone?: LetterTone) {
   switch (tone) {
     case "warm":
-      return "LÃ¤mmin";
+      return "Lämmin";
     case "sales":
-      return "MyyvÃ¤";
+      return "Myyvä";
     case "professional":
     default:
       return "Asiallinen";
@@ -460,7 +460,7 @@ function getStatusLabel(status: JobStatus) {
     case "applied": return "Haettu";
     case "interview": return "Haastattelu";
     case "offer": return "Tarjous";
-    case "rejected": return "HylÃ¤tty";
+    case "rejected": return "Hylätty";
     default: return status;
   }
 }
@@ -519,7 +519,7 @@ function SectionShell({
             </h2>
           </div>
           <div className={`sm:hidden flex items-center justify-center w-10 h-10 rounded-full border transition-transform group-open:rotate-180 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
-            â–¼
+            ▼
           </div>
         </div>
         
@@ -528,9 +528,9 @@ function SectionShell({
         </div>
       </summary>
 
-      <div className="mt-10 animate-in fade-in duration-300">
+      <div className="mt-8 animate-in fade-in duration-300">
         {description ? (
-          <p className={`mb-6 max-w-2xl text-base sm:text-lg leading-relaxed transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`mb-8 max-w-2xl text-base sm:text-lg leading-relaxed transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {description}
           </p>
         ) : null}
@@ -583,8 +583,10 @@ function FieldHint({
 }) {
   return (
     <p
-      className={`mt-2 text-[12px] leading-5 ${
-        theme === "dark" ? "text-gray-500" : "text-gray-500"
+      className={`mt-3 rounded-2xl border px-4 py-3 text-sm leading-6 ${
+        theme === "dark"
+          ? "border-white/10 bg-white/[0.03] text-gray-400"
+          : "border-gray-200 bg-gray-50 text-gray-600"
       }`}
     >
       {children}
@@ -629,11 +631,11 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           </div>
 
           <h4 className={`text-3xl sm:text-4xl font-black tracking-tight mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            {job.title || "NimetÃ¶n tyÃ¶paikka"}
+            {job.title || "Nimetön työpaikka"}
           </h4>
 
           <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            {[job.company, job.location, job.type].filter(Boolean).join(" Â· ")}
+            {[job.company, job.location, job.type].filter(Boolean).join(" · ")}
           </p>
         </div>
 
@@ -648,7 +650,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
                 : (theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100")
             }`}
           >
-            {job.favorite ? "â˜… Suosikki" : "â˜† Suosikiksi"}
+            {job.favorite ? "★ Suosikki" : "☆ Suosikiksi"}
           </button>
 
           <button
@@ -657,49 +659,49 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             aria-pressed={isActive}
             className={`w-full sm:w-auto rounded-2xl px-6 py-5 sm:py-4 text-base font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] hidden`} 
           >
-            {isActive ? "âœ“ Valittu" : "Valitse paikka"}
+            {isActive ? "✓ Valittu" : "Valitse paikka"}
           </button>
 
           <button
             type="button"
             onClick={onAtsScan}
-            aria-label={`Skannaa ATS-osuvuus tyÃ¶paikkaan ${job.title}`}
+            aria-label={`Skannaa ATS-osuvuus työpaikkaan ${job.title}`}
             className={`w-full sm:w-auto rounded-2xl border px-6 py-5 sm:py-4 text-base font-bold transition hover:-translate-y-1 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'dark' ? 'border-purple-500/50 bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white focus-visible:ring-purple-500' : 'border-purple-300 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white focus-visible:ring-purple-600'}`}
           >
-            ðŸ” ATS-Skanneri
+            🔍 ATS-Skanneri
           </button>
 
           <button
             type="button"
             onClick={onInterviewPrep}
-            aria-label={`Ennakoi haastattelukysymykset tyÃ¶paikkaan ${job.title}`}
+            aria-label={`Ennakoi haastattelukysymykset työpaikkaan ${job.title}`}
             className={`w-full sm:w-auto rounded-2xl border px-6 py-5 sm:py-4 text-base font-bold transition hover:-translate-y-1 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'dark' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white focus-visible:ring-indigo-500' : 'border-indigo-300 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white focus-visible:ring-indigo-600'}`}
           >
-            â“ TÃ¤rpit
+            ❓ Tärpit
           </button>
 
           <button
             type="button"
             onClick={onSalary}
-            aria-label={`Tarkista palkkataso tyÃ¶paikkaan ${job.title}`}
+            aria-label={`Tarkista palkkataso työpaikkaan ${job.title}`}
             className="w-full sm:w-auto rounded-2xl border border-blue-500/50 bg-blue-500/10 px-6 py-5 sm:py-4 text-base font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white shadow-[0_0_15px_rgba(59,130,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
           >
-            ðŸ’° Palkka-arvio
+            💰 Palkka-arvio
           </button>
 
           <button
             type="button"
             onClick={onSparring}
-            aria-label={`Treenaa haastattelua tyÃ¶paikkaan ${job.title}`}
+            aria-label={`Treenaa haastattelua työpaikkaan ${job.title}`}
             className="w-full sm:w-auto rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-5 sm:py-4 text-base font-bold text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black shadow-[0_0_15px_rgba(0,191,166,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
           >
-            ðŸŽ¤ Treenaa
+            🎤 Treenaa
           </button>
 
           <button
             type="button"
             onClick={onRemove}
-            aria-label={`Poista tyÃ¶paikka ${job.title}`}
+            aria-label={`Poista työpaikka ${job.title}`}
             className={`w-full sm:w-auto rounded-2xl border px-6 py-5 sm:py-4 text-base font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 ${theme === 'dark' ? 'border-red-900/50 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white' : 'border-red-200 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white'}`}
           >
             Poista
@@ -731,10 +733,10 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           }`}
         >
           {daysLeft < 0
-            ? `Deadline meni ${Math.abs(daysLeft)} pÃ¤ivÃ¤Ã¤ sitten`
+            ? `Deadline meni ${Math.abs(daysLeft)} päivää sitten`
             : daysLeft === 0
-            ? "Deadline on tÃ¤nÃ¤Ã¤n!"
-            : `Deadline ${daysLeft} pÃ¤ivÃ¤n pÃ¤Ã¤stÃ¤`}
+            ? "Deadline on tänään!"
+            : `Deadline ${daysLeft} päivän päästä`}
         </div>
       )}
 
@@ -752,7 +754,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             <option value="applied">Haettu</option>
             <option value="interview">Haastattelu</option>
             <option value="offer">Tarjous</option>
-            <option value="rejected">HylÃ¤tty</option>
+            <option value="rejected">Hylätty</option>
           </select>
         </div>
 
@@ -773,7 +775,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
         </div>
 
         <div>
-          <label htmlFor={`appliedAt-${job.id}`} className={LabelClass(theme)}>HakupÃ¤ivÃ¤</label>
+          <label htmlFor={`appliedAt-${job.id}`} className={LabelClass(theme)}>Hakupäivä</label>
           <input
             id={`appliedAt-${job.id}`}
             type="date"
@@ -800,13 +802,13 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             id={`salary-${job.id}`}
             value={job.salary || ""}
             onChange={(e) => onUpdate({ salary: e.target.value })}
-            placeholder="Esim. 2800â€“3200 â‚¬/kk"
+            placeholder="Esim. 2800–3200 €/kk"
             className={InputClass(theme)}
           />
         </div>
 
         <div>
-          <label htmlFor={`contactPerson-${job.id}`} className={LabelClass(theme)}>YhteyshenkilÃ¶</label>
+          <label htmlFor={`contactPerson-${job.id}`} className={LabelClass(theme)}>Yhteyshenkilö</label>
           <input
             id={`contactPerson-${job.id}`}
             value={job.contactPerson || ""}
@@ -817,7 +819,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
         </div>
 
         <div>
-          <label htmlFor={`contactEmail-${job.id}`} className={LabelClass(theme)}>SÃ¤hkÃ¶posti</label>
+          <label htmlFor={`contactEmail-${job.id}`} className={LabelClass(theme)}>Sähköposti</label>
           <input
             id={`contactEmail-${job.id}`}
             value={job.contactEmail || ""}
@@ -845,7 +847,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           id={`notes-${job.id}`}
           value={job.notes || ""}
           onChange={(e) => onUpdate({ notes: e.target.value })}
-          placeholder="Kirjaa tÃ¤hÃ¤n mitÃ¤ pitÃ¤Ã¤ tehdÃ¤ seuraavaksi, yhteydenotot, fiilikset jne."
+          placeholder="Kirjaa tähän mitä pitää tehdä seuraavaksi, yhteydenotot, fiilikset jne."
           className={TextareaClass("min-h-[160px]", theme)}
         />
       </div>
@@ -857,14 +859,14 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           rel="noreferrer"
           className="mt-10 flex w-full justify-center rounded-2xl border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-8 py-6 text-lg font-black text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
         >
-          AVAA ALKUPERÃ„INEN ILMOITUS âž”
+          AVAA ALKUPERÄINEN ILMOITUS ➔
         </a>
       )}
     </article>
   );
 }
 
-// --- PÃ„Ã„KOMPONENTTI ---
+// --- PÄÄKOMPONENTTI ---
 export default function Home() {
   const router = useRouter();
   
@@ -910,7 +912,7 @@ export default function Home() {
   const [jobs, setJobs] = useState<JobItem[]>([]);
   const [activeJobId, setActiveJobId] = useState<string>("");
   
-  // TINDER LOGIIKKA - LISÃ„TTY TILA TÃ„HÃ„N
+  // TINDER LOGIIKKA - LISÄTTY TILA TÄHÄN
   const [currentJobIndex, setCurrentJobIndex] = useState(0);
 
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
@@ -992,7 +994,7 @@ export default function Home() {
         if (draft.customStyles) setCustomStyles(draft.customStyles);
       }
     } catch (error) {
-      console.error("Paikallisen studiotilan palautus epÃ¤onnistui", error);
+      console.error("Paikallisen studiotilan palautus epäonnistui", error);
     }
 
     async function loadDataFromDb() {
@@ -1119,7 +1121,7 @@ export default function Home() {
           })
         });
       } catch (e) {
-        console.error("Profiilin tallennus epÃ¤onnistui", e);
+        console.error("Profiilin tallennus epäonnistui", e);
       }
     }, 2000);
 
@@ -1164,7 +1166,7 @@ export default function Home() {
         JSON.stringify(draft),
       );
     } catch (error) {
-      console.error("Paikallisen studiotilan tallennus epÃ¤onnistui", error);
+      console.error("Paikallisen studiotilan tallennus epäonnistui", error);
     }
   }, [
     activeJobId,
@@ -1286,10 +1288,16 @@ export default function Home() {
     showFavoritesOnly,
   ]);
 
-  // Varmistetaan, ettÃ¤ aktiivinen tyÃ¶paikka pÃ¤ivittyy, kun swipe tapahtuu
+  // Varmistetaan, että aktiivinen työpaikka päivittyy, kun swipe tapahtuu
   const activeJob = useMemo(() => {
     return filteredJobs[currentJobIndex] || null;
   }, [filteredJobs, currentJobIndex]);
+
+  const cvEditorText = parsedCv.cvBody || "";
+  const cvEditorLineCount = cvEditorText
+    ? cvEditorText.split("\n").filter((line) => line.trim().length > 0).length
+    : 0;
+  const cvEditorCharCount = cvEditorText.length;
 
   useEffect(() => {
     if (filteredJobs.length === 0 && currentJobIndex !== 0) {
@@ -1302,7 +1310,7 @@ export default function Home() {
     }
   }, [currentJobIndex, filteredJobs.length]);
 
-  // PÃ¤ivitetÃ¤Ã¤n aktiivisen tyÃ¶paikan ID aina, kun kortti vaihtuu
+  // Päivitetään aktiivisen työpaikan ID aina, kun kortti vaihtuu
   useEffect(() => {
     if (activeJob) {
       setActiveJobId(activeJob.id);
@@ -1323,6 +1331,11 @@ export default function Home() {
 
   function updateJobForm(key: keyof typeof emptyJobForm, value: string) {
     setJobForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function updateCvBody(value: string) {
+    const prefix = cvResult.split("CV_BODY:")[0] || "";
+    setCvResult(prefix + "CV_BODY:\n" + value);
   }
 
   function updateJob(id: string, patch: Partial<JobItem>) {
@@ -1435,29 +1448,29 @@ export default function Home() {
       cvText: "",
       cvFile: "",
       cvFileName: "",
-      name: "Matti MeikÃ¤lÃ¤inen",
+      name: "Matti Meikäläinen",
       phone: "040 123 4567",
       email: "matti.meikalainen@esimerkki.fi",
       location: "Tampere",
-      targetJob: "MyyntipÃ¤Ã¤llikkÃ¶",
+      targetJob: "Myyntipäällikkö",
       education: "Tampereen Yliopisto | Kauppatieteiden maisteri | 2021\nKallion Lukio | Ylioppilas | 2016",
-      experience: "Esimerkki Oy | AvainasiakaspÃ¤Ã¤llikkÃ¶ | 05/2021 - Nykyinen\n- Vastuussa B2B-myynnistÃ¤ ja asiakkuuksien kehittÃ¤misestÃ¤.\n- Kasvatin myyntiÃ¤ 25% ensimmÃ¤isen vuoden aikana.\n\nMyynti Oy | Myyntineuvottelija | 01/2018 - 04/2021\n- Uusasiakashankinta ja asiakaspalvelu.\n- Tiimin paras myyjÃ¤ 2020.",
-      languages: "Suomi (Ã¤idinkieli), Englanti (erinomainen), Ruotsi (perusteet)",
-      skills: "B2B-myynti, Neuvottelutaidot, CRM-jÃ¤rjestelmÃ¤t, TiimityÃ¶skentely, Ongelmanratkaisu",
+      experience: "Esimerkki Oy | Avainasiakaspäällikkö | 05/2021 - Nykyinen\n- Vastuussa B2B-myynnistä ja asiakkuuksien kehittämisestä.\n- Kasvatin myyntiä 25% ensimmäisen vuoden aikana.\n\nMyynti Oy | Myyntineuvottelija | 01/2018 - 04/2021\n- Uusasiakashankinta ja asiakaspalvelu.\n- Tiimin paras myyjä 2020.",
+      languages: "Suomi (äidinkieli), Englanti (erinomainen), Ruotsi (perusteet)",
+      skills: "B2B-myynti, Neuvottelutaidot, CRM-järjestelmät, Tiimityöskentely, Ongelmanratkaisu",
       cards: "B-ajokortti, Ensiapu 1",
-      projects: "Yrityksen X VerkkosivutupÃ¤ivitys | 2020\n- Johdin tiimiÃ¤, joka uudisti koko verkkopalvelun ja kasvatti liidimÃ¤Ã¤rÃ¤Ã¤ 40%.\n\nOma verkkokauppa (Sivuprojekti) | 2019-2021\n- Perustin ja pyÃ¶ritin menestyksekÃ¤stÃ¤ verkkokauppaa, jossa vastasin koko prosessista hankinnasta asiakaspalveluun.",
+      projects: "Yrityksen X Verkkosivutupäivitys | 2020\n- Johdin tiimiä, joka uudisti koko verkkopalvelun ja kasvatti liidimäärää 40%.\n\nOma verkkokauppa (Sivuprojekti) | 2019-2021\n- Perustin ja pyöritin menestyksekästä verkkokauppaa, jossa vastasin koko prosessista hankinnasta asiakaspalveluun.",
     });
 
     setSearchProfile({
-      desiredRoles: "MyyntipÃ¤Ã¤llikkÃ¶, asiakkuuspÃ¤Ã¤llikkÃ¶, myyntineuvottelija",
+      desiredRoles: "Myyntipäällikkö, asiakkuuspäällikkö, myyntineuvottelija",
       desiredLocation: "Pirkanmaa",
       workType: "Kokoaikainen",
-      shiftPreference: "PÃ¤ivÃ¤tyÃ¶",
-      salaryWish: "4500 â‚¬ / kk",
+      shiftPreference: "Päivätyö",
+      salaryWish: "4500 € / kk",
       keywords: "B2B, myynti, tavoitteellinen",
     });
 
-    setMessage("Esimerkkidata lisÃ¤tty.");
+    setMessage("Esimerkkidata lisätty.");
     setErrorMessage("");
     setTimeout(() => setMessage(""), 2500);
   }
@@ -1467,15 +1480,15 @@ export default function Home() {
     setMessage("");
 
     if (type === "sales") {
-      updateField("targetJob", "MyyjÃ¤");
-      updateSearchProfile("desiredRoles", "MyyjÃ¤, asiakaspalvelija");
-      setMessage("Tavoitetta suunnattu myyntityÃ¶hÃ¶n.");
+      updateField("targetJob", "Myyjä");
+      updateSearchProfile("desiredRoles", "Myyjä, asiakaspalvelija");
+      setMessage("Tavoitetta suunnattu myyntityöhön.");
     }
 
     if (type === "warehouse") {
-      updateField("targetJob", "VarastotyÃ¶ntekijÃ¤");
-      updateSearchProfile("desiredRoles", "VarastotyÃ¶ntekijÃ¤, logistiikkatyÃ¶");
-      setMessage("Tavoitetta suunnattu varastotyÃ¶hÃ¶n.");
+      updateField("targetJob", "Varastotyöntekijä");
+      updateSearchProfile("desiredRoles", "Varastotyöntekijä, logistiikkatyö");
+      setMessage("Tavoitetta suunnattu varastotyöhön.");
     }
 
     if (type === "shorter") {
@@ -1494,7 +1507,7 @@ export default function Home() {
         skills: shorten(prev.skills),
         cards: shorten(prev.cards),
       }));
-      setMessage("KenttiÃ¤ tiivistetty.");
+      setMessage("Kenttiä tiivistetty.");
     }
 
     setTimeout(() => setMessage(""), 2500);
@@ -1506,7 +1519,7 @@ export default function Home() {
       setMessage(successMessage);
       setTimeout(() => setMessage(""), 2500);
     } catch {
-      setErrorMessage("Kopiointi epÃ¤onnistui.");
+      setErrorMessage("Kopiointi epäonnistui.");
       setTimeout(() => setErrorMessage(""), 2500);
     }
   }
@@ -1521,7 +1534,7 @@ export default function Home() {
 
     try {
       setDownloadingPdf(true);
-      setMessage("Luodaan PDF-tiedostoa... (TÃ¤mÃ¤ voi kestÃ¤Ã¤ sekunnin)");
+      setMessage("Luodaan PDF-tiedostoa... (Tämä voi kestää sekunnin)");
       setErrorMessage("");
 
       const originalRadius = printContent.style.borderRadius;
@@ -1623,7 +1636,7 @@ export default function Home() {
 
     } catch (error) {
       console.error(error);
-      setErrorMessage("Virhe PDF-luonnissa. YritÃ¤ ladata sivu uudelleen.");
+      setErrorMessage("Virhe PDF-luonnissa. Yritä ladata sivu uudelleen.");
     } finally {
       setDownloadingPdf(false);
       window.scrollTo(originalScrollX, originalScrollY);
@@ -1632,7 +1645,7 @@ export default function Home() {
   async function downloadDocx(textToDownload: string, isLetter: boolean = false) {
     try {
       if (!textToDownload) {
-        setErrorMessage("Ei ladattavaa tekstiÃ¤.");
+        setErrorMessage("Ei ladattavaa tekstiä.");
         return;
       }
 
@@ -1655,11 +1668,11 @@ export default function Home() {
                 line === line.toUpperCase() ||
                 [
                   "Profiili",
-                  "TyÃ¶kokemus",
+                  "Työkokemus",
                   "Koulutus",
                   "Kielitaito",
                   "Taidot",
-                  "Kortit ja pÃ¤tevyydet",
+                  "Kortit ja pätevyydet",
                   "Harrastukset",
                   "Projektit",
                   "Portfolio"
@@ -1694,7 +1707,7 @@ export default function Home() {
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
       console.error(error);
-      setErrorMessage("DOCX:n luonti epÃ¤onnistui.");
+      setErrorMessage("DOCX:n luonti epäonnistui.");
     } finally {
       setDownloadingDocx(false);
     }
@@ -1724,7 +1737,7 @@ export default function Home() {
         cvFile: event.target?.result as string,
         cvFileName: file.name,
       }));
-      setMessage(`Tiedosto ${file.name} ladattu. Voit nyt parannella sitÃ¤.`);
+      setMessage(`Tiedosto ${file.name} ladattu. Voit nyt parannella sitä.`);
       setTimeout(() => setMessage(""), 3000);
     };
     reader.readAsDataURL(file);
@@ -1732,17 +1745,17 @@ export default function Home() {
 
   function validateCvForm() {
     if (!form.targetJob.trim()) {
-      setErrorMessage("LisÃ¤Ã¤ tavoiteltu tyÃ¶ ennen CV:n generointia.");
+      setErrorMessage("Lisää tavoiteltu työ ennen CV:n generointia.");
       return false;
     }
 
     if (mode === "improve" && !form.cvFile && !form.cvText.trim()) {
-      setErrorMessage("LiitÃ¤ nykyinen CV (esim. PDF) ennen parannusta.");
+      setErrorMessage("Liitä nykyinen CV (esim. PDF) ennen parannusta.");
       return false;
     }
 
     if (mode === "create" && !form.name.trim()) {
-      setErrorMessage("LisÃ¤Ã¤ nimi ennen uuden CV:n luontia.");
+      setErrorMessage("Lisää nimi ennen uuden CV:n luontia.");
       return false;
     }
 
@@ -1756,7 +1769,7 @@ export default function Home() {
       !jobForm.adText.trim()
     ) {
       setErrorMessage(
-        "LisÃ¤Ã¤ vÃ¤hintÃ¤Ã¤n tyÃ¶paikan otsikko, yritys tai ilmoituksen teksti."
+        "Lisää vähintään työpaikan otsikko, yritys tai ilmoituksen teksti."
       );
       return false;
     }
@@ -1765,12 +1778,12 @@ export default function Home() {
 
   function validateLetterForm() {
     if (!form.targetJob.trim()) {
-      setErrorMessage("LisÃ¤Ã¤ tavoiteltu tyÃ¶ ennen hakemuksen generointia.");
+      setErrorMessage("Lisää tavoiteltu työ ennen hakemuksen generointia.");
       return false;
     }
 
     if (!activeJob) {
-      setErrorMessage("Valitse tyÃ¶paikka ennen hakemuksen generointia.");
+      setErrorMessage("Valitse työpaikka ennen hakemuksen generointia.");
       return false;
     }
 
@@ -1796,7 +1809,7 @@ export default function Home() {
         form.targetJob || searchProfile.desiredRoles
           ? `Sopii profiiliin: ${form.targetJob || searchProfile.desiredRoles}`
           : "",
-      source: "LisÃ¤tty kÃ¤sin",
+      source: "Lisätty käsin",
       matchScore: safeMatchScore(82),
       status: "saved",
       priority: "medium",
@@ -1815,7 +1828,7 @@ export default function Home() {
     setActiveJobId(job.id);
     setCurrentJobIndex(0); 
     setJobForm(emptyJobForm);
-    setMessage("TyÃ¶paikka lisÃ¤tty listaan.");
+    setMessage("Työpaikka lisätty listaan.");
     setTab("jobs");
     setTimeout(() => setMessage(""), 2500);
 
@@ -1879,9 +1892,9 @@ export default function Home() {
           languages: form.languages,
           onlyActive: true,
           currentDate: currentDate,
-          sources: ["Duunitori", "Oikotie", "LinkedIn", "TyÃ¶markkinatori"],
+          sources: ["Duunitori", "Oikotie", "LinkedIn", "Työmarkkinatori"],
           strictFreshness: true,
-          instructions: "Hae vain oikeasti NYT avoinna olevia, aitoja tyÃ¶paikkoja useista lÃ¤hteistÃ¤. Ã„lÃ¤ keksi ilmoituksia Ã¤lÃ¤kÃ¤ palauta vanhoja (esim. vuodelta 2024 tai 2025)."
+          instructions: "Hae vain oikeasti NYT avoinna olevia, aitoja työpaikkoja useista lähteistä. Älä keksi ilmoituksia äläkä palauta vanhoja (esim. vuodelta 2024 tai 2025)."
         }),
       });
 
@@ -1889,7 +1902,7 @@ export default function Home() {
       const parsed = safeJsonParseJobs(data.output || "[]");
 
       if (!parsed.length) {
-        setErrorMessage("TyÃ¶paikkaehdotuksia ei saatu muodostettua.");
+        setErrorMessage("Työpaikkaehdotuksia ei saatu muodostettua.");
         return;
       }
 
@@ -1911,7 +1924,7 @@ export default function Home() {
         setActiveJobId(newJobs[0].id);
       }
     setTab("jobs");
-    setMessage("TyÃ¶paikkaehdotukset lisÃ¤tty.");
+    setMessage("Työpaikkaehdotukset lisätty.");
 
       const session = getSession();
       if(session) {
@@ -1928,7 +1941,7 @@ export default function Home() {
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
       console.error(error);
-      setErrorMessage("TyÃ¶paikkaehdotusten haku epÃ¤onnistui.");
+      setErrorMessage("Työpaikkaehdotusten haku epäonnistui.");
     } finally {
       setLoadingJobs(false);
     }
@@ -1939,14 +1952,14 @@ export default function Home() {
     if (currentJobIndex < filteredJobs.length - 1) {
       setCurrentJobIndex(prev => prev + 1);
     } else {
-      setMessage("KÃ¤vit kaikki suodatetut tyÃ¶paikat lÃ¤pi!");
+      setMessage("Kävit kaikki suodatetut työpaikat läpi!");
       setTimeout(() => setMessage(""), 3000);
     }
   };
 
   const handleSaveJob = (jobId: string) => {
     updateJob(jobId, { favorite: true });
-    setMessage("Paikka tallennettu suosikkeihin! ðŸ’š");
+    setMessage("Paikka tallennettu suosikkeihin! 💚");
     setTimeout(() => setMessage(""), 2000);
     
     if (currentJobIndex < filteredJobs.length - 1) {
@@ -1962,7 +1975,7 @@ export default function Home() {
     }
 
     if (!activeJob) {
-      setErrorMessage("Valitse tyÃ¶paikka ennen kohdistetun CV:n luontia.");
+      setErrorMessage("Valitse työpaikka ennen kohdistetun CV:n luontia.");
       return;
     }
 
@@ -1974,7 +1987,7 @@ export default function Home() {
 
     const session = getSession();
     if (!session) {
-      setErrorMessage("Kirjaudu sisÃ¤Ã¤n jatkaaksesi.");
+      setErrorMessage("Kirjaudu sisään jatkaaksesi.");
       return;
     }
 
@@ -2019,7 +2032,7 @@ export default function Home() {
       setSavedCvVariants((prev) => [item, ...prev]);
       setCvResult(`CV_BODY:\n${parsed}`);
       setTab("cv");
-      setMessage("TyÃ¶paikkaan sopiva CV-versio luotu.");
+      setMessage("Työpaikkaan sopiva CV-versio luotu.");
       setTimeout(() => setMessage(""), 2500);
 
       if(session) {
@@ -2030,7 +2043,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error(error);
-      setErrorMessage("TyÃ¶paikkaan sopivan CV-version luonti epÃ¤onnistui.");
+      setErrorMessage("Työpaikkaan sopivan CV-version luonti epäonnistui.");
     } finally {
       setLoadingTailoredCv(false);
     }
@@ -2045,7 +2058,7 @@ export default function Home() {
 
     const session = getSession();
     if (!session) {
-      setErrorMessage("Kirjaudu sisÃ¤Ã¤n jatkaaksesi.");
+      setErrorMessage("Kirjaudu sisään jatkaaksesi.");
       return;
     }
 
@@ -2078,7 +2091,7 @@ export default function Home() {
       setTab("cv");
     } catch (error) {
       console.error(error);
-      setErrorMessage("Virhe yhteydessÃ¤ palvelimeen.");
+      setErrorMessage("Virhe yhteydessä palvelimeen.");
     } finally {
       setLoadingCv(false);
     }
@@ -2092,7 +2105,7 @@ export default function Home() {
 
     const session = getSession();
     if (!session) {
-      setErrorMessage("Sinun tÃ¤ytyy kirjautua sisÃ¤Ã¤n jatkaaksesi.");
+      setErrorMessage("Sinun täytyy kirjautua sisään jatkaaksesi.");
       return;
     }
 
@@ -2144,7 +2157,7 @@ export default function Home() {
 
       setSavedLetters((prev) => [savedLetter, ...prev]);
       setTab("cv"); 
-      setMessage("Hakemus luotu valittuun tyÃ¶paikkaan.");
+      setMessage("Hakemus luotu valittuun työpaikkaan.");
       setTimeout(() => setMessage(""), 2500);
 
       if(session) {
@@ -2164,7 +2177,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error(error);
-      setErrorMessage("Virhe yhteydessÃ¤ palvelimeen.");
+      setErrorMessage("Virhe yhteydessä palvelimeen.");
     } finally {
       setLoadingLetter(false);
     }
@@ -2215,7 +2228,7 @@ export default function Home() {
     }
     setSparringJob(job);
     setSparringChat([
-      { role: "ai", text: `Hei! Olen tekoÃ¤lyrekrytoija yrityksestÃ¤ ${job.company || "tÃ¤Ã¤ltÃ¤"}. Huomasin, ettÃ¤ haet meiltÃ¤ tehtÃ¤vÃ¤Ã¤ "${job.title}". Kertoisitko alkuun hieman itsestÃ¤si ja miksi juuri tÃ¤mÃ¤ paikka kiinnostaa sinua?` }
+      { role: "ai", text: `Hei! Olen tekoälyrekrytoija yrityksestä ${job.company || "täältä"}. Huomasin, että haet meiltä tehtävää "${job.title}". Kertoisitko alkuun hieman itsestäsi ja miksi juuri tämä paikka kiinnostaa sinua?` }
     ]);
   }
 
@@ -2229,7 +2242,7 @@ export default function Home() {
     setIsSparringTyping(true);
 
     setTimeout(() => {
-      setSparringChat([...newChat, { role: "ai", text: "Kiitos vastauksestasi! Se kuulostaa erittÃ¤in mielenkiintoiselta. Miten yleensÃ¤ reagoit tilanteisiin, joissa kohtaat yllÃ¤ttÃ¤viÃ¤ ongelmia tai aikataulupainetta? Voitko antaa jonkin konkreettisen esimerkin aiemmasta tyÃ¶kokemuksestasi?" }]);
+      setSparringChat([...newChat, { role: "ai", text: "Kiitos vastauksestasi! Se kuulostaa erittäin mielenkiintoiselta. Miten yleensä reagoit tilanteisiin, joissa kohtaat yllättäviä ongelmia tai aikataulupainetta? Voitko antaa jonkin konkreettisen esimerkin aiemmasta työkokemuksestasi?" }]);
       setIsSparringTyping(false);
     }, 1800);
   }
@@ -2240,14 +2253,14 @@ export default function Home() {
     setErrorMessage("");
     
     setTimeout(() => {
-      setSkillOutput("Proaktiivinen ongelmanratkaisu, TiimityÃ¶ ja fasilitointi, Aikataulutus ja organisointi");
+      setSkillOutput("Proaktiivinen ongelmanratkaisu, Tiimityö ja fasilitointi, Aikataulutus ja organisointi");
       setIsTranslating(false);
     }, 1500);
   }
 
   async function runAtsScan(job: JobItem) {
     if (!parsedCv.cvBody) {
-      setErrorMessage("Generoi ensin CV, jotta voimme vertailla sitÃ¤ ilmoitukseen.");
+      setErrorMessage("Generoi ensin CV, jotta voimme vertailla sitä ilmoitukseen.");
       return;
     }
     
@@ -2259,7 +2272,7 @@ export default function Home() {
       const fakeMatch = Math.floor(Math.random() * 30) + 60; 
       setAtsResult({
         match: fakeMatch,
-        found: ["Asiakaspalvelu", "Ongelmanratkaisu", "TiimityÃ¶skentely"],
+        found: ["Asiakaspalvelu", "Ongelmanratkaisu", "Tiimityöskentely"],
         missing: ["B2B-myynti", "Salesforce", "Proaktiivisuus"]
       });
       setIsAtsScanning(false);
@@ -2278,11 +2291,11 @@ export default function Home() {
 
     setTimeout(() => {
       setPrepQuestions([
-        { q: "Miksi olet kiinnostunut juuri tÃ¤stÃ¤ tehtÃ¤vÃ¤stÃ¤ ja yrityksestÃ¤mme?", tip: "YhdistÃ¤ yrityksen arvot tai tavoitteet omaan taustaasi ja motivaatioosi." },
-        { q: "MikÃ¤ on suurin ammatillinen saavutuksesi?", tip: "KÃ¤ytÃ¤ STAR-mallia (Tilanne, TehtÃ¤vÃ¤, Toiminta, Tulos) ja ole konkreettinen numeroiden kanssa." },
-        { q: "Miten toimit paineen alla ja tiukoissa aikatauluissa?", tip: "Anna todellinen esimerkki menneisyydestÃ¤, jolloin pysyit rauhallisena ja ratkaisit ongelman." },
-        { q: "Kerro tilanteesta, jossa olit eri mieltÃ¤ kollegan tai esihenkilÃ¶n kanssa.", tip: "Keskity siihen, miten kommunikoit rakentavasti ja pÃ¤Ã¤sitte kompromissiin." },
-        { q: "Miksi meidÃ¤n pitÃ¤isi palkata juuri sinut tÃ¤hÃ¤n rooliin?", tip: "Kertaa 2-3 vahvinta taitoasi ja osoita, miten ne suoraan ratkaisevat heidÃ¤n suurimman ongelmansa." }
+        { q: "Miksi olet kiinnostunut juuri tästä tehtävästä ja yrityksestämme?", tip: "Yhdistä yrityksen arvot tai tavoitteet omaan taustaasi ja motivaatioosi." },
+        { q: "Mikä on suurin ammatillinen saavutuksesi?", tip: "Käytä STAR-mallia (Tilanne, Tehtävä, Toiminta, Tulos) ja ole konkreettinen numeroiden kanssa." },
+        { q: "Miten toimit paineen alla ja tiukoissa aikatauluissa?", tip: "Anna todellinen esimerkki menneisyydestä, jolloin pysyit rauhallisena ja ratkaisit ongelman." },
+        { q: "Kerro tilanteesta, jossa olit eri mieltä kollegan tai esihenkilön kanssa.", tip: "Keskity siihen, miten kommunikoit rakentavasti ja pääsitte kompromissiin." },
+        { q: "Miksi meidän pitäisi palkata juuri sinut tähän rooliin?", tip: "Kertaa 2-3 vahvinta taitoasi ja osoita, miten ne suoraan ratkaisevat heidän suurimman ongelmansa." }
       ]);
       setIsPrepping(false);
     }, 2000);
@@ -2292,7 +2305,7 @@ export default function Home() {
   async function handleUpgradeToPro() {
     const session = getSession();
     if (!session || !session.user.email) {
-        setErrorMessage("Kirjaudu sisÃ¤Ã¤n pÃ¤ivittÃ¤Ã¤ksesi Pro-tasolle.");
+        setErrorMessage("Kirjaudu sisään päivittääksesi Pro-tasolle.");
         return;
     }
     
@@ -2313,11 +2326,11 @@ export default function Home() {
       if (data.url) {
         window.location.href = data.url; 
       } else {
-        setErrorMessage("Stripe virhe: " + (data.error || "Maksuikkunan avaus epÃ¤onnistui."));
+        setErrorMessage("Stripe virhe: " + (data.error || "Maksuikkunan avaus epäonnistui."));
       }
     } catch (error: any) {
       console.error(error);
-      setErrorMessage("Virhe yhteydessÃ¤ maksupalveluun: " + error.message);
+      setErrorMessage("Virhe yhteydessä maksupalveluun: " + error.message);
     }
   }
 
@@ -2346,14 +2359,14 @@ export default function Home() {
       const session = getSession();
       if (!session?.user?.id || !session?.user?.email) return;
 
-      const confirm1 = confirm("VAROITUS: Kaikki tietosi ja Pro-tilauksesi poistetaan vÃ¤littÃ¶mÃ¤sti. TÃ¤tÃ¤ ei voi peruuttaa.");
+      const confirm1 = confirm("VAROITUS: Kaikki tietosi ja Pro-tilauksesi poistetaan välittömästi. Tätä ei voi peruuttaa.");
       if (!confirm1) return;
 
       const confirm2 = prompt("Kirjoita 'POISTA' vahvistaaksesi poiston.");
       if (confirm2 !== "POISTA") return;
 
       try {
-        setMessage("Poistetaan tiliÃ¤ ja peruutetaan tilausta...");
+        setMessage("Poistetaan tiliä ja peruutetaan tilausta...");
         const res = await fetch("/api/delete-account", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -2367,11 +2380,11 @@ export default function Home() {
           if (typeof window !== "undefined") {
             localStorage.clear(); 
           }
-          alert("Tili poistettu onnistuneesti. Toivottavasti nÃ¤hdÃ¤Ã¤n pian uudestaan!");
+          alert("Tili poistettu onnistuneesti. Toivottavasti nähdään pian uudestaan!");
           window.location.href = "/"; 
         } else {
           const errorData = await res.json();
-          alert(errorData.error || "Poisto epÃ¤onnistui. Ota yhteys tukeen.");
+          alert(errorData.error || "Poisto epäonnistui. Ota yhteys tukeen.");
         }
       } catch (err) {
         alert("Yhteysvirhe poiston aikana.");
@@ -2403,7 +2416,7 @@ export default function Home() {
         .light-theme .from-zinc-900\\/50 { --tw-gradient-from: #F3F4F6 !important; }
         .light-theme .bg-black\\/80 { background-color: rgba(255, 255, 255, 0.8) !important; }
         
-        /* Poikkeukset nappeihin, joissa pitÃ¤Ã¤ sÃ¤ilyttÃ¤Ã¤ vÃ¤rit */
+        /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
       <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-32 sm:pb-10 transition-colors duration-300">
@@ -2413,33 +2426,33 @@ export default function Home() {
   
   {/* 1. TIEDOT */}
   <a href="#hakijan-tiedot" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-    <span className="text-lg" aria-hidden="true">ðŸ‘¤</span> Tiedot
+    <span className="text-lg" aria-hidden="true">👤</span> Tiedot
   </a>
 
   {/* 2. HAKU */}
   <a href="#tyonhaku" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-    <span className="text-lg" aria-hidden="true">ðŸ”</span> Haku
+    <span className="text-lg" aria-hidden="true">🔍</span> Haku
   </a>
 
   {/* 3. TULOKSET */}
   <a href="#studio-tulokset" className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold text-[#00BFA6]`}>
-    <span className="text-lg" aria-hidden="true">âœ¨</span> Tulokset
+    <span className="text-lg" aria-hidden="true">✨</span> Tulokset
   </a>
 
-  {/* 4. TYÃ–KALUT (Mobiilissa) */}
+  {/* 4. TYÖKALUT (Mobiilissa) */}
   <button 
     onClick={() => router.push('/tyokalut')} 
     className={`flex flex-1 flex-col items-center gap-1 text-[9px] font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} focus-visible:outline-none`}
   >
-    <span className="text-lg" aria-hidden="true">ðŸ› ï¸</span> TyÃ¶kalut
+    <span className="text-lg" aria-hidden="true">🛠️</span> Työkalut
   </button>
 
-  {/* 5. PRO (Pysyy aina tÃ¤ssÃ¤) */}
+  {/* 5. PRO (Pysyy aina tässä) */}
   <button 
     onClick={() => setShowPaywall(true)} 
     className="flex flex-1 flex-col items-center gap-1 text-[9px] font-black text-[#FF6F3C] animate-pulse focus-visible:outline-none"
   >
-    <span className="text-lg" aria-hidden="true">â­</span> PRO
+    <span className="text-lg" aria-hidden="true">⭐</span> PRO
   </button>
 </nav>
 
@@ -2449,10 +2462,10 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <span className="font-black text-2xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
               
-              {/* UUSI: NÃ¤yttÃ¤Ã¤ Pro-tagin, jos kÃ¤yttÃ¤jÃ¤ on maksanut */}
+              {/* UUSI: Näyttää Pro-tagin, jos käyttäjä on maksanut */}
               {isPro ? (
                 <span className="hidden sm:inline-block px-3 py-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black tracking-widest uppercase rounded-full shadow-[0_0_15px_rgba(250,204,21,0.4)]">
-                  Pro JÃ¤sen
+                  Pro Jäsen
                 </span>
               ) : (
                 <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest hidden sm:block">Studio</div>
@@ -2461,13 +2474,13 @@ export default function Home() {
             
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:w-auto">
               
-              {/* UUSI: PRO-nappi tyÃ¶pÃ¶ydÃ¤lle */}
+              {/* UUSI: PRO-nappi työpöydälle */}
               {!isPro && (
                 <button 
                   onClick={() => setShowPaywall(true)} 
                   className="hidden md:flex bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black px-6 py-2 rounded-xl text-sm font-black hover:scale-105 transition-transform shadow-[0_0_15px_rgba(0,191,166,0.3)]"
                 >
-                  â­ PÃ„IVITÃ„ PRO
+                  ⭐ PÄIVITÄ PRO
                 </button>
               )}
 
@@ -2475,14 +2488,14 @@ export default function Home() {
                 onClick={() => setShowSettings(true)}
                 className="rounded-2xl border border-white/10 px-4 py-2 text-xs sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none"
               >
-                âš™ï¸ ASETUKSET
+                ⚙️ ASETUKSET
               </button>
 
               <button
                 onClick={() => router.push('/tyokalut')}
                 className="hidden sm:inline-block rounded-2xl border border-purple-500/30 bg-purple-500/10 px-4 py-2 text-xs sm:text-sm font-black text-purple-400 hover:bg-purple-500/20 hover:text-purple-300 transition-all whitespace-nowrap focus-visible:outline-none"
               >
-                ðŸ› ï¸ TYÃ–KALUPAKKI
+                🛠️ TYÖKALUPAKKI
               </button>
 
               <button
@@ -2490,7 +2503,7 @@ export default function Home() {
                 className="rounded-2xl border border-white/10 px-4 py-2 text-xs sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none"
                 aria-label={theme === 'light' ? 'Vaihda tummaan teemaan' : 'Vaihda vaaleaan teemaan'}
               >
-                {theme === 'light' ? 'ðŸŒ™ TUMMA' : 'â˜€ï¸ VAALEA'}
+                {theme === 'light' ? '🌙 TUMMA' : '☀️ VAALEA'}
               </button>
             </div>
           </div>
@@ -2505,7 +2518,7 @@ export default function Home() {
             <div className="grid gap-16 lg:items-center">
               <div>
                 <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-8">
-                  Tee tyÃ¶hausta <span className="text-[#00BFA6]">helppoa.</span>
+                  Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
                 </h1>
 
                 <div className="flex flex-col sm:flex-row gap-5">
@@ -2516,7 +2529,7 @@ export default function Home() {
                     aria-expanded={showHelp}
                     aria-controls="help-section"
                   >
-                    <span className="text-2xl" aria-hidden="true">ðŸ’¡</span> {showHelp ? "Piilota ohjeet" : "NÃ¤ytÃ¤ selkeÃ¤t kÃ¤yttÃ¶ohjeet"}
+                    <span className="text-2xl" aria-hidden="true">💡</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
                   </button>
 
                   <button
@@ -2524,7 +2537,7 @@ export default function Home() {
                     onClick={fillExample}
                     className="bg-white text-black px-10 py-5 rounded-[24px] text-lg font-black hover:bg-gray-200 transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                   >
-                    TÃ¤ytÃ¤ esimerkki
+                    Täytä esimerkki
                   </button>
                 </div>
               </div>
@@ -2537,16 +2550,16 @@ export default function Home() {
           <section id="help-section" className="max-w-7xl mx-auto px-8 mt-12 animate-in fade-in slide-in-from-top-6" aria-labelledby="help-heading">
             <div className="rounded-[40px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-10 sm:p-16 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
-                <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">NÃ¤in kÃ¤ytÃ¤t Duuniharavaa</h2>
-                <button onClick={() => setShowHelp(false)} aria-label="Sulje ohjeet" className="text-gray-400 hover:text-white font-bold p-2 text-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">âœ• Sulje</button>
+                <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
+                <button onClick={() => setShowHelp(false)} aria-label="Sulje ohjeet" className="text-gray-400 hover:text-white font-bold p-2 text-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">✕ Sulje</button>
               </div>
               
               <div className="space-y-10 text-gray-300 text-lg leading-relaxed">
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
                   <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl" aria-hidden="true">1</div>
                   <div className="mt-2">
-                    <strong className="text-white block text-2xl mb-3">TÃ¤ytÃ¤ omat tietosi</strong>
-                    Aloita alempaa laatikosta nimeltÃ¤ "Vaihe 1: Hakijan tiedot". Kirjoita nimesi, tyÃ¶kokemuksesi ja koulutuksesi. Voit myÃ¶s vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoÃ¤ly lukee sen puolestasi.
+                    <strong className="text-white block text-2xl mb-3">Täytä omat tietosi</strong>
+                    Aloita alempaa laatikosta nimeltä "Vaihe 1: Hakijan tiedot". Kirjoita nimesi, työkokemuksesi ja koulutuksesi. Voit myös vain valita ja ladata tietokoneeltasi vanhan CV:n PDF-muodossa, niin tekoäly lukee sen puolestasi.
                   </div>
                 </div>
 
@@ -2554,15 +2567,15 @@ export default function Home() {
                   <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#00BFA6] text-black font-black flex items-center justify-center text-3xl" aria-hidden="true">2</div>
                   <div className="mt-2">
                     <strong className="text-white block text-2xl mb-3">Paina "Generoi CV"</strong>
-                    Rullaa Vaihe 1 -laatikon loppuun ja paina vihreÃ¤Ã¤ nappia. TekoÃ¤ly muotoilee sinulle uuden, hienon CV:n. NÃ¤et esikatselun sivun oikeassa laidassa (tai mobiilissa alhaalla). Voit ladata sen suoraan koneellesi PDF-napista.
+                    Rullaa Vaihe 1 -laatikon loppuun ja paina vihreää nappia. Tekoäly muotoilee sinulle uuden, hienon CV:n. Näet esikatselun sivun oikeassa laidassa (tai mobiilissa alhaalla). Voit ladata sen suoraan koneellesi PDF-napista.
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
                   <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl" aria-hidden="true">3</div>
                   <div className="mt-2">
-                    <strong className="text-white block text-2xl mb-3">Etsi tyÃ¶paikkoja</strong>
-                    Siirry "Vaihe 2: Hakuprofiili" -laatikkoon. Kerro siellÃ¤, millaista tyÃ¶tÃ¤ etsit (esim. "MyyjÃ¤, Uusimaa"). Paina "Ehdota tyÃ¶paikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia, voimassa olevia avoimia tehtÃ¤viÃ¤ ja tuo ne nÃ¤kyviin.
+                    <strong className="text-white block text-2xl mb-3">Etsi työpaikkoja</strong>
+                    Siirry "Vaihe 2: Hakuprofiili" -laatikkoon. Kerro siellä, millaista työtä etsit (esim. "Myyjä, Uusimaa"). Paina "Ehdota työpaikkoja" -nappia, jolloin ohjelma etsii sinulle sopivia, voimassa olevia avoimia tehtäviä ja tuo ne näkyviin.
                   </div>
                 </div>
 
@@ -2570,14 +2583,14 @@ export default function Home() {
                   <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#FF6F3C] text-black font-black flex items-center justify-center text-3xl" aria-hidden="true">4</div>
                   <div className="mt-2">
                     <strong className="text-white block text-2xl mb-3">Tee hakemus napin painalluksella</strong>
-                    Sivun oikeassa reunassa (tai mobiilissa alempana) on vÃ¤lilehdet: "CV", "TyÃ¶paikat" ja "Hakemukset". Valitse listalta kiinnostava tyÃ¶paikka ja pyydÃ¤ tekoÃ¤lyÃ¤ kirjoittamaan siihen valmis, rÃ¤Ã¤tÃ¤lÃ¶ity tyÃ¶hakemus yhdellÃ¤ klikkauksella.
+                    Sivun oikeassa reunassa (tai mobiilissa alempana) on välilehdet: "CV", "Työpaikat" ja "Hakemukset". Valitse listalta kiinnostava työpaikka ja pyydä tekoälyä kirjoittamaan siihen valmis, räätälöity työhakemus yhdellä klikkauksella.
                   </div>
                 </div>
               </div>
 
               <div className="mt-12 pt-10 border-t border-white/10 text-center sm:text-left">
                 <button onClick={() => setShowHelp(false)} className="rounded-2xl bg-white px-10 py-5 text-lg font-black text-black transition-all hover:bg-gray-200 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.2)] w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]">
-                  SelvÃ¤, ymmÃ¤rsin! Aloitetaan!
+                  Selvä, ymmärsin! Aloitetaan!
                 </button>
               </div>
             </div>
@@ -2609,11 +2622,11 @@ export default function Home() {
                   : "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1"
               }`}
             >
-              Luo tÃ¤ysin uusi CV
+              Luo täysin uusi CV
             </button>
 
             <div className="ml-auto hidden text-base font-medium text-gray-500 lg:block" aria-live="polite">
-              Pilvitallennus aktiivinen (Supabase) â˜ï¸
+              Pilvitallennus aktiivinen (Supabase) ☁️
             </div>
           </div>
 
@@ -2623,7 +2636,7 @@ export default function Home() {
                 id="hakijan-tiedot"
                 step="Vaihe 1"
                 title="Hakijan tiedot"
-                description="TÃ¤ytÃ¤ tietosi huolellisesti tai lataa vanha CV:si. NÃ¤itÃ¤ kÃ¤ytetÃ¤Ã¤n pohjana kaikessa tekoÃ¤lyn tekemÃ¤ssÃ¤ tyÃ¶ssÃ¤."
+                description="Täytä tietosi huolellisesti tai lataa vanha CV:si. Näitä käytetään pohjana kaikessa tekoälyn tekemässä työssä."
                 theme={theme}
                 action={
                   <div className="flex gap-3">
@@ -2632,12 +2645,12 @@ export default function Home() {
                       onClick={clearForm}
                       className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-gray-300 transition-all hover:bg-white/10 hover:border-red-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500"
                     >
-                      TyhjennÃ¤
+                      Tyhjennä
                     </button>
                   </div>
                 }
               >
-                <form onSubmit={handleCvSubmit} className="space-y-10 mt-6">
+                <form onSubmit={handleCvSubmit} className="space-y-12 mt-8">
                   {mode === "improve" && (
                     <div>
                       <label htmlFor="cvFileUpload" className="mb-4 block text-sm font-bold text-gray-400">
@@ -2658,7 +2671,7 @@ export default function Home() {
                         </label>
                         {form.cvFileName && (
                           <span className="text-base font-medium text-[#00BFA6] break-words px-2" aria-live="polite">
-                            âœ“ {form.cvFileName} valittu
+                            ✓ {form.cvFileName} valittu
                           </span>
                         )}
                       </div>
@@ -2670,7 +2683,7 @@ export default function Home() {
                        <label htmlFor="input-name" className={LabelClass(theme)}>Koko nimi</label>
                        <input
                          id="input-name"
-                         placeholder="Esim. Matti MeikÃ¤lÃ¤inen"
+                         placeholder="Esim. Matti Meikäläinen"
                          value={form.name}
                          onChange={(e) => updateField("name", e.target.value)}
                          className={InputClass(theme)}
@@ -2687,7 +2700,7 @@ export default function Home() {
                        />
                     </div>
                     <div>
-                       <label htmlFor="input-email" className={LabelClass(theme)}>SÃ¤hkÃ¶posti</label>
+                       <label htmlFor="input-email" className={LabelClass(theme)}>Sähköposti</label>
                        <input
                          id="input-email"
                          placeholder="oma@email.com"
@@ -2708,22 +2721,25 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="pt-8">
+                  <div className="pt-4">
                     <div className="flex justify-between items-end mb-3">
                       <label htmlFor="input-targetJob" className={LabelClass(theme)}>Tavoiteltu rooli / ammatti</label>
                     </div>
                     <input
                       id="input-targetJob"
-                      placeholder="MitÃ¤ tyÃ¶tÃ¤ haluat hakea? (esim. MyyntipÃ¤Ã¤llikkÃ¶, Koodari)"
+                      placeholder="Mitä työtä haluat hakea? (esim. Myyntipäällikkö, Koodari)"
                       value={form.targetJob}
                       onChange={(e) => updateField("targetJob", e.target.value)}
                       className={InputClass(theme)}
                       aria-describedby="targetJob-hint"
                     />
-                    <p id="targetJob-hint" className="mt-2 text-[12px] leading-5 text-gray-500">Kirjoita tähän tavoiterooli. Se ohjaa CV:n profiilitekstiä.</p>
+                    <p id="targetJob-hint" className="text-xs text-[#00BFA6] font-bold mt-3 ml-2">💡 Tekoäly kirjoittaa tämän perusteella sinulle myyvän "Hookin" (Profiilitekstin), jolla erotut muista.</p>
+                    <FieldHint theme={theme}>
+                      Kirjoita tähän se työ jota oikeasti tavoittelet juuri nyt. Tämä ohjaa sekä CV:n profiilitekstiä, työnhakua että hakemusten sävyä.
+                    </FieldHint>
                   </div>
 
-                  <div className="pt-8">
+                  <div className="pt-4">
                     <label htmlFor="input-education" className={LabelClass(theme)}>Koulutus</label>
                     <textarea
                       id="input-education"
@@ -2732,43 +2748,55 @@ export default function Home() {
                       onChange={(e) => updateField("education", e.target.value)}
                       className={TextareaClass("min-h-[140px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Lisää uusin koulutus ensin. Jos koulutusta on vähän, myös kurssit, sertifikaatit ja lyhyemmät valmennukset kannattaa kirjoittaa tähän.
+                    </FieldHint>
                   </div>
 
-                  <div className="pt-8">
-                    <label htmlFor="input-experience" className={LabelClass(theme)}>TyÃ¶kokemus</label>
+                  <div className="pt-4">
+                    <label htmlFor="input-experience" className={LabelClass(theme)}>Työkokemus</label>
                     <textarea
                       id="input-experience"
-                      placeholder="TyÃ¶nantaja | TyÃ¶tehtÃ¤vÃ¤ | 01/2020 - 05/2022 (tai 'Nykyinen')&#10;- Lyhyt kuvaus tyÃ¶tehtÃ¤vistÃ¤si...&#10;- Toinen kuvaus..."
+                      placeholder="Työnantaja | Työtehtävä | 01/2020 - 05/2022 (tai 'Nykyinen')&#10;- Lyhyt kuvaus työtehtävistäsi...&#10;- Toinen kuvaus..."
                       value={form.experience}
                       onChange={(e) => updateField("experience", e.target.value)}
                       className={TextareaClass("min-h-[180px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Kirjoita tähän mitä teit, mitä vastasit ja mitä sait aikaan. Jos sinulla on numeroita, tuloksia tai vastuuta, ne kannattaa lisätä tänne näkyviin.
+                    </FieldHint>
                   </div>
 
                   {/* UUSI OSIO: PROJEKTIT */}
-                  <div className="pt-8">
+                  <div className="pt-4">
                     <label htmlFor="input-projects" className={LabelClass(theme)}>Projektit & Portfoliolinkit <span className="text-[#00BFA6] font-normal lowercase">(Vapaaehtoinen)</span></label>
                     <textarea
                       id="input-projects"
-                      placeholder="Projektin nimi | Vuosi&#10;- MitÃ¤ teit ja mitÃ¤ sait aikaan?&#10;- Linkki: https://..."
+                      placeholder="Projektin nimi | Vuosi&#10;- Mitä teit ja mitä sait aikaan?&#10;- Linkki: https://..."
                       value={form.projects}
                       onChange={(e) => updateField("projects", e.target.value)}
                       className={TextareaClass("min-h-[140px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Tämä kohta auttaa erityisesti silloin, jos työkokemusta on vähemmän. Tänne sopivat myös omat projektit, portfoliojutut ja sivutyöt.
+                    </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 pt-8">
+                  <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 pt-6">
                     <div>
                       <div className="flex justify-between items-end mb-3">
                         <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
                       </div>
                       <textarea
                         id="input-languages"
-                        placeholder="Suomi (Ã¤idinkieli), Englanti (sujuva)..."
+                        placeholder="Suomi (äidinkieli), Englanti (sujuva)..."
                         value={form.languages}
                         onChange={(e) => updateField("languages", e.target.value)}
                         className={TextareaClass("min-h-[140px]", theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Kirjoita kieli ja taso mahdollisimman selkeästi, esimerkiksi sujuva, hyvä tai perusteet.
+                      </FieldHint>
                     </div>
                     <div>
                       <div className="flex justify-between items-end mb-3">
@@ -2778,31 +2806,38 @@ export default function Home() {
                           onClick={() => setShowSkillTranslator(true)}
                           className="text-[#00BFA6] text-xs font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded"
                         >
-                          âœ¨ KÃ¤Ã¤nnÃ¤ ammattikielelle
+                          ✨ Käännä ammattikielelle
                         </button>
                       </div>
                       <textarea
                         id="input-skills"
-                        placeholder="MitÃ¤ taitoja sinulla on? (esim. asiakaspalvelu)"
+                        placeholder="Mitä taitoja sinulla on? (esim. asiakaspalvelu)"
                         value={form.skills}
                         onChange={(e) => updateField("skills", e.target.value)}
                         className={TextareaClass("min-h-[140px]", theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Kirjoita tähän sekä pehmeät että tekniset taidot. Jos et ole varma sanamuodoista, käytä vieressä olevaa ammattikielen kääntäjää.
+                      </FieldHint>
                     </div>
                   </div>
 
-                  <div className="pt-8">
-                    <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & PÃ¤tevyydet</label>
+                  <div className="pt-4">
+                    <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
                     <textarea
                       id="input-cards"
-                      placeholder="TyÃ¶turvallisuuskortti, B-ajokortti..."
+                      placeholder="Työturvallisuuskortti, B-ajokortti..."
                       value={form.cards}
                       onChange={(e) => updateField("cards", e.target.value)}
                       className={TextareaClass("min-h-[120px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Lisää tähän kaikki kortit, luvat ja pätevyydet jotka voivat auttaa työnhaussa. Esimerkiksi hygieniapassi, työturvallisuuskortti tai ajokortti.
+                    </FieldHint>
                   </div>
 
-                  <div className="pt-8">`r`n                    <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
+                  <div className="pt-4">
+                    <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
                   </div>
 
                   <button
@@ -2811,7 +2846,7 @@ export default function Home() {
                     className="w-full bg-[#00BFA6] text-black font-black py-6 rounded-[24px] text-2xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)] mt-8 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                     aria-live="polite"
                   >
-                    {loadingCv ? "TekoÃ¤ly rakentaa CV:tÃ¤..." : "1. GENEROI CV"}
+                    {loadingCv ? "Tekoäly rakentaa CV:tä..." : "1. GENEROI CV"}
                   </button>
                 </form>
               </SectionShell>
@@ -2819,13 +2854,13 @@ export default function Home() {
               <SectionShell
                 id="tyonhaku"
                 step="Vaihe 2"
-                title="Hakuprofiili & TyÃ¶nhaku"
-                description="Kerro tekoÃ¤lylle, millaista tyÃ¶tÃ¤ haluat. Se hakee voimassa olevat paikat puolestasi."
+                title="Hakuprofiili & Työnhaku"
+                description="Kerro tekoälylle, millaista työtä haluat. Se hakee voimassa olevat paikat puolestasi."
                 theme={theme}
               >
                 <div className="space-y-10 mt-10">
                   <div>
-                    <label htmlFor="search-roles" className={LabelClass(theme)}>MinkÃ¤ alan tÃ¶itÃ¤ etsit?</label>
+                    <label htmlFor="search-roles" className={LabelClass(theme)}>Minkä alan töitä etsit?</label>
                     <textarea
                       id="search-roles"
                       placeholder="Esim. Myyntineuvottelija, Koodari, Siivooja..."
@@ -2835,19 +2870,25 @@ export default function Home() {
                       }
                       className={TextareaClass("min-h-[140px]", theme)}
                     />
+                    <FieldHint theme={theme}>
+                      Kirjoita tähän ihan suoraan millaisia rooleja oikeasti haet. Voit kirjoittaa useita vaihtoehtoja, esimerkiksi myyjä, asiakaspalvelu, varasto tai frontend.
+                    </FieldHint>
                   </div>
                   
                   <div>
-                     <label htmlFor="search-location" className={LabelClass(theme)}>MiltÃ¤ alueelta?</label>
+                     <label htmlFor="search-location" className={LabelClass(theme)}>Miltä alueelta?</label>
                      <input
                        id="search-location"
-                       placeholder="Esim. Uusimaa, EtÃ¤tyÃ¶"
+                       placeholder="Esim. Uusimaa, Etätyö"
                        value={searchProfile.desiredLocation}
                        onChange={(e) =>
                          updateSearchProfile("desiredLocation", e.target.value)
                        }
                        className={InputClass(theme)}
                      />
+                     <FieldHint theme={theme}>
+                       Voit kirjoittaa kaupungin, maakunnan tai vaikka etätyön. Tämä helpottaa sitä, että ehdotukset tuntuvat oikeilta eivätkä liian kaukaisilta.
+                     </FieldHint>
                   </div>
 
                   <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
@@ -2862,33 +2903,42 @@ export default function Home() {
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Esimerkiksi kokoaikainen, osa-aikainen, keikkatyö tai harjoittelu.
+                      </FieldHint>
                     </div>
                     <div>
                       <label htmlFor="search-shiftPreference" className={LabelClass(theme)}>Vuorotoive</label>
                       <input
                         id="search-shiftPreference"
-                        placeholder="Esim. PÃ¤ivÃ¤tyÃ¶"
+                        placeholder="Esim. Päivätyö"
                         value={searchProfile.shiftPreference}
                         onChange={(e) =>
                           updateSearchProfile("shiftPreference", e.target.value)
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Esimerkiksi päivätyö, ilta, yö tai joustava. Tämä suodattaa ehdotuksia järkevämmin.
+                      </FieldHint>
                     </div>
                   </div>
 
-                    <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
                     <div>
                       <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
                       <input
                         id="search-salaryWish"
-                        placeholder="Esim. 3000â‚¬ / kk"
+                        placeholder="Esim. 3000€ / kk"
                         value={searchProfile.salaryWish}
                         onChange={(e) =>
                           updateSearchProfile("salaryWish", e.target.value)
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Jos et tiedä tarkkaa summaa, arvio riittää. Tällä voi rajata liian kauas meneviä ehdotuksia pois.
+                      </FieldHint>
                     </div>
                     <div>
                       <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja (erota pilkulla)</label>
@@ -2901,10 +2951,13 @@ export default function Home() {
                         }
                         className={InputClass(theme)}
                       />
+                      <FieldHint theme={theme}>
+                        Lisää tähän esimerkiksi kielet, ajokortti, asiakaspalvelu, etä, B2B tai muu tärkeä sana jonka haluat osuvan hakuun.
+                      </FieldHint>
                     </div>
                   </div>
 
-                  <div className="pt-8">
+                  <div className="pt-4">
                     <button
                       type="button"
                       onClick={suggestJobs}
@@ -2912,35 +2965,38 @@ export default function Home() {
                       className="w-full rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-6 text-lg sm:text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_0_25px_rgba(0,191,166,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C]"
                       aria-live="polite"
                     >
-                      {loadingJobs ? "EtsitÃ¤Ã¤n..." : "2. EHDOTA TYÃ–PAIKKOJA"}
+                      {loadingJobs ? "Etsitään..." : "2. EHDOTA TYÖPAIKKOJA"}
                     </button>
+                    <FieldHint theme={theme}>
+                      Kun painat tätä, studio hakee sinulle ehdotuksia tämän profiilin perusteella ja siirtää ne heti Työpaikat-välilehden kortteihin.
+                    </FieldHint>
                   </div>
                 </div>
               </SectionShell>
             </section>
 
-            {/* OIKEA SARAKE: VÃ„LILEHDET */}
-            <section id="studio-tulokset" className="space-y-12 lg:sticky lg:top-8 lg:self-start scroll-mt-24">
+            {/* OIKEA SARAKE: VÄLILEHDET */}
+            <section id="studio-tulokset" className="space-y-10 lg:sticky lg:top-8 lg:self-start scroll-mt-24">
               
-              {/* OSTATKO PRO-TASON? Nappi nÃ¤kyy oikean sarakkeen huipulla, jos ei ole vielÃ¤ pro */}
+              {/* OSTATKO PRO-TASON? Nappi näkyy oikean sarakkeen huipulla, jos ei ole vielä pro */}
               {!isPro && (
                 <div className="flex justify-end w-full mb-4">
                   <button 
                     onClick={() => setShowPaywall(true)} 
                     className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black text-sm px-6 py-3 rounded-full hover:scale-105 transition-transform shadow-[0_0_20px_rgba(168,85,247,0.4)] flex items-center gap-2 border border-white/20"
                   >
-                    <span className="text-lg">â­</span> PÃ„IVITÃ„ PRO -TASOLLE
+                    <span className="text-lg">⭐</span> PÄIVITÄ PRO -TASOLLE
                   </button>
                 </div>
               )}
 
               <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-2xl backdrop-blur-xl transition-all ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
-                {/* VÃ„LILEHTINAPIT (ARIA TABLIST) */}
+                {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
                   className={`sticky top-0 z-40 pt-2 sm:pt-0 mb-12 flex overflow-x-auto whitespace-nowrap pb-5 gap-5 snap-x border-b custom-scrollbar ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
                   role="tablist"
-                  aria-label="PÃ¤Ã¤toiminnot"
+                  aria-label="Päätoiminnot"
                 >
                   <button
                     type="button"
@@ -2970,7 +3026,7 @@ export default function Home() {
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
-                    TyÃ¶paikat
+                    Työpaikat
                   </button>
                   <button
                     type="button"
@@ -3008,7 +3064,7 @@ export default function Home() {
                     {parsedCv.cvBody && activeJob && (
                       <div className={`flex flex-col sm:flex-row gap-5 p-6 rounded-3xl border ${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
                         <div className="flex-1">
-                          <p className={`text-base mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Valittu tyÃ¶paikka: <strong className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeJob.title}</strong></p>
+                          <p className={`text-base mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Valittu työpaikka: <strong className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeJob.title}</strong></p>
                           <button
                             type="button"
                             onClick={createTailoredCv}
@@ -3017,8 +3073,8 @@ export default function Home() {
                             aria-live="polite"
                           >
                             {loadingTailoredCv
-                              ? "Muokataan tekoÃ¤lyllÃ¤..."
-                              : "RÃ¤Ã¤tÃ¤lÃ¶i CV tÃ¤hÃ¤n tyÃ¶paikkaan"}
+                              ? "Muokataan tekoälyllä..."
+                              : "Räätälöi CV tähän työpaikkaan"}
                           </button>
                         </div>
                       </div>
@@ -3082,20 +3138,58 @@ export default function Home() {
 
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
                         <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-7 sm:p-12 shadow-xl">
-                          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div>
-                              <label htmlFor="cv-text-editor" className={`text-2xl font-black block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Muokkaa CV-tekstiÃ¤</label>
-                              <p className={`text-sm mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>TekoÃ¤lyn tuottama luonnos. Voit muokata tekstiÃ¤ tÃ¤ysin vapaasti tÃ¤ssÃ¤ ennen latausta.</p>
+                          <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="max-w-2xl">
+                              <label htmlFor="cv-text-editor" className={`text-2xl font-black block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Muokkaa CV-tekstiä</label>
+                              <p className={`mt-2 text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Muokkaa koko CV:tä suoraan tässä. Kaikki esikatselussa näkyvä sisältö päivittyy samalla.</p>
+                            </div>
+
+                            <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:grid-cols-1">
+                              <button
+                                type="button"
+                                onClick={() => copyText(cvEditorText, "CV-teksti kopioitu leikepöydälle!")}
+                                className={`rounded-2xl border px-5 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
+                              >
+                                Kopioi teksti
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateCvBody(
+                                    cvEditorText
+                                      .replace(/\n{3,}/g, "\n\n")
+                                      .split("\n")
+                                      .map((line) => line.trimEnd())
+                                      .join("\n"),
+                                  )
+                                }
+                                className={`rounded-2xl border px-5 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
+                              >
+                                Siivoa rivit
+                              </button>
                             </div>
                           </div>
+
+                          <div className={`mb-6 grid grid-cols-2 gap-3 rounded-3xl border p-4 sm:grid-cols-4 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white/80'}`}>
+                            <div>
+                              <p className={`text-[11px] font-bold uppercase tracking-[0.18em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Rivejä</p>
+                              <p className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cvEditorLineCount}</p>
+                            </div>
+                            <div>
+                              <p className={`text-[11px] font-bold uppercase tracking-[0.18em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Merkkejä</p>
+                              <p className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cvEditorCharCount}</p>
+                            </div>
+                            <div className="col-span-2 sm:col-span-2">
+                              <p className={`text-[11px] font-bold uppercase tracking-[0.18em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Muokkaa ainakin</p>
+                              <p className={`mt-2 text-sm leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Profiili, kokemus, taidot, koulutus, projektit ja yhteystiedot.</p>
+                            </div>
+                          </div>
+
                           <textarea
                             id="cv-text-editor"
-                            value={parsedCv.cvBody}
-                            onChange={(e) => {
-                              const prefix = cvResult.split("CV_BODY:")[0] || "";
-                              setCvResult(prefix + "CV_BODY:\n" + e.target.value);
-                            }}
-                            className={`min-h-[400px] w-full rounded-3xl border p-6 font-mono text-sm leading-relaxed outline-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-black/50 text-gray-200' : 'border-gray-200 bg-white text-gray-800'}`}
+                            value={cvEditorText}
+                            onChange={(e) => updateCvBody(e.target.value)}
+                            className={`min-h-[520px] w-full rounded-3xl border px-6 py-6 font-mono text-[15px] leading-8 outline-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] sm:min-h-[680px] ${theme === 'dark' ? 'border-white/10 bg-black/50 text-gray-100' : 'border-gray-200 bg-white text-gray-800'}`}
                           />
                         </div>
 
@@ -3139,21 +3233,21 @@ export default function Home() {
                         <div className={`rounded-[32px] border p-8 md:p-10 mt-16 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
                           <div className={`flex flex-wrap items-center justify-between gap-6 mb-8 border-b pb-6 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
                             <div>
-                              <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>VÃ¤rit ja Teema</p>
-                              <p className={`mt-2 text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Pikavalinnat vÃ¤reille tai sÃ¤Ã¤dÃ¤ itse.</p>
+                              <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Värit ja Teema</p>
+                              <p className={`mt-2 text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Pikavalinnat väreille tai säädä itse.</p>
                             </div>
                             <button type="button" onClick={resetCurrentStyle} className={`rounded-2xl border px-6 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-[#00BFA6]/50' : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-[#00BFA6]/50'}`}>
                               Palauta oletukset
                             </button>
                           </div>
 
-                          {/* PIKAVÃ„RIT */}
-                          <div className={`mb-10 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="PikavÃ¤riteemat">
-                            <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0369a1] ${theme === 'dark' ? 'border-white/10 hover:border-[#0369a1] hover:bg-white/5' : 'border-gray-200 hover:border-[#0369a1] hover:bg-gray-50'}`}>ðŸŒŠ Merellinen</button>
-                            <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] ${theme === 'dark' ? 'border-white/10 hover:border-[#10b981] hover:bg-white/5' : 'border-gray-200 hover:border-[#10b981] hover:bg-gray-50'}`}>ðŸŒ² MetsÃ¤</button>
-                            <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d97706] ${theme === 'dark' ? 'border-white/10 hover:border-[#d97706] hover:bg-white/5' : 'border-gray-200 hover:border-[#d97706] hover:bg-gray-50'}`}>ðŸ‚ Syksy</button>
-                            <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed] ${theme === 'dark' ? 'border-white/10 hover:border-[#7c3aed] hover:bg-white/5' : 'border-gray-200 hover:border-[#7c3aed] hover:bg-gray-50'}`}>ðŸ”® Kyber</button>
-                            <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14b8a6] ${theme === 'dark' ? 'border-white/10 hover:border-[#14b8a6] hover:bg-white/5' : 'border-gray-200 hover:border-[#14b8a6] hover:bg-gray-50'}`}>ðŸŒ‘ Tumma Tyyli</button>
+                          {/* PIKAVÄRIT */}
+                          <div className={`mb-10 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="Pikaväriteemat">
+                            <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0369a1] ${theme === 'dark' ? 'border-white/10 hover:border-[#0369a1] hover:bg-white/5' : 'border-gray-200 hover:border-[#0369a1] hover:bg-gray-50'}`}>🌊 Merellinen</button>
+                            <button type="button" onClick={() => applyPalette("#ffffff", "#f1f5f9", "#064e3b", "#022c22", "#10b981", "#0f172a", "#ffffff", "#334155")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] ${theme === 'dark' ? 'border-white/10 hover:border-[#10b981] hover:bg-white/5' : 'border-gray-200 hover:border-[#10b981] hover:bg-gray-50'}`}>🌲 Metsä</button>
+                            <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d97706] ${theme === 'dark' ? 'border-white/10 hover:border-[#d97706] hover:bg-white/5' : 'border-gray-200 hover:border-[#d97706] hover:bg-gray-50'}`}>🍂 Syksy</button>
+                            <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed] ${theme === 'dark' ? 'border-white/10 hover:border-[#7c3aed] hover:bg-white/5' : 'border-gray-200 hover:border-[#7c3aed] hover:bg-gray-50'}`}>🔮 Kyber</button>
+                            <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14b8a6] ${theme === 'dark' ? 'border-white/10 hover:border-[#14b8a6] hover:bg-white/5' : 'border-gray-200 hover:border-[#14b8a6] hover:bg-gray-50'}`}>🌑 Tumma Tyyli</button>
                           </div>
 
                           <div className="mb-10 flex flex-wrap gap-4" role="group" aria-label="CV:n asettelutyylit">
@@ -3168,7 +3262,7 @@ export default function Home() {
                                 {variant === "modern" && "Moderni"}
                                 {variant === "classic" && "Klassinen"}
                                 {variant === "compact" && "Tiivis"}
-                                {variant === "bold" && "NÃ¤yttÃ¤vÃ¤"}
+                                {variant === "bold" && "Näyttävä"}
                               </button>
                             ))}
                           </div>
@@ -3183,7 +3277,7 @@ export default function Home() {
                                   <select id="style-layout" value={customStyle.layout || "left-sidebar"} onChange={(e) => updateCustomStyle("layout", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="left-sidebar">Vasen sivupalkki</option>
                                     <option value="right-sidebar">Oikea sivupalkki</option>
-                                    <option value="top-header">YlÃ¤palkki (Koko leveys)</option>
+                                    <option value="top-header">Yläpalkki (Koko leveys)</option>
                                     <option value="minimalist">Minimalistinen (Keskitetty)</option>
                                     <option value="two-column">Jaettu kahteen sarakkeeseen</option>
                                   </select>
@@ -3198,7 +3292,7 @@ export default function Home() {
                                     <option value="clean">Puhdas (Arial)</option>
                                     <option value="tech">Tekninen (Trebuchet)</option>
                                     <option value="brutalist">Brutalistinen (Impact)</option>
-                                    <option value="playful">LeikkisÃ¤ (Comic)</option>
+                                    <option value="playful">Leikkisä (Comic)</option>
                                   </select>
                                 </div>
                                 <div>
@@ -3206,7 +3300,7 @@ export default function Home() {
                                   <select id="style-headingStyle" value={customStyle.headingStyle || "simple"} onChange={(e) => updateCustomStyle("headingStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="simple">Yksinkertainen</option>
                                     <option value="underline">Alleviivaus</option>
-                                    <option value="highlight">KorostusvÃ¤ri taustalla</option>
+                                    <option value="highlight">Korostusväri taustalla</option>
                                     <option value="boxed">Laatikko</option>
                                   </select>
                                 </div>
@@ -3223,13 +3317,13 @@ export default function Home() {
                                     <option value="normal">Normaali (Normal)</option>
                                     <option value="medium">Puolilihava (Medium)</option>
                                     <option value="bold">Lihava (Bold)</option>
-                                    <option value="black">ErittÃ¤in paksu (Black)</option>
+                                    <option value="black">Erittäin paksu (Black)</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-timelineStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Aikajanan viiva (TyÃ¶kokemus)</label>
+                                  <label htmlFor="style-timelineStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Aikajanan viiva (Työkokemus)</label>
                                   <select id="style-timelineStyle" value={customStyle.timelineStyle || "solid"} onChange={(e) => updateCustomStyle("timelineStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="solid">YhtenÃ¤inen</option>
+                                    <option value="solid">Yhtenäinen</option>
                                     <option value="dashed">Katkoviiva</option>
                                     <option value="dotted">Pisteviiva</option>
                                     <option value="none">Piilotettu</option>
@@ -3238,15 +3332,15 @@ export default function Home() {
                                 <div>
                                   <label htmlFor="style-iconStyle" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yhteystietojen ikonit</label>
                                   <select id="style-iconStyle" value={customStyle.iconStyle || "outline"} onChange={(e) => updateCustomStyle("iconStyle", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="outline">Ã„Ã¤riviivat (Outline)</option>
-                                    <option value="solid">TÃ¤ytetyt (Solid)</option>
+                                    <option value="outline">Ääriviivat (Outline)</option>
+                                    <option value="solid">Täytetyt (Solid)</option>
                                     <option value="none">Piilotettu</option>
                                   </select>
                                 </div>
                                 <div>
                                   <label htmlFor="style-imageFilter" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan filtteri</label>
                                   <select id="style-imageFilter" value={customStyle.imageFilter || "none"} onChange={(e) => updateCustomStyle("imageFilter", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="none">Normaali (VÃ¤rillinen)</option>
+                                    <option value="none">Normaali (Värillinen)</option>
                                     <option value="grayscale">Mustavalkoinen (Grayscale)</option>
                                     <option value="sepia">Seepia (Vintage)</option>
                                   </select>
@@ -3255,15 +3349,15 @@ export default function Home() {
                                   <label htmlFor="style-sidebarBorder" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin erotinviiva</label>
                                   <select id="style-sidebarBorder" value={customStyle.sidebarBorder ? "yes" : "no"} onChange={(e) => updateCustomStyle("sidebarBorder", e.target.value === "yes")} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="no">Ei viivaa</option>
-                                    <option value="yes">NÃ¤ytÃ¤ viiva</option>
+                                    <option value="yes">Näytä viiva</option>
                                   </select>
                                 </div>
                               </div>
                             </div>
 
-                            {/* VÃ„RIT */}
+                            {/* VÄRIT */}
                             <div>
-                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>VÃ¤rimaailma</h4>
+                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Värimaailma</h4>
                               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                                 <div>
                                   <label htmlFor="color-sidebarBg" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkki Bg</label>
@@ -3278,15 +3372,15 @@ export default function Home() {
                                   <input id="color-sidebarText" type="color" value={customStyle.sidebarText} onChange={(e) => updateCustomStyle("sidebarText", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-mainBg" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>PÃ¤Ã¤alue Bg</label>
+                                  <label htmlFor="color-mainBg" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalue Bg</label>
                                   <input id="color-mainBg" type="color" value={customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-mainBg2" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>PÃ¤Ã¤alue Bg 2</label>
+                                  <label htmlFor="color-mainBg2" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalue Bg 2</label>
                                   <input id="color-mainBg2" type="color" value={customStyle.mainBg2 || customStyle.mainBg} onChange={(e) => updateCustomStyle("mainBg2", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-mainText" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>PÃ¤Ã¤alue Txt</label>
+                                  <label htmlFor="color-mainText" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalue Txt</label>
                                   <input id="color-mainText" type="color" value={customStyle.mainText} onChange={(e) => updateCustomStyle("mainText", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
@@ -3294,7 +3388,7 @@ export default function Home() {
                                   <input id="color-headingColor" type="color" value={customStyle.headingColor} onChange={(e) => updateCustomStyle("headingColor", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                                 <div>
-                                  <label htmlFor="color-accentColor" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>KorostevÃ¤ri</label>
+                                  <label htmlFor="color-accentColor" className={`mb-3 block text-xs font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Korosteväri</label>
                                   <input id="color-accentColor" type="color" value={customStyle.accentColor} onChange={(e) => updateCustomStyle("accentColor", e.target.value)} className={`h-12 w-full rounded-xl border p-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-gray-50 border-gray-200'}`} />
                                 </div>
                               </div>
@@ -3305,7 +3399,7 @@ export default function Home() {
                               <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Kuviointi & Taustat</h4>
                               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 <div>
-                                  <label htmlFor="style-pattern" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>PÃ¤Ã¤alueen kuviointi</label>
+                                  <label htmlFor="style-pattern" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalueen kuviointi</label>
                                   <select id="style-pattern" value={customStyle.pattern || "none"} onChange={(e) => updateCustomStyle("pattern", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
                                     <option value="none">Ei kuviointia</option>
                                     <option value="dots">Pisteet (Dots)</option>
@@ -3313,7 +3407,7 @@ export default function Home() {
                                     <option value="diagonal">Vinoviivat (Diagonal)</option>
                                     <option value="grid">Ruudukko (Grid)</option>
                                     <option value="cross">Ristit (Cross)</option>
-                                    <option value="intersecting">RisteÃ¤vÃ¤t viivat</option>
+                                    <option value="intersecting">Risteävät viivat</option>
                                     <option value="waves">Aallot (Waves)</option>
                                     <option value="zigzag">Sahalaita (Zigzag)</option>
                                   </select>
@@ -3327,37 +3421,37 @@ export default function Home() {
                                     <option value="diagonal">Vinoviivat (Diagonal)</option>
                                     <option value="grid">Ruudukko (Grid)</option>
                                     <option value="cross">Ristit (Cross)</option>
-                                    <option value="intersecting">RisteÃ¤vÃ¤t viivat</option>
+                                    <option value="intersecting">Risteävät viivat</option>
                                     <option value="waves">Aallot (Waves)</option>
                                     <option value="zigzag">Sahalaita (Zigzag)</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-mainGradient" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>PÃ¤Ã¤alueen liukuvÃ¤ri (Suunta)</label>
+                                  <label htmlFor="style-mainGradient" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Pääalueen liukuväri (Suunta)</label>
                                   <select id="style-mainGradient" value={customStyle.mainGradientDirection || "none"} onChange={(e) => updateCustomStyle("mainGradientDirection", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="none">Ei liukuvÃ¤riÃ¤</option>
-                                    <option value="to bottom">YlhÃ¤Ã¤ltÃ¤ alas</option>
+                                    <option value="none">Ei liukuväriä</option>
+                                    <option value="to bottom">Ylhäältä alas</option>
                                     <option value="to right">Vasemmalta oikealle</option>
                                     <option value="135deg">Viistosti (135deg)</option>
-                                    <option value="circle">YmpyrÃ¤ (Radial)</option>
+                                    <option value="circle">Ympyrä (Radial)</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <label htmlFor="style-sidebarGradient" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin liukuvÃ¤ri (Suunta)</label>
+                                  <label htmlFor="style-sidebarGradient" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivupalkin liukuväri (Suunta)</label>
                                   <select id="style-sidebarGradient" value={customStyle.sidebarGradientDirection || "none"} onChange={(e) => updateCustomStyle("sidebarGradientDirection", e.target.value as any)} className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
-                                    <option value="none">Ei liukuvÃ¤riÃ¤</option>
-                                    <option value="to bottom">YlhÃ¤Ã¤ltÃ¤ alas</option>
+                                    <option value="none">Ei liukuväriä</option>
+                                    <option value="to bottom">Ylhäältä alas</option>
                                     <option value="to right">Vasemmalta oikealle</option>
                                     <option value="135deg">Viistosti (135deg)</option>
-                                    <option value="circle">YmpyrÃ¤ (Radial)</option>
+                                    <option value="circle">Ympyrä (Radial)</option>
                                   </select>
                                 </div>
                               </div>
                             </div>
 
-                            {/* MITAT & VÃ„LIT */}
+                            {/* MITAT & VÄLIT */}
                             <div>
-                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Mitat & VÃ¤lit</h4>
+                              <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Mitat & Välit</h4>
                               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                                 <div>
                                   <label htmlFor="range-headingSize" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikoiden koko ({customStyle.headingSize || 16}px)</label>
@@ -3368,7 +3462,7 @@ export default function Home() {
                                   <input id="range-contactSize" type="range" min={10} max={18} value={customStyle.contactSize || 14} onChange={(e) => updateCustomStyle("contactSize", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-itemSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Luetteloiden vÃ¤listys ({customStyle.itemSpacing || 12}px)</label>
+                                  <label htmlFor="range-itemSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Luetteloiden välistys ({customStyle.itemSpacing || 12}px)</label>
                                   <input id="range-itemSpacing" type="range" min={4} max={32} value={customStyle.itemSpacing || 12} onChange={(e) => updateCustomStyle("itemSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
@@ -3376,7 +3470,7 @@ export default function Home() {
                                   <input id="range-imageBorderWidth" type="range" min={0} max={10} value={customStyle.imageBorderWidth || 0} onChange={(e) => updateCustomStyle("imageBorderWidth", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-contactSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yhteystietojen ylÃ¤vÃ¤li ({customStyle.contactSpacing || 40}px)</label>
+                                  <label htmlFor="range-contactSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Yhteystietojen yläväli ({customStyle.contactSpacing || 40}px)</label>
                                   <input id="range-contactSpacing" type="range" min={0} max={120} value={customStyle.contactSpacing || 40} onChange={(e) => updateCustomStyle("contactSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
@@ -3388,7 +3482,7 @@ export default function Home() {
                                   <input id="range-sidebarPatternOpacity" type="range" min={1} max={30} value={customStyle.sidebarPatternOpacity || 5} onChange={(e) => updateCustomStyle("sidebarPatternOpacity", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-pagePadding" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivun sisÃ¤marginaalit ({customStyle.pagePadding || 48}px)</label>
+                                  <label htmlFor="range-pagePadding" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sivun sisämarginaalit ({customStyle.pagePadding || 48}px)</label>
                                   <input id="range-pagePadding" type="range" min={20} max={80} value={customStyle.pagePadding || 48} onChange={(e) => updateCustomStyle("pagePadding", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
@@ -3404,19 +3498,19 @@ export default function Home() {
                                   <input id="range-bodySize" type="range" min={12} max={20} value={customStyle.bodySize} onChange={(e) => updateCustomStyle("bodySize", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-borderRadius" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>SisÃ¤laatikoiden pyÃ¶reys ({customStyle.borderRadius}px)</label>
+                                  <label htmlFor="range-borderRadius" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Sisälaatikoiden pyöreys ({customStyle.borderRadius}px)</label>
                                   <input id="range-borderRadius" type="range" min={0} max={40} value={customStyle.borderRadius} onChange={(e) => updateCustomStyle("borderRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-lineHeight" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>RivivÃ¤li ({customStyle.lineHeight})</label>
+                                  <label htmlFor="range-lineHeight" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Riviväli ({customStyle.lineHeight})</label>
                                   <input id="range-lineHeight" type="range" min={1.2} max={2} step={0.05} value={customStyle.lineHeight} onChange={(e) => updateCustomStyle("lineHeight", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div>
-                                  <label htmlFor="range-sectionSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Osioiden vÃ¤li ({customStyle.sectionSpacing}px)</label>
+                                  <label htmlFor="range-sectionSpacing" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Osioiden väli ({customStyle.sectionSpacing}px)</label>
                                   <input id="range-sectionSpacing" type="range" min={8} max={60} value={customStyle.sectionSpacing} onChange={(e) => updateCustomStyle("sectionSpacing", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                                 <div className="sm:col-span-3">
-                                  <label htmlFor="range-imageRadius" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan pyÃ¶ristys ({customStyle.imageRadius}px)</label>
+                                  <label htmlFor="range-imageRadius" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Kuvan pyöristys ({customStyle.imageRadius}px)</label>
                                   <input id="range-imageRadius" type="range" min={0} max={40} value={customStyle.imageRadius} onChange={(e) => updateCustomStyle("imageRadius", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
                                 </div>
                               </div>
@@ -3427,27 +3521,27 @@ export default function Home() {
                       </>
                     ) : (
                       <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`} role="status" aria-live="polite">
-                        <div className="text-5xl mb-6" aria-hidden="true">ðŸ“„</div>
-                        <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei esikatselua vielÃ¤</p>
-                        <p className="text-base">TÃ¤ytÃ¤ tiedot vasemmalla ja paina "Generoi CV", niin nÃ¤et miltÃ¤ tyÃ¶si nÃ¤yttÃ¤Ã¤.</p>
+                        <div className="text-5xl mb-6" aria-hidden="true">📄</div>
+                        <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei esikatselua vielä</p>
+                        <p className="text-base">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* --- TYÃ–PAIKAT TAB (TINDER-MALLI) --- */}
+                {/* --- TYÖPAIKAT TAB (TINDER-MALLI) --- */}
                 {tab === "jobs" && (
                   <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 animate-in fade-in duration-500 pb-28 sm:pb-0">
                     <div className={`rounded-[32px] border p-6 sm:p-10 space-y-10 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                       <h3 className={`text-2xl font-black border-b pb-5 ${theme === 'dark' ? 'text-white border-white/10' : 'text-gray-900 border-gray-100'}`}>
-                        LisÃ¤Ã¤ oma tyÃ¶paikka seurantaan
+                        Lisää oma työpaikka seurantaan
                       </h3>
 
                       <div>
                          <label htmlFor="job-title" className={LabelClass(theme)}>Otsikko</label>
                          <input
                            id="job-title"
-                           placeholder="Esim. MyyntipÃ¤Ã¤llikkÃ¶"
+                           placeholder="Esim. Myyntipäällikkö"
                            value={jobForm.title}
                            onChange={(e) => updateJobForm("title", e.target.value)}
                            className={InputClass(theme)}
@@ -3483,7 +3577,7 @@ export default function Home() {
 
                       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
                         <div>
-                           <label htmlFor="job-type" className={LabelClass(theme)}>TyÃ¶suhde</label>
+                           <label htmlFor="job-type" className={LabelClass(theme)}>Työsuhde</label>
                            <input
                              id="job-type"
                              placeholder="Vakituinen"
@@ -3509,7 +3603,7 @@ export default function Home() {
                            <label htmlFor="job-salary" className={LabelClass(theme)}>Palkka</label>
                            <input
                              id="job-salary"
-                             placeholder="3000 â‚¬/kk"
+                             placeholder="3000 €/kk"
                              value={jobForm.salary}
                              onChange={(e) => updateJobForm("salary", e.target.value)}
                              className={InputClass(theme)}
@@ -3531,7 +3625,7 @@ export default function Home() {
 
                       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
                         <div>
-                           <label htmlFor="job-contactPerson" className={LabelClass(theme)}>YhteyshenkilÃ¶</label>
+                           <label htmlFor="job-contactPerson" className={LabelClass(theme)}>Yhteyshenkilö</label>
                            <input
                              id="job-contactPerson"
                              placeholder="Matti Rekrytoija"
@@ -3543,7 +3637,7 @@ export default function Home() {
                            />
                         </div>
                         <div>
-                           <label htmlFor="job-contactEmail" className={LabelClass(theme)}>SÃ¤hkÃ¶posti</label>
+                           <label htmlFor="job-contactEmail" className={LabelClass(theme)}>Sähköposti</label>
                            <input
                              id="job-contactEmail"
                              placeholder="matti@yritys.fi"
@@ -3565,7 +3659,9 @@ export default function Home() {
                            onChange={(e) => updateJobForm("summary", e.target.value)}
                            className={TextareaClass("min-h-[140px]", theme)}
                          />
-                         <FieldHint theme={theme}>Kirjoita tähän lyhyt oma huomio.</FieldHint>
+                         <FieldHint theme={theme}>
+                           Kirjoita tähän omin sanoin, miksi paikka kiinnostaa tai mitä haluat muistaa siitä myöhemmin.
+                         </FieldHint>
                       </div>
 
                       <div>
@@ -3577,7 +3673,9 @@ export default function Home() {
                            onChange={(e) => updateJobForm("adText", e.target.value)}
                            className={TextareaClass("min-h-[250px]", theme)}
                          />
-                         <FieldHint theme={theme}>Liitä ilmoitus tähän. Se parantaa räätälöintiä.</FieldHint>
+                         <FieldHint theme={theme}>
+                           Tämä on tärkein kenttä räätälöintiä varten. Mitä enemmän koko ilmoituksesta on täällä mukana, sitä parempi CV ja hakemus tästä syntyy.
+                         </FieldHint>
                       </div>
 
                       <button
@@ -3589,8 +3687,8 @@ export default function Home() {
                       </button>
                     </div>
 
-                    <div className={`space-y-10 pt-10 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-6">
+                    <div className={`space-y-8 pt-8 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-4">
                         <h3 className={`text-3xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Omat työpaikat
                         </h3>
@@ -3602,6 +3700,7 @@ export default function Home() {
                           className="w-full sm:max-w-md rounded-2xl border border-white/10 bg-[#0A0A0A] px-6 py-5 text-base text-white outline-none transition-all focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                         />
                       </div>
+
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                         <select
                           aria-label="Suodata statuksen mukaan"
@@ -3617,7 +3716,7 @@ export default function Home() {
                           <option value="applied">Haettu</option>
                           <option value="interview">Haastattelu</option>
                           <option value="offer">Tarjous</option>
-                          <option value="rejected">HylÃ¤tty</option>
+                          <option value="rejected">Hylätty</option>
                         </select>
 
                         <select
@@ -3637,7 +3736,7 @@ export default function Home() {
                         </select>
 
                         <select
-                          aria-label="Lajittele tyÃ¶paikat"
+                          aria-label="Lajittele työpaikat"
                           value={jobSort}
                           onChange={(e) =>
                             setJobSort(
@@ -3668,32 +3767,32 @@ export default function Home() {
                               : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                           }`}
                         >
-                          {showFavoritesOnly ? "â˜… Vain suosikit" : "NÃ¤ytÃ¤ suosikit"}
+                          {showFavoritesOnly ? "★ Vain suosikit" : "Näytä suosikit"}
                         </button>
                       </div>
 
-                      {/* --- TINDER NÃ„KYMÃ„ --- */}
+                      {/* --- TINDER NÄKYMÄ --- */}
                       {filteredJobs.length === 0 ? (
                         <div className={`rounded-[40px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
                           <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei tuloksia</p>
-                          <p className="text-base">Sinulla ei ole vielÃ¤ yhtÃ¤Ã¤n tyÃ¶paikkaa tai suodattimet piilottavat ne.</p>
+                          <p className="text-base">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
                         </div>
                       ) : activeJob ? (
                         <div className="relative pb-24 sm:pb-0">
                           {/* Edistymispalkki */}
                           <div className="mb-4 flex justify-between items-center text-sm font-bold text-gray-500">
-                            <span>TyÃ¶paikka {currentJobIndex + 1} / {filteredJobs.length}</span>
-                            <span className="text-[#00BFA6]">{Math.round(((currentJobIndex + 1) / filteredJobs.length) * 100)}% kÃ¤yty lÃ¤pi</span>
+                            <span>Työpaikka {currentJobIndex + 1} / {filteredJobs.length}</span>
+                            <span className="text-[#00BFA6]">{Math.round(((currentJobIndex + 1) / filteredJobs.length) * 100)}% käyty läpi</span>
                           </div>
                           
-                          {/* TÃ¤ssÃ¤ tulostetaan Vain YKSI kortti kerrallaan */}
+                          {/* Tässä tulostetaan Vain YKSI kortti kerrallaan */}
                           <JobCard
                             key={activeJob.id}
                             job={activeJob}
                             isActive={true}
                             applicationsCount={activeJobLetters.length}
                             cvsCount={activeJobCvVariants.length}
-                            onSelect={() => {}} // Ei tarvita tinderissÃ¤
+                            onSelect={() => {}} // Ei tarvita tinderissä
                             onRemove={() => removeJob(activeJob.id)}
                             onUpdate={(patch: Partial<JobItem>) => updateJob(activeJob.id, patch)}
                             onSparring={() => startSparring(activeJob)}
@@ -3709,13 +3808,13 @@ export default function Home() {
                               onClick={handleSkipJob}
                               className="flex-1 py-6 rounded-[24px] border-2 border-red-500/50 bg-red-500/10 text-red-500 font-black text-xl hover:bg-red-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 shadow-xl"
                             >
-                              âŒ OHITA
+                              ❌ OHITA
                             </button>
                             <button
                               onClick={() => handleSaveJob(activeJob.id)}
                               className="flex-1 py-6 rounded-[24px] bg-[#00BFA6] text-black font-black text-xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                             >
-                              ðŸ’š TALLENNA
+                              💚 TALLENNA
                             </button>
                           </div>
                         </div>
@@ -3727,7 +3826,7 @@ export default function Home() {
                 {tab === "hakemus" && (
                   <div id="panel-letter" role="tabpanel" aria-labelledby="tab-letter" className="space-y-10 animate-in fade-in duration-500">
                     <div className="rounded-[32px] sm:rounded-[40px] border border-[#00BFA6]/30 bg-[#00BFA6]/5 p-6 sm:p-12 relative overflow-hidden shadow-[0_10px_30px_rgba(0,191,166,0.1)]">
-                      <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none leading-none" aria-hidden="true">â€</div>
+                      <div className="absolute top-0 right-0 p-8 text-[#00BFA6] opacity-10 text-9xl font-black pointer-events-none leading-none" aria-hidden="true">”</div>
                       <h3 className={`text-3xl font-black mb-8 relative z-10 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         Rakenna Hakemus
                       </h3>
@@ -3745,14 +3844,14 @@ export default function Home() {
                         </div>
                       ) : (
                         <div className="mb-10 p-6 sm:p-8 bg-red-950/40 border-2 border-red-900/50 rounded-3xl text-red-300 text-lg" role="alert">
-                          <span className="text-3xl block mb-3" aria-hidden="true">âš ï¸</span>
-                          Palaa ensin <strong>TyÃ¶paikat</strong> -vÃ¤lilehdelle ja valitse sieltÃ¤ haluamasi tyÃ¶paikka jota haluat hakea.
+                          <span className="text-3xl block mb-3" aria-hidden="true">⚠️</span>
+                          Palaa ensin <strong>Työpaikat</strong> -välilehdelle ja valitse sieltä haluamasi työpaikka jota haluat hakea.
                         </div>
                       )}
 
                       <div className="relative z-10">
                         <p className={LabelClass(theme)} id="letter-tone-label">
-                          SÃ¤vy, jolla hakemus kirjoitetaan
+                          Sävy, jolla hakemus kirjoitetaan
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 mt-4" role="group" aria-labelledby="letter-tone-label">
                           <button
@@ -3765,7 +3864,7 @@ export default function Home() {
                                 : theme === 'dark' ? "border border-white/10 bg-[#0A0A0A] text-white hover:bg-white/10" : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
                             }`}
                           >
-                            ðŸ’¼ Asiallinen
+                            💼 Asiallinen
                           </button>
                           <button
                             type="button"
@@ -3777,7 +3876,7 @@ export default function Home() {
                                 : theme === 'dark' ? "border border-white/10 bg-[#0A0A0A] text-white hover:bg-white/10" : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
                             }`}
                           >
-                            ðŸ¤ LÃ¤mmin
+                            🤝 Lämmin
                           </button>
                           <button
                             type="button"
@@ -3789,7 +3888,7 @@ export default function Home() {
                                 : theme === 'dark' ? "border border-white/10 bg-[#0A0A0A] text-white hover:bg-white/10" : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-100"
                             }`}
                           >
-                            ðŸš€ MyyvÃ¤
+                            🚀 Myyvä
                           </button>
                         </div>
                       </div>
@@ -3802,15 +3901,15 @@ export default function Home() {
                         aria-live="polite"
                       >
                         {loadingLetter
-                          ? "TekoÃ¤ly kirjoittaa..."
-                          : "3. KIRJOITA HAKEMUS TÃ„HÃ„N PAIKKAAN"}
+                          ? "Tekoäly kirjoittaa..."
+                          : "3. KIRJOITA HAKEMUS TÄHÄN PAIKKAAN"}
                       </button>
                     </div>
 
                     {activeJobLetters.length > 0 && (
                       <div className={`rounded-[32px] border p-6 sm:p-8 mt-10 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
                         <h3 className={`mb-6 text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Hakemusversiot tÃ¤hÃ¤n paikkaan
+                          Hakemusversiot tähän paikkaan
                         </h3>
                         <div className="space-y-4 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                           {activeJobLetters.map((letter, index) => (
@@ -3845,7 +3944,7 @@ export default function Home() {
                               </p>
                               {letter.updatedAt && letter.updatedAt !== letter.createdAt && (
                                 <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                                  PÃ¤ivitetty: {new Date(letter.updatedAt).toLocaleString("fi-FI")}
+                                  Päivitetty: {new Date(letter.updatedAt).toLocaleString("fi-FI")}
                                 </p>
                               )}
                             </button>
@@ -3864,13 +3963,13 @@ export default function Home() {
                             onClick={() => setLetterViewMode("edit")}
                             className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "edit" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                           >
-                            âœï¸ Muokkaa tekstiÃ¤
+                            ✍️ Muokkaa tekstiä
                           </button>
                           <button
                             onClick={() => setLetterViewMode("preview")}
                             className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold rounded-xl transition-all ${letterViewMode === "preview" ? "bg-[#00BFA6] text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                           >
-                            ðŸ“„ Visuaalinen esikatselu
+                            📄 Visuaalinen esikatselu
                           </button>
                         </div>
 
@@ -3904,27 +4003,27 @@ export default function Home() {
                         </div>
                       )}
 
-                      {/* UUDET: SÃ„HKÃ–POSTIAUTOMAATIO & VIDEOTYÃ–KALU */}
+                      {/* UUDET: SÄHKÖPOSTIAUTOMAATIO & VIDEOTYÖKALU */}
                       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className={`p-6 rounded-3xl border ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                           <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
                           <div className="flex flex-col gap-3">
-                            <button onClick={() => alert("SÃ¤hkÃ¶postipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                              âœ‰ï¸ Kysy lisÃ¤tietoja tehtÃ¤vÃ¤stÃ¤
+                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              ✉️ Kysy lisätietoja tehtävästä
                             </button>
-                            <button onClick={() => alert("SÃ¤hkÃ¶postipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                              âœ‰ï¸ Kiitosviesti haastattelun jÃ¤lkeen
+                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              ✉️ Kiitosviesti haastattelun jälkeen
                             </button>
-                            <button onClick={() => alert("SÃ¤hkÃ¶postipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                              ðŸ”— LinkedIn-verkostoitumisviesti
+                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
+                              🔗 LinkedIn-verkostoitumisviesti
                             </button>
                           </div>
                         </div>
 
                         <div className={`p-6 rounded-3xl border flex flex-col justify-center items-center text-center ${theme === 'dark' ? 'bg-[#141414] border-[#FF6F3C]/30' : 'bg-orange-50 border-orange-200'}`}>
-                          <span className="text-4xl mb-3">ðŸŽ¥</span>
+                          <span className="text-4xl mb-3">🎥</span>
                           <h4 className={`text-lg font-black mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Videohakemus-studio</h4>
-                          <p className={`text-sm mb-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>TekoÃ¤ly luo minuutin kÃ¤sikirjoituksen ja avaa teleprompterin lukemista varten.</p>
+                          <p className={`text-sm mb-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Tekoäly luo minuutin käsikirjoituksen ja avaa teleprompterin lukemista varten.</p>
                           <button onClick={() => setTeleprompterJob(activeJob)} className="w-full rounded-xl bg-[#FF6F3C] text-black font-black py-3 hover:scale-105 transition-transform">
                             AVAA TELEPROMPTER
                           </button>
@@ -3934,10 +4033,10 @@ export default function Home() {
                       <div className="flex flex-col sm:flex-row gap-5 mt-6">
                         <button
                           type="button"
-                          onClick={() => copyText(letterDraft || parsedLetter, "Hakemus kopioitu leikepÃ¶ydÃ¤lle!")}
+                          onClick={() => copyText(letterDraft || parsedLetter, "Hakemus kopioitu leikepöydälle!")}
                           className={`flex-1 rounded-3xl border px-8 py-6 sm:py-7 text-lg sm:text-xl font-black transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${theme === 'dark' ? 'border-white/20 bg-white text-black' : 'border-gray-300 bg-gray-900 text-white'}`}
                         >
-                          KOPIOI TEKSTI ðŸ“‹
+                          KOPIOI TEKSTI 📋
                         </button>
 
                         <button
@@ -3953,9 +4052,9 @@ export default function Home() {
                   </>
                 ) : (
                   <div className={`rounded-[32px] sm:rounded-[40px] border-2 border-dashed p-10 sm:p-20 text-center font-medium mt-10 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
-                    <div className="text-5xl mb-6" aria-hidden="true">âœï¸</div>
+                    <div className="text-5xl mb-6" aria-hidden="true">✍️</div>
                     <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Hakemus puuttuu</p>
-                    <p className="text-base text-gray-400">Paina ylempÃ¤Ã¤ nappia, niin hakemuksen teksti ilmestyy tÃ¤hÃ¤n.</p>
+                    <p className="text-base text-gray-400">Paina ylempää nappia, niin hakemuksen teksti ilmestyy tähän.</p>
                   </div>
                 )}
               </div>
@@ -3965,8 +4064,8 @@ export default function Home() {
             {tab === "tips" && (
               <div id="panel-tips" role="tabpanel" aria-labelledby="tab-tips" className="space-y-10 animate-in fade-in duration-500 mt-10">
                 <div className={`rounded-[32px] sm:rounded-[40px] border p-8 sm:p-12 shadow-[0_15px_50px_rgba(255,111,60,0.1)] ${theme === 'dark' ? 'border-[#FF6F3C]/30 bg-[#FF6F3C]/5' : 'border-[#FF6F3C]/30 bg-white'}`}>
-                  <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>TyÃ¶nhaun Tehovinkit ðŸš€</h2>
-                  <p className="text-lg text-gray-400 mb-10">Lue nÃ¤mÃ¤ ohjeet ennen kuin lÃ¤hetÃ¤t seuraavan hakemuksesi, niin parannat mahdollisuuksiasi jopa 80%.</p>
+                  <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Työnhaun Tehovinkit 🚀</h2>
+                  <p className="text-lg text-gray-400 mb-10">Lue nämä ohjeet ennen kuin lähetät seuraavan hakemuksesi, niin parannat mahdollisuuksiasi jopa 80%.</p>
 
                   <div className="space-y-6 sm:space-y-8">
                     <article className={`p-8 sm:p-10 rounded-3xl border shadow-inner ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
@@ -3975,9 +4074,9 @@ export default function Home() {
                         Rakenna vahva "Hook" (Koukku)
                       </h3>
                       <p className={`leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Rekrytoija lukee satoja CV:itÃ¤. Ã„lÃ¤ aloita tylsÃ¤sti "Olen 24-vuotias asiakaspalvelija". 
-                        Aloita mieluummin tuloksilla: <em>"Olen myyntiin erikoistunut tiimipelaaja, joka kasvatti edellisessÃ¤ roolissaan asiakastyytyvÃ¤isyyttÃ¤ 20%."</em> 
-                        KÃ¤ytÃ¤ Studion "Tavoiteltu rooli" -kenttÃ¤Ã¤ apunasi. TekoÃ¤ly kirjoittaa Profiiliisi tÃ¤mÃ¤n koukun, jos kerrot tarkasti mitÃ¤ haluat.
+                        Rekrytoija lukee satoja CV:itä. Älä aloita tylsästi "Olen 24-vuotias asiakaspalvelija". 
+                        Aloita mieluummin tuloksilla: <em>"Olen myyntiin erikoistunut tiimipelaaja, joka kasvatti edellisessä roolissaan asiakastyytyväisyyttä 20%."</em> 
+                        Käytä Studion "Tavoiteltu rooli" -kenttää apunasi. Tekoäly kirjoittaa Profiiliisi tämän koukun, jos kerrot tarkasti mitä haluat.
                       </p>
                     </article>
 
@@ -3987,44 +4086,44 @@ export default function Home() {
                         Kvantifioi tuloksesi (Numeroita!)
                       </h3>
                       <p className={`leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        PelkkÃ¤ tyÃ¶tehtÃ¤vien listaaminen ei riitÃ¤. Kerro <strong>mitÃ¤ sait aikaan</strong>. 
-                        Sijaan ettÃ¤ kirjoitat "Olin kassalla", kirjoita "Palvelin pÃ¤ivittÃ¤in yli 200 asiakasta tehokkaasti kiireisessÃ¤ ympÃ¤ristÃ¶ssÃ¤." 
-                        LisÃ¤Ã¤ numeroita, prosentteja ja sÃ¤Ã¤stettyjÃ¤ euroja aina kun mahdollista.
+                        Pelkkä työtehtävien listaaminen ei riitä. Kerro <strong>mitä sait aikaan</strong>. 
+                        Sijaan että kirjoitat "Olin kassalla", kirjoita "Palvelin päivittäin yli 200 asiakasta tehokkaasti kiireisessä ympäristössä." 
+                        Lisää numeroita, prosentteja ja säästettyjä euroja aina kun mahdollista.
                       </p>
                     </article>
 
                     <article className={`p-8 sm:p-10 rounded-3xl border shadow-inner ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
                       <h3 className="text-xl font-bold text-[#FF6F3C] mb-4 flex items-center gap-3">
                         <span className="w-8 h-8 rounded-full bg-[#FF6F3C]/20 flex items-center justify-center text-sm" aria-hidden="true">3</span> 
-                        RÃ¤Ã¤tÃ¤lÃ¶i AINA
+                        Räätälöi AINA
                       </h3>
                       <p className={`leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Yksi yleinen CV ei toimi joka paikkaan. Duuniharavassa voit luoda jokaiselle tyÃ¶paikalle 
-                        oman, juuri siihen ilmoitukseen rÃ¤Ã¤tÃ¤lÃ¶idyn CV-version (kÃ¤ytÃ¤ "RÃ¤Ã¤tÃ¤lÃ¶i CV tÃ¤hÃ¤n tyÃ¶paikkaan" -nappia). 
-                        Varmista, ettÃ¤ tyÃ¶paikkailmoituksen avainsanat lÃ¶ytyvÃ¤t CV:si taidoista.
+                        Yksi yleinen CV ei toimi joka paikkaan. Duuniharavassa voit luoda jokaiselle työpaikalle 
+                        oman, juuri siihen ilmoitukseen räätälöidyn CV-version (käytä "Räätälöi CV tähän työpaikkaan" -nappia). 
+                        Varmista, että työpaikkailmoituksen avainsanat löytyvät CV:si taidoista.
                       </p>
                     </article>
 
                     <article className={`p-8 sm:p-10 rounded-3xl border shadow-inner ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
                       <h3 className="text-xl font-bold text-[#FF6F3C] mb-4 flex items-center gap-3">
                         <span className="w-8 h-8 rounded-full bg-[#FF6F3C]/20 flex items-center justify-center text-sm" aria-hidden="true">4</span> 
-                        ATS-jÃ¤rjestelmien ymmÃ¤rtÃ¤minen
+                        ATS-järjestelmien ymmärtäminen
                       </h3>
                       <p className={`leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Suuryritykset kÃ¤yttÃ¤vÃ¤t botteja (ATS) lukemaan CV:si ennen ihmistÃ¤. Jos kÃ¤ytÃ¤t liian monimutkaisia fontteja 
-                        tai kummallisia asetteluja, botti ei osaa lukea sitÃ¤. Duuniharavan PDF-export on rakennettu siten, 
-                        ettÃ¤ teksti on aina luettavissa myÃ¶s koneellisesti.
+                        Suuryritykset käyttävät botteja (ATS) lukemaan CV:si ennen ihmistä. Jos käytät liian monimutkaisia fontteja 
+                        tai kummallisia asetteluja, botti ei osaa lukea sitä. Duuniharavan PDF-export on rakennettu siten, 
+                        että teksti on aina luettavissa myös koneellisesti.
                       </p>
                     </article>
 
                     <article className={`p-8 sm:p-10 rounded-3xl border shadow-inner ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
                       <h3 className="text-xl font-bold text-[#FF6F3C] mb-4 flex items-center gap-3">
                         <span className="w-8 h-8 rounded-full bg-[#FF6F3C]/20 flex items-center justify-center text-sm" aria-hidden="true">5</span> 
-                        Harjoittele haastattelua etukÃ¤teen
+                        Harjoittele haastattelua etukäteen
                       </h3>
                       <p className={`leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        TyÃ¶paikat-listauksessa on <strong>"Treenaa"</strong>-nappi. KÃ¤ytÃ¤ sitÃ¤! TekoÃ¤ly simulaattori kysyy sinulta 
-                        juuri niitÃ¤ kysymyksiÃ¤, joita oikea rekrytoija kysyisi tuon kyseisen tyÃ¶paikkailmoituksen perusteella.
+                        Työpaikat-listauksessa on <strong>"Treenaa"</strong>-nappi. Käytä sitä! Tekoäly simulaattori kysyy sinulta 
+                        juuri niitä kysymyksiä, joita oikea rekrytoija kysyisi tuon kyseisen työpaikkailmoituksen perusteella.
                       </p>
                     </article>
                   </div>
@@ -4056,16 +4155,16 @@ export default function Home() {
       <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-purple-500/30' : 'bg-white border-purple-200'}`}>
           <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>ðŸ” ATS-Skanneri</h3>
-            <button onClick={() => setAtsJob(null)} className="text-gray-500 hover:text-purple-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">âœ•</button>
+            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🔍 ATS-Skanneri</h3>
+            <button onClick={() => setAtsJob(null)} className="text-gray-500 hover:text-purple-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
           </div>
           <div className="p-6 sm:p-8 space-y-6">
-            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Vertaa CV:tÃ¤si tyÃ¶paikkailmoitukseen: <strong className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{atsJob.title}</strong></p>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Vertaa CV:täsi työpaikkailmoitukseen: <strong className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{atsJob.title}</strong></p>
             
             {isAtsScanning ? (
               <div className="flex flex-col items-center justify-center py-10 space-y-4">
                 <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-                <p className="text-purple-500 font-bold animate-pulse">TekoÃ¤ly lukee CV:tÃ¤si ja ilmoitusta...</p>
+                <p className="text-purple-500 font-bold animate-pulse">Tekoäly lukee CV:täsi ja ilmoitusta...</p>
               </div>
             ) : atsResult ? (
               <div className="space-y-6">
@@ -4094,14 +4193,14 @@ export default function Home() {
                   <div className="flex-1">
                     <h4 className={`text-lg font-bold mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Osumaprosentti</h4>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {atsResult.match > 75 ? "Loistava! CV:si on hyvin kohdistettu." : "CV:tÃ¤si kannattaa vielÃ¤ hioa. LisÃ¤Ã¤ puuttuvia sanoja taitoihin."}
+                      {atsResult.match > 75 ? "Loistava! CV:si on hyvin kohdistettu." : "CV:täsi kannattaa vielä hioa. Lisää puuttuvia sanoja taitoihin."}
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className={`p-5 rounded-2xl border ${theme === 'dark' ? 'bg-red-500/10 border-red-500/20' : 'bg-red-50 border-red-200'}`}>
-                    <h4 className="text-red-500 font-bold mb-3 flex items-center gap-2"><span>âŒ</span> Puuttuvat avainsanat</h4>
+                    <h4 className="text-red-500 font-bold mb-3 flex items-center gap-2"><span>❌</span> Puuttuvat avainsanat</h4>
                     <div className="flex flex-wrap gap-2">
                       {atsResult.missing.map((word, i) => (
                         <span key={i} className={`px-3 py-1 text-xs font-bold rounded-lg border ${theme === 'dark' ? 'border-red-500/30 text-red-300' : 'border-red-300 text-red-700 bg-white'}`}>{word}</span>
@@ -4109,7 +4208,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className={`p-5 rounded-2xl border ${theme === 'dark' ? 'bg-green-500/10 border-green-500/20' : 'bg-green-50 border-green-200'}`}>
-                    <h4 className="text-green-500 font-bold mb-3 flex items-center gap-2"><span>âœ…</span> LÃ¶ytyvÃ¤t avainsanat</h4>
+                    <h4 className="text-green-500 font-bold mb-3 flex items-center gap-2"><span>✅</span> Löytyvät avainsanat</h4>
                     <div className="flex flex-wrap gap-2">
                       {atsResult.found.map((word, i) => (
                         <span key={i} className={`px-3 py-1 text-xs font-bold rounded-lg border ${theme === 'dark' ? 'border-green-500/30 text-green-300' : 'border-green-300 text-green-700 bg-white'}`}>{word}</span>
@@ -4124,13 +4223,13 @@ export default function Home() {
       </div>
     )}
 
-    {/* HAASTATTELUTÃ„RPIT */}
+    {/* HAASTATTELUTÄRPIT */}
     {prepJob && (
       <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-2xl shadow-2xl flex flex-col animate-in zoom-in-95 h-[70vh] duration-300 ${theme === 'dark' ? 'bg-[#141414] border-indigo-500/30' : 'bg-white border-indigo-200'}`}>
           <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>â“ Haastattelun TÃ¤rpit</h3>
-            <button onClick={() => setPrepJob(null)} className="text-gray-500 hover:text-indigo-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">âœ•</button>
+            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>❓ Haastattelun Tärpit</h3>
+            <button onClick={() => setPrepJob(null)} className="text-gray-500 hover:text-indigo-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
           </div>
           
           <div className="p-6 sm:p-8">
@@ -4141,12 +4240,12 @@ export default function Home() {
               </div>
             ) : (
               <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                <p className={`mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>NÃ¤mÃ¤ ovat todennÃ¤kÃ¶isimmÃ¤t kysymykset, jotka tekoÃ¤ly poimi <strong>{prepJob.title}</strong> -ilmoituksen perusteella.</p>
+                <p className={`mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Nämä ovat todennäköisimmät kysymykset, jotka tekoäly poimi <strong>{prepJob.title}</strong> -ilmoituksen perusteella.</p>
                 {prepQuestions.map((item, idx) => (
                   <div key={idx} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
                     <p className={`font-bold text-lg mb-3 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`}>Q: {item.q}</p>
                     <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-indigo-500/10 border-indigo-500/20 text-gray-300' : 'bg-indigo-50 border-indigo-100 text-gray-700'}`}>
-                      <span className="font-bold text-indigo-500 block mb-1">ðŸ’¡ Vinkki vastaukseen:</span>
+                      <span className="font-bold text-indigo-500 block mb-1">💡 Vinkki vastaukseen:</span>
                       <p className="text-sm">{item.tip}</p>
                     </div>
                   </div>
@@ -4158,16 +4257,16 @@ export default function Home() {
       </div>
     )}
 
-    {/* KÃ„Ã„NTÃ„JÃ„ */}
+    {/* KÄÄNTÄJÄ */}
     {showSkillTranslator && (
       <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
           <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>âœ¨ KÃ¤Ã¤nnÃ¤ ammattikielelle</h3>
-            <button onClick={() => setShowSkillTranslator(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">âœ•</button>
+            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>✨ Käännä ammattikielelle</h3>
+            <button onClick={() => setShowSkillTranslator(false)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
           </div>
           <div className="p-6 sm:p-8 space-y-6">
-            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Kerro omin sanoin, mitÃ¤ teet vapaa-ajallasi (esim. harrastukset, perhearki, yhdistystoiminta). TekoÃ¤ly kÃ¤Ã¤ntÃ¤Ã¤ sen CV-kelpoisiksi taidoiksi.</p>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Kerro omin sanoin, mitä teet vapaa-ajallasi (esim. harrastukset, perhearki, yhdistystoiminta). Tekoäly kääntää sen CV-kelpoisiksi taidoiksi.</p>
             <textarea
               value={skillInput}
               onChange={(e) => setSkillInput(e.target.value)}
@@ -4187,7 +4286,7 @@ export default function Home() {
                   }}
                   className="mt-4 w-full bg-[#00BFA6] text-black font-black py-3 rounded-xl hover:scale-[1.02] transition-transform"
                 >
-                  LISÃ„Ã„ CV:SEEN
+                  LISÄÄ CV:SEEN
                 </button>
               </div>
             ) : (
@@ -4196,7 +4295,7 @@ export default function Home() {
                 disabled={!skillInput || isTranslating}
                 className={`w-full font-black py-4 rounded-xl transition-colors ${!skillInput || isTranslating ? 'bg-gray-500 cursor-not-allowed opacity-50 text-white' : (theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-gray-900 text-white hover:bg-gray-800')}`}
               >
-                {isTranslating ? "KÃ¤Ã¤nnetÃ¤Ã¤n..." : "ANALYSOI"}
+                {isTranslating ? "Käännetään..." : "ANALYSOI"}
               </button>
             )}
           </div>
@@ -4204,17 +4303,17 @@ export default function Home() {
       </div>
     )}
 
-    {/* SÃ„HKÃ–POSTIMALLIT */}
+    {/* SÄHKÖPOSTIMALLIT */}
     {emailTemplateModal && (
       <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
           <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
             <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              {emailTemplateModal.type === 'thanks' && "âœ‰ï¸ Kiitosviesti"}
-              {emailTemplateModal.type === 'questions' && "âœ‰ï¸ Kysy lisÃ¤tietoja"}
-              {emailTemplateModal.type === 'linkedin' && "ðŸ”— Verkostoitumisviesti"}
+              {emailTemplateModal.type === 'thanks' && "✉️ Kiitosviesti"}
+              {emailTemplateModal.type === 'questions' && "✉️ Kysy lisätietoja"}
+              {emailTemplateModal.type === 'linkedin' && "🔗 Verkostoitumisviesti"}
             </h3>
-            <button onClick={() => setEmailTemplateModal(null)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">âœ•</button>
+            <button onClick={() => setEmailTemplateModal(null)} className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
           </div>
           <div className="p-6 sm:p-8 space-y-6">
             <textarea
@@ -4226,12 +4325,12 @@ export default function Home() {
               onClick={() => {
                 navigator.clipboard.writeText(emailTemplateModal.content);
                 setEmailTemplateModal(null);
-                setMessage("Viesti kopioitu leikepÃ¶ydÃ¤lle!");
+                setMessage("Viesti kopioitu leikepöydälle!");
                 setTimeout(() => setMessage(""), 2500);
               }}
               className="w-full bg-[#00BFA6] text-black font-black py-4 rounded-xl hover:scale-[1.02] transition-transform"
             >
-              KOPIOI LEIKEPÃ–YDÃ„LLE
+              KOPIOI LEIKEPÖYDÄLLE
             </button>
           </div>
         </div>
@@ -4243,20 +4342,20 @@ export default function Home() {
       <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div role="dialog" aria-modal="true" className={`border rounded-[32px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-blue-500/30' : 'bg-white border-blue-200'}`}>
           <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
-            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>ðŸ’° Palkka-arvio</h3>
-            <button onClick={() => setSalaryJob(null)} className="text-gray-500 hover:text-blue-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">âœ•</button>
+            <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>💰 Palkka-arvio</h3>
+            <button onClick={() => setSalaryJob(null)} className="text-gray-500 hover:text-blue-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">✕</button>
           </div>
           <div className="p-6 sm:p-8 space-y-6 text-center">
             <p className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{salaryJob.title}</p>
             <div className="py-8">
               <p className="text-sm uppercase tracking-widest text-blue-500 font-bold mb-2">Markkinapalkka (Arvio)</p>
-              <p className={`text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3200<span className="text-3xl text-gray-500 font-medium"> - </span>3800<span className="text-2xl text-blue-500">â‚¬</span></p>
+              <p className={`text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3200<span className="text-3xl text-gray-500 font-medium"> - </span>3800<span className="text-2xl text-blue-500">€</span></p>
             </div>
             <div className={`p-5 rounded-2xl border text-left ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-gray-300' : 'bg-blue-50 border-blue-100 text-gray-700'}`}>
-              <p className="font-bold mb-2 text-blue-500">Miten perustelet pyyntÃ¶si?</p>
+              <p className="font-bold mb-2 text-blue-500">Miten perustelet pyyntösi?</p>
               <ul className="list-disc pl-5 space-y-1 text-sm">
                 <li>Korosta aikaisempaa tulosvastuutasi.</li>
-                <li>Sijainti ({salaryJob.location || "PÃ¤Ã¤kaupunkiseutu"}) nostaa palkkatasoa hieman.</li>
+                <li>Sijainti ({salaryJob.location || "Pääkaupunkiseutu"}) nostaa palkkatasoa hieman.</li>
               </ul>
             </div>
             <button onClick={() => setSalaryJob(null)} className="w-full bg-blue-500 text-white font-black py-4 rounded-xl hover:bg-blue-600 transition-colors">
@@ -4272,34 +4371,34 @@ export default function Home() {
       <div className="fixed inset-0 z-[300] flex flex-col bg-black text-white p-4 sm:p-8 animate-in slide-in-from-bottom-10">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h3 className="font-black text-2xl sm:text-3xl text-[#FF6F3C]">ðŸŽ¥ Videohakemus-studio</h3>
-            <p className="text-gray-400 mt-2">Lue teksti suoraan kameralle. Puhu hitaasti ja selkeÃ¤sti.</p>
+            <h3 className="font-black text-2xl sm:text-3xl text-[#FF6F3C]">🎥 Videohakemus-studio</h3>
+            <p className="text-gray-400 mt-2">Lue teksti suoraan kameralle. Puhu hitaasti ja selkeästi.</p>
           </div>
           <button 
             onClick={() => setTeleprompterJob(null)} 
             className="text-gray-400 hover:text-white font-black text-2xl bg-white/10 hover:bg-white/20 w-12 h-12 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6F3C]"
             aria-label="Sulje teleprompter"
           >
-            âœ•
+            ✕
           </button>
         </div>
         
         <div className="flex-1 overflow-y-auto bg-[#141414] rounded-[32px] sm:rounded-[40px] border border-white/10 p-8 sm:p-16 flex flex-col items-center custom-scrollbar">
           <div className="max-w-4xl space-y-12 text-3xl sm:text-5xl font-black leading-[1.6] text-gray-300 text-center py-20">
-            <p className="text-white">Hei! Olen {form.name || "[Nimesi]"}, ja haen teille <span className="text-[#FF6F3C]">{teleprompterJob.title}</span> -tehtÃ¤vÃ¤Ã¤n.</p>
-            <p>Olen seurannut yrityksenne {teleprompterJob.company || "[Yrityksen nimi]"} toimintaa jo pitkÃ¤Ã¤n, ja arvostan erityisesti tapaanne toimia alalla.</p>
-            <p>Taustani ansiosta minulla on vahva kokemus juuri niistÃ¤ asioista, joita ilmoituksessanne perÃ¤Ã¤nkuulutitte.</p>
-            <p>Uskon, ettÃ¤ asenteeni ja osaamiseni tekisivÃ¤t minusta loistavan lisÃ¤yksen tiimiinne.</p>
-            <p className="text-[#00BFA6]">Kiitos ajastanne, ja toivottavasti pÃ¤Ã¤semme jatkamaan keskustelua haastattelussa!</p>
+            <p className="text-white">Hei! Olen {form.name || "[Nimesi]"}, ja haen teille <span className="text-[#FF6F3C]">{teleprompterJob.title}</span> -tehtävään.</p>
+            <p>Olen seurannut yrityksenne {teleprompterJob.company || "[Yrityksen nimi]"} toimintaa jo pitkään, ja arvostan erityisesti tapaanne toimia alalla.</p>
+            <p>Taustani ansiosta minulla on vahva kokemus juuri niistä asioista, joita ilmoituksessanne peräänkuulutitte.</p>
+            <p>Uskon, että asenteeni ja osaamiseni tekisivät minusta loistavan lisäyksen tiimiinne.</p>
+            <p className="text-[#00BFA6]">Kiitos ajastanne, ja toivottavasti pääsemme jatkamaan keskustelua haastattelussa!</p>
           </div>
         </div>
         
         <div className="mt-8 flex justify-center gap-4">
           <button 
-            onClick={() => alert("Teleprompterin automaattinen rullaus tulee saataville seuraavassa pÃ¤ivityksessÃ¤!")}
+            onClick={() => alert("Teleprompterin automaattinen rullaus tulee saataville seuraavassa päivityksessä!")}
             className="bg-[#FF6F3C] text-black font-black px-10 py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.4)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-black"
           >
-            â–¶ï¸ ALOITA RULLAUS
+            ▶️ ALOITA RULLAUS
           </button>
         </div>
       </div>
@@ -4316,10 +4415,10 @@ export default function Home() {
         >
           <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'bg-white/[0.02] border-white/5' : 'bg-gray-50 border-gray-100'}`}>
             <div>
-              <h3 id="modal-title" className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>ðŸŽ¤ Haastattelusimulaattori</h3>
+              <h3 id="modal-title" className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🎤 Haastattelusimulaattori</h3>
               <p className="text-sm text-[#00BFA6] mt-1 font-bold">{sparringJob.title} @ {sparringJob.company || "Yritys"}</p>
             </div>
-            <button onClick={() => setSparringJob(null)} aria-label="Sulje simulaattori" className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl bg-black/5 hover:bg-black/10 w-12 h-12 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">âœ•</button>
+            <button onClick={() => setSparringJob(null)} aria-label="Sulje simulaattori" className="text-gray-500 hover:text-[#00BFA6] font-black text-2xl bg-black/5 hover:bg-black/10 w-12 h-12 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">✕</button>
           </div>
           
           <div className={`flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 custom-scrollbar ${theme === 'dark' ? '' : 'bg-gray-50'}`} aria-live="polite">
@@ -4327,7 +4426,7 @@ export default function Home() {
               <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
                 <div className={`max-w-[85%] rounded-3xl p-6 ${msg.role === 'ai' ? (theme === 'dark' ? 'bg-[#00BFA6]/10 border border-[#00BFA6]/20 text-gray-200' : 'bg-[#00BFA6]/10 border border-[#00BFA6]/30 text-gray-800') : (theme === 'dark' ? 'bg-white/10 text-white' : 'bg-gray-900 text-white')} ${msg.role === 'ai' ? 'rounded-tl-sm' : 'rounded-tr-sm'}`}>
                   <p className={`text-xs font-black mb-3 tracking-widest uppercase ${msg.role === 'ai' ? 'text-[#00BFA6]' : 'text-gray-400'}`}>
-                    {msg.role === 'ai' ? 'ðŸ¤– Rekrytoija' : 'ðŸ‘¤ SinÃ¤'}
+                    {msg.role === 'ai' ? '🤖 Rekrytoija' : '👤 Sinä'}
                   </p>
                   <p className="leading-relaxed text-[15px]">{msg.text}</p>
                 </div>
@@ -4335,7 +4434,7 @@ export default function Home() {
             ))}
             
             {isSparringTyping && (
-              <div className="flex justify-start" aria-label="TekoÃ¤ly kirjoittaa...">
+              <div className="flex justify-start" aria-label="Tekoäly kirjoittaa...">
                 <div className="bg-[#00BFA6]/10 border border-[#00BFA6]/20 rounded-3xl p-4 text-[#00BFA6] text-xl font-black flex gap-1 rounded-tl-sm" aria-hidden="true">
                   <span className="animate-bounce" style={{animationDelay: "0s"}}>.</span>
                   <span className="animate-bounce" style={{animationDelay: "0.2s"}}>.</span>
@@ -4354,7 +4453,7 @@ export default function Home() {
                 id="chat-input"
                 value={sparringMessage} 
                 onChange={e => setSparringMessage(e.target.value)} 
-                placeholder="Kirjoita vastauksesi tÃ¤hÃ¤n..." 
+                placeholder="Kirjoita vastauksesi tähän..." 
                 className={`flex-1 rounded-2xl border px-6 py-4 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] transition-colors ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-100 border-gray-200 text-gray-900'}`} 
                 disabled={isSparringTyping}
               />
@@ -4363,7 +4462,7 @@ export default function Home() {
                 disabled={!sparringMessage.trim() || isSparringTyping} 
                 className="bg-[#00BFA6] text-black font-black px-8 rounded-2xl disabled:opacity-50 hover:scale-[1.05] active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
               >
-                LÃ„HETÃ„
+                LÄHETÄ
               </button>
             </form>
           </div>
@@ -4371,7 +4470,7 @@ export default function Home() {
       </div>
     )}
 
-    {/* MODAALIEN KUTSUT (Home-funktion sisÃ¤llÃ¤) */}
+    {/* MODAALIEN KUTSUT (Home-funktion sisällä) */}
     <SettingsModal 
       isOpen={showSettings} 
       onClose={() => setShowSettings(false)} 
@@ -4410,19 +4509,19 @@ function SettingsModal({
       <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
         <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
           <h2 className="text-2xl font-black">Tilin asetukset</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black">âœ•</button>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black">✕</button>
         </div>
         <div className="space-y-8">
           <div className={`p-6 rounded-2xl border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100')}`}>
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 font-sans">Nykyinen jÃ¤senyys</p>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 font-sans">Nykyinen jäsenyys</p>
             <div className="flex justify-between items-center">
-              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "â­ PRO-JÃ„SENYYS" : "Ilmaisversio"}</span>
+              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}</span>
               {isPro && <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline">Hallitse</button>}
             </div>
           </div>
-          <button onClick={onLogout} className={`w-full py-3 rounded-xl font-black text-xs border ${theme === 'dark' ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900 shadow-sm'}`}>ðŸ‘‹ KIRJAUDU ULOS</button>
+          <button onClick={onLogout} className={`w-full py-3 rounded-xl font-black text-xs border ${theme === 'dark' ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900 shadow-sm'}`}>👋 KIRJAUDU ULOS</button>
           <div className="pt-6 border-t border-red-500/20 text-center">
-            <button onClick={onDeleteAccount} className="text-red-500 text-xs font-bold hover:underline opacity-60 transition-opacity">Poista tili ja tilaus vÃ¤littÃ¶mÃ¤sti</button>
+            <button onClick={onDeleteAccount} className="text-red-500 text-xs font-bold hover:underline opacity-60 transition-opacity">Poista tili ja tilaus välittömästi</button>
           </div>
         </div>
       </div>
@@ -4443,34 +4542,34 @@ function PaywallModal({
 }) {
   if (!isOpen) return null;
 
-  // Lista ominaisuuksista, jotka esitellÃ¤Ã¤n
+  // Lista ominaisuuksista, jotka esitellään
   const features = [
-    { icon: "âœ¨", title: "Taikasauva-editori", desc: "Muokkaa tekstiÃ¤ lennosta tekoÃ¤lyllÃ¤ suoraan esikatselussa." },
-    { icon: "ðŸ“„", title: "Rajattomat asiakirjat", desc: "Luo ja rÃ¤Ã¤tÃ¤lÃ¶i niin monta CV:tÃ¤ ja hakemusta kuin tarvitset." },
-    { icon: "ðŸŽ¯", title: "TÃ¤ydellinen rÃ¤Ã¤tÃ¤lÃ¶inti", desc: "RÃ¤Ã¤tÃ¤lÃ¶i CV:si automaattisesti vastaamaan tyÃ¶paikkailmoituksen vaatimuksia." },
-    { icon: "ðŸŽ¤", title: "Haastattelusimulaattori", desc: "Harjoittele tyÃ¶haastattelua varten rÃ¤Ã¤tÃ¤lÃ¶idyillÃ¤ kysymyksillÃ¤." },
+    { icon: "✨", title: "Taikasauva-editori", desc: "Muokkaa tekstiä lennosta tekoälyllä suoraan esikatselussa." },
+    { icon: "📄", title: "Rajattomat asiakirjat", desc: "Luo ja räätälöi niin monta CV:tä ja hakemusta kuin tarvitset." },
+    { icon: "🎯", title: "Täydellinen räätälöinti", desc: "Räätälöi CV:si automaattisesti vastaamaan työpaikkailmoituksen vaatimuksia." },
+    { icon: "🎤", title: "Haastattelusimulaattori", desc: "Harjoittele työhaastattelua varten räätälöidyillä kysymyksillä." },
   ];
 
   return (
     <div className="fixed inset-0 z-[600] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300">
       <div className={`w-full max-w-2xl rounded-[40px] border p-2 shadow-2xl animate-in zoom-in-95 duration-400 overflow-hidden ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
         
-        {/* YlÃ¤osa - Gradientti tausta ja otsikko */}
+        {/* Yläosa - Gradientti tausta ja otsikko */}
         <div className="bg-gradient-to-br from-[#00BFA6] to-[#009581] rounded-[32px] p-10 text-center relative overflow-hidden">
-          {/* KoristeympyrÃ¤ taustalla */}
+          {/* Koristeympyrä taustalla */}
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           
           <button onClick={onClose} className="absolute top-6 right-6 text-black/60 hover:text-white transition-colors z-10 p-2 focus-visible:outline-none">
-            <span className="font-black text-2xl">âœ•</span>
+            <span className="font-black text-2xl">✕</span>
           </button>
           
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white mb-6 backdrop-blur-sm">
-            <span className="text-4xl" aria-hidden="true">ðŸš€</span>
+            <span className="text-4xl" aria-hidden="true">🚀</span>
           </div>
           
-          <h2 className="text-4xl font-black text-white tracking-tighter mb-3">Vapauta tÃ¤ysi potentiaalisi</h2>
+          <h2 className="text-4xl font-black text-white tracking-tighter mb-3">Vapauta täysi potentiaalisi</h2>
           <p className="text-white/90 text-lg font-medium max-w-md mx-auto leading-relaxed">
-            Olet kÃ¤yttÃ¤nyt ilmaisen kokeilusi (1/1). PÃ¤ivitÃ¤ PRO-tasolle ja tee tyÃ¶haustasi helpompaa ja tehokkaampaa.
+            Olet käyttänyt ilmaisen kokeilusi (1/1). Päivitä PRO-tasolle ja tee työhaustasi helpompaa ja tehokkaampaa.
           </p>
         </div>
 
@@ -4492,7 +4591,7 @@ function PaywallModal({
 
           <div className={`p-6 rounded-3xl border text-center ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
             <p className="text-5xl font-black tracking-tight mb-2">
-              9,90 â‚¬ <span className="text-lg opacity-60 font-bold">/ kk</span>
+              9,90 € <span className="text-lg opacity-60 font-bold">/ kk</span>
             </p>
             <p className="text-sm opacity-60 mb-6 font-medium">Laskutetaan kuukausittain. Peruuta milloin tahansa.</p>
             
@@ -4500,14 +4599,14 @@ function PaywallModal({
               onClick={onUpgrade}
               className="w-full rounded-2xl bg-gradient-to-r from-[#00BFA6] to-[#00DF9F] py-5 text-xl font-black text-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#00BFA6]/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#00BFA6]/50"
             >
-              ALOITA PRO-TILAUS âœ¨
+              ALOITA PRO-TILAUS ✨
             </button>
             
             <button 
               onClick={onClose}
               className="mt-4 text-sm font-bold opacity-60 hover:opacity-100 transition-opacity p-2"
             >
-              EhkÃ¤ myÃ¶hemmin
+              Ehkä myöhemmin
             </button>
           </div>
         </div>
@@ -4515,5 +4614,3 @@ function PaywallModal({
     </div>
   );
 }
-
-
