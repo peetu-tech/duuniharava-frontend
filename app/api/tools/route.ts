@@ -16,8 +16,8 @@ export async function POST(req: Request) {
 
     let systemPrompt = "";
     let userMessage = "";
+    let useJsonFormat = false;
 
-    // Valitaan oikea ohjeistus (prompt) sen mukaan, mitä työkalua käytetään
     switch (tool) {
       case "hidden-jobs":
         systemPrompt = "Olet asiantunteva ja erittäin vakuuttava uravalmentaja. Kirjoita lyhyt, iskevä ja ammattimainen lähestymisviesti (esim. LinkedIn-yksityisviesti tai sähköposti) suoraan yrityksen päättäjälle. Älä missään nimessä kerjää töitä tai kuulosta epätoivoiselta. Keskity vain siihen arvoon ja ratkaisuun, jonka hakija tuo pöytään.";
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
         systemPrompt = `Olet huipputason LinkedIn-asiantuntija. Kirjoita kaksi asiaa hakijalle:
         1. Lyhyt, arvoa korostava 'Tietoja' (About) teksti profiiliin (max 4 lausetta).
         2. Innostava postaus uutisvirtaan uuden työn etsimisestä (hashtageineen). Älä käytä liikaa emojeita, pidä sävy asiantuntevana.
-        
+
         TÄRKEÄÄ: Sinun ON EHDOTTOMASTI palautettava vastaus täsmälleen tässä muodossa, jotta järjestelmämme osaa lukea sen:
         ABOUT:
         [Kirjoita About-teksti tähän]
@@ -68,6 +68,54 @@ export async function POST(req: Request) {
         userMessage = `Nykyinen tittelini/tasoni: ${data.hhRole}. Tuottamani lisäarvo (ROI) yritykselle: ${data.hhValue}. Muotoile pitch suomeksi.`;
         break;
 
+      case "ats-scan":
+        systemPrompt = `Olet ATS-asiantuntija (Applicant Tracking System). Vertaa CV:tä työpaikkailmoitukseen ja tunnista osuvuus.
+Palauta VAIN validi JSON tässä muodossa:
+{"match": numero_0_100, "found": ["löydetty taito tai avainsana", ...], "missing": ["tärkeä puuttuva taito tai avainsana", ...]}
+Maksimissaan 6 kohtaa per lista. Ei muuta tekstiä.`;
+        userMessage = `CV:\n${data.cvText ?? ""}\n\nTyöpaikkailmoitus:\n${data.jobAd ?? ""}`;
+        useJsonFormat = true;
+        break;
+
+      case "interview-prep":
+        systemPrompt = `Olet haastattelijavalmentaja. Luo 5 realistista, tehtäväkohtaista haastattelukysymystä suomeksi annetun työpaikan perusteella. Vältä geneerisiä kysymyksiä — räätälöi ne nimenomaan tähän rooliin.
+Palauta VAIN validi JSON-taulukko:
+[{"q": "Kysymys suomeksi", "tip": "Lyhyt vastaamisvinkki suomeksi"}, ...]
+Ei muuta tekstiä.`;
+        userMessage = `Tehtävä: ${data.jobTitle ?? "Avoin tehtävä"} yrityksessä ${data.company ?? ""}.\nIlmoitusteksti:\n${data.jobAd ?? ""}`;
+        useJsonFormat = true;
+        break;
+
+      case "skill-translator":
+        systemPrompt = "Olet uravalmentaja. Muunna annettu arkikielinen kokemus tai taito ammattimaisiksi työnhakufraaseiksi suomeksi. Palauta pelkkä pilkulla eroteltu lista 5–8 fraasista. Ei selityksiä, ei markdownia, ei numeroita.";
+        userMessage = `Muunna nämä taidot/kokemus ammattikielelle: ${data.skillInput ?? ""}`;
+        break;
+
+      case "sparring": {
+        systemPrompt = `Olet haastattelijavalmentaja ja vedät harjoitushaastattelua suomeksi. Tehtävä: ${data.jobTitle ?? "avoin tehtävä"} yrityksessä ${data.company ?? "tuntematon yritys"}. Kysy yksi realistinen haastattelukysymys kerrallaan. Kun hakija vastaa, anna lyhyt (1–2 lausetta) rakentava palaute ja esitä seuraava kysymys. Ole kannustava mutta haastava. Aloita ensimmäisellä kysymyksellä.`;
+        userMessage = data.userMessage ?? "";
+
+        const history: { role: "user" | "assistant"; content: string }[] = (data.chatHistory ?? []).map(
+          (m: { role: string; text: string }) => ({
+            role: m.role === "ai" ? "assistant" : "user",
+            content: m.text,
+          })
+        );
+
+        const sparringResponse = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...history,
+            { role: "user", content: userMessage },
+          ],
+          temperature: 0.8,
+          max_tokens: 300,
+        });
+
+        return NextResponse.json({ output: sparringResponse.choices[0].message.content ?? "" });
+      }
+
       default:
         return NextResponse.json({ error: "Tuntematon työkalu" }, { status: 400 });
     }
@@ -76,13 +124,13 @@ export async function POST(req: Request) {
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage }
+        { role: "user", content: userMessage },
       ],
       temperature: 0.7,
+      ...(useJsonFormat ? { response_format: { type: "json_object" } } : {}),
     });
 
-    const resultText = response.choices[0].message.content;
-
+    const resultText = response.choices[0].message.content ?? "";
     return NextResponse.json({ output: resultText });
 
   } catch (error: any) {

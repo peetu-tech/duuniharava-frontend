@@ -2520,8 +2520,9 @@ export default function Home() {
       };
 
       setSavedLetters((prev) => [savedLetter, ...prev]);
-      setTab("cv"); 
-      setMessage("Hakemus luotu valittuun työpaikkaan.");
+      setTab("hakemus");
+      setLetterViewMode("edit");
+      setMessage("Hakemus luotu — muokkaa ja lataa se alta.");
       setTimeout(() => setMessage(""), 2500);
 
       if(session) {
@@ -2596,30 +2597,63 @@ export default function Home() {
     ]);
   }
 
-  function sendSparringMessage(e: React.FormEvent) {
+  async function sendSparringMessage(e: React.FormEvent) {
     e.preventDefault();
     if (!sparringMessage.trim()) return;
-    
+
     const newChat = [...sparringChat, { role: "user" as const, text: sparringMessage }];
     setSparringChat(newChat);
     setSparringMessage("");
     setIsSparringTyping(true);
 
-    setTimeout(() => {
-      setSparringChat([...newChat, { role: "ai", text: "Kiitos vastauksestasi! Se kuulostaa erittäin mielenkiintoiselta. Miten yleensä reagoit tilanteisiin, joissa kohtaat yllättäviä ongelmia tai aikataulupainetta? Voitko antaa jonkin konkreettisen esimerkin aiemmasta työkokemuksestasi?" }]);
+    try {
+      const session = getSession();
+      const res = await fetch("/api/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tool: "sparring",
+          userId: session?.user?.id,
+          data: {
+            jobTitle: sparringJob?.title ?? "",
+            company: sparringJob?.company ?? "",
+            chatHistory: sparringChat,
+            userMessage: sparringMessage,
+          },
+        }),
+      });
+      const data = await res.json();
+      setSparringChat([...newChat, { role: "ai", text: data.output || "Jokin meni pieleen, yritä uudelleen." }]);
+    } catch {
+      setSparringChat([...newChat, { role: "ai", text: "Yhteysvirhe — tarkista internetyhteys ja yritä uudelleen." }]);
+    } finally {
       setIsSparringTyping(false);
-    }, 1800);
+    }
   }
 
   async function translateSkills() {
     if (!skillInput.trim()) return;
     setIsTranslating(true);
     setErrorMessage("");
-    
-    setTimeout(() => {
-      setSkillOutput("Proaktiivinen ongelmanratkaisu, Tiimityö ja fasilitointi, Aikataulutus ja organisointi");
+
+    try {
+      const session = getSession();
+      const res = await fetch("/api/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tool: "skill-translator",
+          userId: session?.user?.id,
+          data: { skillInput },
+        }),
+      });
+      const data = await res.json();
+      setSkillOutput(data.output || "Tekoäly ei palauttanut tulosta.");
+    } catch {
+      setErrorMessage("Yhteysvirhe — yritä uudelleen.");
+    } finally {
       setIsTranslating(false);
-    }, 1500);
+    }
   }
 
   async function runAtsScan(job: JobItem) {
@@ -2627,20 +2661,34 @@ export default function Home() {
       setErrorMessage("Generoi ensin CV, jotta voimme vertailla sitä ilmoitukseen.");
       return;
     }
-    
+
     setAtsJob(job);
     setIsAtsScanning(true);
     setAtsResult(null);
 
-    setTimeout(() => {
-      const fakeMatch = Math.floor(Math.random() * 30) + 60; 
-      setAtsResult({
-        match: fakeMatch,
-        found: ["Asiakaspalvelu", "Ongelmanratkaisu", "Tiimityöskentely"],
-        missing: ["B2B-myynti", "Salesforce", "Proaktiivisuus"]
+    try {
+      const session = getSession();
+      const res = await fetch("/api/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tool: "ats-scan",
+          userId: session?.user?.id,
+          data: { cvText: parsedCv.cvBody, jobAd: job.adText },
+        }),
       });
+      const data = await res.json();
+      const parsed = JSON.parse(data.output || "{}");
+      setAtsResult({
+        match: typeof parsed.match === "number" ? parsed.match : 0,
+        found: Array.isArray(parsed.found) ? parsed.found : [],
+        missing: Array.isArray(parsed.missing) ? parsed.missing : [],
+      });
+    } catch {
+      setErrorMessage("ATS-skannaus epäonnistui — yritä uudelleen.");
+    } finally {
       setIsAtsScanning(false);
-    }, 2500);
+    }
   }
 
   async function generateInterviewPrep(job: JobItem) {
@@ -2653,16 +2701,25 @@ export default function Home() {
     setIsPrepping(true);
     setPrepQuestions([]);
 
-    setTimeout(() => {
-      setPrepQuestions([
-        { q: "Miksi olet kiinnostunut juuri tästä tehtävästä ja yrityksestämme?", tip: "Yhdistä yrityksen arvot tai tavoitteet omaan taustaasi ja motivaatioosi." },
-        { q: "Mikä on suurin ammatillinen saavutuksesi?", tip: "Käytä STAR-mallia (Tilanne, Tehtävä, Toiminta, Tulos) ja ole konkreettinen numeroiden kanssa." },
-        { q: "Miten toimit paineen alla ja tiukoissa aikatauluissa?", tip: "Anna todellinen esimerkki menneisyydestä, jolloin pysyit rauhallisena ja ratkaisit ongelman." },
-        { q: "Kerro tilanteesta, jossa olit eri mieltä kollegan tai esihenkilön kanssa.", tip: "Keskity siihen, miten kommunikoit rakentavasti ja pääsitte kompromissiin." },
-        { q: "Miksi meidän pitäisi palkata juuri sinut tähän rooliin?", tip: "Kertaa 2-3 vahvinta taitoasi ja osoita, miten ne suoraan ratkaisevat heidän suurimman ongelmansa." }
-      ]);
+    try {
+      const session = getSession();
+      const res = await fetch("/api/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tool: "interview-prep",
+          userId: session?.user?.id,
+          data: { jobTitle: job.title, company: job.company, jobAd: job.adText },
+        }),
+      });
+      const data = await res.json();
+      const parsed = JSON.parse(data.output || "[]");
+      setPrepQuestions(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      setErrorMessage("Haastattelukysymysten generointi epäonnistui — yritä uudelleen.");
+    } finally {
       setIsPrepping(false);
-    }, 2000);
+    }
   }
 
 
@@ -4776,15 +4833,32 @@ export default function Home() {
                         />
                       ) : (
                         <div className={`rounded-3xl border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="Hakemuksen Esikatselu">
-                          <div className="min-w-[900px]">
-                            <CvPreview
-                              cvText={letterDraft}
-                              image={profileImage}
-                              styleVariant={cvStyle}
-                              customStyle={customStyle}
-                              mode="letter"
-                            />
-                          </div>
+                          {isMobileViewport ? (
+                            <div
+                              className="w-full overflow-hidden rounded-2xl"
+                              style={{ height: `${Math.round(1123 * previewScale)}px` }}
+                            >
+                              <div style={{ width: "794px", transform: `scale(${previewScale})`, transformOrigin: "top left" }}>
+                                <CvPreview
+                                  cvText={letterDraft}
+                                  image={profileImage}
+                                  styleVariant={cvStyle}
+                                  customStyle={customStyle}
+                                  mode="letter"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="min-w-[900px]">
+                              <CvPreview
+                                cvText={letterDraft}
+                                image={profileImage}
+                                styleVariant={cvStyle}
+                                customStyle={customStyle}
+                                mode="letter"
+                              />
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -4794,15 +4868,19 @@ export default function Home() {
                         <div className={`p-6 rounded-3xl border ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                           <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
                           <div className="flex flex-col gap-3">
-                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                              ✉️ Kysy lisätietoja tehtävästä
-                            </button>
-                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                              ✉️ Kiitosviesti haastattelun jälkeen
-                            </button>
-                            <button onClick={() => alert("Sähköpostipohjat ovat tulossa pian!")} className={`text-left px-5 py-3 rounded-xl border text-sm font-bold transition hover:border-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-gray-200 bg-gray-50 hover:bg-gray-100'}`}>
-                              🔗 LinkedIn-verkostoitumisviesti
-                            </button>
+                            {[
+                              { icon: "✉️", label: "Kysy lisätietoja tehtävästä" },
+                              { icon: "✉️", label: "Kiitosviesti haastattelun jälkeen" },
+                              { icon: "🔗", label: "LinkedIn-verkostoitumisviesti" },
+                            ].map(({ icon, label }) => (
+                              <div
+                                key={label}
+                                className={`flex items-center justify-between px-5 py-3 rounded-xl border text-sm font-bold ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-500 cursor-not-allowed' : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'}`}
+                              >
+                                <span>{icon} {label}</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[#00BFA6] border border-[#00BFA6]/30 rounded-full px-2 py-0.5">Pian</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
 
@@ -4924,7 +5002,7 @@ export default function Home() {
             <div
               role="alert"
               aria-live={errorMessage ? "assertive" : "polite"}
-              className={`fixed bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[28px] border-2 p-8 text-lg font-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all animate-in slide-in-from-bottom-5 ${
+              className={`fixed bottom-[100px] sm:bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[28px] border-2 p-8 text-lg font-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all animate-in slide-in-from-bottom-5 ${
                 errorMessage
                   ? "border-red-900 bg-red-950/95 text-red-300 backdrop-blur-xl"
                   : "border-[#00BFA6] bg-[#00BFA6]/95 text-black backdrop-blur-xl"
@@ -5181,12 +5259,16 @@ export default function Home() {
         </div>
         
         <div className="mt-8 flex justify-center gap-4">
-          <button 
-            onClick={() => alert("Teleprompterin automaattinen rullaus tulee saataville seuraavassa päivityksessä!")}
-            className="bg-[#FF6F3C] text-black font-black px-10 py-5 rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,111,60,0.4)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-black"
-          >
-            ▶️ ALOITA RULLAUS
-          </button>
+          <div className="flex flex-col items-center gap-2">
+            <button
+              disabled
+              className="bg-[#FF6F3C]/40 text-black/50 font-black px-10 py-5 rounded-2xl text-xl cursor-not-allowed"
+              aria-disabled="true"
+            >
+              ▶️ ALOITA RULLAUS
+            </button>
+            <p className="text-xs text-gray-500 tracking-widest uppercase">Automaattinen rullaus — tulossa pian</p>
+          </div>
         </div>
       </div>
     )}
