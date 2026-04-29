@@ -170,6 +170,12 @@ type StudioCloudState = {
   cvStyle: CvStyleVariant;
   letterTone: LetterTone;
   customStyles: Record<CvStyleVariant, CvCustomStyle>;
+  cvResult: string;
+  letterResult: string;
+  letterDraft: string;
+  activeJobId: string;
+  currentJobIndex: number;
+  tab: Tab;
   jobFilter: string;
   jobStatusFilter: "all" | JobStatus;
   jobPriorityFilter: "all" | JobPriority;
@@ -925,6 +931,7 @@ export default function Home() {
   const [showStyleStudio, setShowStyleStudio] = useState(false);
   const [showLetterHistory, setShowLetterHistory] = useState(false);
   const [showLetterExtras, setShowLetterExtras] = useState(false);
+  const [showArchive, setShowArchive] = useState(false);
   
   const [isPro, setIsPro] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -1167,6 +1174,14 @@ export default function Home() {
           if (state.cvStyle) setCvStyle(state.cvStyle);
           if (state.letterTone) setLetterTone(state.letterTone);
           if (state.customStyles) setCustomStyles(state.customStyles);
+          if (typeof state.cvResult === "string") setCvResult(state.cvResult);
+          if (typeof state.letterResult === "string") setLetterResult(state.letterResult);
+          if (typeof state.letterDraft === "string") setLetterDraft(state.letterDraft);
+          if (typeof state.activeJobId === "string") setActiveJobId(state.activeJobId);
+          if (typeof state.currentJobIndex === "number") {
+            setCurrentJobIndex(state.currentJobIndex);
+          }
+          if (state.tab) setTab(state.tab);
           if (typeof state.jobFilter === "string") setJobFilter(state.jobFilter);
           if (state.jobStatusFilter) setJobStatusFilter(state.jobStatusFilter);
           if (state.jobPriorityFilter) setJobPriorityFilter(state.jobPriorityFilter);
@@ -1309,6 +1324,12 @@ export default function Home() {
       cvStyle,
       letterTone,
       customStyles,
+      cvResult,
+      letterResult,
+      letterDraft,
+      activeJobId,
+      currentJobIndex,
+      tab,
       jobFilter,
       jobStatusFilter,
       jobPriorityFilter,
@@ -1337,7 +1358,10 @@ export default function Home() {
 
     return () => clearTimeout(timeout);
   }, [
+    activeJobId,
     customStyles,
+    currentJobIndex,
+    cvResult,
     cvStyle,
     hasSession,
     isAuthChecking,
@@ -1346,9 +1370,12 @@ export default function Home() {
     jobPriorityFilter,
     jobSort,
     jobStatusFilter,
+    letterDraft,
+    letterResult,
     letterTone,
     searchProfile,
     showFavoritesOnly,
+    tab,
     theme,
   ]);
 
@@ -1375,6 +1402,30 @@ export default function Home() {
     if (!activeJobId) return [];
     return savedCvVariants.filter((cv) => cv.jobId === activeJobId);
   }, [savedCvVariants, activeJobId]);
+
+  const sortedSavedLetters = useMemo(
+    () =>
+      [...savedLetters].sort((a, b) =>
+        (b.updatedAt || b.createdAt).localeCompare(a.updatedAt || a.createdAt),
+      ),
+    [savedLetters],
+  );
+
+  const sortedSavedCvVariants = useMemo(
+    () => [...savedCvVariants].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [savedCvVariants],
+  );
+
+  const archiveJobs = useMemo(
+    () =>
+      [...jobs].sort((a, b) => {
+        if ((b.favorite ? 1 : 0) !== (a.favorite ? 1 : 0)) {
+          return (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0);
+        }
+        return b.id.localeCompare(a.id);
+      }),
+    [jobs],
+  );
 
   const filteredJobs = useMemo(() => {
     const q = jobFilter.trim().toLowerCase();
@@ -1486,6 +1537,58 @@ export default function Home() {
 
   function updateJobForm(key: keyof typeof emptyJobForm, value: string) {
     setJobForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function focusJobInStudio(job: JobItem) {
+    if (job.archived) {
+      updateJob(job.id, { archived: false });
+    }
+    setTab("jobs");
+    setJobFilter(job.title || job.company || "");
+    setJobStatusFilter("all");
+    setJobPriorityFilter("all");
+    setShowFavoritesOnly(false);
+    setCurrentJobIndex(0);
+    setActiveJobId(job.id);
+    setShowArchive(false);
+  }
+
+  function openSavedCvVariant(cv: SavedCvVariant) {
+    const relatedJob = jobs.find((job) => job.id === cv.jobId);
+    if (relatedJob) {
+      if (relatedJob.archived) {
+        updateJob(relatedJob.id, { archived: false });
+      }
+      setJobFilter(relatedJob.title || cv.jobTitle);
+      setJobStatusFilter("all");
+      setJobPriorityFilter("all");
+      setShowFavoritesOnly(false);
+      setCurrentJobIndex(0);
+      setActiveJobId(relatedJob.id);
+    }
+    setCvResult(`CV_BODY:\n${cv.content}`);
+    setTab("cv");
+    setShowArchive(false);
+  }
+
+  function openSavedLetter(letter: SavedLetter) {
+    const relatedJob = jobs.find((job) => job.id === letter.jobId);
+    if (relatedJob) {
+      if (relatedJob.archived) {
+        updateJob(relatedJob.id, { archived: false });
+      }
+      setJobFilter(relatedJob.title || letter.jobTitle);
+      setJobStatusFilter("all");
+      setJobPriorityFilter("all");
+      setShowFavoritesOnly(false);
+      setCurrentJobIndex(0);
+      setActiveJobId(relatedJob.id);
+    }
+    setLetterResult(`HAKEMUS:\n${letter.content}`);
+    setLetterDraft(letter.content);
+    setLetterTone(safeLetterTone(letter.tone));
+    setTab("hakemus");
+    setShowArchive(false);
   }
 
   function updateCvBody(value: string) {
@@ -2726,6 +2829,13 @@ export default function Home() {
               )}
 
               <button
+                onClick={() => setShowArchive(true)}
+                className="rounded-2xl border border-white/10 px-4 py-2 text-xs sm:text-sm font-black text-[#00BFA6] hover:bg-[#00BFA6]/10 hover:text-[#7af4e2] transition-all whitespace-nowrap focus-visible:outline-none"
+              >
+                🗂️ TALLENTEET
+              </button>
+
+              <button
                 onClick={() => setShowSettings(true)}
                 className="rounded-2xl border border-white/10 px-4 py-2 text-xs sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all whitespace-nowrap focus-visible:outline-none"
               >
@@ -2783,6 +2893,14 @@ export default function Home() {
                     className="bg-white text-black px-10 py-5 rounded-[24px] text-lg font-black hover:bg-gray-200 transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                   >
                     Täytä esimerkki
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowArchive(true)}
+                    className={`px-10 py-5 rounded-[24px] text-lg font-black transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}
+                  >
+                    Avaa tallenteet
                   </button>
                 </div>
 
@@ -5049,6 +5167,18 @@ export default function Home() {
       onUpgrade={handleUpgradeToPro} 
     />
 
+    <ArchiveModal
+      isOpen={showArchive}
+      onClose={() => setShowArchive(false)}
+      theme={theme}
+      jobs={archiveJobs}
+      savedLetters={sortedSavedLetters}
+      savedCvVariants={sortedSavedCvVariants}
+      onOpenJob={focusJobInStudio}
+      onOpenLetter={openSavedLetter}
+      onOpenCv={openSavedCvVariant}
+    />
+
         <div
           aria-hidden="true"
           className="h-28 sm:hidden"
@@ -5061,6 +5191,170 @@ export default function Home() {
 // ---------------------------------------------------------
 // APUFUNKTIOT (Home-funktion ULKOPUOLELLA)
 // ---------------------------------------------------------
+
+function ArchiveModal({
+  isOpen,
+  onClose,
+  theme,
+  jobs,
+  savedLetters,
+  savedCvVariants,
+  onOpenJob,
+  onOpenLetter,
+  onOpenCv,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  theme: "light" | "dark";
+  jobs: JobItem[];
+  savedLetters: SavedLetter[];
+  savedCvVariants: SavedCvVariant[];
+  onOpenJob: (job: JobItem) => void;
+  onOpenLetter: (letter: SavedLetter) => void;
+  onOpenCv: (cv: SavedCvVariant) => void;
+}) {
+  if (!isOpen) return null;
+
+  const activeJobsCount = jobs.filter((job) => !job.archived).length;
+  const archivedJobsCount = jobs.filter((job) => job.archived).length;
+
+  return (
+    <div className="fixed inset-0 z-[520] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+      <div className={`w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-[32px] border shadow-2xl flex flex-col ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+        <div className={`flex items-center justify-between gap-4 p-6 sm:p-8 border-b ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">Tallennekeskus</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-black tracking-tight">Täältä löydät vanhat CV:t, hakemukset ja työpaikat</h2>
+            <p className={`mt-2 text-sm sm:text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Avaa mikä tahansa tallenne takaisin studioon yhdellä painalluksella.
+            </p>
+          </div>
+          <button onClick={onClose} className="w-11 h-11 rounded-full border border-white/10 text-2xl font-black text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+            ✕
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 custom-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">CV-versiot</p>
+              <p className="mt-3 text-4xl font-black">{savedCvVariants.length}</p>
+            </div>
+            <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Hakemukset</p>
+              <p className="mt-3 text-4xl font-black">{savedLetters.length}</p>
+            </div>
+            <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Aktiiviset työpaikat</p>
+              <p className="mt-3 text-4xl font-black">{activeJobsCount}</p>
+            </div>
+            <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Arkistoidut työpaikat</p>
+              <p className="mt-3 text-4xl font-black">{archivedJobsCount}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <section className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white'}`}>
+              <div className="mb-4">
+                <h3 className="text-xl font-black">CV-versiot</h3>
+                <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avaa aiemmin räätälöity CV takaisin muokkaukseen.</p>
+              </div>
+              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+                {savedCvVariants.length > 0 ? savedCvVariants.map((cv) => (
+                  <button
+                    key={cv.id}
+                    type="button"
+                    onClick={() => onOpenCv(cv)}
+                    className={`w-full rounded-2xl border px-5 py-4 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}
+                  >
+                    <p className="font-black text-[#00BFA6] truncate">{cv.jobTitle}</p>
+                    <p className={`mt-1 text-sm font-medium truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cv.companyName}</p>
+                    <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{new Date(cv.createdAt).toLocaleString("fi-FI")}</p>
+                  </button>
+                )) : (
+                  <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
+                    Tallennettuja CV-versioita ei ole vielä kertynyt.
+                  </p>
+                )}
+              </div>
+            </section>
+
+            <section className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white'}`}>
+              <div className="mb-4">
+                <h3 className="text-xl font-black">Hakemukset</h3>
+                <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Palaa aiempiin hakemusversioihin ja jatka siitä mihin jäit.</p>
+              </div>
+              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+                {savedLetters.length > 0 ? savedLetters.map((letter) => (
+                  <button
+                    key={letter.id}
+                    type="button"
+                    onClick={() => onOpenLetter(letter)}
+                    className={`w-full rounded-2xl border px-5 py-4 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-black text-[#00BFA6] truncate">{letter.jobTitle}</p>
+                        <p className={`mt-1 text-sm font-medium truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{letter.companyName}</p>
+                      </div>
+                      {letter.tone && (
+                        <span className="shrink-0 rounded-full bg-[#00BFA6]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">
+                          {getLetterToneLabel(letter.tone)}
+                        </span>
+                      )}
+                    </div>
+                    <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                      {new Date(letter.updatedAt || letter.createdAt).toLocaleString("fi-FI")}
+                    </p>
+                  </button>
+                )) : (
+                  <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
+                    Tallennettuja hakemuksia ei ole vielä kertynyt.
+                  </p>
+                )}
+              </div>
+            </section>
+
+            <section className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white'}`}>
+              <div className="mb-4">
+                <h3 className="text-xl font-black">Työpaikat</h3>
+                <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avaa tallennettu paikka takaisin seurantaan tai jatka hakemista.</p>
+              </div>
+              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+                {jobs.length > 0 ? jobs.map((job) => (
+                  <button
+                    key={job.id}
+                    type="button"
+                    onClick={() => onOpenJob(job)}
+                    className={`w-full rounded-2xl border px-5 py-4 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-black text-[#00BFA6] truncate">{job.title || "Nimetön työpaikka"}</p>
+                        <p className={`mt-1 text-sm font-medium truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{[job.company, job.location].filter(Boolean).join(" · ")}</p>
+                      </div>
+                      <span className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${job.archived ? 'bg-gray-500/15 text-gray-400' : 'bg-[#00BFA6]/10 text-[#00BFA6]'}`}>
+                        {job.archived ? 'Arkistoitu' : 'Aktiivinen'}
+                      </span>
+                    </div>
+                    <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                      {getStatusLabel(job.status)} · {getPriorityLabel(job.priority)}
+                    </p>
+                  </button>
+                )) : (
+                  <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
+                    Tallennettuja työpaikkoja ei ole vielä kertynyt.
+                  </p>
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SettingsModal({ 
   isOpen, onClose, theme, isPro, onPortal, onDeleteAccount, onLogout 
