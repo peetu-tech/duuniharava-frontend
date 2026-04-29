@@ -1935,8 +1935,32 @@ export default function Home() {
       const data = await res.json();
       const parsed = safeJsonParseJobs(data.output || "[]");
 
-      if (!parsed.length) {
-        setErrorMessage("Työpaikkaehdotuksia ei saatu muodostettua.");
+      if (!res.ok || !parsed.length) {
+        const diagnostics = data.diagnostics;
+        const details: string[] = [];
+
+        if (diagnostics) {
+          details.push(
+            `Työmarkkinatori-osumat: ${diagnostics.tyomarkkinatoriCount ?? 0}`,
+          );
+          details.push(`Google-osumat: ${diagnostics.googleCount ?? 0}`);
+
+          if (!diagnostics.usesProxy) {
+            details.push("Proxy ei ole käytössä.");
+          }
+          if (!diagnostics.hasGoogleKey || !diagnostics.hasGoogleCx) {
+            details.push("Google-hakua ei ole määritetty oikein.");
+          }
+          if (!diagnostics.hasTyomarkkinatoriKey) {
+            details.push("Työmarkkinatorin avain puuttuu.");
+          }
+        }
+
+        setErrorMessage(
+          [data.error || "Työpaikkaehdotuksia ei saatu muodostettua.", ...details]
+            .filter(Boolean)
+            .join(" "),
+        );
         return;
       }
 

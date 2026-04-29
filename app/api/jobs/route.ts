@@ -138,6 +138,14 @@ export async function POST(req: Request) {
     const tmKey = process.env.TYOMARKKINATORI_API_KEY;
     const googleApiKey = process.env.GOOGLE_API_KEY;
     const googleCxId = process.env.GOOGLE_CX_ID || "1219b99e3495d43d8";
+    const diagnostics = {
+      hasTyomarkkinatoriKey: Boolean(tmKey),
+      hasGoogleKey: Boolean(googleApiKey),
+      hasGoogleCx: Boolean(googleCxId),
+      usesProxy: Boolean(proxyAgent),
+      tyomarkkinatoriCount: 0,
+      googleCount: 0,
+    };
 
     let tmJobsForAI: any[] = [];
     let googleJobsForAI: any[] = [];
@@ -233,6 +241,7 @@ export async function POST(req: Request) {
             .slice(0, 20);
 
           tmJobsForAI = scoredJobs.map(({ _score, ...job }) => job);
+          diagnostics.tyomarkkinatoriCount = tmJobsForAI.length;
           console.log(
             `Tyomarkkinatori returned ${tmJobsForAI.length} shortlisted jobs.`,
           );
@@ -281,6 +290,7 @@ export async function POST(req: Request) {
               source,
             };
           });
+          diagnostics.googleCount = googleJobsForAI.length;
           console.log(`Google returned ${googleJobsForAI.length} external jobs.`);
         }
       } catch (error) {
@@ -294,7 +304,12 @@ export async function POST(req: Request) {
     ];
 
     if (combinedJobs.length === 0) {
-      return NextResponse.json({ output: "[]" });
+      return NextResponse.json({
+        output: "[]",
+        diagnostics,
+        error:
+          "Työpaikkoja ei löytynyt yhdestäkään lähteestä. Tarkista proxy- tai Google-asetukset.",
+      });
     }
 
     const today = new Date();
@@ -369,7 +384,10 @@ Palauta vain validi JSON muodossa:
       finalJobs = buildDeterministicJobsFallback(combinedJobs);
     }
 
-    return NextResponse.json({ output: JSON.stringify(finalJobs) });
+    return NextResponse.json({
+      output: JSON.stringify(finalJobs),
+      diagnostics,
+    });
   } catch (error) {
     console.error("Jobs route error:", error);
     return NextResponse.json(
