@@ -14,167 +14,306 @@ const proxyAgent = fixieUrl ? new HttpsProxyAgent(fixieUrl) : undefined;
 
 const TYOMARKKINATORI_URL = "https://api.ahtp.fi/kipa/p67/v2/jobpostings";
 
-function getLocText(field: any): string {
+function getLocText(field: unknown): string {
   if (!field) return "";
   if (typeof field === "string") return field;
-  return field.fi || field.FI || field.sv || field.SV || field.en || field.EN || "";
+  if (typeof field === "object") {
+    const localized = field as Record<string, string | undefined>;
+    return (
+      localized.fi ||
+      localized.FI ||
+      localized.sv ||
+      localized.SV ||
+      localized.en ||
+      localized.EN ||
+      ""
+    );
+  }
+  return "";
+}
+
+function makeExternalId(prefix: string) {
+  return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function normalizeDateString(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function safeJsonLinesParse(text: string): any[] {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
 }
 
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: "OpenAI avain puuttuu." }, { status: 500 });
+      return NextResponse.json(
+        { error: "OpenAI avain puuttuu." },
+        { status: 500 },
+      );
     }
 
     const body = await req.json();
-    const rawSearchTerms = [body.targetJob, body.desiredRoles, body.keywords].filter(Boolean).join(" ");
-    const searchKeywords = Array.from(new Set(rawSearchTerms.toLowerCase().split(/[\s,]+/).filter(w => w.length > 3)));
-    
-    let tmJobsForAI: any[] = [];
-    let googleJobsForAI: any[] = [];
+
+    const rawSearchTerms = [
+      body.targetJob,
+      body.desiredRoles,
+      body.keywords,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    const locationSearch = `${body.desiredLocation || ""}`.trim();
+    const googleSearchTerms = [
+      body.targetJob,
+      body.desiredRoles,
+      body.desiredLocation,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    const searchKeywords = Array.from(
+      new Set(
+        rawSearchTerms
+          .toLowerCase()
+          .split(/[\s,]+/)
+          .filter((word) => word.length > 3),
+      ),
+    );
+
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 14);
 
     const tmKey = process.env.TYOMARKKINATORI_API_KEY;
     const googleApiKey = process.env.GOOGLE_API_KEY;
     const googleCxId = process.env.GOOGLE_CX_ID || "1219b99e3495d43d8";
 
-    const recentDate = new Date();
-    recentDate.setDate(recentDate.getDate() - 14);
+    let tmJobsForAI: any[] = [];
+    let googleJobsForAI: any[] = [];
 
-    // ==========================================================
-    // VAIHE 1A: HAKU TYÖMARKKINATORILTA
-    // ==========================================================
     if (tmKey) {
       try {
-        const payload: any = {
+        console.log("Searching Tyomarkkinatori with narrow payload...");
+
+        const payload: Record<string, unknown> = {
           onlyStatus: "PUBLISHED",
-          created: { from: recentDate.toISOString() }
+          created: { from: recentDate.toISOString() },
         };
 
         if (searchKeywords.length > 0) {
           payload.query = searchKeywords[0];
         }
 
-        const fetchOptions: any = {
+        const fetchOptions: Record<string, unknown> = {
           method: "POST",
           headers: {
             "KIPA-Subscription-Key": tmKey,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         };
 
-        if (proxyAgent) fetchOptions.agent = proxyAgent;
+        if (proxyAgent) {
+          fetchOptions.agent = proxyAgent;
+        }
 
-        const tmResponse = await fetch(TYOMARKKINATORI_URL, fetchOptions);
+        const tmResponse = await fetch(
+          TYOMARKKINATORI_URL,
+          fetchOptions as Parameters<typeof fetch>[1],
+        );
 
         if (tmResponse.ok) {
-          const textData = await tmResponse.text();
-          const allParsedJobs = textData.split('\n').filter(line => line.trim().length > 0).map(line => {
-            try { return JSON.parse(line); } catch (e) { return null; }
-          }).filter(Boolean);
+          const allParsedJobs = safeJsonLinesParse(await tmResponse.text());
 
-          tmJobsForAI = allParsedJobs.map(job => {
-            const title = getLocText(job.position?.title);
-            const company = getLocText(job.client?.company) || getLocText(job.owner?.company) || "Työnantaja";
-            const desc = getLocText(job.position?.jobDescription) || getLocText(job.position?.marketingDescription);
-            const loc = getLocText(job.location?.workplacePostOffice) || job.location?.municipalities?.[0] || "";
-            
-            // KORJAUS: Linkin rakentaminen Työmarkkinatorille
-            // Ensisijaisesti käytetään application.url jos se on olemassa, muuten rakennetaan TM-linkki
-            const applicationUrl = job.application?.url ? getLocText(job.application.url) : null;
-            const fallbackTmUrl = `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${job.id}`;
-            const finalUrl = applicationUrl || fallbackTmUrl;
+          const scoredJobs = allParsedJobs
+            .map((job) => {
+              const title = getLocText(job.position?.title);
+              const company =
+                getLocText(job.client?.company) ||
+                getLocText(job.owner?.company) ||
+                "Työnantaja";
+              const desc =
+                getLocText(job.position?.jobDescription) ||
+                getLocText(job.position?.marketingDescription);
+              const loc =
+                getLocText(job.location?.workplacePostOffice) ||
+                job.location?.municipalities?.[0] ||
+                "";
+              const fullText = `${title} ${company} ${desc} ${loc}`.toLowerCase();
 
-            return {
-              id: job.id,
-              title,
-              company,
-              location: loc,
-              description: desc ? desc.substring(0, 500) : "",
-              url: finalUrl,
-              source: "Työmarkkinatori"
-            };
-          });
+              let score = 0;
+              if (locationSearch && fullText.includes(locationSearch.toLowerCase())) {
+                score += 5;
+              }
+              for (const keyword of searchKeywords) {
+                if (fullText.includes(keyword)) score += 1;
+              }
+
+              const directApplyUrl = getLocText(job.application?.url);
+              const fallbackTmUrl = `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${job.id}`;
+
+              return {
+                id: job.metadata?.externalId || job.id || makeExternalId("tm"),
+                title: title || "Avoin työpaikka",
+                company,
+                location: loc || "Suomi",
+                description: desc ? desc.slice(0, 500) : "",
+                url: directApplyUrl || fallbackTmUrl,
+                source: "Työmarkkinatori",
+                _score: score,
+              };
+            })
+            .sort((a, b) => b._score - a._score)
+            .slice(0, 20);
+
+          tmJobsForAI = scoredJobs.map(({ _score, ...job }) => job);
+          console.log(
+            `Tyomarkkinatori returned ${tmJobsForAI.length} shortlisted jobs.`,
+          );
+        } else {
+          console.error("Tyomarkkinatori API error:", tmResponse.status);
         }
-      } catch (e) {
-        console.error("❌ Työmarkkinatori error:", e);
+      } catch (error) {
+        console.error("Tyomarkkinatori fetch failed:", error);
       }
     }
 
-    // ==========================================================
-    // VAIHE 1B: HAKU GOOGLESTA (Duunitori, Oikotie jne.)
-    // ==========================================================
-    const googleSearchStr = [body.targetJob, body.desiredRoles, body.desiredLocation].filter(Boolean).join(" ");
-
-    if (googleApiKey && googleCxId && googleSearchStr) {
+    if (googleApiKey && googleCxId && googleSearchTerms) {
       try {
-        const googleUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(googleSearchStr)}&gl=fi&dateRestrict=d[14]`;
-        const gRes = await fetch(googleUrl);
-        const gData: any = await gRes.json();
+        console.log("Searching Google Custom Search...");
 
-        if (gData.items) {
-          googleJobsForAI = gData.items.map((item: any) => {
+        const googleUrl =
+          `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}` +
+          `&cx=${googleCxId}` +
+          `&q=${encodeURIComponent(googleSearchTerms)}` +
+          `&gl=fi&dateRestrict=d14`;
+
+        const googleResponse = await fetch(googleUrl);
+        const googleData = (await googleResponse.json()) as { items?: any[] };
+
+        if (Array.isArray(googleData.items) && googleData.items.length > 0) {
+          googleJobsForAI = googleData.items.slice(0, 10).map((item) => {
             let source = "Internet";
-            if (item.link.includes("duunitori.fi")) source = "Duunitori";
-            else if (item.link.includes("oikotie.fi")) source = "Oikotie";
-            else if (item.link.includes("linkedin.com")) source = "LinkedIn";
-            else if (item.link.includes("jobly.fi")) source = "Jobly";
+            if (item.link?.includes("duunitori.fi")) source = "Duunitori";
+            else if (item.link?.includes("oikotie.fi")) source = "Oikotie";
+            else if (item.link?.includes("jobly.fi")) source = "Jobly";
+            else if (item.link?.includes("linkedin.com")) source = "LinkedIn";
 
             return {
-              id: Math.random().toString(36).substr(2, 9),
-              title: item.title.split(/[-|–]/)[0].trim(),
+              id: makeExternalId("ext"),
+              title: `${item.title || "Avoin työpaikka"}`
+                .split(/[-|–]/)[0]
+                .trim(),
               company: "Katso ilmoituksesta",
-              location: body.desiredLocation || "Suomi",
-              description: item.snippet,
+              location: locationSearch || "Suomi",
+              description: item.snippet || "",
               url: item.link,
-              source: source
+              source,
             };
           });
+          console.log(`Google returned ${googleJobsForAI.length} external jobs.`);
         }
-      } catch (e) {
-        console.error("❌ Google search error:", e);
+      } catch (error) {
+        console.error("Google search failed:", error);
       }
     }
 
-    // Yhdistetään ja varmistetaan monipuolisuus
-    const combinedJobs = [...googleJobsForAI.slice(0, 10), ...tmJobsForAI.slice(0, 20)];
-    const todayFi = new Date().toLocaleDateString("fi-FI");
+    const combinedJobs = [
+      ...googleJobsForAI.slice(0, 10),
+      ...tmJobsForAI.slice(0, 20),
+    ];
 
     if (combinedJobs.length === 0) {
       return NextResponse.json({ output: "[]" });
     }
 
-    // ==========================================
-    // VAIHE 2: AI-RIKASTUS & LOPULLINEN VALINTA
-    // ==========================================
+    const today = new Date();
+    const fallbackFutureDeadline = new Date(today);
+    fallbackFutureDeadline.setDate(today.getDate() + 30);
+
+    const aiPrompt = `
+Olet rekrytointikonsultti. Hakijan toiveet:
+- Rooli: ${rawSearchTerms || body.targetJob || body.desiredRoles || "Avoin työ"}
+- Alue: ${locationSearch || "Suomi"}
+
+Alla on lista oikeita työpaikkahakuosumia eri lähteistä:
+${JSON.stringify(combinedJobs)}
+
+Tehtävä:
+1. Valitse 12 parhaiten sopivaa työpaikkaa.
+2. Ota mukaan useita eri lähteitä, jos niitä on tarjolla.
+3. Jos mukana on ulkoisia lähteitä, valitse vähintään 4 paikkaa muualta kuin Työmarkkinatorilta.
+4. Älä keksi uusia työpaikkoja listan ulkopuolelta.
+5. Säilytä url-kenttä täsmälleen sellaisena kuin syötteessä.
+6. Jos ilmoituksen teksti on lyhyt ulkoisesta lähteestä, käytä adText-kentässä tätä tekstiä:
+"Tämä työpaikka löytyi ulkoisesta palvelusta. Klikkaa alla olevaa painiketta avataksesi ilmoituksen, kopioi sen teksti ja tuo se Duuniharavaan analysoitavaksi!"
+
+Deadline-ohje:
+- Tänään on ${normalizeDateString(today)}.
+- Jos oikeaa deadlinea ei voi päätellä, käytä tulevaa päivämäärää ${normalizeDateString(fallbackFutureDeadline)}.
+- Älä koskaan anna mennyttä päivämäärää.
+
+Palauta vain validi JSON muodossa:
+{
+  "jobs": [
+    {
+      "title": "Työn nimi",
+      "company": "Yritys",
+      "location": "Sijainti",
+      "type": "Kokoaikainen tai Osa-aikainen",
+      "summary": "Houkutteleva 1-2 lauseen yhteenveto",
+      "adText": "Ilmoitusteksti tai yllä oleva vakioteksti",
+      "url": "Sama url kuin syötteessä",
+      "whyFit": "Miksi sopii hakijalle",
+      "source": "Sama kuin syötteessä",
+      "matchScore": 1,
+      "status": "interested",
+      "priority": "medium",
+      "salary": "Lue kuvauksesta, muuten Sopimuksen mukaan",
+      "deadline": "YYYY-MM-DD",
+      "notes": ""
+    }
+  ]
+}`;
+
     const aiResponse = await openai.chat.completions.create({
       model: "gpt-4o",
       response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: "Olet rekrytointiasiantuntija. Palauta VAIN JSON-dataa." },
-        { role: "user", content: `
-Valitse tästä listasta 12-15 parhaiten hakijalle sopivaa työpaikkaa: ${JSON.stringify(combinedJobs)}
-Hakijan toiveet: ${rawSearchTerms}
-
-TÄRKEÄT OHJEET:
-1. MONIPUOLISUUS: Valitse vähintään 5 paikkaa muualta kuin Työmarkkinatorilta (jos niitä on listassa). Suosi Duunitoria ja Oikotietä.
-2. LINKIT: Käytä alkuperäisiä URL-osoitteita muuttamatta niitä.
-3. TIIVISTELMÄT: Kirjoita jokaiselle oma, houkutteleva myyntipuhe (summary).
-4. PÄIVÄMÄÄRÄT: Tänään on ${todayFi}. Varmista että deadline on tulevaisuudessa.
-
-Palauta muodossa:
-{ "jobs": [ { "title": "...", "company": "...", "location": "...", "type": "...", "summary": "...", "adText": "...", "url": "...", "whyFit": "...", "source": "...", "matchScore": 0-100, "status": "interested", "priority": "medium", "salary": "...", "deadline": "YYYY-MM-DD" } ] }
-` }
+        {
+          role: "system",
+          content:
+            "Olet apuri, joka palauttaa vain validia JSON-dataa eikä koskaan keksi uusia työpaikkoja syötteen ulkopuolelta.",
+        },
+        { role: "user", content: aiPrompt },
       ],
-      temperature: 0.3,
+      temperature: 0.2,
     });
 
-    const rawOutput = aiResponse.choices[0]?.message?.content?.trim() || '{"jobs": []}';
-    const parsed = JSON.parse(rawOutput);
-    return NextResponse.json({ output: JSON.stringify(parsed.jobs || []) });
+    const rawOutput =
+      aiResponse.choices[0]?.message?.content?.trim() || '{"jobs": []}';
+    const parsed = JSON.parse(rawOutput) as { jobs?: unknown[] };
+    const finalJobs = Array.isArray(parsed.jobs) ? parsed.jobs : [];
 
-  } catch (error: any) {
-    console.error("❌ Route error:", error);
-    return NextResponse.json({ error: "Haku epäonnistui." }, { status: 500 });
+    return NextResponse.json({ output: JSON.stringify(finalJobs) });
+  } catch (error) {
+    console.error("Jobs route error:", error);
+    return NextResponse.json(
+      { error: "Työpaikkojen haku epäonnistui." },
+      { status: 500 },
+    );
   }
 }
