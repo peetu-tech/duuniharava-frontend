@@ -112,6 +112,21 @@ function uniqueByUrl<T extends { url?: string }>(items: T[]) {
   });
 }
 
+function uniqueJobsByUrlOrTitle<
+  T extends { url?: string; title?: string; company?: string }
+>(items: T[]) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const fallbackKey = `${item.title || ""}::${item.company || ""}`
+      .trim()
+      .toLowerCase();
+    const key = (item.url || fallbackKey).trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function buildJobsCacheKey(body: Record<string, unknown>) {
   return JSON.stringify({
     targetJob: `${body.targetJob || ""}`.trim().toLowerCase(),
@@ -435,18 +450,20 @@ export async function POST(req: Request) {
       }
     }
 
-    const combinedJobs = [
+    const combinedJobs = uniqueJobsByUrlOrTitle([
       ...googleJobsForAI.slice(0, 10),
       ...tmJobsForAI.slice(0, 20),
-    ];
+    ]);
 
     if (combinedJobs.length === 0) {
-      return NextResponse.json({
+      const responsePayload = {
         output: "[]",
         diagnostics,
         error:
           "Työpaikkoja ei löytynyt yhdestäkään lähteestä. Tarkista proxy- tai Google-asetukset.",
-      });
+      };
+      writeJobsCache(cacheKey, responsePayload);
+      return NextResponse.json(responsePayload);
     }
 
     const today = new Date();
