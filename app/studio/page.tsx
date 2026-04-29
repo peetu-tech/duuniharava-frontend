@@ -536,10 +536,10 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-10 sm:mb-16 rounded-[32px] sm:rounded-[40px] border p-7 sm:p-14 shadow-2xl backdrop-blur-xl transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`} 
+      className={`group mb-8 sm:mb-16 rounded-[28px] sm:rounded-[40px] border p-5 sm:p-14 shadow-2xl backdrop-blur-xl transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
-      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-7 border-b pb-7 sm:pb-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-xl [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 sm:gap-7 border-b pb-5 sm:pb-8 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-xl [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
         <div className="w-full sm:w-auto flex justify-between items-center">
           <div>
             <p className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
@@ -923,6 +923,7 @@ export default function Home() {
   const [showHelp, setShowHelp] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [previewScale, setPreviewScale] = useState(1);
   const [showMoreCvFields, setShowMoreCvFields] = useState(false);
   const [showMoreSearchFields, setShowMoreSearchFields] = useState(false);
   const [showManualJobForm, setShowManualJobForm] = useState(false);
@@ -1201,7 +1202,9 @@ export default function Home() {
     if (typeof window === "undefined") return;
 
     const handleResize = () => {
-      setIsMobileViewport(window.innerWidth < 768);
+      const w = window.innerWidth;
+      setIsMobileViewport(w < 768);
+      setPreviewScale(w < 640 ? Math.min(1, (w - 40) / 794) : 1);
     };
 
     handleResize();
@@ -3791,22 +3794,39 @@ export default function Home() {
                               <h3 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Näin CV näyttää</h3>
                             </div>
                             <p className={`max-w-xl text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              Puhelimella voit vierittää esikatselua sivusuunnassa. Tärkein muokkaus tapahtuu aina yläpuolella tekstieditorissa.
+                              Esikatselu skaalautuu puhelimen leveyteen. Muokkaa tekstiä yllä olevassa editorissa — muutokset näkyvät heti tässä.
                             </p>
                           </div>
-                          <div className="min-w-[320px] sm:min-w-[680px] xl:min-w-[900px]">
-                            <CvPreview
-                              cvText={parsedCv.cvBody}
-                              image={profileImage}
-                              styleVariant={cvStyle}
-                              customStyle={customStyle}
-                              mode="cv"
-                            />
-                          </div>
+                          {isMobileViewport ? (
+                            <div
+                              className="w-full overflow-hidden rounded-2xl"
+                              style={{ height: `${Math.round(1123 * previewScale)}px` }}
+                            >
+                              <div style={{ width: "794px", transform: `scale(${previewScale})`, transformOrigin: "top left" }}>
+                                <CvPreview
+                                  cvText={parsedCv.cvBody}
+                                  image={profileImage}
+                                  styleVariant={cvStyle}
+                                  customStyle={customStyle}
+                                  mode="cv"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="min-w-[680px] xl:min-w-[900px]">
+                              <CvPreview
+                                cvText={parsedCv.cvBody}
+                                image={profileImage}
+                                styleVariant={cvStyle}
+                                customStyle={customStyle}
+                                mode="cv"
+                              />
+                            </div>
+                          )}
                         </div>
 
                         {/* LATAUSNAPIT */}
-                        <div className="flex flex-col sm:flex-row gap-5 mt-20 pt-10 border-t border-white/10">
+                        <div className={`flex flex-col sm:flex-row gap-5 mt-12 sm:mt-20 pt-8 sm:pt-10 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
                           <button
                             type="button"
                             onClick={() => downloadPdf("cv-preview", false)}
