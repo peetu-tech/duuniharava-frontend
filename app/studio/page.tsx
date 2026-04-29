@@ -163,6 +163,20 @@ type StudioDraftState = {
   customStyles: Record<CvStyleVariant, CvCustomStyle>;
 };
 
+type StudioCloudState = {
+  searchProfile: typeof emptySearchProfile;
+  jobForm: typeof emptyJobForm;
+  theme: "light" | "dark";
+  cvStyle: CvStyleVariant;
+  letterTone: LetterTone;
+  customStyles: Record<CvStyleVariant, CvCustomStyle>;
+  jobFilter: string;
+  jobStatusFilter: "all" | JobStatus;
+  jobPriorityFilter: "all" | JobPriority;
+  jobSort: "match" | "deadline" | "priority" | "newest" | "company";
+  showFavoritesOnly: boolean;
+};
+
 const STORAGE_KEY = "duuniharava_state_v8";
 
 function getStudioStorageKey(userId: string) {
@@ -1135,6 +1149,32 @@ export default function Home() {
             createdAt: c.created_at
           })));
         }
+
+        const sRes = await fetch(
+          `${supabaseUrl}/rest/v1/studio_state?user_id=eq.${userId}&select=state&limit=1`,
+          { headers },
+        );
+        const sData = await sRes.json();
+        if (Array.isArray(sData) && sData[0]?.state) {
+          const state = sData[0].state as Partial<StudioCloudState>;
+          if (state.searchProfile) {
+            setSearchProfile((prev) => ({ ...prev, ...state.searchProfile }));
+          }
+          if (state.jobForm) {
+            setJobForm((prev) => ({ ...prev, ...state.jobForm }));
+          }
+          if (state.theme) setTheme(state.theme);
+          if (state.cvStyle) setCvStyle(state.cvStyle);
+          if (state.letterTone) setLetterTone(state.letterTone);
+          if (state.customStyles) setCustomStyles(state.customStyles);
+          if (typeof state.jobFilter === "string") setJobFilter(state.jobFilter);
+          if (state.jobStatusFilter) setJobStatusFilter(state.jobStatusFilter);
+          if (state.jobPriorityFilter) setJobPriorityFilter(state.jobPriorityFilter);
+          if (state.jobSort) setJobSort(state.jobSort);
+          if (typeof state.showFavoritesOnly === "boolean") {
+            setShowFavoritesOnly(state.showFavoritesOnly);
+          }
+        }
       } catch (err) {
         console.error("Virhe tietojen latauksessa:", err);
       }
@@ -1254,6 +1294,61 @@ export default function Home() {
     searchProfile,
     showFavoritesOnly,
     tab,
+    theme,
+  ]);
+
+  useEffect(() => {
+    if (isAuthChecking || !hasSession) return;
+    const session = getSession();
+    if (!session) return;
+
+    const cloudState: StudioCloudState = {
+      searchProfile,
+      jobForm,
+      theme,
+      cvStyle,
+      letterTone,
+      customStyles,
+      jobFilter,
+      jobStatusFilter,
+      jobPriorityFilter,
+      jobSort,
+      showFavoritesOnly,
+    };
+
+    const timeout = setTimeout(async () => {
+      try {
+        await fetch(`${supabaseUrl}/rest/v1/studio_state`, {
+          method: "POST",
+          headers: {
+            ...getSupabaseHeaders(),
+            Prefer: "resolution=merge-duplicates",
+          },
+          body: JSON.stringify({
+            user_id: session.user.id,
+            state: cloudState,
+            updated_at: new Date().toISOString(),
+          }),
+        });
+      } catch (error) {
+        console.error("Studion pilvitilan tallennus epäonnistui", error);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, [
+    customStyles,
+    cvStyle,
+    hasSession,
+    isAuthChecking,
+    jobFilter,
+    jobForm,
+    jobPriorityFilter,
+    jobSort,
+    jobStatusFilter,
+    letterTone,
+    searchProfile,
+    showFavoritesOnly,
     theme,
   ]);
 
