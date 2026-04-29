@@ -602,6 +602,7 @@ function FieldHint({
 function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring, onSalary, onAtsScan, onInterviewPrep, theme }: any) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
+  const [showJobTools, setShowJobTools] = useState(false);
 
   return (
     <article
@@ -611,9 +612,9 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           : (theme === 'dark' ? "border-white/10 bg-[#141414] hover:border-white/20 hover:-translate-y-1" : "border-gray-200 bg-white hover:border-gray-300 hover:-translate-y-1")
       }`}
     >
-      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
-        <div className="min-w-0 flex-1">
-          <div className="mb-5 flex flex-wrap items-center gap-3">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
+          <div className="min-w-0 flex-1">
+            <div className="mb-5 flex flex-wrap items-center gap-3">
             {job.source && (
               <span className={`rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-300' : 'border-gray-200 bg-gray-100 text-gray-600'}`}>
                 {job.source}
@@ -644,75 +645,88 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row flex-wrap gap-4 w-full lg:w-auto pt-6 lg:pt-0 border-t border-transparent lg:border-none mt-4 lg:mt-0">
-          <button
-            type="button"
-            onClick={() => onUpdate({ favorite: !job.favorite })}
-            aria-pressed={job.favorite}
-            className={`w-full sm:w-auto rounded-2xl px-6 py-5 sm:py-4 text-base font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
-              job.favorite
-                ? "bg-[#FF6F3C] text-white shadow-[0_0_15px_rgba(255,111,60,0.4)] hover:bg-[#FF6F3C]/80"
-                : (theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100")
-            }`}
-          >
-            {job.favorite ? "★ Suosikki" : "☆ Suosikiksi"}
-          </button>
+          <div className="w-full lg:w-auto pt-6 lg:pt-0 border-t border-transparent lg:border-none mt-4 lg:mt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => onUpdate({ favorite: !job.favorite })}
+                aria-pressed={job.favorite}
+                className={`w-full rounded-2xl px-5 py-4 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                  job.favorite
+                    ? "bg-[#FF6F3C] text-white shadow-[0_0_15px_rgba(255,111,60,0.4)] hover:bg-[#FF6F3C]/80"
+                    : (theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100")
+                }`}
+              >
+                {job.favorite ? "★ Suosikki" : "☆ Tallenna"}
+              </button>
 
-          <button
-            type="button"
-            onClick={onSelect}
-            aria-pressed={isActive}
-            className={`w-full sm:w-auto rounded-2xl px-6 py-5 sm:py-4 text-base font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] hidden`} 
-          >
-            {isActive ? "✓ Valittu" : "Valitse paikka"}
-          </button>
+              <button
+                type="button"
+                onClick={() => setShowJobTools((prev: boolean) => !prev)}
+                aria-expanded={showJobTools}
+                className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                  theme === 'dark' ? "border-white/10 bg-white/5 text-white hover:bg-white/10" : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                {showJobTools ? "Piilota lisätyökalut" : "Lisätyökalut"}
+              </button>
 
-          <button
-            type="button"
-            onClick={onAtsScan}
-            aria-label={`Skannaa ATS-osuvuus työpaikkaan ${job.title}`}
-            className={`w-full sm:w-auto rounded-2xl border px-6 py-5 sm:py-4 text-base font-bold transition hover:-translate-y-1 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'dark' ? 'border-purple-500/50 bg-purple-500/10 text-purple-400 hover:bg-purple-500 hover:text-white focus-visible:ring-purple-500' : 'border-purple-300 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white focus-visible:ring-purple-600'}`}
-          >
-            🔍 ATS-Skanneri
-          </button>
+              <button
+                type="button"
+                onClick={onRemove}
+                aria-label={`Poista työpaikka ${job.title}`}
+                className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 ${theme === 'dark' ? 'border-red-900/50 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white' : 'border-red-200 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white'}`}
+              >
+                Poista
+              </button>
+            </div>
 
-          <button
-            type="button"
-            onClick={onInterviewPrep}
-            aria-label={`Ennakoi haastattelukysymykset työpaikkaan ${job.title}`}
-            className={`w-full sm:w-auto rounded-2xl border px-6 py-5 sm:py-4 text-base font-bold transition hover:-translate-y-1 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'dark' ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white focus-visible:ring-indigo-500' : 'border-indigo-300 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white focus-visible:ring-indigo-600'}`}
-          >
-            ❓ Tärpit
-          </button>
+            {showJobTools && (
+              <div className={`mt-4 rounded-[28px] border p-4 sm:p-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/90'}`}>
+                <p className={`mb-4 text-xs font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Lisätyökalut
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={onAtsScan}
+                    aria-label={`Skannaa ATS-osuvuus työpaikkaan ${job.title}`}
+                    className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'dark' ? 'border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500 hover:text-white focus-visible:ring-purple-500' : 'border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-600 hover:text-white focus-visible:ring-purple-600'}`}
+                  >
+                    ATS-skanneri
+                  </button>
 
-          <button
-            type="button"
-            onClick={onSalary}
-            aria-label={`Tarkista palkkataso työpaikkaan ${job.title}`}
-            className="w-full sm:w-auto rounded-2xl border border-blue-500/50 bg-blue-500/10 px-6 py-5 sm:py-4 text-base font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white shadow-[0_0_15px_rgba(59,130,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-          >
-            💰 Palkka-arvio
-          </button>
+                  <button
+                    type="button"
+                    onClick={onInterviewPrep}
+                    aria-label={`Ennakoi haastattelukysymykset työpaikkaan ${job.title}`}
+                    className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'dark' ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500 hover:text-white focus-visible:ring-indigo-500' : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white focus-visible:ring-indigo-600'}`}
+                  >
+                    Haastattelutärpit
+                  </button>
 
-          <button
-            type="button"
-            onClick={onSparring}
-            aria-label={`Treenaa haastattelua työpaikkaan ${job.title}`}
-            className="w-full sm:w-auto rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-5 sm:py-4 text-base font-bold text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black shadow-[0_0_15px_rgba(0,191,166,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
-          >
-            🎤 Treenaa
-          </button>
+                  <button
+                    type="button"
+                    onClick={onSalary}
+                    aria-label={`Tarkista palkkataso työpaikkaan ${job.title}`}
+                    className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'dark' ? 'border-blue-500/40 bg-blue-500/10 text-blue-300 hover:bg-blue-500 hover:text-white focus-visible:ring-blue-500' : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white focus-visible:ring-blue-600'}`}
+                  >
+                    Palkka-arvio
+                  </button>
 
-          <button
-            type="button"
-            onClick={onRemove}
-            aria-label={`Poista työpaikka ${job.title}`}
-            className={`w-full sm:w-auto rounded-2xl border px-6 py-5 sm:py-4 text-base font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 ${theme === 'dark' ? 'border-red-900/50 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white' : 'border-red-200 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white'}`}
-          >
-            Poista
-          </button>
+                  <button
+                    type="button"
+                    onClick={onSparring}
+                    aria-label={`Treenaa haastattelua työpaikkaan ${job.title}`}
+                    className="w-full rounded-2xl border border-[#00BFA6]/40 bg-[#00BFA6]/10 px-5 py-4 text-sm font-bold text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                  >
+                    Haastattelutreeni
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
       {job.summary && (
         <p className={`mt-8 text-base leading-relaxed p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-black/40 border-white/5 text-gray-300' : 'bg-gray-50 border-gray-100 text-gray-700'}`}>{job.summary}</p>
