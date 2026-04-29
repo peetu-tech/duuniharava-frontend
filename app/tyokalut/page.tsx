@@ -212,20 +212,20 @@ export default function ExtraToolsPage() {
         .light-theme .border-white\\/10 { border-color: #E5E7EB !important; }
         .light-theme .border-white\\/5 { border-color: #F3F4F6 !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white font-sans pb-24 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white font-sans pb-32 sm:pb-24 transition-colors duration-300">
         
         {/* MOBIILIN PIKANAVIGOINTI */}
-        <nav className={`fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center p-3 pb-safe border-t sm:hidden backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`} aria-label="Mobiilin pikavalikko">
-          <button onClick={() => router.push('/studio')} className={`flex flex-col items-center gap-1 text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-lg p-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+        <nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-center gap-2 rounded-[28px] border p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:hidden backdrop-blur-2xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/92 border-white/10' : 'bg-white/92 border-gray-200 shadow-[0_18px_40px_rgba(0,0,0,0.12)]'}`} aria-label="Mobiilin pikavalikko">
+          <button onClick={() => router.push('/studio')} className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-[10px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'text-gray-400 hover:bg-white/5' : 'text-gray-500 hover:bg-gray-100'}`}>
             <span className="text-xl" aria-hidden="true">🏠</span> Studio
           </button>
-          <button className={`flex flex-col items-center gap-1 text-xs font-bold text-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg p-1`}>
+          <button className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-[10px] font-bold text-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 bg-purple-500/10`}>
             <span className="text-xl" aria-hidden="true">🛠️</span> Työkalut
           </button>
         </nav>
 
         {/* HERO */}
-        <section className="border-b border-white/10 bg-gradient-to-b from-purple-900/20 to-transparent pt-12 pb-12 sm:pb-16 px-6 sm:px-8">
+        <section className="border-b border-white/10 bg-gradient-to-b from-purple-900/20 to-transparent pt-16 pb-14 sm:pt-12 sm:pb-16 px-4 sm:px-8">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
             <div>
               <div className="flex items-center gap-4 mb-4">
@@ -252,7 +252,7 @@ export default function ExtraToolsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-8 sm:mt-12">
           
           {/* TABS - "App Icon" Grid Layout */}
-          <div ref={tabsRef} className="grid grid-cols-4 min-[500px]:grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-4 mb-10 sm:mb-14">
+          <div ref={tabsRef} className="grid grid-cols-2 min-[500px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4 mb-8 sm:mb-14">
             {tools.map(tool => (
               <button 
                 key={tool.id}
