@@ -9,6 +9,15 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const JOBS_CACHE_TTL_MS = 1000 * 60 * 15;
+const jobsCache = new Map<
+  string,
+  {
+    expiresAt: number;
+    payload: Record<string, unknown>;
+  }
+>();
+
 const fixieUrl = process.env.FIXIE_URL?.trim();
 const proxyAgent = fixieUrl ? new HttpsProxyAgent(fixieUrl) : undefined;
 
@@ -103,6 +112,33 @@ function uniqueByUrl<T extends { url?: string }>(items: T[]) {
   });
 }
 
+function buildJobsCacheKey(body: Record<string, unknown>) {
+  return JSON.stringify({
+    targetJob: `${body.targetJob || ""}`.trim().toLowerCase(),
+    desiredRoles: `${body.desiredRoles || ""}`.trim().toLowerCase(),
+    desiredLocation: `${body.desiredLocation || ""}`.trim().toLowerCase(),
+    keywords: `${body.keywords || ""}`.trim().toLowerCase(),
+    workType: `${body.workType || ""}`.trim().toLowerCase(),
+  });
+}
+
+function readJobsCache(key: string) {
+  const cached = jobsCache.get(key);
+  if (!cached) return null;
+  if (cached.expiresAt <= Date.now()) {
+    jobsCache.delete(key);
+    return null;
+  }
+  return cached.payload;
+}
+
+function writeJobsCache(key: string, payload: Record<string, unknown>) {
+  jobsCache.set(key, {
+    expiresAt: Date.now() + JOBS_CACHE_TTL_MS,
+    payload,
+  });
+}
+
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -112,7 +148,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
+    const body = (await req.json()) as Record<string, unknown>;
+    const cacheKey = buildJobsCacheKey(body);
 
     const rawSearchTerms = [
       body.targetJob,
@@ -141,6 +178,37 @@ export async function POST(req: Request) {
           .filter((word) => word.length > 3),
       ),
     );
+
+    if (
+      !`${body.targetJob || ""}`.trim() &&
+      !`${body.desiredRoles || ""}`.trim() &&
+      searchKeywords.length === 0
+    ) {
+      const responsePayload = {
+        output: "[]",
+        diagnostics: {
+          hasTyomarkkinatoriKey: Boolean(process.env.TYOMARKKINATORI_API_KEY),
+          hasGoogleKey: Boolean(process.env.GOOGLE_API_KEY),
+          hasGoogleCx: Boolean(process.env.GOOGLE_CX_ID),
+          usesProxy: Boolean(proxyAgent),
+          tyomarkkinatoriCount: 0,
+          googleCount: 0,
+          tyomarkkinatoriStatus: "skipped",
+          googleStatus: "skipped",
+          tyomarkkinatoriError: "",
+          googleError: "",
+        },
+        error:
+          "Lisää ensin selkeä rooli tai hakusanoja työnhakuun. Näin vältämme turhat haut ja saat osuvammat ehdotukset.",
+      };
+      writeJobsCache(cacheKey, responsePayload);
+      return NextResponse.json(responsePayload);
+    }
+
+    const cachedPayload = readJobsCache(cacheKey);
+    if (cachedPayload) {
+      return NextResponse.json(cachedPayload);
+    }
 
     const recentDate = new Date();
     recentDate.setDate(recentDate.getDate() - 14);
@@ -453,10 +521,12 @@ Palauta vain validi JSON muodossa:
       finalJobs = buildDeterministicJobsFallback(combinedJobs);
     }
 
-    return NextResponse.json({
+    const responsePayload = {
       output: JSON.stringify(finalJobs),
       diagnostics,
-    });
+    };
+    writeJobsCache(cacheKey, responsePayload);
+    return NextResponse.json(responsePayload);
   } catch (error) {
     console.error("Jobs route error:", error);
     return NextResponse.json(
