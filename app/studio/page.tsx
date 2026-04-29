@@ -169,6 +169,15 @@ function getStudioStorageKey(userId: string) {
   return `${STORAGE_KEY}_${userId}`;
 }
 
+function clearStudioLocalState(userId?: string) {
+  if (typeof window === "undefined") return;
+  if (userId) {
+    localStorage.removeItem(getStudioStorageKey(userId));
+  }
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem("duuniharava.auth.session");
+}
+
 const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
   modern: {
     sidebarBg: "#0f172a",
@@ -977,6 +986,12 @@ export default function Home() {
     timestamp: number;
     jobs: JobItem[];
   } | null>(null);
+  const [lastJobsSearchMeta, setLastJobsSearchMeta] = useState<{
+    searchedAt: string;
+    sourceSummary: string;
+    resultCount: number;
+    wasCached?: boolean;
+  } | null>(null);
 
   const customStyle = customStyles[cvStyle];
 
@@ -1767,13 +1782,14 @@ export default function Home() {
   }
 
   async function handleLogout() {
-  if (typeof window !== "undefined") {
-    localStorage.clear();
-    sessionStorage.clear(); 
+    const session = getSession();
+    if (typeof window !== "undefined") {
+      clearStudioLocalState(session?.user.id);
+      sessionStorage.clear(); 
+    }
+    
+    window.location.href = "/";
   }
-  
-  window.location.href = "/";
-}
 
   function handleCvFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -1958,6 +1974,12 @@ export default function Home() {
         cachedSearch.key === searchKey &&
         Date.now() - cachedSearch.timestamp < 1000 * 60 * 15
       ) {
+        setLastJobsSearchMeta({
+          searchedAt: new Date(cachedSearch.timestamp).toISOString(),
+          sourceSummary: "Äskeinen haku muistista",
+          resultCount: cachedSearch.jobs.length,
+          wasCached: true,
+        });
         setTab("jobs");
         setMessage("Sama haku tehtiin juuri. Ohitetaan uusi verkkohaku ja säästetään käyttöä.");
         setTimeout(() => setMessage(""), 2500);
@@ -2035,6 +2057,12 @@ export default function Home() {
         timestamp: Date.now(),
         jobs: newJobs,
       };
+      setLastJobsSearchMeta({
+        searchedAt: new Date().toISOString(),
+        sourceSummary: `Työmarkkinatori ${data.diagnostics?.tyomarkkinatoriCount ?? 0} · Google ${data.diagnostics?.googleCount ?? 0}`,
+        resultCount: newJobs.length,
+        wasCached: false,
+      });
 
       setJobs((prev) => [...newJobs, ...prev]);
       setCurrentJobIndex(0); 
@@ -2496,7 +2524,7 @@ export default function Home() {
 
         if (res.ok) {
           if (typeof window !== "undefined") {
-            localStorage.clear(); 
+            clearStudioLocalState(getSession()?.user.id);
           }
           alert("Tili poistettu onnistuneesti. Toivottavasti nähdään pian uudestaan!");
           window.location.href = "/"; 
@@ -4050,6 +4078,34 @@ export default function Home() {
                           className="w-full sm:max-w-md rounded-2xl border border-white/10 bg-[#0A0A0A] px-6 py-5 text-base text-white outline-none transition-all focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                         />
                       </div>
+
+                      {lastJobsSearchMeta && (
+                        <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
+                          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div>
+                              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">
+                                Hakustatus
+                              </p>
+                              <p className={`mt-2 text-base font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                {lastJobsSearchMeta.wasCached
+                                  ? "Näytetään äskeinen haku muistista"
+                                  : "Työpaikat päivitetty onnistuneesti"}
+                              </p>
+                              <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                {lastJobsSearchMeta.sourceSummary} · {lastJobsSearchMeta.resultCount} paikkaa · {new Date(lastJobsSearchMeta.searchedAt).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={suggestJobs}
+                              disabled={loadingJobs}
+                              className="rounded-2xl border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-5 py-4 text-sm font-black text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black disabled:opacity-50"
+                            >
+                              {loadingJobs ? "Päivitetään..." : "Hae uudet paikat"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="mb-4 sm:hidden">
                         <button
