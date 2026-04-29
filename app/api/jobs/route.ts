@@ -93,6 +93,16 @@ function buildDeterministicJobsFallback(
   }));
 }
 
+function uniqueByUrl<T extends { url?: string }>(items: T[]) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.url || "";
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -256,27 +266,51 @@ export async function POST(req: Request) {
         console.log("Searching Google Custom Search...");
 
         const googleQueries = [
-          `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(googleSearchTerms)}&gl=fi&dateRestrict=d14`,
-          `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(googleSearchTerms)}&gl=fi`,
-        ];
+          `${googleSearchTerms} työpaikka`,
+          `${body.targetJob || ""} ${body.desiredLocation || ""} työpaikka`,
+          `${body.desiredRoles || ""} ${body.desiredLocation || ""} työpaikka`,
+          `${body.targetJob || body.desiredRoles || ""} site:duunitori.fi`,
+          `${body.targetJob || body.desiredRoles || ""} site:oikotie.fi työpaikat`,
+          `${body.targetJob || body.desiredRoles || ""} site:jobly.fi`,
+          `${body.targetJob || body.desiredRoles || ""} site:linkedin.com/jobs`,
+        ]
+          .map((query) => query.replace(/\s+/g, " ").trim())
+          .filter(Boolean);
 
         let googleItems: any[] = [];
-        for (const googleUrl of googleQueries) {
-          const googleResponse = await fetch(googleUrl);
-          const googleData = (await googleResponse.json()) as { items?: any[] };
-          if (Array.isArray(googleData.items) && googleData.items.length > 0) {
-            googleItems = googleData.items;
+        for (const query of googleQueries) {
+          const requestUrls = [
+            `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(query)}&gl=fi&dateRestrict=d14&num=10`,
+            `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(query)}&gl=fi&num=10`,
+          ];
+
+          for (const requestUrl of requestUrls) {
+            const googleResponse = await fetch(requestUrl);
+            const googleData = (await googleResponse.json()) as { items?: any[] };
+            if (Array.isArray(googleData.items) && googleData.items.length > 0) {
+              googleItems.push(...googleData.items);
+            }
+            if (googleItems.length >= 24) {
+              break;
+            }
+          }
+
+          if (googleItems.length >= 24) {
             break;
           }
         }
 
-        if (googleItems.length > 0) {
-          googleJobsForAI = googleItems.slice(0, 10).map((item) => {
+        const dedupedGoogleItems = uniqueByUrl(
+          googleItems.map((item) => ({ ...item, url: item.link })),
+        );
+
+        if (dedupedGoogleItems.length > 0) {
+          googleJobsForAI = dedupedGoogleItems.slice(0, 12).map((item) => {
             let source = "Internet";
-            if (item.link?.includes("duunitori.fi")) source = "Duunitori";
-            else if (item.link?.includes("oikotie.fi")) source = "Oikotie";
-            else if (item.link?.includes("jobly.fi")) source = "Jobly";
-            else if (item.link?.includes("linkedin.com")) source = "LinkedIn";
+            if (item.url?.includes("duunitori.fi")) source = "Duunitori";
+            else if (item.url?.includes("oikotie.fi")) source = "Oikotie";
+            else if (item.url?.includes("jobly.fi")) source = "Jobly";
+            else if (item.url?.includes("linkedin.com")) source = "LinkedIn";
 
             return {
               id: makeExternalId("ext"),
@@ -286,7 +320,7 @@ export async function POST(req: Request) {
               company: "Katso ilmoituksesta",
               location: locationSearch || "Suomi",
               description: item.snippet || "",
-              url: item.link,
+              url: item.url,
               source,
             };
           });
