@@ -958,6 +958,11 @@ export default function Home() {
   const [isTranslating, setIsTranslating] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement | null>(null); 
+  const jobsSearchCacheRef = useRef<{
+    key: string;
+    timestamp: number;
+    jobs: JobItem[];
+  } | null>(null);
 
   const customStyle = customStyles[cvStyle];
 
@@ -1912,24 +1917,45 @@ export default function Home() {
     setErrorMessage("");
 
     try {
-      const currentDate = new Date().toLocaleDateString("fi-FI");
+      const searchPayload = {
+        ...searchProfile,
+        targetJob: form.targetJob,
+        experience: form.experience,
+        skills: form.skills,
+        languages: form.languages,
+        onlyActive: true,
+        currentDate: new Date().toLocaleDateString("fi-FI"),
+        sources: ["Duunitori", "Oikotie", "LinkedIn", "Työmarkkinatori"],
+        strictFreshness: true,
+        instructions:
+          "Hae vain oikeasti NYT avoinna olevia, aitoja työpaikkoja useista lähteistä. Älä keksi ilmoituksia äläkä palauta vanhoja (esim. vuodelta 2024 tai 2025).",
+      };
+      const searchKey = JSON.stringify({
+        targetJob: searchPayload.targetJob,
+        desiredRoles: searchPayload.desiredRoles,
+        desiredLocation: searchPayload.desiredLocation,
+        keywords: searchPayload.keywords,
+        workType: searchPayload.workType,
+      });
+      const cachedSearch = jobsSearchCacheRef.current;
+
+      if (
+        cachedSearch &&
+        cachedSearch.key === searchKey &&
+        Date.now() - cachedSearch.timestamp < 1000 * 60 * 15
+      ) {
+        setTab("jobs");
+        setMessage("Sama haku tehtiin juuri. Ohitetaan uusi verkkohaku ja säästetään käyttöä.");
+        setTimeout(() => setMessage(""), 2500);
+        return;
+      }
+
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...searchProfile,
-          targetJob: form.targetJob,
-          experience: form.experience,
-          skills: form.skills,
-          languages: form.languages,
-          onlyActive: true,
-          currentDate: currentDate,
-          sources: ["Duunitori", "Oikotie", "LinkedIn", "Työmarkkinatori"],
-          strictFreshness: true,
-          instructions: "Hae vain oikeasti NYT avoinna olevia, aitoja työpaikkoja useista lähteistä. Älä keksi ilmoituksia äläkä palauta vanhoja (esim. vuodelta 2024 tai 2025)."
-        }),
+        body: JSON.stringify(searchPayload),
       });
 
       const data = await res.json();
@@ -1989,6 +2015,12 @@ export default function Home() {
           archived: false,
         })
       );
+
+      jobsSearchCacheRef.current = {
+        key: searchKey,
+        timestamp: Date.now(),
+        jobs: newJobs,
+      };
 
       setJobs((prev) => [...newJobs, ...prev]);
       setCurrentJobIndex(0); 
