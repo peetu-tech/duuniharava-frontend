@@ -2808,7 +2808,15 @@ export default function Home() {
     <span className="text-xl" aria-hidden="true">🛠️</span> Työkalut
   </button>
 
-  {/* 5. PRO (Pysyy aina tässä) */}
+  {/* 5. TALLENTEET */}
+  <button 
+    onClick={() => setShowArchive(true)} 
+    className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-[10px] font-black transition-all ${theme === 'dark' ? 'text-[#00BFA6] hover:bg-white/5' : 'text-[#00BFA6] hover:bg-gray-100'} focus-visible:outline-none`}
+  >
+    <span className="text-xl" aria-hidden="true">🗂️</span> Tallenteet
+  </button>
+
+  {/* 6. PRO (Pysyy aina tässä) */}
   <button 
     onClick={() => setShowPaywall(true)} 
     className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-[#FF6F3C]/12 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
@@ -2897,7 +2905,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setShowHelp(!showHelp)}
-                    className="bg-[#00BFA6]/10 border border-[#00BFA6]/40 text-[#00BFA6] px-10 py-5 rounded-[24px] text-lg font-black hover:bg-[#00BFA6]/20 transition-all shadow-xl flex items-center justify-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                    className="bg-[#00BFA6]/10 border border-[#00BFA6]/40 text-[#00BFA6] px-7 sm:px-10 py-4 sm:py-5 rounded-[24px] text-base sm:text-lg font-black hover:bg-[#00BFA6]/20 transition-all shadow-xl flex items-center justify-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                     aria-expanded={showHelp}
                     aria-controls="help-section"
                   >
@@ -2907,7 +2915,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={fillExample}
-                    className="bg-white text-black px-10 py-5 rounded-[24px] text-lg font-black hover:bg-gray-200 transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                    className="bg-white text-black px-7 sm:px-10 py-4 sm:py-5 rounded-[24px] text-base sm:text-lg font-black hover:bg-gray-200 transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                   >
                     Täytä esimerkki
                   </button>
@@ -2915,7 +2923,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setShowArchive(true)}
-                    className={`px-10 py-5 rounded-[24px] text-lg font-black transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}
+                    className={`px-7 sm:px-10 py-4 sm:py-5 rounded-[24px] text-base sm:text-lg font-black transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}
                   >
                     Avaa tallenteet
                   </button>
@@ -2934,13 +2942,13 @@ export default function Home() {
                 </div>
 
                 {(latestSavedCvVariant || latestSavedLetter || latestTouchedJob) && (
-                  <div className={`mt-8 rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.04]' : 'border-gray-200 bg-white/80'}`}>
+                  <div className={`mt-8 rounded-[28px] border p-4 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.04]' : 'border-gray-200 bg-white/80'}`}>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                       <div>
                         <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">
                           Jatka nopeasti
                         </p>
-                        <h3 className={`mt-2 text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        <h3 className={`mt-2 text-xl sm:text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Viimeisimmät tallenteet löytyvät heti tästä
                         </h3>
                       </div>
@@ -2958,10 +2966,10 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => openSavedCvVariant(latestSavedCvVariant)}
-                          className={`rounded-2xl border px-5 py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
+                          className={`rounded-2xl border px-4 sm:px-5 py-4 sm:py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
                         >
                           <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Viimeisin CV</p>
-                          <p className={`mt-3 text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestSavedCvVariant.jobTitle}</p>
+                          <p className={`mt-3 text-base sm:text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestSavedCvVariant.jobTitle}</p>
                           <p className={`mt-1 text-sm truncate ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{latestSavedCvVariant.companyName}</p>
                           <p className={`mt-3 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{new Date(latestSavedCvVariant.createdAt).toLocaleString("fi-FI")}</p>
                         </button>
@@ -2971,10 +2979,10 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => openSavedLetter(latestSavedLetter)}
-                          className={`rounded-2xl border px-5 py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
+                          className={`rounded-2xl border px-4 sm:px-5 py-4 sm:py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
                         >
                           <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Viimeisin hakemus</p>
-                          <p className={`mt-3 text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestSavedLetter.jobTitle}</p>
+                          <p className={`mt-3 text-base sm:text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestSavedLetter.jobTitle}</p>
                           <p className={`mt-1 text-sm truncate ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{latestSavedLetter.companyName}</p>
                           <p className={`mt-3 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{new Date(latestSavedLetter.updatedAt || latestSavedLetter.createdAt).toLocaleString("fi-FI")}</p>
                         </button>
@@ -2984,10 +2992,10 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => focusJobInStudio(latestTouchedJob)}
-                          className={`rounded-2xl border px-5 py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
+                          className={`rounded-2xl border px-4 sm:px-5 py-4 sm:py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
                         >
                           <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Viimeisin työpaikka</p>
-                          <p className={`mt-3 text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestTouchedJob.title || "Nimetön työpaikka"}</p>
+                          <p className={`mt-3 text-base sm:text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestTouchedJob.title || "Nimetön työpaikka"}</p>
                           <p className={`mt-1 text-sm truncate ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{[latestTouchedJob.company, latestTouchedJob.location].filter(Boolean).join(" · ")}</p>
                           <p className={`mt-3 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{getStatusLabel(latestTouchedJob.status)} · {getPriorityLabel(latestTouchedJob.priority)}</p>
                         </button>
@@ -5299,48 +5307,48 @@ function ArchiveModal({
   const archivedJobsCount = jobs.filter((job) => job.archived).length;
 
   return (
-    <div className="fixed inset-0 z-[520] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className={`w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-[32px] border shadow-2xl flex flex-col ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-        <div className={`flex items-center justify-between gap-4 p-6 sm:p-8 border-b ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+    <div className="fixed inset-0 z-[520] flex items-center justify-center bg-black/80 backdrop-blur-md p-0 sm:p-4 animate-in fade-in duration-200">
+      <div className={`w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-6xl overflow-hidden rounded-none sm:rounded-[32px] border-0 sm:border shadow-2xl flex flex-col ${theme === 'dark' ? 'bg-[#141414] sm:border-white/10 text-white' : 'bg-white sm:border-gray-200 text-gray-900'}`}>
+        <div className={`sticky top-0 z-10 flex items-start justify-between gap-4 p-5 sm:p-8 border-b ${theme === 'dark' ? 'border-white/10 bg-[#141414]/95' : 'border-gray-200 bg-white/95'} backdrop-blur-xl`}>
           <div>
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">Tallennekeskus</p>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-black tracking-tight">Täältä löydät vanhat CV:t, hakemukset ja työpaikat</h2>
+            <h2 className="mt-2 text-xl sm:text-3xl font-black tracking-tight">Täältä löydät vanhat CV:t, hakemukset ja työpaikat</h2>
             <p className={`mt-2 text-sm sm:text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               Avaa mikä tahansa tallenne takaisin studioon yhdellä painalluksella.
             </p>
           </div>
-          <button onClick={onClose} className="w-11 h-11 rounded-full border border-white/10 text-2xl font-black text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+          <button onClick={onClose} className="shrink-0 w-11 h-11 rounded-full border border-white/10 text-2xl font-black text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
             ✕
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 custom-scrollbar">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">CV-versiot</p>
-              <p className="mt-3 text-4xl font-black">{savedCvVariants.length}</p>
+              <p className="mt-3 text-3xl sm:text-4xl font-black">{savedCvVariants.length}</p>
             </div>
             <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Hakemukset</p>
-              <p className="mt-3 text-4xl font-black">{savedLetters.length}</p>
+              <p className="mt-3 text-3xl sm:text-4xl font-black">{savedLetters.length}</p>
             </div>
             <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Aktiiviset työpaikat</p>
-              <p className="mt-3 text-4xl font-black">{activeJobsCount}</p>
+              <p className="mt-3 text-3xl sm:text-4xl font-black">{activeJobsCount}</p>
             </div>
             <div className={`rounded-3xl border p-5 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Arkistoidut työpaikat</p>
-              <p className="mt-3 text-4xl font-black">{archivedJobsCount}</p>
+              <p className="mt-3 text-3xl sm:text-4xl font-black">{archivedJobsCount}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
             <section className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white'}`}>
               <div className="mb-4">
                 <h3 className="text-xl font-black">CV-versiot</h3>
                 <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avaa aiemmin räätälöity CV takaisin muokkaukseen.</p>
               </div>
-              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-3 max-h-[320px] sm:max-h-[420px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
                 {savedCvVariants.length > 0 ? savedCvVariants.map((cv) => (
                   <button
                     key={cv.id}
@@ -5365,7 +5373,7 @@ function ArchiveModal({
                 <h3 className="text-xl font-black">Hakemukset</h3>
                 <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Palaa aiempiin hakemusversioihin ja jatka siitä mihin jäit.</p>
               </div>
-              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-3 max-h-[320px] sm:max-h-[420px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
                 {savedLetters.length > 0 ? savedLetters.map((letter) => (
                   <button
                     key={letter.id}
@@ -5401,7 +5409,7 @@ function ArchiveModal({
                 <h3 className="text-xl font-black">Työpaikat</h3>
                 <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avaa tallennettu paikka takaisin seurantaan tai jatka hakemista.</p>
               </div>
-              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-3 max-h-[320px] sm:max-h-[420px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
                 {jobs.length > 0 ? jobs.map((job) => (
                   <button
                     key={job.id}
