@@ -55,6 +55,44 @@ function safeJsonLinesParse(text: string): any[] {
     .filter(Boolean);
 }
 
+function buildDeterministicJobsFallback(
+  jobs: Array<{
+    title?: string;
+    company?: string;
+    location?: string;
+    description?: string;
+    url?: string;
+    source?: string;
+  }>,
+) {
+  const fallbackDeadline = new Date();
+  fallbackDeadline.setDate(fallbackDeadline.getDate() + 30);
+  const deadline = normalizeDateString(fallbackDeadline);
+
+  return jobs.slice(0, 12).map((job, index) => ({
+    title: job.title || "Avoin työpaikka",
+    company: job.company || "Katso ilmoituksesta",
+    location: job.location || "Suomi",
+    type: "Kokoaikainen",
+    summary: job.description
+      ? `${job.description.slice(0, 140).trim()}...`
+      : "Tutustu ilmoitukseen ja arvioi sopivuus tarkemmin.",
+    adText:
+      job.source && job.source !== "Työmarkkinatori"
+        ? "Tämä työpaikka löytyi ulkoisesta palvelusta. Klikkaa alla olevaa painiketta avataksesi ilmoituksen, kopioi sen teksti ja tuo se Duuniharavaan analysoitavaksi!"
+        : job.description || "Avaa ilmoitus nähdäksesi tarkemmat tiedot.",
+    url: job.url || "https://tyomarkkinatori.fi/",
+    whyFit: "Perustuu hakusanoihin, sijaintiin ja ilmoituksen kuvaukseen.",
+    source: job.source || "Internet",
+    matchScore: Math.max(55, 88 - index * 2),
+    status: "interested",
+    priority: "medium",
+    salary: "Sopimuksen mukaan",
+    deadline,
+    notes: "",
+  }));
+}
+
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -108,36 +146,51 @@ export async function POST(req: Request) {
       try {
         console.log("Searching Tyomarkkinatori with narrow payload...");
 
-        const payload: Record<string, unknown> = {
+        const tmPayloads: Record<string, unknown>[] = [];
+        if (searchKeywords.length > 0) {
+          tmPayloads.push({
+            onlyStatus: "PUBLISHED",
+            created: { from: recentDate.toISOString() },
+            query: searchKeywords[0],
+          });
+        }
+        tmPayloads.push({
           onlyStatus: "PUBLISHED",
           created: { from: recentDate.toISOString() },
-        };
+        });
 
-        if (searchKeywords.length > 0) {
-          payload.query = searchKeywords[0];
+        let allParsedJobs: any[] = [];
+        for (const payload of tmPayloads) {
+          const fetchOptions: Record<string, unknown> = {
+            method: "POST",
+            headers: {
+              "KIPA-Subscription-Key": tmKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          };
+
+          if (proxyAgent) {
+            fetchOptions.agent = proxyAgent;
+          }
+
+          const tmResponse = await fetch(
+            TYOMARKKINATORI_URL,
+            fetchOptions as Parameters<typeof fetch>[1],
+          );
+
+          if (!tmResponse.ok) {
+            console.error("Tyomarkkinatori API error:", tmResponse.status);
+            continue;
+          }
+
+          allParsedJobs = safeJsonLinesParse(await tmResponse.text());
+          if (allParsedJobs.length > 0) {
+            break;
+          }
         }
 
-        const fetchOptions: Record<string, unknown> = {
-          method: "POST",
-          headers: {
-            "KIPA-Subscription-Key": tmKey,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        };
-
-        if (proxyAgent) {
-          fetchOptions.agent = proxyAgent;
-        }
-
-        const tmResponse = await fetch(
-          TYOMARKKINATORI_URL,
-          fetchOptions as Parameters<typeof fetch>[1],
-        );
-
-        if (tmResponse.ok) {
-          const allParsedJobs = safeJsonLinesParse(await tmResponse.text());
-
+        if (allParsedJobs.length > 0) {
           const scoredJobs = allParsedJobs
             .map((job) => {
               const title = getLocText(job.position?.title);
@@ -183,8 +236,6 @@ export async function POST(req: Request) {
           console.log(
             `Tyomarkkinatori returned ${tmJobsForAI.length} shortlisted jobs.`,
           );
-        } else {
-          console.error("Tyomarkkinatori API error:", tmResponse.status);
         }
       } catch (error) {
         console.error("Tyomarkkinatori fetch failed:", error);
@@ -195,17 +246,23 @@ export async function POST(req: Request) {
       try {
         console.log("Searching Google Custom Search...");
 
-        const googleUrl =
-          `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}` +
-          `&cx=${googleCxId}` +
-          `&q=${encodeURIComponent(googleSearchTerms)}` +
-          `&gl=fi&dateRestrict=d14`;
+        const googleQueries = [
+          `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(googleSearchTerms)}&gl=fi&dateRestrict=d14`,
+          `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(googleSearchTerms)}&gl=fi`,
+        ];
 
-        const googleResponse = await fetch(googleUrl);
-        const googleData = (await googleResponse.json()) as { items?: any[] };
+        let googleItems: any[] = [];
+        for (const googleUrl of googleQueries) {
+          const googleResponse = await fetch(googleUrl);
+          const googleData = (await googleResponse.json()) as { items?: any[] };
+          if (Array.isArray(googleData.items) && googleData.items.length > 0) {
+            googleItems = googleData.items;
+            break;
+          }
+        }
 
-        if (Array.isArray(googleData.items) && googleData.items.length > 0) {
-          googleJobsForAI = googleData.items.slice(0, 10).map((item) => {
+        if (googleItems.length > 0) {
+          googleJobsForAI = googleItems.slice(0, 10).map((item) => {
             let source = "Internet";
             if (item.link?.includes("duunitori.fi")) source = "Duunitori";
             else if (item.link?.includes("oikotie.fi")) source = "Oikotie";
@@ -306,7 +363,11 @@ Palauta vain validi JSON muodossa:
     const rawOutput =
       aiResponse.choices[0]?.message?.content?.trim() || '{"jobs": []}';
     const parsed = JSON.parse(rawOutput) as { jobs?: unknown[] };
-    const finalJobs = Array.isArray(parsed.jobs) ? parsed.jobs : [];
+    let finalJobs = Array.isArray(parsed.jobs) ? parsed.jobs : [];
+
+    if (finalJobs.length === 0 && combinedJobs.length > 0) {
+      finalJobs = buildDeterministicJobsFallback(combinedJobs);
+    }
 
     return NextResponse.json({ output: JSON.stringify(finalJobs) });
   } catch (error) {
