@@ -1427,6 +1427,23 @@ export default function Home() {
     [jobs],
   );
 
+  const latestSavedLetter = useMemo(
+    () =>
+      sortedSavedLetters[0] || null,
+    [sortedSavedLetters],
+  );
+
+  const latestSavedCvVariant = useMemo(
+    () =>
+      sortedSavedCvVariants[0] || null,
+    [sortedSavedCvVariants],
+  );
+
+  const latestTouchedJob = useMemo(() => {
+    if (!archiveJobs.length) return null;
+    return archiveJobs[0];
+  }, [archiveJobs]);
+
   const filteredJobs = useMemo(() => {
     const q = jobFilter.trim().toLowerCase();
 
@@ -2915,6 +2932,69 @@ export default function Home() {
                     3. Avaa työkalut vasta kun tarvitset niitä
                   </div>
                 </div>
+
+                {(latestSavedCvVariant || latestSavedLetter || latestTouchedJob) && (
+                  <div className={`mt-8 rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.04]' : 'border-gray-200 bg-white/80'}`}>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">
+                          Jatka nopeasti
+                        </p>
+                        <h3 className={`mt-2 text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          Viimeisimmät tallenteet löytyvät heti tästä
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowArchive(true)}
+                        className={`rounded-2xl px-5 py-3 text-sm font-black transition-all ${theme === 'dark' ? 'border border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border border-gray-200 bg-gray-50 text-gray-800 hover:bg-white'}`}
+                      >
+                        Avaa koko tallennekeskus
+                      </button>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+                      {latestSavedCvVariant && (
+                        <button
+                          type="button"
+                          onClick={() => openSavedCvVariant(latestSavedCvVariant)}
+                          className={`rounded-2xl border px-5 py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
+                        >
+                          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Viimeisin CV</p>
+                          <p className={`mt-3 text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestSavedCvVariant.jobTitle}</p>
+                          <p className={`mt-1 text-sm truncate ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{latestSavedCvVariant.companyName}</p>
+                          <p className={`mt-3 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{new Date(latestSavedCvVariant.createdAt).toLocaleString("fi-FI")}</p>
+                        </button>
+                      )}
+
+                      {latestSavedLetter && (
+                        <button
+                          type="button"
+                          onClick={() => openSavedLetter(latestSavedLetter)}
+                          className={`rounded-2xl border px-5 py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
+                        >
+                          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Viimeisin hakemus</p>
+                          <p className={`mt-3 text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestSavedLetter.jobTitle}</p>
+                          <p className={`mt-1 text-sm truncate ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{latestSavedLetter.companyName}</p>
+                          <p className={`mt-3 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{new Date(latestSavedLetter.updatedAt || latestSavedLetter.createdAt).toLocaleString("fi-FI")}</p>
+                        </button>
+                      )}
+
+                      {latestTouchedJob && (
+                        <button
+                          type="button"
+                          onClick={() => focusJobInStudio(latestTouchedJob)}
+                          className={`rounded-2xl border px-5 py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}
+                        >
+                          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Viimeisin työpaikka</p>
+                          <p className={`mt-3 text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{latestTouchedJob.title || "Nimetön työpaikka"}</p>
+                          <p className={`mt-1 text-sm truncate ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{[latestTouchedJob.company, latestTouchedJob.location].filter(Boolean).join(" · ")}</p>
+                          <p className={`mt-3 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{getStatusLabel(latestTouchedJob.status)} · {getPriorityLabel(latestTouchedJob.priority)}</p>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
