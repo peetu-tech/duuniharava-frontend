@@ -29,33 +29,31 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     
-    // TÄRKEÄ KORJAUS DATAMÄÄRÄÄN: Kerätään tehokkaat hakusanat
+    // Kerätään tehokkaat hakusanat
     const rawSearchTerms = [body.targetJob, body.desiredRoles, body.keywords].filter(Boolean).join(" ");
     const searchKeywords = Array.from(new Set(rawSearchTerms.toLowerCase().split(/[\s,]+/).filter(w => w.length > 3)));
     
     let tmJobsForAI: any[] = [];
     const tmKey = process.env.TYOMARKKINATORI_API_KEY;
 
+    // Asetetaan tiukka aikaraja: Vain max 14 päivää vanhoja ilmoituksia!
+    const recentDate = new Date();
+    recentDate.setDate(recentDate.getDate() - 14);
+
     // ==========================================================
-    // VAIHE 1A: HAKU TYÖMARKKINATORILTA (Tehostettu täsmähaku!)
+    // VAIHE 1A: HAKU TYÖMARKKINATORILTA
     // ==========================================================
     if (tmKey) {
       try {
         console.log("🔍 Haetaan Työmarkkinatorilta täsmähakuna...");
         
-        // Rakennetaan query fiksusti. Vain avoimet ja täsmähakusanalla.
-        // Jos hakusanoja ei ole, haetaan viimeiset 3 päivää.
         const payload: any = {
-          onlyStatus: "PUBLISHED"
+          onlyStatus: "PUBLISHED",
+          created: { from: recentDate.toISOString() } // Tämä pakottaa päivämäärärajan AINA
         };
 
         if (searchKeywords.length > 0) {
-            // Lähetetään Työmarkkinatorille heti tärkein sana (esim. Myyjä), jolloin se suodattaa tuhannet turhat roskat pois!
-            payload.query = searchKeywords[0];
-        } else {
-            const recentDate = new Date();
-            recentDate.setDate(recentDate.getDate() - 3);
-            payload.created = { from: recentDate.toISOString() };
+            payload.query = searchKeywords[0]; // Etsitään vain täsmähakusanoilla
         }
 
         const fetchOptions: any = {
@@ -79,7 +77,6 @@ export async function POST(req: Request) {
             try { return JSON.parse(line); } catch (e) { return null; }
           }).filter(Boolean);
 
-          // Nyt meillä on vain joku kymmenen tulosta sadantuhannen sijaan -> Proxy ei räjähdä!
           let scoredJobs = allParsedJobs.map(job => {
             const title = getLocText(job.position?.title);
             const company = getLocText(job.client?.company) || getLocText(job.owner?.company);
@@ -122,13 +119,13 @@ export async function POST(req: Request) {
     const googleApiKey = process.env.GOOGLE_API_KEY;
     const googleCxId = process.env.GOOGLE_CX_ID || "1219b99e3495d43d8"; 
 
-    // Rakennetaan Google-haku yhdistämällä termit ja lokaatio
     const googleSearchStr = [body.targetJob, body.desiredRoles, body.desiredLocation].filter(Boolean).join(" ");
 
     if (googleApiKey && googleCxId && googleSearchStr) {
       try {
-        console.log("🔍 Haetaan Google Custom Searchin kautta (Duunitori, Oikotie jne)...");
-        const googleUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(googleSearchStr)}&gl=fi`;
+        console.log("🔍 Haetaan Google Custom Searchin kautta...");
+        // &dateRestrict=d[14] estää sen ettei Google hae vuosia vanhoja ilmoituksia
+        const googleUrl = `https://customsearch.googleapis.com/customsearch/v1?key=${googleApiKey}&cx=${googleCxId}&q=${encodeURIComponent(googleSearchStr)}&gl=fi&dateRestrict=d[14]`;
         
         const gRes = await fetch(googleUrl);
         const gData: any = await gRes.json();
@@ -143,7 +140,7 @@ export async function POST(req: Request) {
 
             return {
               id: Math.random().toString(36).substr(2, 9),
-              title: item.title.split("|")[0].trim(), // Otetaan Googlen tittelistä vain eka osa
+              title: item.title.split("|")[0].trim(),
               company: "Katso ilmoituksesta", 
               location: body.desiredLocation || "Suomi",
               description: item.snippet, 
@@ -163,6 +160,9 @@ export async function POST(req: Request) {
 
     let aiPrompt = "";
     let isFallback = false;
+    
+    // Annetaan tekoälylle tieto mikä päivä on tänään, ettei se aseta deadlineja menneisyyteen
+    const todayFi = new Date().toLocaleDateString("fi-FI");
 
     // ==========================================
     // VAIHE 2: AI-RIKASTUS & VALINTA
@@ -184,6 +184,8 @@ ERITYISOHJEET (Jos source on Duunitori, Oikotie, Jobly tai LinkedIn):
 Näiden paikkojen kohdalla sinulla on vain lyhyt esikatseluteksti. Aseta näiden kohdalla adText-kentän arvoksi täsmälleen tämä: "Tämä työpaikka löytyi ulkoisesta palvelusta. Klikkaa alla olevaa painiketta avataksesi ilmoituksen, kopioi sen teksti ja tuo se Duuniharavaan analysoitavaksi!"
 Yritä päätellä yrityksen nimi 'title' tai 'description' kentistä näille.
 
+HUOMIO DEADLINE: Tänään on ${todayFi}. Varmista että kaikkiin asetetaan fiksu deadline tulevaisuuteen, jos sitä ei ole suoraan datassa. Älä koskaan laita deadlineksi mennyttä päivää.
+
 Palauta VAIN JSON-objekti avaimella "jobs", jossa on nämä kentät:
 {
   "jobs": [
@@ -201,7 +203,7 @@ Palauta VAIN JSON-objekti avaimella "jobs", jossa on nämä kentät:
       "status": "interested",
       "priority": "medium",
       "salary": "Lue kuvauksesta, muuten Sopimuksen mukaan",
-      "deadline": "Lue kuvauksesta",
+      "deadline": "YYYY-MM-DD (Aina tulevaisuudessa!)",
       "notes": ""
     }
   ]
@@ -212,6 +214,8 @@ Palauta VAIN JSON-objekti avaimella "jobs", jossa on nämä kentät:
 Työmarkkinatorilta ei saatu juuri nyt dataa haulle. Luo 10 simuloitua avointa työpaikkaa:
 - Toive: ${rawSearchTerms || body.desiredRoles || body.targetJob || 'Avoimet työpaikat'}
 - Alue: ${body.desiredLocation || 'Suomi'}
+
+HUOM: Tänään on ${todayFi}. Kaikkien deadlinejen TÄYTYY olla tulevaisuudessa (esim. 1-2 kuukautta tästä päivästä). Älä anna vanhoja päivämääriä.
 
 Palauta TÄSMÄLLEEN tämä JSON-rakenne avaimella "jobs":
 {
@@ -230,7 +234,7 @@ Palauta TÄSMÄLLEEN tämä JSON-rakenne avaimella "jobs":
       "status": "interested",
       "priority": "medium",
       "salary": "Esim. 2500-3500 €/kk",
-      "deadline": "2024-12-31",
+      "deadline": "YYYY-MM-DD (AINA TULEVAISUUDESSA!)",
       "notes": ""
     }
   ]
