@@ -155,6 +155,10 @@ export async function POST(req: Request) {
       usesProxy: Boolean(proxyAgent),
       tyomarkkinatoriCount: 0,
       googleCount: 0,
+      tyomarkkinatoriStatus: "not_tried",
+      googleStatus: "not_tried",
+      tyomarkkinatoriError: "",
+      googleError: "",
     };
 
     let tmJobsForAI: any[] = [];
@@ -163,6 +167,7 @@ export async function POST(req: Request) {
     if (tmKey) {
       try {
         console.log("Searching Tyomarkkinatori with narrow payload...");
+        diagnostics.tyomarkkinatoriStatus = "request_started";
 
         const tmPayloads: Record<string, unknown>[] = [];
         if (searchKeywords.length > 0) {
@@ -199,13 +204,19 @@ export async function POST(req: Request) {
 
           if (!tmResponse.ok) {
             console.error("Tyomarkkinatori API error:", tmResponse.status);
+            diagnostics.tyomarkkinatoriStatus = `http_${tmResponse.status}`;
             continue;
           }
 
           allParsedJobs = safeJsonLinesParse(await tmResponse.text());
           if (allParsedJobs.length > 0) {
+            diagnostics.tyomarkkinatoriStatus = "ok";
             break;
           }
+        }
+
+        if (allParsedJobs.length === 0 && diagnostics.tyomarkkinatoriStatus === "request_started") {
+          diagnostics.tyomarkkinatoriStatus = "empty";
         }
 
         if (allParsedJobs.length > 0) {
@@ -258,12 +269,16 @@ export async function POST(req: Request) {
         }
       } catch (error) {
         console.error("Tyomarkkinatori fetch failed:", error);
+        diagnostics.tyomarkkinatoriStatus = "failed";
+        diagnostics.tyomarkkinatoriError =
+          error instanceof Error ? error.message : "Tuntematon virhe";
       }
     }
 
     if (googleApiKey && googleCxId && googleSearchTerms) {
       try {
         console.log("Searching Google Custom Search...");
+        diagnostics.googleStatus = "request_started";
 
         const googleQueries = [
           `${googleSearchTerms} työpaikka`,
@@ -286,9 +301,24 @@ export async function POST(req: Request) {
 
           for (const requestUrl of requestUrls) {
             const googleResponse = await fetch(requestUrl);
-            const googleData = (await googleResponse.json()) as { items?: any[] };
+            if (!googleResponse.ok) {
+              diagnostics.googleStatus = `http_${googleResponse.status}`;
+              diagnostics.googleError = `Google API vastasi koodilla ${googleResponse.status}`;
+              continue;
+            }
+
+            const googleData = (await googleResponse.json()) as {
+              items?: any[];
+              error?: { message?: string };
+            };
+
+            if (googleData.error?.message) {
+              diagnostics.googleStatus = "api_error";
+              diagnostics.googleError = googleData.error.message;
+            }
             if (Array.isArray(googleData.items) && googleData.items.length > 0) {
               googleItems.push(...googleData.items);
+              diagnostics.googleStatus = "ok";
             }
             if (googleItems.length >= 24) {
               break;
@@ -326,9 +356,14 @@ export async function POST(req: Request) {
           });
           diagnostics.googleCount = googleJobsForAI.length;
           console.log(`Google returned ${googleJobsForAI.length} external jobs.`);
+        } else if (diagnostics.googleStatus === "request_started") {
+          diagnostics.googleStatus = "empty";
         }
       } catch (error) {
         console.error("Google search failed:", error);
+        diagnostics.googleStatus = "failed";
+        diagnostics.googleError =
+          error instanceof Error ? error.message : "Tuntematon virhe";
       }
     }
 

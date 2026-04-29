@@ -1944,6 +1944,14 @@ export default function Home() {
             `Työmarkkinatori-osumat: ${diagnostics.tyomarkkinatoriCount ?? 0}`,
           );
           details.push(`Google-osumat: ${diagnostics.googleCount ?? 0}`);
+          if (diagnostics.tyomarkkinatoriStatus) {
+            details.push(
+              `Työmarkkinatori-tila: ${diagnostics.tyomarkkinatoriStatus}`,
+            );
+          }
+          if (diagnostics.googleStatus) {
+            details.push(`Google-tila: ${diagnostics.googleStatus}`);
+          }
 
           if (!diagnostics.usesProxy) {
             details.push("Proxy ei ole käytössä.");
@@ -1953,6 +1961,12 @@ export default function Home() {
           }
           if (!diagnostics.hasTyomarkkinatoriKey) {
             details.push("Työmarkkinatorin avain puuttuu.");
+          }
+          if (diagnostics.tyomarkkinatoriError) {
+            details.push(`Työmarkkinatori-virhe: ${diagnostics.tyomarkkinatoriError}`);
+          }
+          if (diagnostics.googleError) {
+            details.push(`Google-virhe: ${diagnostics.googleError}`);
           }
         }
 
