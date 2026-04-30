@@ -5705,22 +5705,41 @@ function SettingsModal({
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className={`w-full max-w-lg rounded-[32px] border p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-        <div className="flex justify-between items-center mb-8 border-b pb-4 border-gray-500/20">
-          <h2 className="text-2xl font-black">Tilin asetukset</h2>
+      <div className={`w-full max-w-lg rounded-[32px] border p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+        <div className="flex items-start justify-between gap-4 mb-8 border-b pb-4 border-gray-500/20">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Tilin hallinta</p>
+            <h2 className="mt-2 text-2xl font-black">Tilin asetukset</h2>
+            <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Täältä hoidat jäsenyyden, uloskirjautumisen ja tilin poistamisen rauhassa yhdestä paikasta.
+            </p>
+          </div>
           <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black">✕</button>
         </div>
-        <div className="space-y-8">
-          <div className={`p-6 rounded-2xl border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100')}`}>
+        <div className="space-y-6 sm:space-y-8">
+          <div className={`p-5 sm:p-6 rounded-[26px] border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100')}`}>
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 font-sans">Nykyinen jäsenyys</p>
-            <div className="flex justify-between items-center">
-              <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}</span>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "⭐ PRO-JÄSENYYS" : "Ilmaisversio"}</span>
+                <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {isPro
+                    ? "Kaikki tärkeimmät työkalut, tallenteet ja räätälöinnit ovat käytössäsi."
+                    : "Voit käyttää perustyökaluja ja päivittää PROhon, kun haluat enemmän versioita ja lisätyökaluja."}
+                </p>
+              </div>
               {isPro && <button onClick={onPortal} className="text-xs font-bold text-[#00BFA6] underline">Hallitse</button>}
             </div>
           </div>
-          <button onClick={onLogout} className={`w-full py-3 rounded-xl font-black text-xs border ${theme === 'dark' ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900 shadow-sm'}`}>👋 KIRJAUDU ULOS</button>
-          <div className="pt-6 border-t border-red-500/20 text-center">
-            <button onClick={onDeleteAccount} className="text-red-500 text-xs font-bold hover:underline opacity-60 transition-opacity">Poista tili ja tilaus välittömästi</button>
+          <div className={`rounded-[26px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/20' : 'border-gray-200 bg-gray-50'}`}>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">Turvallinen jatkaminen</p>
+            <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Kun kirjaudut ulos, tallenteet, CV:t ja hakemukset säilyvät tililläsi. Voit palata myöhemmin takaisin samaan työtilaan.
+            </p>
+          </div>
+          <button onClick={onLogout} className={`w-full py-4 rounded-2xl font-black text-sm border ${theme === 'dark' ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900 shadow-sm'}`}>👋 Kirjaudu ulos</button>
+          <div className="pt-5 border-t border-red-500/20 text-center">
+            <button onClick={onDeleteAccount} className="text-red-500 text-xs font-bold hover:underline opacity-70 transition-opacity">Poista tili ja tilaus välittömästi</button>
           </div>
         </div>
       </div>
@@ -5754,7 +5773,7 @@ function PaywallModal({
       <div className={`w-full max-w-2xl rounded-[40px] border p-2 shadow-2xl animate-in zoom-in-95 duration-400 overflow-hidden ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
         
         {/* Yläosa - Gradientti tausta ja otsikko */}
-        <div className="bg-gradient-to-br from-[#00BFA6] to-[#009581] rounded-[32px] p-10 text-center relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#00BFA6] to-[#009581] rounded-[32px] p-8 sm:p-10 text-center relative overflow-hidden">
           {/* Koristeympyrä taustalla */}
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           
@@ -5766,14 +5785,21 @@ function PaywallModal({
             <span className="text-4xl" aria-hidden="true">🚀</span>
           </div>
           
-          <h2 className="text-4xl font-black text-white tracking-tighter mb-3">Vapauta täysi potentiaalisi</h2>
-          <p className="text-white/90 text-lg font-medium max-w-md mx-auto leading-relaxed">
+          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tighter mb-3">Vapauta täysi potentiaalisi</h2>
+          <p className="text-white/90 text-base sm:text-lg font-medium max-w-md mx-auto leading-relaxed">
             Olet käyttänyt ilmaisen kokeilusi (1/1). Päivitä PRO-tasolle ja tee työhaustasi helpompaa ja tehokkaampaa.
           </p>
         </div>
 
         {/* Alaosa - Ominaisuuslista ja tilausnappi */}
         <div className="p-8 sm:p-10">
+          <div className={`mb-8 rounded-[28px] border p-5 sm:p-6 text-left ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">Mitä saat käytännössä</p>
+            <p className={`mt-3 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              PRO sopii parhaiten silloin, kun teet useita hakemuksia, haluat tallentaa eri versioita ja käyttää työnhaun lisätyökaluja ilman rajoituksia.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 mb-10">
             {features.map((feature, index) => (
               <div key={index} className="flex items-start gap-4">
@@ -5807,6 +5833,10 @@ function PaywallModal({
             >
               Ehkä myöhemmin
             </button>
+
+            <p className="mt-4 text-xs leading-6 opacity-60">
+              Tallenteet ja nykyinen työtilasi säilyvät tililläsi. Päivitys vaikuttaa vain käytössä oleviin ominaisuuksiin.
+            </p>
           </div>
         </div>
       </div>
