@@ -512,6 +512,55 @@ function priorityRank(priority: JobPriority) {
   }
 }
 
+function getSourceMeta(source?: string) {
+  const value = (source || "").trim();
+
+  switch (value) {
+    case "Työmarkkinatori":
+      return {
+        label: value,
+        note: "Tiedot haettu suoraan työpaikkalähteestä.",
+        badgeClass:
+          "border-[#00BFA6]/25 bg-[#00BFA6]/10 text-[#00BFA6]",
+      };
+    case "Duunitori":
+    case "Oikotie":
+    case "LinkedIn":
+    case "Jobly":
+    case "Indeed":
+    case "Monster":
+    case "Kuntarekry":
+      return {
+        label: value,
+        note: "Avaa alkuperäinen ilmoitus nähdäksesi koko kuvauksen.",
+        badgeClass:
+          "border-blue-500/25 bg-blue-500/10 text-blue-500",
+      };
+    case "Lisätty käsin":
+      return {
+        label: value,
+        note: "Oma lisäys seurantaan.",
+        badgeClass:
+          "border-amber-500/25 bg-amber-500/10 text-amber-500",
+      };
+    case "AI-ehdotus":
+    case "Tekoäly-simulaatio":
+      return {
+        label: value || "AI-ehdotus",
+        note: "Arvioitu ehdotus, tarkista yksityiskohdat ennen hakemista.",
+        badgeClass:
+          "border-purple-500/25 bg-purple-500/10 text-purple-500",
+      };
+    default:
+      return {
+        label: value || "Lähde",
+        note: "Tarkista ilmoituksen tiedot ennen hakemista.",
+        badgeClass:
+          "border-white/10 bg-white/5 text-gray-300",
+      };
+  }
+}
+
 // --- KOMPONENTIT ---
 
 function SectionShell({
@@ -632,6 +681,7 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
   const [showJobTools, setShowJobTools] = useState(false);
+  const sourceMeta = getSourceMeta(job.source);
 
   return (
     <article
@@ -645,8 +695,8 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           <div className="min-w-0 flex-1">
             <div className="mb-5 flex flex-wrap items-center gap-3">
             {job.source && (
-              <span className={`rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-300' : 'border-gray-200 bg-gray-100 text-gray-600'}`}>
-                {job.source}
+              <span className={`rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] ${sourceMeta.badgeClass}`}>
+                {sourceMeta.label}
               </span>
             )}
             <span className="rounded-full bg-[#00BFA6]/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">
@@ -672,6 +722,12 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {[job.company, job.location, job.type].filter(Boolean).join(" · ")}
           </p>
+
+          {job.source && (
+            <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+              {sourceMeta.note}
+            </p>
+          )}
         </div>
 
           <div className="w-full lg:w-auto pt-6 lg:pt-0 border-t border-transparent lg:border-none mt-4 lg:mt-0">
@@ -1012,6 +1068,7 @@ export default function Home() {
     searchedAt: string;
     sourceSummary: string;
     resultCount: number;
+    sources?: string[];
     wasCached?: boolean;
   } | null>(null);
 
@@ -2196,6 +2253,13 @@ export default function Home() {
           searchedAt: new Date(cachedSearch.timestamp).toISOString(),
           sourceSummary: "Äskeinen haku muistista",
           resultCount: cachedSearch.jobs.length,
+          sources: Array.from(
+            new Set(
+              cachedSearch.jobs
+                .map((job) => job.source)
+                .filter(Boolean),
+            ),
+          ) as string[],
           wasCached: true,
         });
         setTab("jobs");
@@ -2279,6 +2343,9 @@ export default function Home() {
         searchedAt: new Date().toISOString(),
         sourceSummary: `Työmarkkinatori ${data.diagnostics?.tyomarkkinatoriCount ?? 0} · Google ${data.diagnostics?.googleCount ?? 0}`,
         resultCount: newJobs.length,
+        sources: Array.from(
+          new Set(newJobs.map((job) => job.source).filter(Boolean)),
+        ) as string[],
         wasCached: false,
       });
 
@@ -4472,6 +4539,21 @@ export default function Home() {
                               <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                 {lastJobsSearchMeta.sourceSummary} · {lastJobsSearchMeta.resultCount} paikkaa · {new Date(lastJobsSearchMeta.searchedAt).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}
                               </p>
+                              {lastJobsSearchMeta.sources?.length ? (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {lastJobsSearchMeta.sources.slice(0, 4).map((source) => {
+                                    const meta = getSourceMeta(source);
+                                    return (
+                                      <span
+                                        key={source}
+                                        className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${meta.badgeClass}`}
+                                      >
+                                        {meta.label}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              ) : null}
                             </div>
                             <button
                               type="button"
@@ -5460,7 +5542,8 @@ function ArchiveModal({
                   >
                     <p className="font-black text-[#00BFA6] truncate">{cv.jobTitle}</p>
                     <p className={`mt-1 text-sm font-medium truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cv.companyName}</p>
-                    <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{new Date(cv.createdAt).toLocaleString("fi-FI")}</p>
+                    <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Tallennettu {new Date(cv.createdAt).toLocaleString("fi-FI")}</p>
+                    <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Avaa CV takaisin studioon</p>
                   </button>
                 )) : (
                   <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
@@ -5495,8 +5578,9 @@ function ArchiveModal({
                       )}
                     </div>
                     <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                      {new Date(letter.updatedAt || letter.createdAt).toLocaleString("fi-FI")}
+                      Viimeksi muokattu {new Date(letter.updatedAt || letter.createdAt).toLocaleString("fi-FI")}
                     </p>
+                    <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Avaa hakemus takaisin studioon</p>
                   </button>
                 )) : (
                   <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
@@ -5519,6 +5603,10 @@ function ArchiveModal({
                     onClick={() => onOpenJob(job)}
                     className={`w-full rounded-2xl border px-5 py-4 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}
                   >
+                    {(() => {
+                      const sourceMeta = getSourceMeta(job.source);
+                      return (
+                        <>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-black text-[#00BFA6] truncate">{job.title || "Nimetön työpaikka"}</p>
@@ -5531,6 +5619,18 @@ function ArchiveModal({
                     <p className={`mt-2 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
                       {getStatusLabel(job.status)} · {getPriorityLabel(job.priority)}
                     </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${sourceMeta.badgeClass}`}>
+                        {sourceMeta.label}
+                      </span>
+                      <span className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                        {sourceMeta.note}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Avaa työpaikka takaisin seurantaan</p>
+                        </>
+                      );
+                    })()}
                   </button>
                 )) : (
                   <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
