@@ -191,14 +191,14 @@ export default function ExtraToolsPage() {
   };
 
   const tools = [
-    { id: "linkedin-magnet", icon: "🚀", title: "LinkedIn", activeClass: "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-blue-500" },
-    { id: "headhunter", icon: "💎", title: "Headhunterit", activeClass: "bg-slate-800 text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] border-slate-600" },
-    { id: "hidden-jobs", icon: "🕵️", title: "Piilotyöt", activeClass: "bg-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] border-purple-400" },
-    { id: "red-flag", icon: "🕳️", title: "Haastattelu", activeClass: "bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] border-red-400" },
-    { id: "reference", icon: "⭐", title: "Suosittelijat", activeClass: "bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] border-amber-400" },
-    { id: "calling-script", icon: "📞", title: "Puhelut", activeClass: "bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] border-indigo-400" },
-    { id: "career-pivot", icon: "🧭", title: "Uranvaihto", activeClass: "bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] border-emerald-400" },
-    { id: "salary-negotiation", icon: "🤝", title: "Palkka", activeClass: "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] border-[#00BFA6]" },
+    { id: "linkedin-magnet", icon: "🚀", title: "LinkedIn", summary: "Profiili ja julkaisu", activeClass: "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-blue-500" },
+    { id: "headhunter", icon: "💎", title: "Headhunterit", summary: "Ensivaikutelma kuntoon", activeClass: "bg-slate-800 text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] border-slate-600" },
+    { id: "hidden-jobs", icon: "🕵️", title: "Piilotyöt", summary: "Lähesty suoraan päättäjää", activeClass: "bg-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] border-purple-400" },
+    { id: "red-flag", icon: "🕳️", title: "Haastattelu", summary: "Vaikeat kysymykset", activeClass: "bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] border-red-400" },
+    { id: "reference", icon: "⭐", title: "Suosittelijat", summary: "Pyydä tuki oikein", activeClass: "bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] border-amber-400" },
+    { id: "calling-script", icon: "📞", title: "Puhelut", summary: "Valmis puhelurunko", activeClass: "bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] border-indigo-400" },
+    { id: "career-pivot", icon: "🧭", title: "Uranvaihto", summary: "Taidot uuteen suuntaan", activeClass: "bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] border-emerald-400" },
+    { id: "salary-negotiation", icon: "🤝", title: "Palkka", summary: "Vastatarjous helposti", activeClass: "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] border-[#00BFA6]" },
   ];
 
   return (
@@ -232,9 +232,10 @@ export default function ExtraToolsPage() {
                 <span className="font-black text-2xl sm:text-3xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
                 <div className="bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded-full text-[10px] font-bold text-purple-400 uppercase tracking-widest">Automaatio</div>
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black">Anna tekoälyn <span className="text-purple-500">tehdä työt.</span></h1>
+              <p className="text-[11px] sm:text-xs font-black uppercase tracking-[0.24em] text-purple-400">Lisätyökalut</p>
+              <h1 className="mt-3 text-3xl sm:text-5xl font-black">Anna tekoälyn <span className="text-purple-500">tehdä työt.</span></h1>
               <p className={`mt-4 text-sm sm:text-lg max-w-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Älä keksi pyörää uudelleen. Valitse työkalu alta, kerro perusasiat ja anna algoritmin tuottaa asiantuntijatason tekstiä sekunneissa.
+                Älä keksi pyörää uudelleen. Valitse työkalu alta, kerro tärkeimmät tiedot ja anna Duuniharavan rakentaa sinulle valmis luonnos sekunneissa.
               </p>
             </div>
             
@@ -250,7 +251,21 @@ export default function ExtraToolsPage() {
         </section>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-8 sm:mt-12">
-          
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8 sm:mb-12">
+            <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">1. Valitse työkalu</p>
+              <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Aloita siitä kohdasta, jossa olet juuri nyt jumissa. Jokainen työkalu ratkaisee yhden selkeän tilanteen.</p>
+            </div>
+            <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">2. Kerro vain tärkein</p>
+              <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Et tarvitse täydellistä briiffiä. Riittää, että täytät yhden tai kaksi tärkeintä tietoa kunnolla.</p>
+            </div>
+            <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">3. Kopioi ja jatka</p>
+              <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Kun luonnos näyttää hyvältä, kopioi se talteen ja jatka suoraan studioon tai alkuperäiseen palveluun.</p>
+            </div>
+          </div>
+
           {/* TABS - "App Icon" Grid Layout */}
           <div ref={tabsRef} className="grid grid-cols-2 min-[500px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4 mb-8 sm:mb-14">
             {tools.map(tool => (
@@ -265,6 +280,9 @@ export default function ExtraToolsPage() {
               >
                 <span className="text-2xl sm:text-4xl mb-1 sm:mb-3 block transition-transform hover:scale-110" aria-hidden="true">{tool.icon}</span>
                 <span className="text-[9px] sm:text-xs font-black uppercase tracking-wider leading-tight">{tool.title}</span>
+                <span className={`mt-2 hidden sm:block text-[11px] leading-4 ${activeTab === tool.id ? 'text-white/80' : (theme === 'dark' ? 'text-gray-500' : 'text-gray-500')}`}>
+                  {tool.summary}
+                </span>
               </button>
             ))}
           </div>

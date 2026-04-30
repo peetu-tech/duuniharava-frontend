@@ -561,6 +561,40 @@ function getSourceMeta(source?: string) {
   }
 }
 
+function formatJobsSearchFailure(data: any) {
+  const diagnostics = data?.diagnostics;
+
+  if (!diagnostics) {
+    return data?.error || "Työpaikkaehdotuksia ei saatu muodostettua juuri nyt.";
+  }
+
+  const notes: string[] = [];
+
+  if (diagnostics.tyomarkkinatoriStatus === "failed") {
+    notes.push("Työmarkkinatori ei vastannut tällä hetkellä.");
+  } else if ((diagnostics.tyomarkkinatoriCount ?? 0) > 0) {
+    notes.push(`Työmarkkinatorilta löytyi ${diagnostics.tyomarkkinatoriCount} osumaa.`);
+  }
+
+  if (diagnostics.googleStatus === "http_403") {
+    notes.push("Google-varahaku tarvitsee asetusten tarkistuksen.");
+  } else if ((diagnostics.googleCount ?? 0) > 0) {
+    notes.push(`Muista lähteistä löytyi ${diagnostics.googleCount} osumaa.`);
+  }
+
+  if (!diagnostics.usesProxy) {
+    notes.push("Proxy ei ole käytössä.");
+  }
+
+  if ((diagnostics.tyomarkkinatoriCount ?? 0) === 0 && (diagnostics.googleCount ?? 0) === 0) {
+    notes.unshift("Työpaikkoja ei löytynyt juuri nyt yhdestäkään lähteestä.");
+  }
+
+  notes.push("Tarkista hakuehdot tai kokeile hetken päästä uudelleen.");
+
+  return notes.join(" ");
+}
+
 // --- KOMPONENTIT ---
 
 function SectionShell({
@@ -2280,45 +2314,8 @@ export default function Home() {
       const parsed = safeJsonParseJobs(data.output || "[]");
 
       if (!res.ok || !parsed.length) {
-        const diagnostics = data.diagnostics;
-        const details: string[] = [];
-
-        if (diagnostics) {
-          details.push(
-            `Työmarkkinatori-osumat: ${diagnostics.tyomarkkinatoriCount ?? 0}`,
-          );
-          details.push(`Google-osumat: ${diagnostics.googleCount ?? 0}`);
-          if (diagnostics.tyomarkkinatoriStatus) {
-            details.push(
-              `Työmarkkinatori-tila: ${diagnostics.tyomarkkinatoriStatus}`,
-            );
-          }
-          if (diagnostics.googleStatus) {
-            details.push(`Google-tila: ${diagnostics.googleStatus}`);
-          }
-
-          if (!diagnostics.usesProxy) {
-            details.push("Proxy ei ole käytössä.");
-          }
-          if (!diagnostics.hasGoogleKey || !diagnostics.hasGoogleCx) {
-            details.push("Google-hakua ei ole määritetty oikein.");
-          }
-          if (!diagnostics.hasTyomarkkinatoriKey) {
-            details.push("Työmarkkinatorin avain puuttuu.");
-          }
-          if (diagnostics.tyomarkkinatoriError) {
-            details.push(`Työmarkkinatori-virhe: ${diagnostics.tyomarkkinatoriError}`);
-          }
-          if (diagnostics.googleError) {
-            details.push(`Google-virhe: ${diagnostics.googleError}`);
-          }
-        }
-
-        setErrorMessage(
-          [data.error || "Työpaikkaehdotuksia ei saatu muodostettua.", ...details]
-            .filter(Boolean)
-            .join(" "),
-        );
+        console.warn("Jobs search diagnostics", data?.diagnostics);
+        setErrorMessage(formatJobsSearchFailure(data));
         return;
       }
 
