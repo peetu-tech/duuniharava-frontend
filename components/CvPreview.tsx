@@ -18,12 +18,12 @@ export type CvCustomStyle = {
   lineHeight: number;
   sectionSpacing: number;
   imageRadius: number;
-  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag";
+  pattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag" | "chevrons" | "halftone";
   patternOpacity?: number;
-  sidebarPattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag";
+  sidebarPattern?: "none" | "dots" | "lines" | "grid" | "diagonal" | "cross" | "intersecting" | "waves" | "zigzag" | "chevrons" | "halftone";
   sidebarPatternOpacity?: number;
   showSeparators?: boolean;
-  fontFamily?: "modern" | "classic" | "mono" | "elegant" | "clean" | "tech" | "brutalist" | "playful";
+  fontFamily?: "modern" | "classic" | "mono" | "elegant" | "clean" | "tech" | "brutalist" | "playful" | "editorial" | "rounded";
   layout?: "left-sidebar" | "right-sidebar" | "top-header" | "two-column" | "minimalist";
   headerStyle?: "solid" | "transparent" | "gradient";
   headingAlign?: "left" | "center" | "right";
@@ -179,6 +179,8 @@ export default function CvPreview({
       case 'tech': return '"Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", sans-serif';
       case 'brutalist': return 'Impact, Charcoal, sans-serif';
       case 'playful': return '"Comic Sans MS", "Marker Felt", sans-serif';
+      case 'editorial': return '"Palatino Linotype", "Book Antiqua", Palatino, serif';
+      case 'rounded': return '"Avenir Next Rounded", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif';
       case 'modern':
       default: return 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     }
@@ -248,6 +250,12 @@ export default function CvPreview({
     } else if (patternType === "zigzag") {
       patternImg = `linear-gradient(135deg, ${useColor} 25%, transparent 25%) -50px 0, linear-gradient(225deg, ${useColor} 25%, transparent 25%) -50px 0, linear-gradient(315deg, ${useColor} 25%, transparent 25%), linear-gradient(45deg, ${useColor} 25%, transparent 25%)`;
       patternSize = "100px 100px";
+    } else if (patternType === "chevrons") {
+      patternImg = `linear-gradient(135deg, ${useColor} 25%, transparent 25%) -20px 0/40px 40px, linear-gradient(225deg, ${useColor} 25%, transparent 25%) -20px 0/40px 40px, linear-gradient(315deg, ${useColor} 25%, transparent 25%) 0px 0/40px 40px, linear-gradient(45deg, ${useColor} 25%, transparent 25%) 0px 0/40px 40px`;
+      patternSize = "40px 40px";
+    } else if (patternType === "halftone") {
+      patternImg = `radial-gradient(${useColor} 1px, transparent 1px), radial-gradient(${useColor} 1px, transparent 1px)`;
+      patternSize = "18px 18px";
     }
 
     return { 

@@ -715,7 +715,11 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
   const [showJobTools, setShowJobTools] = useState(false);
+  const [showJobDetails, setShowJobDetails] = useState(false);
   const sourceMeta = getSourceMeta(job.source);
+  const originalLabel = ["Duunitori", "Oikotie", "LinkedIn", "Jobly", "Indeed", "Monster", "Kuntarekry"].includes(sourceMeta.label)
+    ? "Avaa alkuperäinen ilmoitus"
+    : "Avaa ilmoitus";
 
   return (
     <article
@@ -800,6 +804,17 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
               </button>
             </div>
 
+            <button
+              type="button"
+              onClick={() => setShowJobDetails((prev: boolean) => !prev)}
+              aria-expanded={showJobDetails}
+              className={`mt-3 w-full rounded-2xl border px-5 py-4 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                theme === 'dark' ? "border-white/10 bg-white/[0.03] text-gray-300 hover:bg-white/10" : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {showJobDetails ? "Piilota seurannan tiedot" : "Näytä seurannan tiedot"}
+            </button>
+
             {showJobTools && (
               <div className={`mt-4 rounded-[28px] border p-4 sm:p-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/90'}`}>
                 <p className={`mb-4 text-xs font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -878,6 +893,8 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
         </div>
       )}
 
+      {showJobDetails && (
+      <>
       <div className={`mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 pt-8 border-t ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
         <div>
           <label htmlFor={`status-${job.id}`} className={LabelClass(theme)}>Status</label>
@@ -989,15 +1006,17 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
           className={TextareaClass("min-h-[160px]", theme)}
         />
       </div>
+      </>
+      )}
 
       {job.url && (
         <a
           href={job.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-10 flex w-full justify-center rounded-2xl border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-8 py-6 text-lg font-black text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+          className="mt-10 flex w-full justify-center rounded-2xl border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-8 py-6 text-base sm:text-lg font-black text-[#00BFA6] transition hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
         >
-          AVAA ALKUPERÄINEN ILMOITUS ➔
+          {originalLabel.toUpperCase()} ➔
         </a>
       )}
     </article>
@@ -4002,6 +4021,10 @@ export default function Home() {
                             <button type="button" onClick={() => applyPalette("#fffbeb", "#fef3c7", "#78350f", "#451a03", "#d97706", "#451a03", "#fffbeb", "#92400e")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d97706] ${theme === 'dark' ? 'border-white/10 hover:border-[#d97706] hover:bg-white/5' : 'border-gray-200 hover:border-[#d97706] hover:bg-gray-50'}`}>🍂 Syksy</button>
                             <button type="button" onClick={() => applyPalette("#ffffff", "#f3f4f6", "#4c1d95", "#312e81", "#7c3aed", "#111827", "#ffffff", "#4338ca")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed] ${theme === 'dark' ? 'border-white/10 hover:border-[#7c3aed] hover:bg-white/5' : 'border-gray-200 hover:border-[#7c3aed] hover:bg-gray-50'}`}>🔮 Kyber</button>
                             <button type="button" onClick={() => applyPalette("#18181b", "#111827", "#000000", "#0a0a0a", "#14b8a6", "#f3f4f6", "#e5e7eb", "#9ca3af")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14b8a6] ${theme === 'dark' ? 'border-white/10 hover:border-[#14b8a6] hover:bg-white/5' : 'border-gray-200 hover:border-[#14b8a6] hover:bg-gray-50'}`}>🌑 Tumma Tyyli</button>
+                            <button type="button" onClick={() => applyPalette("#fff7ed", "#ffedd5", "#7c2d12", "#9a3412", "#f97316", "#431407", "#fff7ed", "#c2410c")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f97316] ${theme === 'dark' ? 'border-white/10 hover:border-[#f97316] hover:bg-white/5' : 'border-gray-200 hover:border-[#f97316] hover:bg-gray-50'}`}>🌅 Auringonlasku</button>
+                            <button type="button" onClick={() => applyPalette("#fdf2f8", "#fce7f3", "#831843", "#9d174d", "#ec4899", "#500724", "#fff1f2", "#be185d")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899] ${theme === 'dark' ? 'border-white/10 hover:border-[#ec4899] hover:bg-white/5' : 'border-gray-200 hover:border-[#ec4899] hover:bg-gray-50'}`}>🌸 Rosé</button>
+                            <button type="button" onClick={() => applyPalette("#f5f3ff", "#ede9fe", "#312e81", "#1e1b4b", "#8b5cf6", "#111827", "#ffffff", "#5b21b6")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6] ${theme === 'dark' ? 'border-white/10 hover:border-[#8b5cf6] hover:bg-white/5' : 'border-gray-200 hover:border-[#8b5cf6] hover:bg-gray-50'}`}>✨ Studio</button>
+                            <button type="button" onClick={() => applyPalette("#f8fafc", "#e2e8f0", "#082f49", "#0f172a", "#38bdf8", "#0f172a", "#f8fafc", "#0f766e")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] ${theme === 'dark' ? 'border-white/10 hover:border-[#38bdf8] hover:bg-white/5' : 'border-gray-200 hover:border-[#38bdf8] hover:bg-gray-50'}`}>🧊 Nordinen</button>
                           </div>
 
                           <div className="mb-10 flex flex-wrap gap-4" role="group" aria-label="CV:n asettelutyylit">
@@ -4047,6 +4070,8 @@ export default function Home() {
                                     <option value="tech">Tekninen (Trebuchet)</option>
                                     <option value="brutalist">Brutalistinen (Impact)</option>
                                     <option value="playful">Leikkisä (Comic)</option>
+                                    <option value="editorial">Editorial (Palatino)</option>
+                                    <option value="rounded">Pyöreä (Rounded)</option>
                                   </select>
                                 </div>
                                 <div>
@@ -4164,6 +4189,8 @@ export default function Home() {
                                     <option value="intersecting">Risteävät viivat</option>
                                     <option value="waves">Aallot (Waves)</option>
                                     <option value="zigzag">Sahalaita (Zigzag)</option>
+                                    <option value="chevrons">Kulmaraidat (Chevrons)</option>
+                                    <option value="halftone">Rasteripisteet (Halftone)</option>
                                   </select>
                                 </div>
                                 <div>
@@ -4178,6 +4205,8 @@ export default function Home() {
                                     <option value="intersecting">Risteävät viivat</option>
                                     <option value="waves">Aallot (Waves)</option>
                                     <option value="zigzag">Sahalaita (Zigzag)</option>
+                                    <option value="chevrons">Kulmaraidat (Chevrons)</option>
+                                    <option value="halftone">Rasteripisteet (Halftone)</option>
                                   </select>
                                 </div>
                                 <div>
