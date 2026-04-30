@@ -595,6 +595,27 @@ function formatJobsSearchFailure(data: any) {
   return notes.join(" ");
 }
 
+function formatRelativeSearchTime(value?: string) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const diffMinutes = Math.max(
+    0,
+    Math.round((Date.now() - date.getTime()) / (1000 * 60)),
+  );
+
+  if (diffMinutes < 1) return "haettu juuri nyt";
+  if (diffMinutes < 60) return `haettu ${diffMinutes} min sitten`;
+
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `haettu ${diffHours} h sitten`;
+
+  const diffDays = Math.round(diffHours / 24);
+  return `haettu ${diffDays} pv sitten`;
+}
+
 // --- KOMPONENTIT ---
 
 function SectionShell({
@@ -4563,7 +4584,7 @@ export default function Home() {
                                   : "Työpaikat päivitetty onnistuneesti"}
                               </p>
                               <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                {lastJobsSearchMeta.sourceSummary} · {lastJobsSearchMeta.resultCount} paikkaa · {new Date(lastJobsSearchMeta.searchedAt).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}
+                                {lastJobsSearchMeta.sourceSummary} · {lastJobsSearchMeta.resultCount} paikkaa · {formatRelativeSearchTime(lastJobsSearchMeta.searchedAt)} · {new Date(lastJobsSearchMeta.searchedAt).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}
                               </p>
                               {lastJobsSearchMeta.sources?.length ? (
                                 <div className="mt-3 flex flex-wrap gap-2">
@@ -4580,6 +4601,9 @@ export default function Home() {
                                   })}
                                 </div>
                               ) : null}
+                              <p className={`mt-3 text-xs leading-6 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                                Ulkoisista lähteistä tulevissa paikoissa näet joskus ensin tiivistelmän. Avaa alkuperäinen ilmoitus, kun haluat tarkistaa koko kuvauksen ennen hakemuksen räätälöintiä.
+                              </p>
                             </div>
                             <button
                               type="button"
