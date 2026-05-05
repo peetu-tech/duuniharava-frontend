@@ -93,6 +93,14 @@ type SavedCvVariant = {
   createdAt: string;
 };
 
+type SavedStylePreset = {
+  id: string;
+  name: string;
+  styleVariant: CvStyleVariant;
+  customStyle: CvCustomStyle;
+  createdAt: string;
+};
+
 const emptyForm = {
   cvText: "",
   cvFile: "",
@@ -162,6 +170,7 @@ type StudioDraftState = {
   activeJobId: string;
   currentJobIndex: number;
   customStyles: Record<CvStyleVariant, CvCustomStyle>;
+  savedStylePresets: SavedStylePreset[];
 };
 
 type StudioCloudState = {
@@ -183,6 +192,7 @@ type StudioCloudState = {
   jobPriorityFilter: "all" | JobPriority;
   jobSort: "match" | "deadline" | "priority" | "newest" | "company";
   showFavoritesOnly: boolean;
+  savedStylePresets: SavedStylePreset[];
 };
 
 const STORAGE_KEY = "duuniharava_state_v8";
@@ -384,6 +394,77 @@ const defaultCustomStyles: Record<CvStyleVariant, CvCustomStyle> = {
     sidebarBorder: false,
   },
 };
+
+const premiumStylePresets: SavedStylePreset[] = [
+  {
+    id: "preset-executive-slate",
+    name: "Executive Slate",
+    styleVariant: "modern",
+    createdAt: "system",
+    customStyle: {
+      ...defaultCustomStyles.modern,
+      sidebarBg: "#111827",
+      sidebarBg2: "#1f2937",
+      accentColor: "#14b8a6",
+      headingColor: "#0f766e",
+      mainBg: "#ffffff",
+      mainBg2: "#f8fafc",
+      fontFamily: "editorial",
+      pattern: "lines",
+      patternOpacity: 3,
+      sidebarPattern: "none",
+      borderRadius: 18,
+      pagePadding: 52,
+      headingStyle: "simple",
+      itemSpacing: 18,
+    },
+  },
+  {
+    id: "preset-creative-pulse",
+    name: "Creative Pulse",
+    styleVariant: "bold",
+    createdAt: "system",
+    customStyle: {
+      ...defaultCustomStyles.bold,
+      sidebarBg: "#3b0764",
+      sidebarBg2: "#581c87",
+      accentColor: "#f97316",
+      headingColor: "#7c3aed",
+      mainBg: "#fff7ed",
+      mainBg2: "#ffedd5",
+      fontFamily: "rounded",
+      pattern: "chevrons",
+      patternOpacity: 6,
+      sidebarPattern: "halftone",
+      sidebarPatternOpacity: 8,
+      shadowStyle: "soft",
+      imageShape: "rounded",
+    },
+  },
+  {
+    id: "preset-minimal-nordic",
+    name: "Minimal Nordic",
+    styleVariant: "compact",
+    createdAt: "system",
+    customStyle: {
+      ...defaultCustomStyles.compact,
+      sidebarBg: "#e0f2fe",
+      sidebarBg2: "#f0f9ff",
+      sidebarText: "#0f172a",
+      accentColor: "#0ea5e9",
+      headingColor: "#0369a1",
+      mainBg: "#ffffff",
+      mainBg2: "#f8fafc",
+      fontFamily: "clean",
+      pattern: "none",
+      sidebarPattern: "dots",
+      sidebarPatternOpacity: 6,
+      headingStyle: "underline",
+      borderRadius: 14,
+      pagePadding: 44,
+    },
+  },
+];
 
 // --- APUFUNKTIOT ---
 function parseCvResult(raw: string): ParsedCvResult {
@@ -1141,6 +1222,7 @@ export default function Home() {
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
+  const [savedStylePresets, setSavedStylePresets] = useState<SavedStylePreset[]>([]);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -1232,6 +1314,9 @@ export default function Home() {
             setCurrentJobIndex(draft.currentJobIndex);
           }
           if (draft.customStyles) setCustomStyles(draft.customStyles);
+          if (draft.savedStylePresets?.length) {
+            setSavedStylePresets(draft.savedStylePresets);
+          }
         }
       } catch (error) {
         console.error("Paikallisen studiotilan palautus epäonnistui", error);
@@ -1350,6 +1435,9 @@ export default function Home() {
               if (state.cvStyle) setCvStyle(state.cvStyle);
               if (state.letterTone) setLetterTone(state.letterTone);
               if (state.customStyles) setCustomStyles(state.customStyles);
+              if (state.savedStylePresets?.length) {
+                setSavedStylePresets(state.savedStylePresets);
+              }
               if (typeof state.cvResult === "string") setCvResult(state.cvResult);
               if (typeof state.letterResult === "string") setLetterResult(state.letterResult);
               if (typeof state.letterDraft === "string") setLetterDraft(state.letterDraft);
@@ -1455,6 +1543,7 @@ export default function Home() {
       activeJobId,
       currentJobIndex,
       customStyles,
+      savedStylePresets,
     };
 
     try {
@@ -1488,6 +1577,7 @@ export default function Home() {
     profileImage,
     savedCvVariants,
     savedLetters,
+    savedStylePresets,
     searchProfile,
     showFavoritesOnly,
     tab,
@@ -1507,6 +1597,7 @@ export default function Home() {
       cvStyle,
       letterTone,
       customStyles,
+      savedStylePresets,
       cvResult,
       letterResult,
       letterDraft,
@@ -1561,6 +1652,7 @@ export default function Home() {
     letterDraft,
     letterResult,
     letterTone,
+    savedStylePresets,
     searchProfile,
     showFavoritesOnly,
     tab,
@@ -1867,6 +1959,80 @@ export default function Home() {
     updateCustomStyle("mainText", mainText);
     updateCustomStyle("sidebarText", sidebarText);
     updateCustomStyle("headingColor", headingColor);
+  }
+
+  function applyStylePreset(preset: SavedStylePreset) {
+    setCvStyle(preset.styleVariant);
+    setCustomStyles((prev) => ({
+      ...prev,
+      [preset.styleVariant]: {
+        ...preset.customStyle,
+      },
+    }));
+    setMessage(`Tyyli "${preset.name}" otettu käyttöön.`);
+    setTimeout(() => setMessage(""), 2500);
+  }
+
+  function saveCurrentStylePreset() {
+    const name = typeof window !== "undefined"
+      ? window.prompt("Anna tyylille nimi", `${form.targetJob || "Oma"} tyyli`)
+      : null;
+
+    if (!name) return;
+
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+
+    const preset: SavedStylePreset = {
+      id: makeId(),
+      name: trimmedName,
+      styleVariant: cvStyle,
+      customStyle: { ...customStyle },
+      createdAt: new Date().toISOString(),
+    };
+
+    setSavedStylePresets((prev) => [preset, ...prev.filter((item) => item.name !== trimmedName)].slice(0, 8));
+    setMessage(`Tyyli "${trimmedName}" tallennettu omaan kokoelmaan.`);
+    setTimeout(() => setMessage(""), 2500);
+  }
+
+  function removeSavedStylePreset(id: string) {
+    setSavedStylePresets((prev) => prev.filter((preset) => preset.id !== id));
+    setMessage("Tallennettu tyyli poistettu.");
+    setTimeout(() => setMessage(""), 2500);
+  }
+
+  function applyQuickStyleMood(mode: "professional" | "modern" | "compact") {
+    if (mode === "professional") {
+      updateCustomStyle("fontFamily", "editorial");
+      updateCustomStyle("headingStyle", "simple");
+      updateCustomStyle("headingTransform", "uppercase");
+      updateCustomStyle("borderRadius", 10);
+      updateCustomStyle("shadowStyle", "none");
+      updateCustomStyle("itemSpacing", 14);
+      updateCustomStyle("pattern", "none");
+      updateCustomStyle("sidebarPattern", "none");
+      setMessage("CV-tyyli rauhoitettiin ammattimaisemmaksi.");
+    } else if (mode === "modern") {
+      updateCustomStyle("fontFamily", "modern");
+      updateCustomStyle("headingStyle", "underline");
+      updateCustomStyle("shadowStyle", "soft");
+      updateCustomStyle("pattern", "halftone");
+      updateCustomStyle("patternOpacity", 4);
+      updateCustomStyle("sidebarPattern", "chevrons");
+      updateCustomStyle("sidebarPatternOpacity", 6);
+      updateCustomStyle("imageShape", "rounded");
+      setMessage("CV-tyyli päivitettiin modernimmaksi.");
+    } else {
+      updateCustomStyle("bodySize", Math.max(12, (customStyle.bodySize || 14) - 1));
+      updateCustomStyle("lineHeight", Math.max(1.35, Number(((customStyle.lineHeight || 1.6) - 0.1).toFixed(2))));
+      updateCustomStyle("sectionSpacing", Math.max(18, (customStyle.sectionSpacing || 28) - 6));
+      updateCustomStyle("itemSpacing", Math.max(8, (customStyle.itemSpacing || 14) - 3));
+      updateCustomStyle("pagePadding", Math.max(28, (customStyle.pagePadding || 48) - 6));
+      setMessage("CV-tyyli tiivistettiin yhdelle sivulle sopivammaksi.");
+    }
+
+    setTimeout(() => setMessage(""), 2500);
   }
 
   function resetCurrentStyle() {
@@ -4096,11 +4262,106 @@ export default function Home() {
                               <button type="button" onClick={resetCurrentStyle} className={`rounded-2xl border px-6 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-[#00BFA6]/50' : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-[#00BFA6]/50'}`}>
                                 Palauta oletukset
                               </button>
+                              <button type="button" onClick={saveCurrentStylePreset} className={`rounded-2xl border px-6 py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-[#00BFA6]/30 bg-[#00BFA6]/10 text-[#7EF5E3] hover:bg-[#00BFA6]/15' : 'border-[#00BFA6]/30 bg-[#00BFA6]/10 text-[#0f766e] hover:bg-[#00BFA6]/15'}`}>
+                                Tallenna oma tyyli
+                              </button>
                             </div>
                           </div>
 
                           {(!isMobileViewport || showStyleStudio) && (
                             <>
+                          <div className={`mb-10 mt-8 grid grid-cols-1 gap-4 rounded-[28px] border p-5 sm:grid-cols-3 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/80'}`}>
+                            <button type="button" onClick={() => applyQuickStyleMood("professional")} className={`rounded-2xl border px-5 py-4 text-sm font-bold text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}>
+                              <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikamuokkaus</span>
+                              <span className="mt-2 block text-base font-black">Virallisempi</span>
+                              <span className={`mt-1 block text-xs leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Rauhallisempi typografia ja siistimpi ilme.</span>
+                            </button>
+                            <button type="button" onClick={() => applyQuickStyleMood("modern")} className={`rounded-2xl border px-5 py-4 text-sm font-bold text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}>
+                              <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikamuokkaus</span>
+                              <span className="mt-2 block text-base font-black">Modernimpi</span>
+                              <span className={`mt-1 block text-xs leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Hieman rohkeampi, nykyaikainen pinta ja kuviot.</span>
+                            </button>
+                            <button type="button" onClick={() => applyQuickStyleMood("compact")} className={`rounded-2xl border px-5 py-4 text-sm font-bold text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}>
+                              <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikamuokkaus</span>
+                              <span className="mt-2 block text-base font-black">Tiiviimpi</span>
+                              <span className={`mt-1 block text-xs leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Puristaa sisältöä yhdelle sivulle helpommin.</span>
+                            </button>
+                          </div>
+
+                          <div className={`mb-10 rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/80'}`}>
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                              <div>
+                                <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Pro-pohjat</p>
+                                <p className={`mt-2 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  Valitse valmis suunta, kun haluat nopean näyttävän alun ilman säätämistä.
+                                </p>
+                              </div>
+                            </div>
+                            <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+                              {premiumStylePresets.map((preset) => (
+                                <button
+                                  key={preset.id}
+                                  type="button"
+                                  onClick={() => applyStylePreset(preset)}
+                                  className={`rounded-2xl border px-5 py-5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:border-[#00BFA6]/50 hover:bg-white/10' : 'border-gray-200 bg-white text-gray-900 hover:border-[#00BFA6]/40 hover:bg-gray-50'}`}
+                                >
+                                  <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">{preset.styleVariant}</span>
+                                  <span className="mt-2 block text-lg font-black">{preset.name}</span>
+                                  <span className={`mt-2 block text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    {preset.id === "preset-executive-slate" && "Johtaja- ja asiantuntijarooliin rauhallinen premium-ilme."}
+                                    {preset.id === "preset-creative-pulse" && "Luovempi, energinen ja erottuva kokonaisuus."}
+                                    {preset.id === "preset-minimal-nordic" && "Pelkistetty, skandinaavinen ja helposti luettava tyyli."}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className={`mb-10 rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/80'}`}>
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                              <div>
+                                <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Omat tallennetut tyylit</p>
+                                <p className={`mt-2 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  Tallenna parhaat ulkoasut omaan kirjastoon ja ota ne käyttöön yhdellä painalluksella.
+                                </p>
+                              </div>
+                            </div>
+                            {savedStylePresets.length ? (
+                              <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
+                                {savedStylePresets.map((preset) => (
+                                  <div key={preset.id} className={`rounded-2xl border p-4 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'}`}>
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="min-w-0">
+                                        <p className={`text-base font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{preset.name}</p>
+                                        <p className={`mt-1 text-xs uppercase tracking-[0.18em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                                          {preset.styleVariant} · tallennettu {new Date(preset.createdAt).toLocaleDateString("fi-FI")}
+                                        </p>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => removeSavedStylePreset(preset.id)}
+                                        className={`rounded-xl px-3 py-2 text-xs font-black transition-all ${theme === 'dark' ? 'bg-red-500/10 text-red-300 hover:bg-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
+                                      >
+                                        Poista
+                                      </button>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => applyStylePreset(preset)}
+                                      className="mt-4 w-full rounded-2xl bg-[#00BFA6] px-4 py-3 text-sm font-black text-black transition-transform hover:scale-[1.01]"
+                                    >
+                                      Käytä tätä tyyliä
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className={`mt-5 rounded-2xl border border-dashed p-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 text-gray-400' : 'border-gray-300 text-gray-500'}`}>
+                                Tallenna ensimmäinen oma tyyli, niin saat tähän oman pienen tyylikirjaston.
+                              </div>
+                            )}
+                          </div>
+
                           {/* PIKAVÄRIT */}
                           <div className={`mb-10 mt-8 flex flex-wrap gap-3 border-b pb-8 ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`} role="group" aria-label="Pikaväriteemat">
                             <button type="button" onClick={() => applyPalette("#ffffff", "#f8fafc", "#0f172a", "#1e293b", "#0369a1", "#111827", "#ffffff", "#475569")} className={`rounded-xl px-5 py-3 text-sm font-bold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0369a1] ${theme === 'dark' ? 'border-white/10 hover:border-[#0369a1] hover:bg-white/5' : 'border-gray-200 hover:border-[#0369a1] hover:bg-gray-50'}`}>🌊 Merellinen</button>
