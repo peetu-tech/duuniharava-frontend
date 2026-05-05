@@ -15,6 +15,7 @@ import {
 import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import { clearSession, getSession, getValidSession } from "../../lib/supabaseAuth";
+import { trackUsageEvent } from "../../lib/usageTracking";
 
 // --- SUPABASE ASETUKSET --- 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -2391,6 +2392,10 @@ export default function Home() {
       }
 
       pdf.save(`duuniharava-${isLetter ? 'hakemus' : 'cv'}-${cvStyle}.pdf`);
+      void trackUsageEvent("pdf_downloaded", {
+        kind: isLetter ? "letter" : "cv",
+        style: cvStyle,
+      });
       
       setMessage("PDF ladattu onnistuneesti koneellesi!");
       setTimeout(() => setMessage(""), 3500);
@@ -2464,6 +2469,10 @@ export default function Home() {
 
       const blob = await Packer.toBlob(doc);
       saveAs(blob, `duuniharava-${isLetter ? 'hakemus' : 'cv'}.docx`);
+      void trackUsageEvent("docx_downloaded", {
+        kind: isLetter ? "letter" : "cv",
+        style: cvStyle,
+      });
       setMessage("DOCX ladattu.");
       setTimeout(() => setMessage(""), 2500);
     } catch (error) {
@@ -2593,6 +2602,10 @@ export default function Home() {
     setMessage("Työpaikka lisätty listaan.");
     setTab("jobs");
     setTimeout(() => setMessage(""), 2500);
+    void trackUsageEvent("job_saved_manual", {
+      hasCompany: Boolean(job.company),
+      hasUrl: Boolean(job.url),
+    });
 
     void getValidSession().then((session) => {
       if (!session) return;
@@ -2687,6 +2700,12 @@ export default function Home() {
         setTab("jobs");
         setMessage("Sama haku tehtiin juuri. Ohitetaan uusi verkkohaku ja säästetään käyttöä.");
         setTimeout(() => setMessage(""), 2500);
+        void trackUsageEvent("jobs_search_reused", {
+          resultCount: cachedSearch.jobs.length,
+          sources: Array.from(
+            new Set(cachedSearch.jobs.map((job) => job.source).filter(Boolean)),
+          ),
+        });
         return;
       }
 
@@ -2741,6 +2760,11 @@ export default function Home() {
       }
     setTab("jobs");
     setMessage("Työpaikkaehdotukset lisätty.");
+      void trackUsageEvent("jobs_search_completed", {
+        resultCount: newJobs.length,
+        sources: Array.from(new Set(newJobs.map((job) => job.source).filter(Boolean))),
+        cached: false,
+      });
 
       const session = await getValidSession();
       if(session) {
@@ -2778,6 +2802,11 @@ export default function Home() {
     updateJob(jobId, { favorite: true });
     setMessage("Paikka tallennettu suosikkeihin! 💚");
     setTimeout(() => setMessage(""), 2000);
+    const savedJob = jobs.find((job) => job.id === jobId);
+    void trackUsageEvent("job_favorited", {
+      source: savedJob?.source || null,
+      title: savedJob?.title || null,
+    });
     
     if (currentJobIndex < filteredJobs.length - 1) {
       setCurrentJobIndex(prev => prev + 1);
@@ -2851,6 +2880,10 @@ export default function Home() {
       setTab("cv");
       setMessage("Työpaikkaan sopiva CV-versio luotu.");
       setTimeout(() => setMessage(""), 2500);
+      void trackUsageEvent("tailored_cv_generated", {
+        source: activeJob.source || null,
+        company: activeJob.company || null,
+      });
 
       if(session) {
         fetch(`${supabaseUrl}/rest/v1/cv_variants`, {
@@ -2906,6 +2939,11 @@ export default function Home() {
       const output = data.output || data.error || "Jokin meni pieleen.";
       setCvResult(output);
       setTab("cv");
+      void trackUsageEvent("cv_generated", {
+        mode,
+        hasUploadedCv: Boolean(form.cvFileName),
+        style: cvStyle,
+      });
     } catch (error) {
       console.error(error);
       setErrorMessage("Virhe yhteydessä palvelimeen.");
@@ -2977,6 +3015,11 @@ export default function Home() {
       setLetterViewMode("edit");
       setMessage("Hakemus luotu — muokkaa ja lataa se alta.");
       setTimeout(() => setMessage(""), 2500);
+      void trackUsageEvent("cover_letter_generated", {
+        tone: letterTone,
+        source: activeJob.source || null,
+        company: activeJob.company || null,
+      });
 
       if(session) {
         fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
@@ -3020,6 +3063,10 @@ export default function Home() {
     setLetterResult(`HAKEMUS:\n${letterDraft.trim()}`);
     setMessage("Muokattu hakemus tallennettu.");
     setTimeout(() => setMessage(""), 2500);
+    void trackUsageEvent("cover_letter_saved_edit", {
+      tone: letterTone,
+      source: activeJob.source || null,
+    });
 
     void getValidSession().then((session) => {
       if (!session) return;
@@ -3262,10 +3309,15 @@ export default function Home() {
           const errorData = await res.json();
           alert(errorData.error || "Poisto epäonnistui. Ota yhteys tukeen.");
         }
-      } catch (err) {
-        alert("Yhteysvirhe poiston aikana.");
-      }
+    } catch (err) {
+      alert("Yhteysvirhe poiston aikana.");
     }
+  }
+
+  function openArchiveModal() {
+    setShowArchive(true);
+    void trackUsageEvent("archive_opened", { currentTab: tab });
+  }
 
   return (
     <div className={theme === 'light' ? 'light-theme' : ''}>
@@ -3325,7 +3377,7 @@ export default function Home() {
 
   {/* 5. TALLENTEET */}
   <button 
-    onClick={() => setShowArchive(true)} 
+    onClick={openArchiveModal} 
     className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-[10px] font-black transition-all ${theme === 'dark' ? 'text-[#00BFA6] hover:bg-white/5' : 'text-[#00BFA6] hover:bg-gray-100'} focus-visible:outline-none`}
   >
     <span className="text-xl" aria-hidden="true">🗂️</span> Tallenteet
@@ -3369,7 +3421,7 @@ export default function Home() {
               )}
 
               <button
-                onClick={() => setShowArchive(true)}
+                onClick={openArchiveModal}
                 className="rounded-2xl border border-white/10 px-4 py-2 text-xs sm:text-sm font-black text-[#00BFA6] hover:bg-[#00BFA6]/10 hover:text-[#7af4e2] transition-all whitespace-nowrap focus-visible:outline-none"
               >
                 🗂️ TALLENTEET
@@ -3437,7 +3489,7 @@ export default function Home() {
 
                   <button
                     type="button"
-                    onClick={() => setShowArchive(true)}
+                    onClick={openArchiveModal}
                     className={`px-7 sm:px-10 py-4 sm:py-5 rounded-[24px] text-base sm:text-lg font-black transition-all shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}
                   >
                     Avaa tallenteet
@@ -3469,7 +3521,7 @@ export default function Home() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => setShowArchive(true)}
+                        onClick={openArchiveModal}
                         className={`rounded-2xl px-5 py-3 text-sm font-black transition-all ${theme === 'dark' ? 'border border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border border-gray-200 bg-gray-50 text-gray-800 hover:bg-white'}`}
                       >
                         Avaa koko tallennekeskus

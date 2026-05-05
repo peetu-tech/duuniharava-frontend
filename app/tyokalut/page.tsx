@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getSession } from "../../lib/supabaseAuth";
+import { trackUsageEvent } from "../../lib/usageTracking";
 
 type ToolTab = "headhunter" | "hidden-jobs" | "calling-script" | "salary-negotiation" | "linkedin-magnet" | "career-pivot" | "red-flag" | "reference";
 
@@ -61,6 +62,10 @@ export default function ExtraToolsPage() {
   const [message, setMessage] = useState("");
   const tabsRef = useRef<HTMLDivElement>(null);
 
+  const trackToolUsage = (tool: string) => {
+    void trackUsageEvent("tool_used", { tool }, "tools");
+  };
+
   useEffect(() => {
     const session = getSession();
     if (!session) {
@@ -90,6 +95,7 @@ export default function ExtraToolsPage() {
       
       if (data.output) {
         setResult(data.output);
+        trackToolUsage(toolName);
       } else {
         setMessage("Tekoäly palautti tyhjän vastauksen.");
       }
@@ -137,6 +143,7 @@ export default function ExtraToolsPage() {
           about: aboutMatch || data.output, 
           post: postMatch || "" 
         });
+        trackToolUsage("linkedin-magnet");
       }
     } catch (err) {
       setMessage("Virhe API-kutsussa.");
