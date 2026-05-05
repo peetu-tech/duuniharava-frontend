@@ -101,6 +101,13 @@ type SavedStylePreset = {
   createdAt: string;
 };
 
+type SavedLetterTonePreset = {
+  id: string;
+  name: string;
+  tone: LetterTone;
+  createdAt: string;
+};
+
 const emptyForm = {
   cvText: "",
   cvFile: "",
@@ -171,6 +178,7 @@ type StudioDraftState = {
   currentJobIndex: number;
   customStyles: Record<CvStyleVariant, CvCustomStyle>;
   savedStylePresets: SavedStylePreset[];
+  savedLetterTonePresets: SavedLetterTonePreset[];
 };
 
 type StudioCloudState = {
@@ -193,6 +201,7 @@ type StudioCloudState = {
   jobSort: "match" | "deadline" | "priority" | "newest" | "company";
   showFavoritesOnly: boolean;
   savedStylePresets: SavedStylePreset[];
+  savedLetterTonePresets: SavedLetterTonePreset[];
 };
 
 const STORAGE_KEY = "duuniharava_state_v8";
@@ -464,6 +473,12 @@ const premiumStylePresets: SavedStylePreset[] = [
       pagePadding: 44,
     },
   },
+];
+
+const starterLetterTonePresets: SavedLetterTonePreset[] = [
+  { id: "tone-pro", name: "Asiallinen perus", tone: "professional", createdAt: "system" },
+  { id: "tone-warm", name: "Lämmin ja ihmisläheinen", tone: "warm", createdAt: "system" },
+  { id: "tone-sales", name: "Rohkea ja myyvä", tone: "sales", createdAt: "system" },
 ];
 
 // --- APUFUNKTIOT ---
@@ -1223,6 +1238,7 @@ export default function Home() {
   const [savedCvVariants, setSavedCvVariants] = useState<SavedCvVariant[]>([]);
   const [customStyles, setCustomStyles] = useState<Record<CvStyleVariant, CvCustomStyle>>(defaultCustomStyles);
   const [savedStylePresets, setSavedStylePresets] = useState<SavedStylePreset[]>([]);
+  const [savedLetterTonePresets, setSavedLetterTonePresets] = useState<SavedLetterTonePreset[]>(starterLetterTonePresets);
 
   const pdfRef = useRef<HTMLDivElement | null>(null);
 
@@ -1316,6 +1332,9 @@ export default function Home() {
           if (draft.customStyles) setCustomStyles(draft.customStyles);
           if (draft.savedStylePresets?.length) {
             setSavedStylePresets(draft.savedStylePresets);
+          }
+          if (draft.savedLetterTonePresets?.length) {
+            setSavedLetterTonePresets(draft.savedLetterTonePresets);
           }
         }
       } catch (error) {
@@ -1438,6 +1457,9 @@ export default function Home() {
               if (state.savedStylePresets?.length) {
                 setSavedStylePresets(state.savedStylePresets);
               }
+              if (state.savedLetterTonePresets?.length) {
+                setSavedLetterTonePresets(state.savedLetterTonePresets);
+              }
               if (typeof state.cvResult === "string") setCvResult(state.cvResult);
               if (typeof state.letterResult === "string") setLetterResult(state.letterResult);
               if (typeof state.letterDraft === "string") setLetterDraft(state.letterDraft);
@@ -1544,6 +1566,7 @@ export default function Home() {
       currentJobIndex,
       customStyles,
       savedStylePresets,
+      savedLetterTonePresets,
     };
 
     try {
@@ -1578,6 +1601,7 @@ export default function Home() {
     savedCvVariants,
     savedLetters,
     savedStylePresets,
+    savedLetterTonePresets,
     searchProfile,
     showFavoritesOnly,
     tab,
@@ -1598,6 +1622,7 @@ export default function Home() {
       letterTone,
       customStyles,
       savedStylePresets,
+      savedLetterTonePresets,
       cvResult,
       letterResult,
       letterDraft,
@@ -1653,6 +1678,7 @@ export default function Home() {
     letterResult,
     letterTone,
     savedStylePresets,
+    savedLetterTonePresets,
     searchProfile,
     showFavoritesOnly,
     tab,
@@ -1996,9 +2022,93 @@ export default function Home() {
     setTimeout(() => setMessage(""), 2500);
   }
 
+  function saveCurrentLetterTonePreset() {
+    const name = typeof window !== "undefined"
+      ? window.prompt("Anna sävylle nimi", `${getLetterToneLabel(letterTone)} suosikki`)
+      : null;
+
+    if (!name) return;
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+
+    const preset: SavedLetterTonePreset = {
+      id: makeId(),
+      name: trimmedName,
+      tone: letterTone,
+      createdAt: new Date().toISOString(),
+    };
+
+    setSavedLetterTonePresets((prev) => [preset, ...prev.filter((item) => item.name !== trimmedName)].slice(0, 8));
+    setMessage(`Hakemuksen sävy "${trimmedName}" tallennettu.`);
+    setTimeout(() => setMessage(""), 2500);
+  }
+
+  function applyLetterTonePreset(preset: SavedLetterTonePreset) {
+    setLetterTone(preset.tone);
+    setMessage(`Hakemuksen sävy "${preset.name}" otettu käyttöön.`);
+    setTimeout(() => setMessage(""), 2500);
+  }
+
+  function removeLetterTonePreset(id: string) {
+    setSavedLetterTonePresets((prev) => prev.filter((preset) => preset.id !== id));
+    setMessage("Tallennettu sävy poistettu.");
+    setTimeout(() => setMessage(""), 2500);
+  }
+
   function removeSavedStylePreset(id: string) {
     setSavedStylePresets((prev) => prev.filter((preset) => preset.id !== id));
     setMessage("Tallennettu tyyli poistettu.");
+    setTimeout(() => setMessage(""), 2500);
+  }
+
+  function applyLetterDraftPreset(mode: "tighten" | "polish" | "bolder" | "warmer") {
+    const source = (letterDraft || parsedLetter).trim();
+    if (!source) {
+      setErrorMessage("Luo tai kirjoita hakemus ensin, jotta voin muokata sitä.");
+      setTimeout(() => setErrorMessage(""), 2500);
+      return;
+    }
+
+    let nextDraft = source
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/[ \t]+/g, " ")
+      .trim();
+
+    if (mode === "tighten") {
+      nextDraft = nextDraft
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => line.replace(/\b(erityisesti|todella|hyvin|varsin)\b/gi, "").replace(/\s{2,}/g, " ").trim())
+        .join("\n\n");
+      setMessage("Hakemusta tiivistettiin.");
+    } else if (mode === "polish") {
+      nextDraft = nextDraft
+        .replace(/\bmä\b/gi, "minä")
+        .replace(/\boon\b/gi, "olen")
+        .replace(/\bhaluun\b/gi, "haluan")
+        .replace(/\btekisin mielelläni\b/gi, "toivon mahdollisuutta")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+      setMessage("Hakemuksesta tehtiin asiallisempi.");
+    } else if (mode === "bolder") {
+      nextDraft = nextDraft.replace(
+        /^/i,
+        "Tuon tehtävään käytännön näyttöä, oma-aloitteisuutta ja halun saada tuloksia aikaan.\n\n",
+      );
+      setLetterTone("sales");
+      setMessage("Hakemuksesta tehtiin rohkeampi.");
+    } else {
+      nextDraft = nextDraft.replace(
+        /^/i,
+        "Minulle on tärkeää tehdä työ huolellisesti, yhteistyössä ja aidosti hyvää asiakaskokemusta rakentaen.\n\n",
+      );
+      setLetterTone("warm");
+      setMessage("Hakemuksesta tehtiin lämpimämpi.");
+    }
+
+    setLetterDraft(nextDraft);
+    setLetterResult(`HAKEMUS:\n${nextDraft}`);
     setTimeout(() => setMessage(""), 2500);
   }
 
@@ -5193,6 +5303,55 @@ export default function Home() {
                             🚀 Myyvä
                           </button>
                         </div>
+
+                        <div className={`mt-6 rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/80'}`}>
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Sävy-suosikit</p>
+                              <p className={`mt-2 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Tallenna suosikkisävy myöhempää käyttöä varten tai vaihda sitä yhdellä painalluksella.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={saveCurrentLetterTonePreset}
+                              className={`rounded-2xl border px-5 py-3 text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-[#00BFA6]/30 bg-[#00BFA6]/10 text-[#7EF5E3] hover:bg-[#00BFA6]/15' : 'border-[#00BFA6]/30 bg-[#00BFA6]/10 text-[#0f766e] hover:bg-[#00BFA6]/15'}`}
+                            >
+                              Tallenna suosikkisävy
+                            </button>
+                          </div>
+
+                          <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+                            {savedLetterTonePresets.map((preset) => (
+                              <div key={preset.id} className={`rounded-2xl border p-4 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <p className={`text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{preset.name}</p>
+                                    <p className={`mt-1 text-xs uppercase tracking-[0.18em] ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                                      {getLetterToneLabel(preset.tone)}
+                                    </p>
+                                  </div>
+                                  {preset.createdAt !== "system" && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeLetterTonePreset(preset.id)}
+                                      className={`rounded-xl px-3 py-2 text-[11px] font-black transition-all ${theme === 'dark' ? 'bg-red-500/10 text-red-300 hover:bg-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
+                                    >
+                                      Poista
+                                    </button>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => applyLetterTonePreset(preset)}
+                                  className="mt-4 w-full rounded-2xl bg-[#00BFA6] px-4 py-3 text-sm font-black text-black transition-transform hover:scale-[1.01]"
+                                >
+                                  Käytä tätä sävyä
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
 
                       <button
@@ -5281,6 +5440,41 @@ export default function Home() {
                           className="w-full sm:w-auto rounded-2xl border border-[#00BFA6]/50 bg-[#00BFA6]/10 px-6 py-4 sm:py-3.5 text-base font-bold text-[#00BFA6] transition-all hover:bg-[#00BFA6] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                         >
                           Tallenna muokkaukset
+                        </button>
+                      </div>
+
+                      <div className={`mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 ${theme === 'dark' ? '' : ''}`}>
+                        <button
+                          type="button"
+                          onClick={() => applyLetterDraftPreset("tighten")}
+                          className={`rounded-2xl border px-5 py-4 text-left text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-gray-50 text-gray-800 hover:bg-white'}`}
+                        >
+                          <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikaparannus</span>
+                          <span className="mt-2 block text-base">Tiivistä</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => applyLetterDraftPreset("polish")}
+                          className={`rounded-2xl border px-5 py-4 text-left text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-gray-50 text-gray-800 hover:bg-white'}`}
+                        >
+                          <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikaparannus</span>
+                          <span className="mt-2 block text-base">Virallisempi</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => applyLetterDraftPreset("warmer")}
+                          className={`rounded-2xl border px-5 py-4 text-left text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-gray-50 text-gray-800 hover:bg-white'}`}
+                        >
+                          <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikaparannus</span>
+                          <span className="mt-2 block text-base">Lämpimämpi</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => applyLetterDraftPreset("bolder")}
+                          className={`rounded-2xl border px-5 py-4 text-left text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-gray-50 text-gray-800 hover:bg-white'}`}
+                        >
+                          <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikaparannus</span>
+                          <span className="mt-2 block text-base">Rohkeampi</span>
                         </button>
                       </div>
 
