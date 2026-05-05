@@ -6061,6 +6061,90 @@ function ArchiveModal({
 
   const activeJobsCount = jobs.filter((job) => !job.archived).length;
   const archivedJobsCount = jobs.filter((job) => job.archived).length;
+  const [archiveQuery, setArchiveQuery] = useState("");
+  const [archiveType, setArchiveType] = useState<"all" | "cv" | "letter" | "job">("all");
+
+  const normalizedQuery = archiveQuery.trim().toLowerCase();
+
+  const filteredSavedCvVariants = savedCvVariants.filter((cv) => {
+    if (archiveType !== "all" && archiveType !== "cv") return false;
+    if (!normalizedQuery) return true;
+    return [cv.jobTitle, cv.companyName, cv.content]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(normalizedQuery);
+  });
+
+  const filteredSavedLetters = savedLetters.filter((letter) => {
+    if (archiveType !== "all" && archiveType !== "letter") return false;
+    if (!normalizedQuery) return true;
+    return [letter.jobTitle, letter.companyName, letter.content, letter.tone]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(normalizedQuery);
+  });
+
+  const filteredArchiveJobs = jobs.filter((job) => {
+    if (archiveType !== "all" && archiveType !== "job") return false;
+    if (!normalizedQuery) return true;
+    return [
+      job.title,
+      job.company,
+      job.location,
+      job.summary,
+      job.source,
+      job.notes,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(normalizedQuery);
+  });
+
+  const latestItems = [
+    savedCvVariants[0]
+      ? {
+          id: `cv-${savedCvVariants[0].id}`,
+          kind: "CV",
+          title: savedCvVariants[0].jobTitle,
+          subtitle: savedCvVariants[0].companyName,
+          date: savedCvVariants[0].createdAt,
+          action: () => onOpenCv(savedCvVariants[0]),
+        }
+      : null,
+    savedLetters[0]
+      ? {
+          id: `letter-${savedLetters[0].id}`,
+          kind: "Hakemus",
+          title: savedLetters[0].jobTitle,
+          subtitle: savedLetters[0].companyName,
+          date: savedLetters[0].updatedAt || savedLetters[0].createdAt,
+          action: () => onOpenLetter(savedLetters[0]),
+        }
+      : null,
+    jobs[0]
+      ? {
+          id: `job-${jobs[0].id}`,
+          kind: jobs[0].archived ? "Työpaikka · arkisto" : "Työpaikka",
+          title: jobs[0].title || "Nimetön työpaikka",
+          subtitle: jobs[0].company || "Tallennettu paikka",
+          date: jobs[0].appliedAt || jobs[0].deadline || new Date().toISOString(),
+          action: () => onOpenJob(jobs[0]),
+        }
+      : null,
+  ]
+    .filter(Boolean)
+    .sort((a, b) => `${b!.date}`.localeCompare(`${a!.date}`))
+    .slice(0, 3) as Array<{
+      id: string;
+      kind: string;
+      title: string;
+      subtitle: string;
+      date: string;
+      action: () => void;
+    }>;
 
   return (
     <div className="fixed inset-0 z-[520] flex items-center justify-center bg-black/80 backdrop-blur-md p-0 sm:p-4 animate-in fade-in duration-200">
@@ -6098,6 +6182,60 @@ function ArchiveModal({
             </div>
           </div>
 
+          <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white'}`}>
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Jatka tästä</p>
+                <h3 className="mt-2 text-xl sm:text-2xl font-black">Viimeksi muokatut tallenteet ja nopea haku</h3>
+                <p className={`mt-2 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Löydä nopeasti vanha CV, hakemus tai työpaikka ilman pitkää selaamista.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:w-[520px]">
+                <input
+                  value={archiveQuery}
+                  onChange={(e) => setArchiveQuery(e.target.value)}
+                  placeholder="Hae nimellä, yrityksellä tai sisällöllä..."
+                  className={`w-full rounded-2xl border px-5 py-4 text-sm outline-none transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white placeholder:text-gray-500' : 'border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400'}`}
+                />
+                <select
+                  value={archiveType}
+                  onChange={(e) => setArchiveType(e.target.value as "all" | "cv" | "letter" | "job")}
+                  className={`w-full rounded-2xl border px-5 py-4 text-sm font-bold outline-none transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-900'}`}
+                >
+                  <option value="all">Kaikki tallenteet</option>
+                  <option value="cv">Vain CV:t</option>
+                  <option value="letter">Vain hakemukset</option>
+                  <option value="job">Vain työpaikat</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+              {latestItems.length > 0 ? latestItems.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={item.action}
+                  className={`rounded-2xl border px-5 py-5 text-left transition-all hover:-translate-y-1 hover:border-[#00BFA6]/50 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-gray-50'}`}
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">{item.kind}</p>
+                  <p className={`mt-2 text-lg font-black truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.title}</p>
+                  <p className={`mt-1 text-sm truncate ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{item.subtitle}</p>
+                  <p className={`mt-3 text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                    Viimeisin tallenne {new Date(item.date).toLocaleString("fi-FI")}
+                  </p>
+                  <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Jatka tästä</p>
+                </button>
+              )) : (
+                <div className={`lg:col-span-3 rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
+                  Tallennekeskus täyttyy sitä mukaa kun luot CV-versioita, hakemuksia ja tallennettuja työpaikkoja.
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
             <section className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white'}`}>
               <div className="mb-4">
@@ -6105,7 +6243,7 @@ function ArchiveModal({
                 <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avaa aiemmin räätälöity CV takaisin muokkaukseen.</p>
               </div>
               <div className="space-y-3 max-h-[320px] sm:max-h-[420px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
-                {savedCvVariants.length > 0 ? savedCvVariants.map((cv) => (
+                {filteredSavedCvVariants.length > 0 ? filteredSavedCvVariants.map((cv) => (
                   <button
                     key={cv.id}
                     type="button"
@@ -6119,7 +6257,7 @@ function ArchiveModal({
                   </button>
                 )) : (
                   <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
-                    Tallennettuja CV-versioita ei ole vielä kertynyt.
+                    Tällä haulla ei löytynyt CV-versioita.
                   </p>
                 )}
               </div>
@@ -6131,7 +6269,7 @@ function ArchiveModal({
                 <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Palaa aiempiin hakemusversioihin ja jatka siitä mihin jäit.</p>
               </div>
               <div className="space-y-3 max-h-[320px] sm:max-h-[420px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
-                {savedLetters.length > 0 ? savedLetters.map((letter) => (
+                {filteredSavedLetters.length > 0 ? filteredSavedLetters.map((letter) => (
                   <button
                     key={letter.id}
                     type="button"
@@ -6156,7 +6294,7 @@ function ArchiveModal({
                   </button>
                 )) : (
                   <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
-                    Tallennettuja hakemuksia ei ole vielä kertynyt.
+                    Tällä haulla ei löytynyt hakemuksia.
                   </p>
                 )}
               </div>
@@ -6168,7 +6306,7 @@ function ArchiveModal({
                 <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Avaa tallennettu paikka takaisin seurantaan tai jatka hakemista.</p>
               </div>
               <div className="space-y-3 max-h-[320px] sm:max-h-[420px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
-                {jobs.length > 0 ? jobs.map((job) => (
+                {filteredArchiveJobs.length > 0 ? filteredArchiveJobs.map((job) => (
                   <button
                     key={job.id}
                     type="button"
@@ -6206,7 +6344,7 @@ function ArchiveModal({
                   </button>
                 )) : (
                   <p className={`rounded-2xl border border-dashed px-4 py-5 text-sm leading-6 ${theme === 'dark' ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-500'}`}>
-                    Tallennettuja työpaikkoja ei ole vielä kertynyt.
+                    Tällä haulla ei löytynyt työpaikkoja.
                   </p>
                 )}
               </div>
