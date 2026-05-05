@@ -45,6 +45,61 @@ function makeExternalId(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function normalizeTextValue(value?: string) {
+  return (value || "").replace(/\s+/g, " ").trim();
+}
+
+function normalizeComparableText(value?: string) {
+  return normalizeTextValue(value)
+    .toLowerCase()
+    .replace(/[|–—-].*$/, "")
+    .trim();
+}
+
+function normalizeJobUrl(url?: string) {
+  if (!url) return "";
+
+  try {
+    const parsed = new URL(url);
+    const trackingParams = [
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_term",
+      "utm_content",
+      "fbclid",
+      "gclid",
+      "mc_cid",
+      "mc_eid",
+    ];
+
+    for (const key of trackingParams) {
+      parsed.searchParams.delete(key);
+    }
+
+    parsed.hash = "";
+    const normalizedPath = parsed.pathname.replace(/\/+$/, "") || "/";
+    return `${parsed.origin}${normalizedPath}${parsed.search}`;
+  } catch {
+    return url.trim();
+  }
+}
+
+function makeJobIdentityKey(job: {
+  url?: string;
+  title?: string;
+  company?: string;
+  source?: string;
+}) {
+  const normalizedUrl = normalizeJobUrl(job.url);
+  const title = normalizeComparableText(job.title);
+  const company = normalizeComparableText(job.company);
+  const source = normalizeComparableText(job.source);
+
+  if (normalizedUrl) return `url::${normalizedUrl}`;
+  return `meta::${title}::${company}::${source}`;
+}
+
 function normalizeDateString(date: Date) {
   return date.toISOString().slice(0, 10);
 }
@@ -105,7 +160,7 @@ function buildDeterministicJobsFallback(
 function uniqueByUrl<T extends { url?: string }>(items: T[]) {
   const seen = new Set<string>();
   return items.filter((item) => {
-    const key = item.url || "";
+    const key = normalizeJobUrl(item.url);
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -117,13 +172,96 @@ function uniqueJobsByUrlOrTitle<
 >(items: T[]) {
   const seen = new Set<string>();
   return items.filter((item) => {
-    const fallbackKey = `${item.title || ""}::${item.company || ""}`
-      .trim()
-      .toLowerCase();
-    const key = (item.url || fallbackKey).trim().toLowerCase();
+    const key = makeJobIdentityKey(item);
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
+  });
+}
+
+function pickTyomarkkinatoriUrl(job: any) {
+  const directApplyUrl = normalizeJobUrl(
+    getLocText(job?.application?.url) ||
+      getLocText(job?.applicationUrl) ||
+      getLocText(job?.applyUrl) ||
+      getLocText(job?.externalUrl),
+  );
+
+  if (directApplyUrl) return directApplyUrl;
+
+  const idCandidate =
+    job?.id || job?.metadata?.externalId || job?.metadata?.id || "";
+
+  return idCandidate
+    ? `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${idCandidate}`
+    : "https://tyomarkkinatori.fi/";
+}
+
+function pickGoogleResultUrl(item: any) {
+  const metaTags = Array.isArray(item?.pagemap?.metatags)
+    ? item.pagemap.metatags
+    : [];
+  const metaCandidate = metaTags
+    .map(
+      (tag: Record<string, string>) =>
+        tag["og:url"] || tag["twitter:url"] || tag["og:site:url"] || "",
+    )
+    .find(Boolean);
+
+  return normalizeJobUrl(metaCandidate || item?.link || "");
+}
+
+function restoreCanonicalJobs<
+  T extends {
+    url?: string;
+    title?: string;
+    company?: string;
+    source?: string;
+    location?: string;
+  },
+>(
+  jobs: T[],
+  originals: Array<{
+    url?: string;
+    title?: string;
+    company?: string;
+    source?: string;
+    location?: string;
+  }>,
+) {
+  const byIdentity = new Map<string, (typeof originals)[number]>();
+  const byMeta = new Map<string, (typeof originals)[number]>();
+
+  for (const original of originals) {
+    const identityKey = makeJobIdentityKey(original);
+    const metaKey = `meta::${normalizeComparableText(original.title)}::${normalizeComparableText(original.company)}::${normalizeComparableText(original.source)}`;
+    if (identityKey) byIdentity.set(identityKey, original);
+    if (metaKey) byMeta.set(metaKey, original);
+  }
+
+  return jobs.map((job) => {
+    const identityKey = makeJobIdentityKey(job);
+    const metaKey = `meta::${normalizeComparableText(job.title)}::${normalizeComparableText(job.company)}::${normalizeComparableText(job.source)}`;
+    const original = byIdentity.get(identityKey) || byMeta.get(metaKey);
+
+    if (!original) {
+      return {
+        ...job,
+        url: normalizeJobUrl(job.url),
+      };
+    }
+
+    return {
+      ...job,
+      title: job.title || original.title,
+      company:
+        !job.company || normalizeComparableText(job.company) === "katso ilmoituksesta"
+          ? original.company || job.company
+          : job.company,
+      location: job.location || original.location,
+      source: original.source || job.source,
+      url: original.url || normalizeJobUrl(job.url),
+    };
   });
 }
 
@@ -327,16 +465,13 @@ export async function POST(req: Request) {
                 if (fullText.includes(keyword)) score += 1;
               }
 
-              const directApplyUrl = getLocText(job.application?.url);
-              const fallbackTmUrl = `https://tyomarkkinatori.fi/henkiloasiakkaat/tyopaikat/${job.id}`;
-
               return {
                 id: job.metadata?.externalId || job.id || makeExternalId("tm"),
                 title: title || "Avoin työpaikka",
                 company,
                 location: loc || "Suomi",
                 description: desc ? desc.slice(0, 500) : "",
-                url: directApplyUrl || fallbackTmUrl,
+                url: pickTyomarkkinatoriUrl(job),
                 source: "Työmarkkinatori",
                 _score: score,
               };
@@ -419,11 +554,15 @@ export async function POST(req: Request) {
 
         if (dedupedGoogleItems.length > 0) {
           googleJobsForAI = dedupedGoogleItems.slice(0, 12).map((item) => {
+            const canonicalUrl = pickGoogleResultUrl(item);
             let source = "Internet";
-            if (item.url?.includes("duunitori.fi")) source = "Duunitori";
-            else if (item.url?.includes("oikotie.fi")) source = "Oikotie";
-            else if (item.url?.includes("jobly.fi")) source = "Jobly";
-            else if (item.url?.includes("linkedin.com")) source = "LinkedIn";
+            if (canonicalUrl.includes("duunitori.fi")) source = "Duunitori";
+            else if (canonicalUrl.includes("oikotie.fi")) source = "Oikotie";
+            else if (canonicalUrl.includes("jobly.fi")) source = "Jobly";
+            else if (canonicalUrl.includes("linkedin.com")) source = "LinkedIn";
+            else if (canonicalUrl.includes("indeed.")) source = "Indeed";
+            else if (canonicalUrl.includes("monster.")) source = "Monster";
+            else if (canonicalUrl.includes("kuntarekry.fi")) source = "Kuntarekry";
 
             return {
               id: makeExternalId("ext"),
@@ -433,7 +572,7 @@ export async function POST(req: Request) {
               company: "Katso ilmoituksesta",
               location: locationSearch || "Suomi",
               description: item.snippet || "",
-              url: item.url,
+              url: canonicalUrl,
               source,
             };
           });
@@ -537,6 +676,19 @@ Palauta vain validi JSON muodossa:
     if (finalJobs.length === 0 && combinedJobs.length > 0) {
       finalJobs = buildDeterministicJobsFallback(combinedJobs);
     }
+
+    finalJobs = uniqueJobsByUrlOrTitle(
+      restoreCanonicalJobs(
+        finalJobs as Array<{
+          url?: string;
+          title?: string;
+          company?: string;
+          source?: string;
+          location?: string;
+        }>,
+        combinedJobs,
+      ),
+    );
 
     const responsePayload = {
       output: JSON.stringify(finalJobs),
