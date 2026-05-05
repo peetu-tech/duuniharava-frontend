@@ -11,6 +11,7 @@ export type AuthSession = {
   access_token: string;
   refresh_token: string;
   expires_in: number;
+  expires_at?: number;
   token_type: string;
   user: {
     id: string;
@@ -19,10 +20,28 @@ export type AuthSession = {
 };
 
 const SESSION_KEY = "duuniharava.auth.session";
+const REFRESH_SKEW_SECONDS = 60;
+let refreshPromise: Promise<AuthSession | null> | null = null;
+
+function normalizeSession(session: AuthSession): AuthSession {
+  if (!session.expires_at && session.expires_in) {
+    return {
+      ...session,
+      expires_at: Math.floor(Date.now() / 1000) + session.expires_in,
+    };
+  }
+
+  return session;
+}
+
+function isSessionExpiringSoon(session: AuthSession) {
+  if (!session.expires_at) return false;
+  return session.expires_at - REFRESH_SKEW_SECONDS <= Math.floor(Date.now() / 1000);
+}
 
 export function saveSession(session: AuthSession) {
   if (typeof window !== "undefined") {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    localStorage.setItem(SESSION_KEY, JSON.stringify(normalizeSession(session)));
   }
 }
 
@@ -31,7 +50,7 @@ export function getSession(): AuthSession | null {
   const raw = localStorage.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as AuthSession;
+    return normalizeSession(JSON.parse(raw) as AuthSession);
   } catch {
     return null;
   }
@@ -43,10 +62,56 @@ export function clearSession() {
   }
 }
 
+export async function refreshSession(session?: AuthSession | null) {
+  assertEnv();
+
+  const currentSession = session || getSession();
+  if (!currentSession?.refresh_token) return null;
+
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: SUPABASE_ANON_KEY as string,
+    },
+    body: JSON.stringify({ refresh_token: currentSession.refresh_token }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    clearSession();
+    throw new Error(data?.msg || data?.error_description || "Istunnon päivitys epäonnistui.");
+  }
+
+  const nextSession = normalizeSession(data as AuthSession);
+  saveSession(nextSession);
+  return nextSession;
+}
+
+export async function getValidSession(forceRefresh = false): Promise<AuthSession | null> {
+  const session = getSession();
+  if (!session) return null;
+
+  if (!forceRefresh && !isSessionExpiringSoon(session)) {
+    return session;
+  }
+
+  if (!refreshPromise) {
+    refreshPromise = refreshSession(session).finally(() => {
+      refreshPromise = null;
+    });
+  }
+
+  try {
+    return await refreshPromise;
+  } catch {
+    return null;
+  }
+}
+
 export async function signInWithPassword(email: string, password: string) {
   assertEnv();
 
-  // Käytetään as string -määritystä, jotta TypeScript tietää näiden olevan olemassa
   const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
     method: "POST",
     headers: {
@@ -61,7 +126,7 @@ export async function signInWithPassword(email: string, password: string) {
     throw new Error(data?.msg || data?.error_description || "Kirjautuminen epäonnistui.");
   }
 
-  const session = data as AuthSession;
+  const session = normalizeSession(data as AuthSession);
   saveSession(session);
   return session;
 }

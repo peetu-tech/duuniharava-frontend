@@ -14,14 +14,14 @@ import {
 } from "docx";
 import CvPreview, { type CvCustomStyle } from "@/components/CvPreview";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
-import { clearSession, getSession } from "../../lib/supabaseAuth";
+import { clearSession, getSession, getValidSession } from "../../lib/supabaseAuth";
 
 // --- SUPABASE ASETUKSET --- 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-function getSupabaseHeaders() {
-  const session = getSession();
+async function getSupabaseHeaders() {
+  const session = await getValidSession();
   return {
     apikey: supabaseAnonKey,
     Authorization: `Bearer ${session?.access_token || ""}`,
@@ -137,6 +137,7 @@ const emptyJobForm = {
 };
 
 type StudioDraftState = {
+  updatedAt: string;
   mode: "improve" | "create";
   tab: Tab;
   letterViewMode: "edit" | "preview";
@@ -164,6 +165,7 @@ type StudioDraftState = {
 };
 
 type StudioCloudState = {
+  updatedAt: string;
   searchProfile: typeof emptySearchProfile;
   jobForm: typeof emptyJobForm;
   theme: "light" | "dark";
@@ -184,6 +186,12 @@ type StudioCloudState = {
 };
 
 const STORAGE_KEY = "duuniharava_state_v8";
+
+function getTimestampMs(value?: string) {
+  if (!value) return 0;
+  const parsed = new Date(value).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
 
 function getStudioStorageKey(userId: string) {
   return `${STORAGE_KEY}_${userId}`;
@@ -1149,184 +1157,199 @@ export default function Home() {
   const customStyle = customStyles[cvStyle];
 
   useEffect(() => {
-    const session = getSession();
-    if (!session) {
-      router.replace("/login");
-      return;
-    }
-    setHasSession(true);
-    setIsAuthChecking(false);
-
-    try {
-      const stored = localStorage.getItem(getStudioStorageKey(session.user.id));
-      if (stored) {
-        const draft = JSON.parse(stored) as Partial<StudioDraftState>;
-        if (draft.mode) setMode(draft.mode);
-        if (draft.tab) setTab(draft.tab);
-        if (draft.letterViewMode) setLetterViewMode(draft.letterViewMode);
-        if (draft.cvStyle) setCvStyle(draft.cvStyle);
-        if (draft.letterTone) setLetterTone(draft.letterTone);
-        if (draft.theme) setTheme(draft.theme);
-        if (draft.form) setForm((prev) => ({ ...prev, ...draft.form }));
-        if (draft.searchProfile) {
-          setSearchProfile((prev) => ({ ...prev, ...draft.searchProfile }));
-        }
-        if (draft.jobForm) setJobForm((prev) => ({ ...prev, ...draft.jobForm }));
-        if (draft.jobs?.length) {
-          setJobs(draft.jobs.map((job) => normalizeJob(job)));
-        }
-        if (draft.savedLetters?.length) setSavedLetters(draft.savedLetters);
-        if (draft.savedCvVariants?.length) setSavedCvVariants(draft.savedCvVariants);
-        if (draft.cvResult) setCvResult(draft.cvResult);
-        if (draft.letterResult) setLetterResult(draft.letterResult);
-        if (draft.letterDraft) setLetterDraft(draft.letterDraft);
-        if (draft.profileImage) setProfileImage(draft.profileImage);
-        if (draft.jobFilter) setJobFilter(draft.jobFilter);
-        if (draft.jobStatusFilter) setJobStatusFilter(draft.jobStatusFilter);
-        if (draft.jobPriorityFilter) setJobPriorityFilter(draft.jobPriorityFilter);
-        if (draft.jobSort) setJobSort(draft.jobSort);
-        if (typeof draft.showFavoritesOnly === "boolean") {
-          setShowFavoritesOnly(draft.showFavoritesOnly);
-        }
-        if (draft.activeJobId) setActiveJobId(draft.activeJobId);
-        if (typeof draft.currentJobIndex === "number") {
-          setCurrentJobIndex(draft.currentJobIndex);
-        }
-        if (draft.customStyles) setCustomStyles(draft.customStyles);
+    async function bootstrapStudio() {
+      const session = await getValidSession();
+      if (!session) {
+        router.replace("/login");
+        return;
       }
-    } catch (error) {
-      console.error("Paikallisen studiotilan palautus epäonnistui", error);
-    }
 
-    async function loadDataFromDb() {
-      if (!session) return;
-      const headers = getSupabaseHeaders();
-      const userId = session.user.id;
+      setHasSession(true);
+      setIsAuthChecking(false);
+
+      let localDraftUpdatedAt = 0;
 
       try {
-        const pRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers });
-        if (pRes.status === 401 || pRes.status === 403) {
-          clearSession();
-          router.replace("/login");
-          return;
-        }
-        
-        const pData = await pRes.json();
-        if (pData && pData.length > 0) {
-          const p = pData[0];
-          setIsPro(p.is_pro || false);
-          setForm((prev) => ({
-            ...prev,
-            name: p.full_name || "",
-            phone: p.phone || "",
-            email: p.email_address || "",
-            location: p.location || "",
-            targetJob: p.target_job || "",
-            education: p.education || "",
-            experience: p.experience || "",
-            languages: p.languages || "",
-            skills: p.skills || "",
-            cards: p.cards || "",
-            projects: p.projects || "",
-          }));
-          if (p.profile_image_url) setProfileImage(p.profile_image_url);
-        }
-
-        const jRes = await fetch(`${supabaseUrl}/rest/v1/jobs?user_id=eq.${userId}&order=created_at.desc`, { headers });
-        const jData = await jRes.json();
-        if (jData && Array.isArray(jData)) {
-          setJobs(jData.map((j: any) => normalizeJob({
-            id: j.id,
-            title: j.title,
-            company: j.company,
-            location: j.location,
-            type: j.type,
-            summary: j.summary,
-            adText: j.ad_text,
-            url: j.url,
-            whyFit: j.why_fit,
-            source: j.source,
-            matchScore: j.match_score,
-            status: j.status,
-            priority: j.priority,
-            salary: j.salary,
-            appliedAt: j.applied_at,
-            deadline: j.deadline,
-            notes: j.notes,
-            contactPerson: j.contact_person,
-            contactEmail: j.contact_email,
-            companyWebsite: j.company_website,
-            favorite: j.favorite,
-            archived: j.archived
-          })));
-        }
-
-        const lRes = await fetch(`${supabaseUrl}/rest/v1/saved_letters?user_id=eq.${userId}&order=created_at.desc`, { headers });
-        const lData = await lRes.json();
-        if (lData && Array.isArray(lData)) {
-          setSavedLetters(lData.map((l: any) => ({
-            id: l.id,
-            jobId: l.job_id,
-            jobTitle: l.job_title,
-            companyName: l.company_name,
-            content: l.content,
-            tone: safeLetterTone(l.tone),
-            createdAt: l.created_at,
-            updatedAt: l.updated_at || l.created_at,
-          })));
-        }
-
-        const cRes = await fetch(`${supabaseUrl}/rest/v1/cv_variants?user_id=eq.${userId}&order=created_at.desc`, { headers });
-        const cData = await cRes.json();
-        if (cData && Array.isArray(cData)) {
-          setSavedCvVariants(cData.map((c: any) => ({
-            id: c.id,
-            jobId: c.job_id,
-            jobTitle: c.job_title,
-            companyName: c.company_name,
-            content: c.content,
-            createdAt: c.created_at
-          })));
-        }
-
-        const sRes = await fetch(
-          `${supabaseUrl}/rest/v1/studio_state?user_id=eq.${userId}&select=state&limit=1`,
-          { headers },
-        );
-        const sData = await sRes.json();
-        if (Array.isArray(sData) && sData[0]?.state) {
-          const state = sData[0].state as Partial<StudioCloudState>;
-          if (state.searchProfile) {
-            setSearchProfile((prev) => ({ ...prev, ...state.searchProfile }));
+        const stored = localStorage.getItem(getStudioStorageKey(session.user.id));
+        if (stored) {
+          const draft = JSON.parse(stored) as Partial<StudioDraftState>;
+          localDraftUpdatedAt = getTimestampMs(draft.updatedAt);
+          if (draft.mode) setMode(draft.mode);
+          if (draft.tab) setTab(draft.tab);
+          if (draft.letterViewMode) setLetterViewMode(draft.letterViewMode);
+          if (draft.cvStyle) setCvStyle(draft.cvStyle);
+          if (draft.letterTone) setLetterTone(draft.letterTone);
+          if (draft.theme) setTheme(draft.theme);
+          if (draft.form) setForm((prev) => ({ ...prev, ...draft.form }));
+          if (draft.searchProfile) {
+            setSearchProfile((prev) => ({ ...prev, ...draft.searchProfile }));
           }
-          if (state.jobForm) {
-            setJobForm((prev) => ({ ...prev, ...state.jobForm }));
+          if (draft.jobForm) setJobForm((prev) => ({ ...prev, ...draft.jobForm }));
+          if (draft.jobs?.length) {
+            setJobs(draft.jobs.map((job) => normalizeJob(job)));
           }
-          if (state.theme) setTheme(state.theme);
-          if (state.cvStyle) setCvStyle(state.cvStyle);
-          if (state.letterTone) setLetterTone(state.letterTone);
-          if (state.customStyles) setCustomStyles(state.customStyles);
-          if (typeof state.cvResult === "string") setCvResult(state.cvResult);
-          if (typeof state.letterResult === "string") setLetterResult(state.letterResult);
-          if (typeof state.letterDraft === "string") setLetterDraft(state.letterDraft);
-          if (typeof state.activeJobId === "string") setActiveJobId(state.activeJobId);
-          if (typeof state.currentJobIndex === "number") {
-            setCurrentJobIndex(state.currentJobIndex);
+          if (draft.savedLetters?.length) setSavedLetters(draft.savedLetters);
+          if (draft.savedCvVariants?.length) setSavedCvVariants(draft.savedCvVariants);
+          if (draft.cvResult) setCvResult(draft.cvResult);
+          if (draft.letterResult) setLetterResult(draft.letterResult);
+          if (draft.letterDraft) setLetterDraft(draft.letterDraft);
+          if (draft.profileImage) setProfileImage(draft.profileImage);
+          if (draft.jobFilter) setJobFilter(draft.jobFilter);
+          if (draft.jobStatusFilter) setJobStatusFilter(draft.jobStatusFilter);
+          if (draft.jobPriorityFilter) setJobPriorityFilter(draft.jobPriorityFilter);
+          if (draft.jobSort) setJobSort(draft.jobSort);
+          if (typeof draft.showFavoritesOnly === "boolean") {
+            setShowFavoritesOnly(draft.showFavoritesOnly);
           }
-          if (state.tab) setTab(state.tab);
-          if (typeof state.jobFilter === "string") setJobFilter(state.jobFilter);
-          if (state.jobStatusFilter) setJobStatusFilter(state.jobStatusFilter);
-          if (state.jobPriorityFilter) setJobPriorityFilter(state.jobPriorityFilter);
-          if (state.jobSort) setJobSort(state.jobSort);
-          if (typeof state.showFavoritesOnly === "boolean") {
-            setShowFavoritesOnly(state.showFavoritesOnly);
+          if (draft.activeJobId) setActiveJobId(draft.activeJobId);
+          if (typeof draft.currentJobIndex === "number") {
+            setCurrentJobIndex(draft.currentJobIndex);
           }
+          if (draft.customStyles) setCustomStyles(draft.customStyles);
         }
-      } catch (err) {
-        console.error("Virhe tietojen latauksessa:", err);
+      } catch (error) {
+        console.error("Paikallisen studiotilan palautus epäonnistui", error);
       }
+
+      async function loadDataFromDb() {
+        const headers = await getSupabaseHeaders();
+        const userId = session!.user.id;
+
+        try {
+          const pRes = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=*`, { headers });
+          if (pRes.status === 401 || pRes.status === 403) {
+            clearSession();
+            router.replace("/login");
+            return;
+          }
+
+          const pData = await pRes.json();
+          if (pData && pData.length > 0) {
+            const p = pData[0];
+            setIsPro(p.is_pro || false);
+            setForm((prev) => ({
+              ...prev,
+              name: p.full_name || "",
+              phone: p.phone || "",
+              email: p.email_address || "",
+              location: p.location || "",
+              targetJob: p.target_job || "",
+              education: p.education || "",
+              experience: p.experience || "",
+              languages: p.languages || "",
+              skills: p.skills || "",
+              cards: p.cards || "",
+              projects: p.projects || "",
+            }));
+            if (p.profile_image_url) setProfileImage(p.profile_image_url);
+          }
+
+          const jRes = await fetch(`${supabaseUrl}/rest/v1/jobs?user_id=eq.${userId}&order=created_at.desc`, { headers });
+          const jData = await jRes.json();
+          if (jData && Array.isArray(jData)) {
+            setJobs(jData.map((j: any) => normalizeJob({
+              id: j.id,
+              title: j.title,
+              company: j.company,
+              location: j.location,
+              type: j.type,
+              summary: j.summary,
+              adText: j.ad_text,
+              url: j.url,
+              whyFit: j.why_fit,
+              source: j.source,
+              matchScore: j.match_score,
+              status: j.status,
+              priority: j.priority,
+              salary: j.salary,
+              appliedAt: j.applied_at,
+              deadline: j.deadline,
+              notes: j.notes,
+              contactPerson: j.contact_person,
+              contactEmail: j.contact_email,
+              companyWebsite: j.company_website,
+              favorite: j.favorite,
+              archived: j.archived
+            })));
+          }
+
+          const lRes = await fetch(`${supabaseUrl}/rest/v1/saved_letters?user_id=eq.${userId}&order=created_at.desc`, { headers });
+          const lData = await lRes.json();
+          if (lData && Array.isArray(lData)) {
+            setSavedLetters(lData.map((l: any) => ({
+              id: l.id,
+              jobId: l.job_id,
+              jobTitle: l.job_title,
+              companyName: l.company_name,
+              content: l.content,
+              tone: safeLetterTone(l.tone),
+              createdAt: l.created_at,
+              updatedAt: l.updated_at || l.created_at,
+            })));
+          }
+
+          const cRes = await fetch(`${supabaseUrl}/rest/v1/cv_variants?user_id=eq.${userId}&order=created_at.desc`, { headers });
+          const cData = await cRes.json();
+          if (cData && Array.isArray(cData)) {
+            setSavedCvVariants(cData.map((c: any) => ({
+              id: c.id,
+              jobId: c.job_id,
+              jobTitle: c.job_title,
+              companyName: c.company_name,
+              content: c.content,
+              createdAt: c.created_at
+            })));
+          }
+
+          const sRes = await fetch(
+            `${supabaseUrl}/rest/v1/studio_state?user_id=eq.${userId}&select=state,updated_at&limit=1`,
+            { headers },
+          );
+          const sData = await sRes.json();
+          if (Array.isArray(sData) && sData[0]?.state) {
+            const state = sData[0].state as Partial<StudioCloudState>;
+            const cloudUpdatedAt = Math.max(
+              getTimestampMs(state.updatedAt),
+              getTimestampMs(sData[0].updated_at),
+            );
+
+            if (cloudUpdatedAt > localDraftUpdatedAt) {
+              if (state.searchProfile) {
+                setSearchProfile((prev) => ({ ...prev, ...state.searchProfile }));
+              }
+              if (state.jobForm) {
+                setJobForm((prev) => ({ ...prev, ...state.jobForm }));
+              }
+              if (state.theme) setTheme(state.theme);
+              if (state.cvStyle) setCvStyle(state.cvStyle);
+              if (state.letterTone) setLetterTone(state.letterTone);
+              if (state.customStyles) setCustomStyles(state.customStyles);
+              if (typeof state.cvResult === "string") setCvResult(state.cvResult);
+              if (typeof state.letterResult === "string") setLetterResult(state.letterResult);
+              if (typeof state.letterDraft === "string") setLetterDraft(state.letterDraft);
+              if (typeof state.activeJobId === "string") setActiveJobId(state.activeJobId);
+              if (typeof state.currentJobIndex === "number") {
+                setCurrentJobIndex(state.currentJobIndex);
+              }
+              if (state.tab) setTab(state.tab);
+              if (typeof state.jobFilter === "string") setJobFilter(state.jobFilter);
+              if (state.jobStatusFilter) setJobStatusFilter(state.jobStatusFilter);
+              if (state.jobPriorityFilter) setJobPriorityFilter(state.jobPriorityFilter);
+              if (state.jobSort) setJobSort(state.jobSort);
+              if (typeof state.showFavoritesOnly === "boolean") {
+                setShowFavoritesOnly(state.showFavoritesOnly);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Virhe tietojen latauksessa:", err);
+        }
+      }
+
+      loadDataFromDb();
     }
-    loadDataFromDb();
+
+    bootstrapStudio();
   }, [router]);
 
   useEffect(() => {
@@ -1345,14 +1368,13 @@ export default function Home() {
 
   useEffect(() => {
     if (isAuthChecking || !hasSession) return;
-    const session = getSession();
-    if (!session) return;
-
     const timeout = setTimeout(async () => {
       try {
+        const session = await getValidSession();
+        if (!session) return;
         await fetch(`${supabaseUrl}/rest/v1/profiles`, {
           method: "POST",
-          headers: { ...getSupabaseHeaders(), "Prefer": "resolution=merge-duplicates" },
+          headers: { ...(await getSupabaseHeaders()), "Prefer": "resolution=merge-duplicates" },
           body: JSON.stringify({
             id: session.user.id,
             full_name: form.name,
@@ -1381,8 +1403,8 @@ export default function Home() {
     if (isAuthChecking || !hasSession) return;
     const session = getSession();
     if (!session) return;
-
     const draft: StudioDraftState = {
+      updatedAt: new Date().toISOString(),
       mode,
       tab,
       letterViewMode,
@@ -1452,6 +1474,7 @@ export default function Home() {
     if (!session) return;
 
     const cloudState: StudioCloudState = {
+      updatedAt: new Date().toISOString(),
       searchProfile,
       jobForm,
       theme,
@@ -1473,15 +1496,20 @@ export default function Home() {
 
     const timeout = setTimeout(async () => {
       try {
+        const session = await getValidSession();
+        if (!session) return;
         await fetch(`${supabaseUrl}/rest/v1/studio_state`, {
           method: "POST",
           headers: {
-            ...getSupabaseHeaders(),
+            ...(await getSupabaseHeaders()),
             Prefer: "resolution=merge-duplicates",
           },
           body: JSON.stringify({
             user_id: session.user.id,
-            state: cloudState,
+            state: {
+              ...cloudState,
+              updatedAt: new Date().toISOString(),
+            },
             updated_at: new Date().toISOString(),
           }),
         });
@@ -1779,10 +1807,15 @@ export default function Home() {
     if (patch.companyWebsite !== undefined) dbPatch.company_website = patch.companyWebsite;
     if (patch.archived !== undefined) dbPatch.archived = patch.archived;
 
-    fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, {
-      method: "PATCH",
-      headers: getSupabaseHeaders(),
-      body: JSON.stringify(dbPatch)
+    void getValidSession().then((validSession) => {
+      if (!validSession) return;
+      void getSupabaseHeaders().then((headers) => {
+        fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, {
+          method: "PATCH",
+          headers,
+          body: JSON.stringify(dbPatch)
+        });
+      });
     });
   }
 
@@ -2250,21 +2283,23 @@ export default function Home() {
     setTab("jobs");
     setTimeout(() => setMessage(""), 2500);
 
-    const session = getSession();
-    if (session) {
-      fetch(`${supabaseUrl}/rest/v1/jobs`, {
-        method: "POST",
-        headers: getSupabaseHeaders(),
-        body: JSON.stringify({
-          id: job.id, user_id: session.user.id, title: job.title, company: job.company, location: job.location,
-          type: job.type, summary: job.summary, ad_text: job.adText, url: job.url, why_fit: job.whyFit,
-          source: job.source, match_score: job.matchScore, status: job.status, priority: job.priority,
-          salary: job.salary, applied_at: job.appliedAt || null, deadline: job.deadline || null, notes: job.notes,
-          contact_person: job.contactPerson, contact_email: job.contactEmail, company_website: job.companyWebsite,
-          favorite: job.favorite, archived: job.archived
-        })
+    void getValidSession().then((session) => {
+      if (!session) return;
+      void getSupabaseHeaders().then((headers) => {
+        fetch(`${supabaseUrl}/rest/v1/jobs`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            id: job.id, user_id: session.user.id, title: job.title, company: job.company, location: job.location,
+            type: job.type, summary: job.summary, ad_text: job.adText, url: job.url, why_fit: job.whyFit,
+            source: job.source, match_score: job.matchScore, status: job.status, priority: job.priority,
+            salary: job.salary, applied_at: job.appliedAt || null, deadline: job.deadline || null, notes: job.notes,
+            contact_person: job.contactPerson, contact_email: job.contactEmail, company_website: job.companyWebsite,
+            favorite: job.favorite, archived: job.archived
+          })
+        });
       });
-    }
+    });
   }
 
   function removeJob(id: string) {
@@ -2284,10 +2319,12 @@ export default function Home() {
     setSavedLetters((prev) => prev.filter((letter) => letter.jobId !== id));
     setSavedCvVariants((prev) => prev.filter((cv) => cv.jobId !== id));
 
-    const session = getSession();
-    if (session) {
-      fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, { method: "DELETE", headers: getSupabaseHeaders() });
-    }
+    void getValidSession().then((session) => {
+      if (!session) return;
+      void getSupabaseHeaders().then((headers) => {
+        fetch(`${supabaseUrl}/rest/v1/jobs?id=eq.${id}`, { method: "DELETE", headers });
+      });
+    });
   }
 
   async function suggestJobs() {
@@ -2394,11 +2431,12 @@ export default function Home() {
     setTab("jobs");
     setMessage("Työpaikkaehdotukset lisätty.");
 
-      const session = getSession();
+      const session = await getValidSession();
       if(session) {
+        const headers = await getSupabaseHeaders();
         newJobs.forEach(job => {
           fetch(`${supabaseUrl}/rest/v1/jobs`, {
-            method: "POST", headers: getSupabaseHeaders(),
+            method: "POST", headers,
             body: JSON.stringify({
               id: job.id, user_id: session.user.id, title: job.title, company: job.company, location: job.location, type: job.type, summary: job.summary, ad_text: job.adText, url: job.url, why_fit: job.whyFit, source: job.source, match_score: job.matchScore, status: job.status, priority: job.priority, salary: job.salary, applied_at: job.appliedAt || null, deadline: job.deadline || null, notes: job.notes, contact_person: job.contactPerson, contact_email: job.contactEmail, company_website: job.companyWebsite, favorite: job.favorite, archived: job.archived
             })
@@ -2505,7 +2543,7 @@ export default function Home() {
 
       if(session) {
         fetch(`${supabaseUrl}/rest/v1/cv_variants`, {
-          method: "POST", headers: getSupabaseHeaders(),
+          method: "POST", headers: await getSupabaseHeaders(),
           body: JSON.stringify({ id: item.id, user_id: session.user.id, job_id: item.jobId, job_title: item.jobTitle, company_name: item.companyName, content: item.content })
         });
       }
@@ -2631,7 +2669,7 @@ export default function Home() {
 
       if(session) {
         fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
-          method: "POST", headers: getSupabaseHeaders(),
+          method: "POST", headers: await getSupabaseHeaders(),
           body: JSON.stringify({
             id: savedLetter.id,
             user_id: session.user.id,
@@ -2672,22 +2710,24 @@ export default function Home() {
     setMessage("Muokattu hakemus tallennettu.");
     setTimeout(() => setMessage(""), 2500);
 
-    const session = getSession();
-    if(session) {
-      fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
-        method: "POST", headers: getSupabaseHeaders(),
-        body: JSON.stringify({
-          id: savedLetter.id,
-          user_id: session.user.id,
-          job_id: savedLetter.jobId,
-          job_title: savedLetter.jobTitle,
-          company_name: savedLetter.companyName,
-          content: savedLetter.content,
-          tone: savedLetter.tone,
-          updated_at: savedLetter.updatedAt,
-        })
+    void getValidSession().then((session) => {
+      if (!session) return;
+      void getSupabaseHeaders().then((headers) => {
+        fetch(`${supabaseUrl}/rest/v1/saved_letters`, {
+          method: "POST", headers,
+          body: JSON.stringify({
+            id: savedLetter.id,
+            user_id: session.user.id,
+            job_id: savedLetter.jobId,
+            job_title: savedLetter.jobTitle,
+            company_name: savedLetter.companyName,
+            content: savedLetter.content,
+            tone: savedLetter.tone,
+            updated_at: savedLetter.updatedAt,
+          })
+        });
       });
-    }
+    });
   }
 
   function startSparring(job: JobItem) {

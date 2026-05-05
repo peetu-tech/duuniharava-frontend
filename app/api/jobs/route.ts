@@ -10,6 +10,7 @@ const openai = new OpenAI({
 });
 
 const JOBS_CACHE_TTL_MS = 1000 * 60 * 15;
+const JOBS_FAILURE_CACHE_TTL_MS = 1000 * 60;
 const jobsCache = new Map<
   string,
   {
@@ -198,6 +199,7 @@ function pickTyomarkkinatoriUrl(job: any) {
 }
 
 function pickGoogleResultUrl(item: any) {
+  const fallbackUrl = normalizeJobUrl(item?.link || "");
   const metaTags = Array.isArray(item?.pagemap?.metatags)
     ? item.pagemap.metatags
     : [];
@@ -208,7 +210,16 @@ function pickGoogleResultUrl(item: any) {
     )
     .find(Boolean);
 
-  return normalizeJobUrl(metaCandidate || item?.link || "");
+  const normalizedMetaCandidate = normalizeJobUrl(metaCandidate || "");
+  if (!normalizedMetaCandidate) return fallbackUrl;
+
+  try {
+    const fallbackHost = new URL(fallbackUrl).hostname.replace(/^www\./, "");
+    const candidateHost = new URL(normalizedMetaCandidate).hostname.replace(/^www\./, "");
+    return fallbackHost === candidateHost ? normalizedMetaCandidate : fallbackUrl;
+  } catch {
+    return fallbackUrl;
+  }
 }
 
 function restoreCanonicalJobs<
@@ -285,9 +296,13 @@ function readJobsCache(key: string) {
   return cached.payload;
 }
 
-function writeJobsCache(key: string, payload: Record<string, unknown>) {
+function writeJobsCache(
+  key: string,
+  payload: Record<string, unknown>,
+  ttlMs: number = JOBS_CACHE_TTL_MS,
+) {
   jobsCache.set(key, {
-    expiresAt: Date.now() + JOBS_CACHE_TTL_MS,
+    expiresAt: Date.now() + ttlMs,
     payload,
   });
 }
@@ -354,7 +369,7 @@ export async function POST(req: Request) {
         error:
           "Lisää ensin selkeä rooli tai hakusanoja työnhakuun. Näin vältämme turhat haut ja saat osuvammat ehdotukset.",
       };
-      writeJobsCache(cacheKey, responsePayload);
+      writeJobsCache(cacheKey, responsePayload, JOBS_FAILURE_CACHE_TTL_MS);
       return NextResponse.json(responsePayload);
     }
 
@@ -601,7 +616,7 @@ export async function POST(req: Request) {
         error:
           "Työpaikkoja ei löytynyt yhdestäkään lähteestä. Tarkista proxy- tai Google-asetukset.",
       };
-      writeJobsCache(cacheKey, responsePayload);
+      writeJobsCache(cacheKey, responsePayload, JOBS_FAILURE_CACHE_TTL_MS);
       return NextResponse.json(responsePayload);
     }
 
