@@ -35,7 +35,7 @@ export default function ExtraToolsPage() {
   const [linkedInResult, setLinkedInResult] = useState({ about: "", post: "" });
   const [isLoadingLinkedIn, setIsLoadingLinkedIn] = useState(false);
 
-  // Tilamuuttujat: Uravaihtajan Kompassi
+  // Tilamuuttujat: Uravaihtajan kompassi
   const [oldJob, setOldJob] = useState("");
   const [newJob, setNewJob] = useState("");
   const [pivotResult, setPivotResult] = useState("");
@@ -76,7 +76,7 @@ export default function ExtraToolsPage() {
     setTimeout(() => setMessage(""), 2500);
   };
 
-  // YHTEINEN APUFUKTIO API-KUTSUILLE
+  // Yhteinen apufunktio API-kutsuille
   const fetchToolResult = async (toolName: string, dataPayload: any, setResult: Function, setLoading: Function) => {
     setLoading(true);
     try {
@@ -325,7 +325,7 @@ export default function ExtraToolsPage() {
             {/* HEADHUNTER-MAGNEETTI */}
             {activeTab === "headhunter" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
-                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>💎 Headhunter-Magneetti</h2>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>💎 Headhunter-magneetti</h2>
                 <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Asiantuntijat ja johtajat eivät hae töitä, heidät löydetään. Tekoäly muotoilee sinulle vakuuttavan, arvoa (ROI) korostavan viestin, jolla voit lähestyä suorahakukonsultteja ennakoivasti.</p>
                 
                 <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-slate-800/30 border-slate-600' : 'bg-slate-100 border-slate-300'}`}>
@@ -372,8 +372,8 @@ export default function ExtraToolsPage() {
             {/* PIILOTYÖPAIKAT */}
             {activeTab === "hidden-jobs" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
-                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Piilotyöpaikan Kartoittaja</h2>
-                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Yli 70% paikoista ei tule koskaan julkiseen hakuun. Anna tekoälyn laatia avoin hakemus suoraan yrityksen päättäjälle.</p>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Piilotyöpaikan kartoittaja</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Yli 70 % paikoista ei tule koskaan julkiseen hakuun. Anna tekoälyn laatia avoin hakemus suoraan yrityksen päättäjälle.</p>
                 
                 <div className={`mb-10 p-6 sm:p-8 rounded-3xl border ${theme === 'dark' ? 'bg-purple-500/5 border-purple-500/20' : 'bg-purple-50 border-purple-200'}`}>
                   <h3 className={`text-xl font-bold mb-3 flex items-center gap-2 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
@@ -455,8 +455,8 @@ export default function ExtraToolsPage() {
             {/* URAVAIHTAJAN KOMPASSI */}
             {activeTab === "career-pivot" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
-                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Uravaihtajan Kompassi</h2>
-                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Haluatko vaihtaa alaa, mutta tuntuu että aloitat nollasta? Tekoäly etsii vanhasta kokemuksestasi piilevät taidot ja kääntää ne uuden alan vaatimalle kielelle.</p>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Uravaihtajan kompassi</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Haluatko vaihtaa alaa, mutta tuntuu että aloitat nollasta? Tekoäly etsii vanhasta kokemuksestasi piilevät taidot ja kääntää ne uuden alan kielelle.</p>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
                   <form onSubmit={generatePivotPlan} className="space-y-6">
@@ -466,7 +466,7 @@ export default function ExtraToolsPage() {
                     </div>
                     <div>
                       <label className={LabelClass}>Mihin työhön haluat siirtyä?</label>
-                      <input value={newJob} onChange={e => setNewJob(e.target.value)} placeholder="Esim. Asiakaspalvelupäällikkö tai Koodari" className={InputClass} required />
+                      <input value={newJob} onChange={e => setNewJob(e.target.value)} placeholder="Esim. Asiakaspalvelupäällikkö tai koodari" className={InputClass} required />
                     </div>
                     <button type="submit" disabled={isLoadingPivot} className="w-full bg-emerald-500 text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform disabled:opacity-50 shadow-[0_10px_20px_rgba(16,185,129,0.3)]">
                       {isLoadingPivot ? "Analysoidaan taitoja..." : "NÄYTÄ REITTI UUDELLE ALALLE"}
@@ -574,8 +574,8 @@ export default function ExtraToolsPage() {
             {/* PALKKANEUVOTTELIJA */}
             {activeTab === "salary-negotiation" && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
-                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Asiantuntijan Palkkaneuvottelija</h2>
-                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Työnantajat odottavat sinun neuvottelevan. Anna tekoälyn muotoilla täydellisen asiallinen, mutta jämäkkä vastatarjous.</p>
+                <h2 className={`text-2xl sm:text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Asiantuntijan palkkaneuvottelija</h2>
+                <p className={`text-base sm:text-lg mb-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Työnantajat odottavat sinun neuvottelevan. Anna tekoälyn muotoilla asiallinen mutta jämäkkä vastatarjous.</p>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
                   <form onSubmit={generateSalaryCounter} className="space-y-6">
@@ -622,3 +622,4 @@ export default function ExtraToolsPage() {
     </div>
   );
 }
+
