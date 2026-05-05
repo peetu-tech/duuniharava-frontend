@@ -740,12 +740,27 @@ function FieldHint({
   );
 }
 
-function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemove, onUpdate, onSparring, onSalary, onAtsScan, onInterviewPrep, theme }: any) {
+function JobCard({
+  job,
+  isActive,
+  applicationsCount,
+  cvsCount,
+  onSelect,
+  onRemove,
+  onUpdate,
+  onSparring,
+  onSalary,
+  onAtsScan,
+  onInterviewPrep,
+  theme,
+  searchTimeLabel,
+}: any) {
   const score = safeMatchScore(job.matchScore);
   const daysLeft = daysUntil(job.deadline);
   const [showJobTools, setShowJobTools] = useState(false);
   const [showJobDetails, setShowJobDetails] = useState(false);
   const sourceMeta = getSourceMeta(job.source);
+  const isExternalPreview = ["Duunitori", "Oikotie", "LinkedIn", "Jobly", "Indeed", "Monster", "Kuntarekry"].includes(sourceMeta.label);
   const originalLabel = ["Duunitori", "Oikotie", "LinkedIn", "Jobly", "Indeed", "Monster", "Kuntarekry"].includes(sourceMeta.label)
     ? "Avaa alkuperäinen ilmoitus"
     : "Avaa ilmoitus";
@@ -780,6 +795,11 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
                 Suosikki
               </span>
             )}
+            {searchTimeLabel && (
+              <span className={`rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] ${theme === 'dark' ? 'bg-white/5 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                {searchTimeLabel}
+              </span>
+            )}
           </div>
 
           <h4 className={`text-3xl sm:text-4xl font-black tracking-tight mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -794,6 +814,12 @@ function JobCard({ job, isActive, applicationsCount, cvsCount, onSelect, onRemov
             <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
               {sourceMeta.note}
             </p>
+          )}
+
+          {isExternalPreview && (
+            <div className={`mt-4 inline-flex max-w-full rounded-2xl border px-4 py-3 text-sm leading-6 ${theme === 'dark' ? 'border-blue-500/20 bg-blue-500/10 text-blue-200' : 'border-blue-200 bg-blue-50 text-blue-700'}`}>
+              Tässä kortissa näkyy vain esikatselu. Avaa alkuperäinen ilmoitus nähdäksesi koko tekstin ja ajantasaiset tiedot.
+            </div>
           )}
         </div>
 
@@ -4761,6 +4787,7 @@ export default function Home() {
                             isActive={true}
                             applicationsCount={activeJobLetters.length}
                             cvsCount={activeJobCvVariants.length}
+                            searchTimeLabel={lastJobsSearchMeta ? formatRelativeSearchTime(lastJobsSearchMeta.searchedAt) : ""}
                             onSelect={() => {}} // Ei tarvita tinderissä
                             onRemove={() => removeJob(activeJob.id)}
                             onUpdate={(patch: Partial<JobItem>) => updateJob(activeJob.id, patch)}

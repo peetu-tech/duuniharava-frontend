@@ -53,7 +53,7 @@ function normalizeTextValue(value?: string) {
 function normalizeComparableText(value?: string) {
   return normalizeTextValue(value)
     .toLowerCase()
-    .replace(/[|–—-].*$/, "")
+    .replace(/[|\-–—].*$/, "")
     .trim();
 }
 
@@ -98,7 +98,15 @@ function makeJobIdentityKey(job: {
   const source = normalizeComparableText(job.source);
 
   if (normalizedUrl) return `url::${normalizedUrl}`;
-  return `meta::${title}::${company}::${source}`;
+
+  let domain = "";
+  try {
+    domain = job.url ? new URL(job.url).hostname.replace(/^www\./, "") : "";
+  } catch {
+    domain = "";
+  }
+
+  return `meta::${domain}::${title}::${company}::${source}`;
 }
 
 function normalizeDateString(date: Date) {
@@ -719,3 +727,4 @@ Palauta vain validi JSON muodossa:
     );
   }
 }
+
