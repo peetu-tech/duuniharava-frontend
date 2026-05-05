@@ -8,15 +8,18 @@ import { signInWithPassword } from "../../lib/supabaseAuth";
 const loginHighlights = [
   {
     title: "Jatka siitä mihin jäit",
-    description: "CV:t, hakemukset ja tallenteet odottavat samassa työtilassa ilman että sinun täytyy etsiä niitä uudelleen.",
+    description:
+      "CV:t, hakemukset ja tallenteet odottavat samassa työtilassa ilman että sinun täytyy etsiä niitä uudelleen.",
   },
   {
     title: "Työnhaku pysyy kasassa",
-    description: "Seuraa kiinnostavia paikkoja, tehtyjä hakemuksia ja seuraavia askeleita yhdestä näkymästä.",
+    description:
+      "Seuraa kiinnostavia paikkoja, tehtyjä hakemuksia ja seuraavia askeleita yhdestä näkymästä.",
   },
   {
     title: "Tekoäly auttaa käytännössä",
-    description: "Muokkaa CV:tä, kirjoita hakemuksia ja viimeistele sisältöä ilman että kaiken tarvitsee alkaa tyhjästä.",
+    description:
+      "Muokkaa CV:tä, kirjoita hakemuksia ja viimeistele sisältöä ilman että kaiken tarvitsee alkaa tyhjästä.",
   },
 ];
 
@@ -60,7 +63,8 @@ export default function LoginPage() {
                 Tervetuloa takaisin <span className="text-[#00BFA6]">Duuniharavaan.</span>
               </h1>
               <p className="max-w-xl text-base leading-8 text-gray-300 sm:text-lg sm:leading-9">
-                Avaa oma työtila, jatka viimeisintä CV:täsi ja pidä työnhaku rauhallisesti yhdessä paikassa. Mobiilissa tai koneella kaikki jatkuu siitä mihin jäit.
+                Avaa oma työtila, jatka viimeisintä CV:täsi ja pidä työnhaku rauhallisesti yhdessä paikassa.
+                Mobiilissa tai koneella kaikki jatkuu siitä mihin jäit.
               </p>
             </div>
 

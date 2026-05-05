@@ -8,15 +8,18 @@ import { signUp } from "../../lib/supabaseAuth";
 const signupHighlights = [
   {
     title: "Tallenna kaikki yhteen paikkaan",
-    description: "CV:t, hakemukset ja työpaikkaseuranta pysyvät samassa tilissä tallessa ilman erillistä säätöä.",
+    description:
+      "CV:t, hakemukset ja työpaikkaseuranta pysyvät samassa tilissä tallessa ilman erillistä säätöä.",
   },
   {
     title: "Muokkaa rauhassa eri laitteilla",
-    description: "Voit aloittaa puhelimella ja jatkaa myöhemmin koneella ilman että työ katoaa matkalla.",
+    description:
+      "Voit aloittaa puhelimella ja jatkaa myöhemmin koneella ilman että työ katoaa matkalla.",
   },
   {
     title: "Räätälöi nopeammin",
-    description: "Tekoäly auttaa sinua luomaan eri versioita työpaikkojen mukaan niin että työnhaku pysyy liikkeessä.",
+    description:
+      "Tekoäly auttaa sinua luomaan eri versioita työpaikkojen mukaan niin että työnhaku pysyy liikkeessä.",
   },
 ];
 
@@ -61,7 +64,8 @@ export default function SignupPage() {
                 Luo tili ja rakenna työnhaku <span className="text-[#00BFA6]">yhteen työtilaan.</span>
               </h1>
               <p className="max-w-xl text-base leading-8 text-gray-300 sm:text-lg sm:leading-9">
-                Aloita muutamassa hetkessä. Kun tili on luotu, voit tallentaa CV:t, hakemukset, työpaikat ja omat asetukset samaan paikkaan.
+                Aloita muutamassa hetkessä. Kun tili on luotu, voit tallentaa CV:t, hakemukset, työpaikat ja
+                omat asetukset samaan paikkaan.
               </p>
             </div>
 
