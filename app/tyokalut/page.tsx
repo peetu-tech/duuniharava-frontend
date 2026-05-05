@@ -614,7 +614,7 @@ export default function ExtraToolsPage() {
 
         {/* TOAST MESSAGE */}
         {message && (
-          <div className="fixed bottom-24 sm:bottom-8 right-4 sm:right-8 z-50 rounded-[28px] border-2 border-green-500 bg-green-500/95 p-5 sm:p-6 text-base sm:text-lg font-black text-black shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-5">
+          <div className="fixed bottom-24 sm:bottom-8 right-4 sm:right-8 z-50 max-w-[340px] rounded-[24px] border border-[#00BFA6]/30 bg-[#0f172a]/92 p-4 sm:p-5 text-sm sm:text-base font-bold text-white shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-5">
             {message}
           </div>
         )}

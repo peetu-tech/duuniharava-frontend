@@ -1216,6 +1216,7 @@ export default function Home() {
   const [letterDraft, setLetterDraft] = useState("");
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [profileImage, setProfileImage] = useState("");
   const [jobFilter, setJobFilter] = useState("");
 
@@ -1504,6 +1505,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isAuthChecking || !hasSession) return;
+    setSaveState("saving");
     const timeout = setTimeout(async () => {
       try {
         const session = await getValidSession();
@@ -1527,8 +1529,10 @@ export default function Home() {
             profile_image_url: profileImage
           })
         });
+        setSaveState("saved");
       } catch (e) {
         console.error("Profiilin tallennus epäonnistui", e);
+        setSaveState("error");
       }
     }, 2000);
 
@@ -1539,6 +1543,7 @@ export default function Home() {
     if (isAuthChecking || !hasSession) return;
     const session = getSession();
     if (!session) return;
+    setSaveState("saving");
     const draft: StudioDraftState = {
       updatedAt: new Date().toISOString(),
       mode,
@@ -1576,6 +1581,7 @@ export default function Home() {
       );
     } catch (error) {
       console.error("Paikallisen studiotilan tallennus epäonnistui", error);
+      setSaveState("error");
     }
   }, [
     activeJobId,
@@ -1612,6 +1618,7 @@ export default function Home() {
     if (isAuthChecking || !hasSession) return;
     const session = getSession();
     if (!session) return;
+    setSaveState("saving");
 
     const cloudState: StudioCloudState = {
       updatedAt: new Date().toISOString(),
@@ -1655,8 +1662,10 @@ export default function Home() {
             updated_at: new Date().toISOString(),
           }),
         });
+        setSaveState("saved");
       } catch (error) {
         console.error("Studion pilvitilan tallennus epäonnistui", error);
+        setSaveState("error");
       }
     }, 2000);
 
@@ -3595,7 +3604,10 @@ export default function Home() {
             </button>
 
             <div className="text-sm font-medium text-gray-500 sm:ml-auto lg:block" aria-live="polite">
-              Pilvitallennus aktiivinen (Supabase) ☁️
+              {saveState === "saving" && "Tallennetaan muutoksia automaattisesti..."}
+              {saveState === "saved" && "Automaattisesti tallennettu · pilvitallennus aktiivinen ☁️"}
+              {saveState === "error" && "Tallennuksessa oli häiriö. Yritetään uudelleen."}
+              {saveState === "idle" && "Pilvitallennus aktiivinen (Supabase) ☁️"}
             </div>
           </div>
 
@@ -5656,10 +5668,10 @@ export default function Home() {
             <div
               role="alert"
               aria-live={errorMessage ? "assertive" : "polite"}
-              className={`fixed bottom-[100px] sm:bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[28px] border-2 p-8 text-lg font-black shadow-[0_20px_60px_rgba(0,0,0,0.8)] transition-all animate-in slide-in-from-bottom-5 ${
+              className={`fixed bottom-[100px] sm:bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[24px] border p-5 sm:p-6 text-sm sm:text-base font-bold shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all animate-in slide-in-from-bottom-5 ${
                 errorMessage
-                  ? "border-red-900 bg-red-950/95 text-red-300 backdrop-blur-xl"
-                  : "border-[#00BFA6] bg-[#00BFA6]/95 text-black backdrop-blur-xl"
+                  ? "border-red-500/30 bg-[#1f1012]/95 text-red-200 backdrop-blur-xl"
+                  : "border-[#00BFA6]/30 bg-[#0f172a]/92 text-white backdrop-blur-xl"
               }`}
             >
               {errorMessage || message}
