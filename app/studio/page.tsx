@@ -811,7 +811,7 @@ function TextareaClass(minHeight: string, theme: "light" | "dark") {
 }
 
 function LabelClass(theme: "light" | "dark") {
-  return `mb-4 block text-sm font-bold ml-1 transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-700'}`;
+  return `mb-5 block text-sm font-bold ml-1 transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-700'}`;
 }
 
 function FieldHint({
@@ -823,7 +823,7 @@ function FieldHint({
 }) {
   return (
     <div
-      className={`mt-4 flex items-start gap-3 rounded-xl border-l-2 px-3 py-2 text-xs sm:text-sm leading-6 ${
+      className={`mt-5 flex items-start gap-4 rounded-xl border-l-2 px-4 py-3 text-xs sm:text-sm leading-7 ${
         theme === "dark"
           ? "border-[#00BFA6]/50 bg-transparent text-gray-500"
           : "border-[#00BFA6]/40 bg-transparent text-gray-500"
@@ -4060,8 +4060,8 @@ export default function Home() {
                 theme={theme}
                 defaultOpen={!isMobileViewport}
               >
-                <div className="space-y-12 mt-12">
-                  <div className={`rounded-[18px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+                <div className="mt-14 space-y-14 sm:space-y-16">
+                  <div className={`rounded-[18px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
                       Helppo tapa aloittaa
                     </p>
@@ -4069,7 +4069,7 @@ export default function Home() {
                       Täytä ensin vain kolme kohtaa: millaista työtä haet, miltä alueelta ja haluatko kokoaikaisen vai osa-aikaisen työn. Muut kentät ovat vain tarkennuksia.
                     </p>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <label htmlFor="search-roles" className={LabelClass(theme)}>Minkä alan töitä etsit?</label>
                     <textarea
                       id="search-roles"
@@ -4085,7 +4085,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                      <label htmlFor="search-location" className={LabelClass(theme)}>Miltä alueelta?</label>
                      <input
                        id="search-location"
@@ -4101,8 +4101,8 @@ export default function Home() {
                      </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
-                    <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-y-10 sm:gap-y-12 lg:gap-x-12 lg:gap-y-14 lg:grid-cols-2">
+                    <div className="space-y-6">
                       <label htmlFor="search-workType" className={LabelClass(theme)}>Kokoaikainen vai Osa-aikainen?</label>
                       <input
                         id="search-workType"
@@ -4117,7 +4117,7 @@ export default function Home() {
                         Esimerkiksi kokoaikainen, osa-aikainen, keikkatyö tai harjoittelu.
                       </FieldHint>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <label htmlFor="search-shiftPreference" className={LabelClass(theme)}>Vuorotoive</label>
                       <input
                         id="search-shiftPreference"
@@ -4134,7 +4134,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className={`rounded-[18px] border p-4 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
+                  <div className={`rounded-[18px] border p-5 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
                     <button
                       type="button"
                       onClick={() => setShowMoreSearchFields((prev) => !prev)}
@@ -4144,13 +4144,13 @@ export default function Home() {
                       <span>Tarkenna hakua</span>
                       <span className="text-[#00BFA6]">{showMoreSearchFields ? "Piilota" : "Avaa"}</span>
                     </button>
-                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                       Palkkatoive ja avainsanat ovat vapaaehtoisia.
                     </p>
 
                     {showMoreSearchFields && (
-                      <div className="mt-6 grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
-                        <div className="space-y-4">
+                      <div className="mt-8 grid grid-cols-1 gap-y-10 sm:gap-y-12 lg:gap-x-12 lg:gap-y-14 lg:grid-cols-2">
+                        <div className="space-y-6">
                           <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
                           <input
                             id="search-salaryWish"
@@ -4165,7 +4165,7 @@ export default function Home() {
                             Jos et tiedä tarkkaa summaa, arvio riittää. Tällä voi rajata liian kauas meneviä ehdotuksia pois.
                           </FieldHint>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                           <label htmlFor="search-keywords" className={LabelClass(theme)}>Muita avainsanoja (erota pilkulla)</label>
                           <input
                             id="search-keywords"
@@ -4184,7 +4184,7 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="pt-4 sm:pt-6">
+                  <div className="pt-6 sm:pt-8">
                     <button
                       type="button"
                       onClick={suggestJobs}
@@ -5233,8 +5233,8 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div id="jobs-list-start" className={`space-y-10 pt-10 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-2">
+                    <div id="jobs-list-start" className={`space-y-12 pt-14 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                      <div className="mb-4 flex flex-col justify-between gap-7 sm:flex-row sm:items-center">
                         <h3 className={`text-3xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Omat työpaikat
                         </h3>
@@ -5243,27 +5243,27 @@ export default function Home() {
                           value={jobFilter}
                           onChange={(e) => setJobFilter(e.target.value)}
                           placeholder="Suodata listaa..."
-                          className="w-full sm:max-w-md rounded-[14px] border border-white/10 bg-[#0A0A0A] px-6 py-5 text-base text-white outline-none transition-all focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                          className="w-full rounded-[14px] border border-white/10 bg-[#0A0A0A] px-6 py-5 text-base text-white outline-none transition-all focus:border-[#00BFA6] focus:ring-1 focus:ring-[#00BFA6] shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] sm:max-w-md"
                         />
                       </div>
 
                       {lastJobsSearchMeta && (
-                        <div className={`rounded-[18px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
-                          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className={`rounded-[18px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
+                          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                             <div>
                               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">
                                 Hakustatus
                               </p>
-                              <p className={`mt-2 text-base font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              <p className={`mt-3 text-base font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {lastJobsSearchMeta.wasCached
                                   ? "Näytetään äskeinen haku muistista"
                                   : "Työpaikat päivitetty onnistuneesti"}
                               </p>
-                              <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                 {lastJobsSearchMeta.sourceSummary} · {lastJobsSearchMeta.resultCount} paikkaa · {formatRelativeSearchTime(lastJobsSearchMeta.searchedAt)} · {new Date(lastJobsSearchMeta.searchedAt).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}
                               </p>
                               {lastJobsSearchMeta.sources?.length ? (
-                                <div className="mt-3 flex flex-wrap gap-2">
+                                <div className="mt-4 flex flex-wrap gap-3">
                                   {lastJobsSearchMeta.sources.slice(0, 4).map((source) => {
                                     const meta = getSourceMeta(source);
                                     return (
@@ -5277,7 +5277,7 @@ export default function Home() {
                                   })}
                                 </div>
                               ) : null}
-                              <p className={`mt-3 text-xs leading-6 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                              <p className={`mt-4 text-xs leading-6 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
                                 Ulkoisista lähteistä tulevissa paikoissa näet joskus ensin tiivistelmän. Avaa alkuperäinen ilmoitus, kun haluat tarkistaa koko kuvauksen ennen hakemuksen räätälöintiä.
                               </p>
                             </div>
@@ -5293,7 +5293,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className="mb-4 sm:hidden">
+                      <div className="mb-6 sm:hidden">
                         <button
                           type="button"
                           onClick={() => setShowJobFilters((prev) => !prev)}
@@ -5305,14 +5305,14 @@ export default function Home() {
                       </div>
 
                       {(!isMobileViewport || showJobFilters) && (
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
+                      <div className="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6">
                         <select
                           aria-label="Suodata statuksen mukaan"
                           value={jobStatusFilter}
                           onChange={(e) =>
                             setJobStatusFilter(e.target.value as "all" | JobStatus)
                           }
-                          className={`w-full rounded-[14px] border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[58px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
+                          className={`w-full rounded-[14px] border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[64px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
                         >
                           <option value="all">Kaikki tilat</option>
                           <option value="saved">Tallennettu</option>
@@ -5331,7 +5331,7 @@ export default function Home() {
                               e.target.value as "all" | JobPriority
                             )
                           }
-                          className={`w-full rounded-[14px] border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[58px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
+                          className={`w-full rounded-[14px] border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[64px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
                         >
                           <option value="all">Kaikki prio</option>
                           <option value="low">Matala</option>
@@ -5352,7 +5352,7 @@ export default function Home() {
                                 | "company"
                             )
                           }
-                          className={`w-full rounded-[14px] border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[58px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
+                          className={`w-full rounded-[14px] border px-5 py-4 text-sm font-bold outline-none focus:border-[#00BFA6] cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#00BFA6] min-h-[64px] ${theme === 'dark' ? 'border-white/10 bg-[#141414] text-white' : 'border-gray-200 bg-white text-gray-900'}`}
                         >
                           <option value="newest">Uusimmat</option>
                           <option value="match">Match</option>
@@ -5365,22 +5365,22 @@ export default function Home() {
                           type="button"
                           aria-pressed={showFavoritesOnly}
                           onClick={() => setShowFavoritesOnly((prev) => !prev)}
-                          className={`w-full rounded-[14px] px-5 py-4 text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C] min-h-[58px] ${
+                          className={`w-full rounded-[14px] px-5 py-4 text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C] min-h-[64px] ${
                             showFavoritesOnly
                               ? "bg-[#FF6F3C] text-white shadow-[0_0_20px_rgba(255,111,60,0.5)] scale-[1.02]"
                               : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                           }`}
                         >
-                          {showFavoritesOnly ? "? Vain suosikit" : "Näytä suosikit"}
+                          {showFavoritesOnly ? "Vain suosikit" : "Näytä suosikit"}
                         </button>
                       </div>
                       )}
 
                       {/* --- TINDER NÄKYMÄ --- */}
                       {filteredJobs.length === 0 ? (
-                        <div className={`rounded-[40px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
-                          <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei tuloksia</p>
-                          <p className="text-base">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
+                        <div className={`mt-4 rounded-[20px] border-2 border-dashed p-12 text-center font-medium sm:p-20 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
+                          <p className={`mb-3 text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei tuloksia</p>
+                          <p className="mx-auto max-w-2xl text-base leading-8">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
                         </div>
                       ) : activeJob ? (
                         <div className="relative pb-24 sm:pb-0">
