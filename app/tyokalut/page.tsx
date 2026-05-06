@@ -207,6 +207,7 @@ export default function ExtraToolsPage() {
     { id: "career-pivot", icon: "🧭", title: "Uranvaihto", summary: "Taidot uuteen suuntaan", activeClass: "bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] border-emerald-400" },
     { id: "salary-negotiation", icon: "🤝", title: "Palkka", summary: "Vastatarjous helposti", activeClass: "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] border-[#00BFA6]" },
   ];
+  const activeToolMeta = tools.find((tool) => tool.id === activeTab) ?? tools[0];
 
   return (
     <div className={theme === 'light' ? 'light-theme' : ''}>
