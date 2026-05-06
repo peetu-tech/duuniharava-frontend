@@ -745,10 +745,10 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-14 sm:mb-20 rounded-[20px] border p-7 sm:p-12 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group mb-16 sm:mb-24 rounded-[20px] border p-8 sm:p-14 xl:p-16 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
-      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-7 sm:gap-8 border-b pb-7 sm:pb-9 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 sm:gap-10 border-b pb-8 sm:pb-11 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
         <div className="w-full sm:w-auto flex justify-between items-center">
           <div>
             <p className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
@@ -768,9 +768,9 @@ function SectionShell({
         </div>
       </summary>
 
-      <div className="mt-12 animate-in fade-in duration-300">
+      <div className="mt-14 pb-3 animate-in fade-in duration-300">
         {description ? (
-          <p className={`mb-12 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`mb-14 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {description}
           </p>
         ) : null}
@@ -3810,8 +3810,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-16 xl:grid-cols-[minmax(380px,0.82fr)_minmax(0,1.18fr)] 2xl:grid-cols-[minmax(420px,0.8fr)_minmax(0,1.2fr)]">
-            <section className="space-y-14 sm:space-y-16">
+          <div className="grid grid-cols-1 items-start gap-20 xl:gap-24 xl:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.22fr)] 2xl:grid-cols-[minmax(400px,0.78fr)_minmax(0,1.22fr)]">
+            <section className="space-y-16 sm:space-y-20">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -3831,7 +3831,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <form onSubmit={handleCvSubmit} className="space-y-14 mt-10">
+                <form onSubmit={handleCvSubmit} className="mt-12 space-y-16 sm:space-y-20">
                   {mode === "improve" && (
                     <div>
                       <label htmlFor="cvFileUpload" className="mb-4 block text-sm font-bold text-gray-400">
@@ -3859,8 +3859,8 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-y-10 sm:gap-y-12 lg:gap-x-10 lg:gap-y-14 lg:grid-cols-2 pt-8">
-                    <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-y-12 sm:gap-y-14 lg:gap-x-12 lg:gap-y-16 lg:grid-cols-2 pt-10">
+                    <div className="space-y-6">
                        <label htmlFor="input-name" className={LabelClass(theme)}>Koko nimi</label>
                        <input
                          id="input-name"
@@ -3870,7 +3870,7 @@ export default function Home() {
                          className={InputClass(theme)}
                        />
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                        <label htmlFor="input-phone" className={LabelClass(theme)}>Puhelin</label>
                        <input
                          id="input-phone"
@@ -3880,7 +3880,7 @@ export default function Home() {
                          className={InputClass(theme)}
                        />
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                        <label htmlFor="input-email" className={LabelClass(theme)}>Sähköposti</label>
                        <input
                          id="input-email"
@@ -3890,7 +3890,7 @@ export default function Home() {
                          className={InputClass(theme)}
                        />
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                        <label htmlFor="input-location" className={LabelClass(theme)}>Paikkakunta</label>
                        <input
                          id="input-location"
@@ -4069,7 +4069,7 @@ export default function Home() {
                       Täytä ensin vain kolme kohtaa: millaista työtä haet, miltä alueelta ja haluatko kokoaikaisen vai osa-aikaisen työn. Muut kentät ovat vain tarkennuksia.
                     </p>
                   </div>
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     <label htmlFor="search-roles" className={LabelClass(theme)}>Minkä alan töitä etsit?</label>
                     <textarea
                       id="search-roles"
@@ -4085,7 +4085,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
                   
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                      <label htmlFor="search-location" className={LabelClass(theme)}>Miltä alueelta?</label>
                      <input
                        id="search-location"
@@ -4101,8 +4101,8 @@ export default function Home() {
                      </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-y-10 sm:gap-y-12 lg:gap-x-12 lg:gap-y-14 lg:grid-cols-2">
-                    <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-y-12 sm:gap-y-14 lg:gap-x-14 lg:gap-y-16 lg:grid-cols-2">
+                    <div className="space-y-8">
                       <label htmlFor="search-workType" className={LabelClass(theme)}>Kokoaikainen vai Osa-aikainen?</label>
                       <input
                         id="search-workType"
@@ -4117,7 +4117,7 @@ export default function Home() {
                         Esimerkiksi kokoaikainen, osa-aikainen, keikkatyö tai harjoittelu.
                       </FieldHint>
                     </div>
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                       <label htmlFor="search-shiftPreference" className={LabelClass(theme)}>Vuorotoive</label>
                       <input
                         id="search-shiftPreference"
@@ -4203,7 +4203,7 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-14 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
+            <section id="studio-tulokset" className="space-y-16 sm:space-y-20 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
               <div className={`rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
