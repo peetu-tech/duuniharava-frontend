@@ -745,10 +745,10 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-10 sm:mb-20 rounded-[20px] sm:rounded-[16px] border p-6 sm:p-12 shadow-[0_24px_60px_rgba(0,0,0,0.16)] backdrop-blur-xl transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group mb-14 sm:mb-20 rounded-[20px] border p-7 sm:p-12 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
-      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8 border-b pb-6 sm:pb-9 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-7 sm:gap-8 border-b pb-7 sm:pb-9 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
         <div className="w-full sm:w-auto flex justify-between items-center">
           <div>
             <p className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
@@ -3407,27 +3407,27 @@ export default function Home() {
       <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-56 sm:pb-20 transition-colors duration-300">
         
     {/* MOBIILIN PIKANAVIGOINTI (5 NAPPIA) */}
-<nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-3 rounded-[20px] border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:hidden backdrop-blur-2xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/92 border-white/10' : 'bg-white/92 border-gray-200 shadow-[0_18px_40px_rgba(0,0,0,0.12)]'}`} aria-label="Mobiilin pikavalikko">
+<nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-4 rounded-[20px] border p-3.5 pb-[max(0.85rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
   
   {/* 1. TIEDOT */}
-  <a href="#hakijan-tiedot" className={`flex min-h-[68px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+  <a href="#hakijan-tiedot" className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
     <span className="text-xl" aria-hidden="true">◫</span> Tiedot
   </a>
 
   {/* 2. HAKU */}
-  <a href="#tyonhaku" className={`flex min-h-[68px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+  <a href="#tyonhaku" className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
     <span className="text-xl" aria-hidden="true">⌕</span> Haku
   </a>
 
   {/* 3. TULOKSET */}
-  <a href="#studio-tulokset" className={`flex min-h-[68px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[14px] bg-[#00BFA6]/12 px-2 text-[10px] font-bold text-[#00BFA6]`}>
+  <a href="#studio-tulokset" className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] bg-[#00BFA6]/12 px-2 text-[10px] font-bold text-[#00BFA6]`}>
     <span className="text-xl" aria-hidden="true">▣</span> Tulokset
   </a>
 
   {/* 4. TYÖKALUT (Mobiilissa) */}
   <button 
     onClick={() => router.push('/tyokalut')} 
-    className={`flex min-h-[68px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'} focus-visible:outline-none`}
+    className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'} focus-visible:outline-none`}
   >
     <span className="text-xl" aria-hidden="true">✦</span> Työkalut
   </button>
@@ -3435,7 +3435,7 @@ export default function Home() {
   {/* 5. TALLENTEET */}
   <button 
     onClick={openArchiveModal} 
-    className={`flex min-h-[68px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[14px] px-2 text-[10px] font-black transition-all ${theme === 'dark' ? 'text-[#00BFA6] hover:bg-white/5' : 'text-[#00BFA6] hover:bg-gray-100'} focus-visible:outline-none`}
+    className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-black transition-all ${theme === 'dark' ? 'text-[#00BFA6] hover:bg-white/5' : 'text-[#00BFA6] hover:bg-gray-100'} focus-visible:outline-none`}
   >
     <span className="text-xl" aria-hidden="true">🗂️</span> Tallenteet
   </button>
@@ -3443,15 +3443,15 @@ export default function Home() {
   {/* 6. PRO (Pysyy aina tässä) */}
   <button 
     onClick={() => setShowPaywall(true)} 
-    className="flex min-h-[68px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[14px] bg-[#FF6F3C]/12 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
+    className="flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] bg-[#FF6F3C]/12 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
   >
     <span className="text-xl" aria-hidden="true">▲</span> PRO
   </button>
 </nav>
 
         {/* HEADER (Tietokone) */}
-        <nav className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-colors ${theme === 'dark' ? 'bg-[#0F0F0F]/80 border-white/10' : 'bg-white/80 border-gray-200'}`}>
-          <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 xl:px-10 2xl:px-14 py-4 sm:py-5 flex justify-between items-center gap-6">
+        <nav className={`sticky top-0 z-50 border-b transition-colors sm:backdrop-blur-xl ${theme === 'dark' ? 'bg-[#0F0F0F] sm:bg-[#0F0F0F]/80 border-white/10' : 'bg-white sm:bg-white/80 border-gray-200'}`}>
+          <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 xl:px-10 2xl:px-14 py-5 sm:py-5 flex justify-between items-center gap-6">
             <div className="flex items-center gap-5">
               <span className="font-black text-2xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
               
@@ -3465,7 +3465,7 @@ export default function Home() {
               )}
             </div>
             
-            <div className="flex flex-col items-center gap-4 sm:w-auto sm:flex-row sm:gap-3">
+            <div className="flex flex-col items-center gap-5 sm:w-auto sm:flex-row sm:gap-3">
               
               {/* UUSI: PRO-nappi työpöydälle */}
               {!isPro && (
@@ -3513,19 +3513,19 @@ export default function Home() {
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
           
-          <div className="relative mx-auto w-full max-w-[1920px] px-4 sm:px-8 xl:px-10 2xl:px-14 py-20 sm:py-24 lg:py-28">
+          <div className="relative mx-auto w-full max-w-[1920px] px-4 sm:px-8 xl:px-10 2xl:px-14 py-24 sm:py-24 lg:py-28">
             
-            <div className="grid gap-12 sm:gap-16 lg:items-center">
+            <div className="grid gap-14 sm:gap-16 lg:items-center">
               <div>
-                <h1 id="hero-heading" className="mb-7 text-4xl font-black leading-[0.94] tracking-tight sm:mb-9 sm:text-6xl lg:text-7xl xl:text-[5.6rem]">
+                <h1 id="hero-heading" className="mb-9 max-w-5xl text-[3.35rem] font-black leading-[0.9] tracking-tight sm:mb-9 sm:text-6xl lg:text-7xl xl:text-[5.6rem]">
                   Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
                 </h1>
 
-                <p className={`mb-8 max-w-4xl text-base leading-8 sm:text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <p className={`mb-10 max-w-3xl text-base leading-8 sm:text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä.
                 </p>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-5">
+                <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:gap-5">
                   <button
                     type="button"
                     onClick={() => setShowHelp(!showHelp)}
@@ -3553,21 +3553,21 @@ export default function Home() {
                   </button>
                 </div>
 
-                <div className={`mt-10 grid grid-cols-1 gap-6 sm:mt-12 sm:grid-cols-3 lg:gap-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  <div className={`rounded-[16px] border px-6 py-6 text-sm leading-7 shadow-[0_12px_30px_rgba(0,0,0,0.08)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
+                <div className={`mt-14 grid grid-cols-1 gap-5 sm:mt-12 sm:grid-cols-3 lg:gap-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <div className={`rounded-[16px] border px-6 py-7 text-sm leading-7 shadow-[0_8px_24px_rgba(0,0,0,0.06)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
                     1. Täytä tärkeimmät tiedot
                   </div>
-                  <div className={`rounded-[16px] border px-6 py-6 text-sm leading-7 shadow-[0_12px_30px_rgba(0,0,0,0.08)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
+                  <div className={`rounded-[16px] border px-6 py-7 text-sm leading-7 shadow-[0_8px_24px_rgba(0,0,0,0.06)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
                     2. Muokkaa CV:tä omassa työtilassa
                   </div>
-                  <div className={`rounded-[16px] border px-6 py-6 text-sm leading-7 shadow-[0_12px_30px_rgba(0,0,0,0.08)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
+                  <div className={`rounded-[16px] border px-6 py-7 text-sm leading-7 shadow-[0_8px_24px_rgba(0,0,0,0.06)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
                     3. Avaa työkalut vasta kun tarvitset niitä
                   </div>
                 </div>
 
                 {(latestSavedCvVariant || latestSavedLetter || latestTouchedJob) && (
-                  <div className={`mt-10 rounded-[18px] border p-5 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.04]' : 'border-gray-200 bg-white/80'}`}>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div className={`mt-14 rounded-[18px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.04]' : 'border-gray-200 bg-white/80'}`}>
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                       <div>
                         <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">
                           Jatka nopeasti
@@ -3585,7 +3585,7 @@ export default function Home() {
                       </button>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                    <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-3">
                       {latestSavedCvVariant && (
                         <button
                           type="button"
@@ -3635,7 +3635,7 @@ export default function Home() {
         {/* --- OHJE-OSIO --- */}
         {showHelp && (
           <section id="help-section" className="mx-auto mt-14 w-full max-w-[1920px] animate-in fade-in slide-in-from-top-6 px-4 sm:px-8 xl:px-10 2xl:px-14" aria-labelledby="help-heading">
-            <div className="rounded-[20px] border-2 border-[#00BFA6]/30 bg-zinc-900/90 p-8 shadow-2xl backdrop-blur-xl sm:p-14">
+            <div className="rounded-[20px] border-2 border-[#00BFA6]/30 bg-zinc-900 p-8 shadow-[0_12px_30px_rgba(0,0,0,0.16)] sm:p-14 sm:shadow-2xl sm:backdrop-blur-xl">
               <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
                 <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
                 <button onClick={() => setShowHelp(false)} aria-label="Sulje ohjeet" className="p-2 text-xl font-bold text-gray-400 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">✕ Sulje</button>
@@ -3685,9 +3685,9 @@ export default function Home() {
         )}
 
         <div className="mx-auto w-full max-w-[1920px] px-4 py-[4.5rem] sm:px-8 sm:py-[5.5rem] xl:px-10 2xl:px-14 lg:py-24">
-          <section className="mb-12 grid grid-cols-1 gap-7 sm:mb-14 xl:grid-cols-[minmax(0,1.08fr)_repeat(3,minmax(0,0.8fr))] 2xl:gap-8">
-            <div className={`relative overflow-hidden rounded-[20px] border p-8 shadow-[0_28px_70px_rgba(0,0,0,0.18)] sm:p-10 ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.12),rgba(20,20,20,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
-              <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl" aria-hidden="true" />
+          <section className="mb-14 grid grid-cols-1 gap-8 sm:mb-16 xl:grid-cols-[minmax(0,1.08fr)_repeat(3,minmax(0,0.8fr))] 2xl:gap-9">
+            <div className={`relative overflow-hidden rounded-[20px] border p-8 shadow-[0_12px_34px_rgba(0,0,0,0.12)] sm:p-10 sm:shadow-[0_28px_70px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.12),rgba(20,20,20,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+              <div className="absolute right-0 top-0 hidden h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl sm:block" aria-hidden="true" />
               <p className="relative text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Aloita tästä</p>
               <h2 className={`relative mt-3 text-2xl sm:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 {nextStepTitle}
@@ -3713,7 +3713,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={`rounded-[18px] border p-8 shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+            <div className={`rounded-[18px] border p-8 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Profiili</p>
               <p className={`mt-4 text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{profileCompletion}%</p>
               <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -3721,7 +3721,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className={`rounded-[18px] border p-8 shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+            <div className={`rounded-[18px] border p-8 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Työnhaku</p>
               <p className={`mt-4 text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{filteredJobs.length}</p>
               <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -3729,7 +3729,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className={`rounded-[18px] border p-8 shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+            <div className={`rounded-[18px] border p-8 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Työtila nyt</p>
               <p className={`mt-4 text-2xl font-black leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{workspaceTabLabel}</p>
               <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -3738,7 +3738,7 @@ export default function Home() {
             </div>
           </section>
 
-          <div className={`mb-14 rounded-[20px] border p-5 shadow-xl sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+          <div className={`mb-16 rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
             <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
@@ -3776,7 +3776,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={`mt-7 flex flex-col gap-5 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
+            <div className={`mt-8 flex flex-col gap-6 border-t pt-7 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
               <div className="flex flex-wrap gap-4">
                 <button
                   type="button"
@@ -3810,8 +3810,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-12 xl:grid-cols-[minmax(380px,0.82fr)_minmax(0,1.18fr)] 2xl:grid-cols-[minmax(420px,0.8fr)_minmax(0,1.2fr)]">
-            <section className="space-y-10 sm:space-y-14">
+          <div className="grid grid-cols-1 items-start gap-16 xl:grid-cols-[minmax(380px,0.82fr)_minmax(0,1.18fr)] 2xl:grid-cols-[minmax(420px,0.8fr)_minmax(0,1.2fr)]">
+            <section className="space-y-14 sm:space-y-16">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -3859,7 +3859,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2 pt-6">
+                  <div className="grid grid-cols-1 gap-y-10 sm:gap-y-12 lg:gap-x-10 lg:gap-y-14 lg:grid-cols-2 pt-8">
                     <div className="space-y-4">
                        <label htmlFor="input-name" className={LabelClass(theme)}>Koko nimi</label>
                        <input
@@ -4203,9 +4203,9 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-12 scroll-mt-24 lg:sticky lg:top-6 lg:self-start">
-              <div className={`rounded-[20px] border p-6 shadow-xl sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <section id="studio-tulokset" className="space-y-14 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
+              <div className={`rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+                <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Rauhallinen työtila</p>
                     <h3 className={`mt-2 text-2xl sm:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -4245,11 +4245,11 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[20px] border p-7 shadow-2xl backdrop-blur-xl transition-all sm:p-12 ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`rounded-[20px] border p-7 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-12 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`sticky top-0 z-40 mb-16 flex snap-x gap-4 overflow-x-auto whitespace-nowrap border-b pb-7 pt-2 custom-scrollbar sm:gap-6 sm:pt-0 ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
+                  className={`z-40 mb-16 flex snap-x gap-4 overflow-x-auto whitespace-nowrap border-b pb-7 pt-2 custom-scrollbar lg:sticky lg:top-0 sm:gap-6 sm:pt-0 ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
@@ -4464,7 +4464,7 @@ export default function Home() {
                         )}
 
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
-                        <div className="rounded-[40px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-10 xl:p-12 shadow-[0_18px_60px_rgba(0,191,166,0.12)]">
+                        <div className="rounded-[20px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-6 sm:p-10 xl:p-12 shadow-[0_10px_24px_rgba(0,191,166,0.08)] sm:shadow-[0_18px_60px_rgba(0,191,166,0.12)]">
                           <div className={`mb-6 rounded-[18px] border p-4 sm:p-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/70'}`}>
                             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
                               Helpoin tapa muokata
@@ -4529,7 +4529,7 @@ export default function Home() {
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div id="cv-preview-panel" className={`rounded-[40px] border p-4 sm:p-8 overflow-x-auto shadow-2xl custom-scrollbar mt-12 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
+                        <div id="cv-preview-panel" className={`rounded-[20px] border p-4 sm:p-8 overflow-x-auto shadow-[0_12px_30px_rgba(0,0,0,0.12)] custom-scrollbar mt-12 sm:shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
                           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
@@ -5409,7 +5409,7 @@ export default function Home() {
                           />
 
                           {/* Tinder-napit */}
-                          <div className={`sticky bottom-20 sm:static flex gap-4 mt-6 rounded-[18px] border p-3 backdrop-blur-xl sm:border-0 sm:bg-transparent sm:p-0 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]/95' : 'border-gray-200 bg-white/95 shadow-[0_10px_30px_rgba(0,0,0,0.08)]'}`}>
+                        <div className={`sticky bottom-20 sm:static mt-8 flex gap-4 rounded-[18px] border p-4 sm:border-0 sm:bg-transparent sm:p-0 ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-white shadow-[0_10px_24px_rgba(0,0,0,0.06)]'}`}>
                             <button
                               onClick={handleSkipJob}
                               className="flex-1 py-6 rounded-[16px] border-2 border-red-500/50 bg-red-500/10 text-red-500 font-black text-xl hover:bg-red-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 shadow-xl"
