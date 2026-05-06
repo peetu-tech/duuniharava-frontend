@@ -745,10 +745,10 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-16 sm:mb-24 rounded-[20px] border p-8 sm:p-14 xl:p-16 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group mb-20 sm:mb-28 rounded-[20px] border p-10 sm:p-16 xl:p-20 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
-      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 sm:gap-10 border-b pb-8 sm:pb-11 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-10 sm:gap-12 border-b pb-10 sm:pb-14 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
         <div className="w-full sm:w-auto flex justify-between items-center">
           <div>
             <p className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
@@ -768,9 +768,9 @@ function SectionShell({
         </div>
       </summary>
 
-      <div className="mt-14 pb-3 animate-in fade-in duration-300">
+      <div className="mt-16 pb-6 animate-in fade-in duration-300">
         {description ? (
-          <p className={`mb-14 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`mb-16 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {description}
           </p>
         ) : null}
@@ -3451,7 +3451,7 @@ export default function Home() {
 
         {/* HEADER (Tietokone) */}
         <nav className={`sticky top-0 z-50 border-b transition-colors sm:backdrop-blur-xl ${theme === 'dark' ? 'bg-[#0F0F0F] sm:bg-[#0F0F0F]/80 border-white/10' : 'bg-white sm:bg-white/80 border-gray-200'}`}>
-          <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 xl:px-10 2xl:px-14 py-5 sm:py-5 flex justify-between items-center gap-6">
+          <div className="w-full max-w-[1720px] mx-auto px-6 sm:px-10 xl:px-16 2xl:px-24 py-5 sm:py-5 flex justify-between items-center gap-6">
             <div className="flex items-center gap-5">
               <span className="font-black text-2xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
               
@@ -3513,7 +3513,7 @@ export default function Home() {
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
           
-          <div className="relative mx-auto w-full max-w-[1920px] px-4 sm:px-8 xl:px-10 2xl:px-14 py-24 sm:py-24 lg:py-28">
+          <div className="relative mx-auto w-full max-w-[1720px] px-6 sm:px-10 xl:px-16 2xl:px-24 py-24 sm:py-24 lg:py-28">
             
             <div className="grid gap-14 sm:gap-16 lg:items-center">
               <div>
@@ -3634,7 +3634,7 @@ export default function Home() {
 
         {/* --- OHJE-OSIO --- */}
         {showHelp && (
-          <section id="help-section" className="mx-auto mt-14 w-full max-w-[1920px] animate-in fade-in slide-in-from-top-6 px-4 sm:px-8 xl:px-10 2xl:px-14" aria-labelledby="help-heading">
+          <section id="help-section" className="mx-auto mt-14 w-full max-w-[1720px] animate-in fade-in slide-in-from-top-6 px-6 sm:px-10 xl:px-16 2xl:px-24" aria-labelledby="help-heading">
             <div className="rounded-[20px] border-2 border-[#00BFA6]/30 bg-zinc-900 p-8 shadow-[0_12px_30px_rgba(0,0,0,0.16)] sm:p-14 sm:shadow-2xl sm:backdrop-blur-xl">
               <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
                 <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
@@ -3684,7 +3684,7 @@ export default function Home() {
           </section>
         )}
 
-        <div className="mx-auto w-full max-w-[1920px] px-4 py-[4.5rem] sm:px-8 sm:py-[5.5rem] xl:px-10 2xl:px-14 lg:py-24">
+        <div className="mx-auto w-full max-w-[1720px] px-6 py-[4.5rem] sm:px-10 sm:py-[5.5rem] xl:px-16 2xl:px-24 lg:py-24">
           <section className="mb-14 grid grid-cols-1 gap-8 sm:mb-16 xl:grid-cols-[minmax(0,1.08fr)_repeat(3,minmax(0,0.8fr))] 2xl:gap-9">
             <div className={`relative overflow-hidden rounded-[20px] border p-8 shadow-[0_12px_34px_rgba(0,0,0,0.12)] sm:p-10 sm:shadow-[0_28px_70px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.12),rgba(20,20,20,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
               <div className="absolute right-0 top-0 hidden h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl sm:block" aria-hidden="true" />
@@ -3810,8 +3810,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-20 xl:gap-24 xl:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.22fr)] 2xl:grid-cols-[minmax(400px,0.78fr)_minmax(0,1.22fr)]">
-            <section className="space-y-16 sm:space-y-20">
+          <div className="grid grid-cols-1 items-start gap-24 xl:gap-28 xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.28fr)] 2xl:grid-cols-[minmax(360px,0.74fr)_minmax(0,1.26fr)]">
+            <section className="space-y-20 sm:space-y-24">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -3831,7 +3831,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <form onSubmit={handleCvSubmit} className="mt-12 space-y-16 sm:space-y-20">
+                <form onSubmit={handleCvSubmit} className="mt-14 space-y-20 sm:space-y-24">
                   {mode === "improve" && (
                     <div>
                       <label htmlFor="cvFileUpload" className="mb-4 block text-sm font-bold text-gray-400">
@@ -3859,7 +3859,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-y-12 sm:gap-y-14 lg:gap-x-12 lg:gap-y-16 lg:grid-cols-2 pt-10">
+                  <div className="grid grid-cols-1 gap-y-14 sm:gap-y-16 lg:gap-x-14 lg:gap-y-20 lg:grid-cols-2 pt-12">
                     <div className="space-y-6">
                        <label htmlFor="input-name" className={LabelClass(theme)}>Koko nimi</label>
                        <input
@@ -3902,7 +3902,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="pt-4 sm:pt-6">
+                  <div className="pt-8 sm:pt-10">
                     <div className="flex justify-between items-end mb-3">
                       <label htmlFor="input-targetJob" className={LabelClass(theme)}>Tavoiteltu rooli / ammatti</label>
                     </div>
@@ -3914,7 +3914,7 @@ export default function Home() {
                       className={InputClass(theme)}
                       aria-describedby="targetJob-hint"
                     />
-                    <p id="targetJob-hint" className="mt-3 ml-1 inline-flex rounded-full border border-[#00BFA6]/30 bg-[#00BFA6]/8 px-3 py-1.5 text-[11px] font-bold text-[#00BFA6]">
+                    <p id="targetJob-hint" className="mt-4 ml-1 inline-flex rounded-full border border-[#00BFA6]/30 bg-[#00BFA6]/8 px-3 py-1.5 text-[11px] font-bold text-[#00BFA6]">
                       Profiiliteksti rakentuu tämän perusteella
                     </p>
                     <FieldHint theme={theme}>
@@ -3922,7 +3922,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  <div className="pt-4 sm:pt-6">
+                  <div className="pt-8 sm:pt-10">
                     <label htmlFor="input-education" className={LabelClass(theme)}>Koulutus</label>
                     <textarea
                       id="input-education"
@@ -4060,7 +4060,7 @@ export default function Home() {
                 theme={theme}
                 defaultOpen={!isMobileViewport}
               >
-                <div className="mt-14 space-y-14 sm:space-y-16">
+                <div className="mt-16 space-y-16 sm:space-y-20">
                   <div className={`rounded-[18px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-gray-50'}`}>
                     <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
                       Helppo tapa aloittaa
@@ -4101,7 +4101,7 @@ export default function Home() {
                      </FieldHint>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-y-12 sm:gap-y-14 lg:gap-x-14 lg:gap-y-16 lg:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-y-14 sm:gap-y-16 lg:gap-x-16 lg:gap-y-20 lg:grid-cols-2">
                     <div className="space-y-8">
                       <label htmlFor="search-workType" className={LabelClass(theme)}>Kokoaikainen vai Osa-aikainen?</label>
                       <input
@@ -4184,7 +4184,7 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="pt-6 sm:pt-8">
+                  <div className="pt-10 sm:pt-12">
                     <button
                       type="button"
                       onClick={suggestJobs}
@@ -4203,7 +4203,7 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-16 sm:space-y-20 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
+            <section id="studio-tulokset" className="space-y-20 sm:space-y-24 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
               <div className={`rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
@@ -5013,7 +5013,7 @@ export default function Home() {
 
                 {/* --- TYÖPAIKAT TAB (TINDER-MALLI) --- */}
                 {tab === "jobs" && (
-                  <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-12 animate-in fade-in duration-500 pb-28 sm:pb-0">
+                  <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-14 animate-in fade-in duration-500 pb-28 sm:space-y-16 sm:pb-0">
                     <div className={`rounded-[20px] sm:rounded-[16px] border p-6 sm:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-3xl">
@@ -5059,8 +5059,8 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className={`rounded-[20px] border p-7 sm:p-10 space-y-12 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
-                      <div className="space-y-4">
+                    <div className={`rounded-[20px] border p-8 sm:p-12 space-y-14 ${theme === 'dark' ? 'border-white/10 bg-white/[0.02]' : 'border-gray-200 bg-white'}`}>
+                      <div className="space-y-6">
                         <div className="flex items-center justify-between gap-4 border-b pb-5">
                           <h3 className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                             Lisää oma työpaikka seurantaan
@@ -5081,7 +5081,7 @@ export default function Home() {
 
                       {(!isMobileViewport || showManualJobForm) && (
                       <>
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                          <label htmlFor="job-title" className={LabelClass(theme)}>Otsikko</label>
                          <input
                            id="job-title"
@@ -5092,8 +5092,8 @@ export default function Home() {
                          />
                       </div>
 
-                      <div className="grid grid-cols-1 gap-y-8 sm:gap-y-9 lg:gap-x-8 lg:gap-y-10 lg:grid-cols-2">
-                        <div className="space-y-4">
+                      <div className="grid grid-cols-1 gap-y-10 sm:gap-y-12 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
+                        <div className="space-y-6">
                            <label htmlFor="job-company" className={LabelClass(theme)}>Yritys</label>
                            <input
                              id="job-company"
@@ -5105,7 +5105,7 @@ export default function Home() {
                              className={InputClass(theme)}
                            />
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                            <label htmlFor="job-location" className={LabelClass(theme)}>Sijainti</label>
                            <input
                              id="job-location"
