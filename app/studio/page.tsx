@@ -3960,13 +3960,13 @@ export default function Home() {
                       <span>Lisää tietoja CV:hen</span>
                       <span className="text-[#00BFA6]">{showMoreCvFields ? "Piilota" : "Avaa"}</span>
                     </button>
-                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`mt-4 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                       Projektit, kielet, taidot, kortit ja profiilikuva.
                     </p>
 
                     {showMoreCvFields && (
-                      <div className="mt-6 space-y-8">
-                        <div className="pt-1">
+                      <div className="mt-10 space-y-12 sm:space-y-14">
+                        <div className="pt-2">
                           <label htmlFor="input-projects" className={LabelClass(theme)}>Projektit & Portfoliolinkit <span className="text-[#00BFA6] font-normal lowercase">(Vapaaehtoinen)</span></label>
                           <textarea
                             id="input-projects"
@@ -3980,9 +3980,9 @@ export default function Home() {
                           </FieldHint>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-y-8 sm:gap-y-10 lg:gap-x-10 lg:gap-y-12 lg:grid-cols-2">
-                          <div className="space-y-4">
-                            <div className="flex justify-between items-end mb-3">
+                        <div className="grid grid-cols-1 gap-y-10 sm:gap-y-12 lg:gap-x-12 lg:gap-y-14 lg:grid-cols-2">
+                          <div className="space-y-6">
+                            <div className="mb-4 flex justify-between items-end">
                               <label htmlFor="input-languages" className={LabelClass(theme)}>Kielitaito</label>
                             </div>
                             <textarea
@@ -3996,8 +3996,8 @@ export default function Home() {
                               Kirjoita kieli ja taso mahdollisimman selkeästi, esimerkiksi sujuva, hyvä tai perusteet.
                             </FieldHint>
                           </div>
-                          <div className="space-y-4">
-                            <div className="flex justify-between items-end mb-3">
+                          <div className="space-y-6">
+                            <div className="mb-4 flex justify-between items-end">
                               <label htmlFor="input-skills" className={LabelClass(theme)}>Osaaminen & Taidot</label>
                               <button 
                                 type="button" 
@@ -4020,7 +4020,7 @@ export default function Home() {
                           </div>
                         </div>
 
-                        <div className="pt-1">
+                        <div className="pt-2">
                           <label htmlFor="input-cards" className={LabelClass(theme)}>Kortit & Pätevyydet</label>
                           <textarea
                             id="input-cards"
@@ -4034,7 +4034,7 @@ export default function Home() {
                           </FieldHint>
                         </div>
 
-                        <div className="pt-1">
+                        <div className="pt-3">
                           <ProfileImageUpload image={profileImage} onChange={setProfileImage} />
                         </div>
                       </div>
@@ -4044,7 +4044,7 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={loadingCv}
-                    className="w-full bg-[#00BFA6] text-black font-black py-6 rounded-[16px] text-2xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)] mt-8 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                    className="mt-12 w-full bg-[#00BFA6] text-black font-black py-6 rounded-[16px] text-2xl hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_15px_40px_-10px_rgba(0,191,166,0.6)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                     aria-live="polite"
                   >
                     {loadingCv ? "Tekoäly rakentaa CV:tä..." : "1. GENEROI CV"}
@@ -5194,7 +5194,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                          <label htmlFor="job-summary" className={LabelClass(theme)}>Lyhyt kuvaus / muistiinpanot</label>
                          <textarea
                            id="job-summary"
@@ -5208,7 +5208,7 @@ export default function Home() {
                          </FieldHint>
                       </div>
 
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                          <label htmlFor="job-adText" className={LabelClass(theme)}>Kopioi ilmoitusteksti (Tärkeä tekoälylle)</label>
                          <textarea
                            id="job-adText"
@@ -5225,7 +5225,7 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={addJob}
-                        className="mt-6 w-full rounded-[14px] bg-[#00BFA6] px-8 py-6 text-lg sm:text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
+                        className="mt-10 w-full rounded-[14px] bg-[#00BFA6] px-8 py-6 text-lg sm:text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6]"
                       >
                         + TALLENNA SEURANTAAN
                       </button>
@@ -5233,8 +5233,8 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div id="jobs-list-start" className={`space-y-12 pt-14 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
-                      <div className="mb-4 flex flex-col justify-between gap-7 sm:flex-row sm:items-center">
+                    <div id="jobs-list-start" className={`space-y-14 pt-16 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                      <div className="mb-6 flex flex-col justify-between gap-8 sm:mb-8 sm:flex-row sm:items-center">
                         <h3 className={`text-3xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Omat työpaikat
                         </h3>
@@ -5293,7 +5293,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className="mb-6 sm:hidden">
+                      <div className="mb-8 sm:hidden">
                         <button
                           type="button"
                           onClick={() => setShowJobFilters((prev) => !prev)}
@@ -5305,7 +5305,7 @@ export default function Home() {
                       </div>
 
                       {(!isMobileViewport || showJobFilters) && (
-                      <div className="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6">
+                      <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 xl:gap-8">
                         <select
                           aria-label="Suodata statuksen mukaan"
                           value={jobStatusFilter}
@@ -5378,7 +5378,7 @@ export default function Home() {
 
                       {/* --- TINDER NÄKYMÄ --- */}
                       {filteredJobs.length === 0 ? (
-                        <div className={`mt-4 rounded-[20px] border-2 border-dashed p-12 text-center font-medium sm:p-20 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
+                        <div className={`mt-8 rounded-[20px] border-2 border-dashed p-14 text-center font-medium sm:mt-10 sm:p-24 ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`}>
                           <p className={`mb-3 text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei tuloksia</p>
                           <p className="mx-auto max-w-2xl text-base leading-8">Sinulla ei ole vielä yhtään työpaikkaa tai suodattimet piilottavat ne.</p>
                         </div>
