@@ -208,9 +208,29 @@ export default function ExtraToolsPage() {
     { id: "salary-negotiation", icon: "🤝", title: "Palkka", summary: "Vastatarjous helposti", activeClass: "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)] border-[#00BFA6]" },
   ];
 
+  const activeToolMeta = tools.find((tool) => tool.id === activeTab) ?? tools[0];
+  const completedDraftCount = [
+    linkedInResult.about || linkedInResult.post ? 1 : 0,
+    hhResult ? 1 : 0,
+    hiddenJobResult ? 1 : 0,
+    callScriptResult ? 1 : 0,
+    pivotResult ? 1 : 0,
+    redFlagResult ? 1 : 0,
+    refResult ? 1 : 0,
+    salaryResult ? 1 : 0,
+  ].reduce((sum, value) => sum + value, 0);
+
   return (
     <div className={theme === 'light' ? 'light-theme' : ''}>
       <style dangerouslySetInnerHTML={{__html: `
+        @keyframes softFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes softPulse {
+          0%, 100% { box-shadow: 0 0 0 rgba(0,191,166,0); }
+          50% { box-shadow: 0 0 30px rgba(0,191,166,0.12); }
+        }
         .light-theme .bg-\\[\\#0F0F0F\\] { background-color: #F9FAFB !important; }
         .light-theme .bg-\\[\\#141414\\] { background-color: #FFFFFF !important; }
         .light-theme .bg-black\\/50 { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; }
@@ -218,8 +238,10 @@ export default function ExtraToolsPage() {
         .light-theme .text-gray-400 { color: #6B7280 !important; }
         .light-theme .border-white\\/10 { border-color: #E5E7EB !important; }
         .light-theme .border-white\\/5 { border-color: #F3F4F6 !important; }
+        .soft-float { animation: softFloat 6s ease-in-out infinite; }
+        .soft-pulse { animation: softPulse 4s ease-in-out infinite; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white font-sans pb-32 sm:pb-24 transition-colors duration-300">
+      <main className="min-h-screen overflow-hidden bg-[#0F0F0F] text-white font-sans pb-32 sm:pb-24 transition-colors duration-300">
         
         {/* MOBIILIN PIKANAVIGOINTI */}
         <nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-center gap-2 rounded-[28px] border p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_18px_50px_rgba(0,0,0,0.35)] sm:hidden backdrop-blur-2xl transition-colors ${theme === 'dark' ? 'bg-[#0A0A0A]/92 border-white/10' : 'bg-white/92 border-gray-200 shadow-[0_18px_40px_rgba(0,0,0,0.12)]'}`} aria-label="Mobiilin pikavalikko">
@@ -233,68 +255,87 @@ export default function ExtraToolsPage() {
 
         {/* HERO */}
         <section className="border-b border-white/10 bg-gradient-to-b from-purple-900/20 to-transparent pt-16 pb-14 sm:pt-12 sm:pb-16 px-4 sm:px-8">
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+          <div className="max-w-[1920px] mx-auto flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 xl:gap-12">
             <div>
               <div className="flex items-center gap-4 mb-4">
                 <span className="font-black text-2xl sm:text-3xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
                 <div className="bg-purple-500/20 border border-purple-500/30 px-3 py-1 rounded-full text-[10px] font-bold text-purple-400 uppercase tracking-widest">Automaatio</div>
               </div>
               <p className="text-[11px] sm:text-xs font-black uppercase tracking-[0.24em] text-purple-400">Lisätyökalut</p>
-              <h1 className="mt-3 text-3xl sm:text-5xl font-black">Anna tekoälyn <span className="text-purple-500">tehdä työt.</span></h1>
-              <p className={`mt-4 text-sm sm:text-lg max-w-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              <h1 className="mt-3 max-w-4xl text-4xl sm:text-6xl xl:text-7xl font-black leading-[0.96] tracking-tight">Anna tekoälyn <span className="text-purple-500">tehdä työt.</span></h1>
+              <p className={`mt-5 text-base sm:text-xl max-w-2xl leading-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                 Älä keksi pyörää uudelleen. Valitse työkalu alta, kerro tärkeimmät tiedot ja anna Duuniharavan rakentaa sinulle valmis luonnos sekunneissa.
               </p>
             </div>
             
-            <div className="flex gap-4 w-full sm:w-auto">
-              <button onClick={() => router.push('/studio')} className="flex-1 sm:flex-none rounded-2xl border border-white/10 px-6 py-4 sm:py-3 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all text-center">
+            <div className="flex gap-4 w-full xl:w-auto xl:min-w-[360px]">
+              <button onClick={() => router.push('/studio')} className="flex-1 sm:flex-none rounded-2xl border border-white/10 px-6 py-4 sm:py-4 text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all text-center hover:-translate-y-1">
                 ← TAKAISIN STUDIOON
               </button>
-              <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-2xl border border-white/10 px-6 py-4 sm:py-3 text-lg sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center">
+              <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-2xl border border-white/10 px-6 py-4 sm:py-4 text-lg sm:text-sm font-black text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center hover:-translate-y-1">
                 {theme === 'light' ? '🌙' : '☀️'}
               </button>
             </div>
           </div>
         </section>
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-8 sm:mt-12">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8 sm:mb-12">
-            <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-10 2xl:px-14 mt-8 sm:mt-12">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 xl:gap-8 mb-10 sm:mb-14">
+            <div className={`rounded-[32px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">1. Valitse työkalu</p>
               <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Aloita siitä kohdasta, jossa olet juuri nyt jumissa. Jokainen työkalu ratkaisee yhden selkeän tilanteen.</p>
             </div>
-            <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
+            <div className={`rounded-[32px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">2. Kerro vain tärkein</p>
               <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Et tarvitse täydellistä briiffiä. Riittää, että täytät yhden tai kaksi tärkeintä tietoa kunnolla.</p>
             </div>
-            <div className={`rounded-[28px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
+            <div className={`rounded-[32px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white'}`}>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00BFA6]">3. Kopioi ja jatka</p>
               <p className={`mt-3 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Kun luonnos näyttää hyvältä, kopioi se talteen ja jatka suoraan studioon tai alkuperäiseen palveluun.</p>
             </div>
           </div>
 
           {/* TABS - "App Icon" Grid Layout */}
-          <div ref={tabsRef} className="grid grid-cols-2 min-[500px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4 mb-8 sm:mb-14">
+          <div ref={tabsRef} className="grid grid-cols-2 min-[560px]:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-8 gap-4 sm:gap-5 xl:gap-6 mb-10 sm:mb-16">
             {tools.map(tool => (
               <button 
                 key={tool.id}
                 onClick={(e) => handleTabClick(tool.id as ToolTab, e)} 
-                className={`flex flex-col items-center justify-center text-center rounded-2xl sm:rounded-[24px] p-3 sm:p-5 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-purple-500 ${
+                className={`flex min-h-[132px] sm:min-h-[150px] flex-col items-center justify-center text-center rounded-[28px] sm:rounded-[30px] p-4 sm:p-6 transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-purple-500 ${
                   activeTab === tool.id 
                     ? tool.activeClass 
-                    : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:-translate-y-1' : 'border border-gray-200 bg-white shadow-sm text-gray-600 hover:bg-gray-50 hover:-translate-y-1')
+                    : (theme === 'dark' ? 'border border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:-translate-y-2 hover:border-white/20' : 'border border-gray-200 bg-white shadow-sm text-gray-600 hover:bg-gray-50 hover:-translate-y-2')
                 }`}
               >
-                <span className="text-2xl sm:text-4xl mb-1 sm:mb-3 block transition-transform hover:scale-110" aria-hidden="true">{tool.icon}</span>
-                <span className="text-[9px] sm:text-xs font-black uppercase tracking-wider leading-tight">{tool.title}</span>
-                <span className={`mt-2 hidden sm:block text-[11px] leading-4 ${activeTab === tool.id ? 'text-white/80' : (theme === 'dark' ? 'text-gray-500' : 'text-gray-500')}`}>
+                <span className="text-3xl sm:text-5xl mb-2 sm:mb-4 block transition-transform duration-300 hover:scale-110" aria-hidden="true">{tool.icon}</span>
+                <span className="text-[10px] sm:text-sm font-black uppercase tracking-[0.18em] leading-tight">{tool.title}</span>
+                <span className={`mt-3 text-[11px] sm:text-xs leading-5 ${activeTab === tool.id ? 'text-white/80' : (theme === 'dark' ? 'text-gray-500' : 'text-gray-500')}`}>
                   {tool.summary}
                 </span>
               </button>
             ))}
           </div>
 
-          <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 shadow-2xl backdrop-blur-xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+
+          <div className={`mb-6 rounded-[32px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/95'}`}>
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+              <div className="max-w-3xl">
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Helppo eteneminen</p>
+                <h2 className={`mt-2 text-2xl sm:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  {activeToolMeta.title}: ensin sy�te vasemmalle, valmis luonnos oikealle
+                </h2>
+                <p className={`mt-3 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  T�m� n�kym� on nyt tarkoituksella selke�mpi: yksi ty�kalu kerrallaan, enemm�n ilmaa elementtien v�liin ja huomio olennaiseen.
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 lg:w-[360px]">
+                <div className={`rounded-2xl border px-4 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}><p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">1</p><p className={`mt-2 text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Valitse</p></div>
+                <div className={`rounded-2xl border px-4 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}><p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">2</p><p className={`mt-2 text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Sy�t�</p></div>
+                <div className={`rounded-2xl border px-4 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}><p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">3</p><p className={`mt-2 text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Kopioi</p></div>
+              </div>
+            </div>
+          </div>
+          <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 xl:p-14 shadow-2xl backdrop-blur-xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
             
             {/* LINKEDIN MAGNEETTI */}
             {activeTab === "linkedin-magnet" && (
@@ -629,4 +670,6 @@ export default function ExtraToolsPage() {
     </div>
   );
 }
+
+
 
