@@ -313,7 +313,7 @@ export default function ExtraToolsPage() {
               </div>
             </div>
           </div>
-          <div className={ounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 xl:p-14 shadow-2xl backdrop-blur-xl }>
+          <div className={`rounded-[32px] sm:rounded-[40px] border p-6 sm:p-12 xl:p-14 shadow-2xl backdrop-blur-xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
             
             {/* LINKEDIN MAGNEETTI */}
             {activeTab === "linkedin-magnet" && (
@@ -648,5 +648,6 @@ export default function ExtraToolsPage() {
     </div>
   );
 }
+
 
 
