@@ -3456,6 +3456,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-5 sm:w-auto sm:flex-row sm:gap-3">
               
               {/* UUSI: PRO-nappi työpöydälle */}
+              <div aria-hidden="true" className="h-10 sm:h-14 xl:h-20" />
               {!isPro && (
                 <button 
                   onClick={() => setShowPaywall(true)} 
@@ -4234,7 +4235,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`mt-16 sm:mt-24 xl:mt-28 rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
+              <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
@@ -4321,7 +4322,9 @@ export default function Home() {
                         </p>
                       </div>
 
-                      <div className="mt-6 grid grid-cols-1 gap-3 sm:hidden">
+                      <div aria-hidden="true" className="h-6 sm:h-8 xl:h-10" />
+
+                      <div className="grid grid-cols-1 gap-3 sm:hidden">
                         <button
                           type="button"
                           onClick={() => document.getElementById("cv-text-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })}
