@@ -4192,7 +4192,7 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-24 sm:space-y-32 scroll-mt-24 xl:sticky xl:top-6 xl:self-start xl:pl-8 2xl:pl-10">
+            <section id="studio-tulokset" className="space-y-24 sm:space-y-36 scroll-mt-24 xl:sticky xl:top-6 xl:self-start xl:pl-8 2xl:pl-10">
               <div className="space-y-16">
               <div className={`rounded-[24px] border p-7 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-8 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
@@ -4235,7 +4235,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div aria-hidden="true" className="h-20 sm:h-24 xl:h-28" />
+              <div aria-hidden="true" className="h-24 sm:h-32 xl:h-40" />
 
               <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
@@ -4324,7 +4324,7 @@ export default function Home() {
                         </p>
                       </div>
 
-                      <div aria-hidden="true" className="h-12 sm:h-14 xl:h-16" />
+                      <div aria-hidden="true" className="h-16 sm:h-20 xl:h-24" />
 
                       <div className="grid grid-cols-1 gap-3 sm:hidden">
                         <button
@@ -4466,6 +4466,8 @@ export default function Home() {
                           </div>
                         )}
 
+                        <div aria-hidden="true" className="h-8 sm:h-12 xl:h-16" />
+
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
                         {!showCvEditorPanel && (
                           <div className={`rounded-[24px] border p-6 sm:p-8 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}>
@@ -4552,6 +4554,8 @@ export default function Home() {
                           />
                         </div>
                         )}
+
+                        <div aria-hidden="true" className="h-10 sm:h-14 xl:h-20" />
 
                         {/* CV PREVIEW */}
                         {!showCvPreviewPanel && (
@@ -4640,7 +4644,9 @@ export default function Home() {
                         )}
 
                         {/* --- CANVA TASON EDITOR --- */}
-                        <div className={`rounded-[26px] border p-7 md:p-11 mt-18 sm:mt-24 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
+                        <div aria-hidden="true" className="h-12 sm:h-16 xl:h-24" />
+
+                        <div className={`rounded-[26px] border p-7 md:p-11 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
                           <div className={`flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
                             <div className="max-w-2xl">
                               <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Värit ja teema</p>
@@ -4668,7 +4674,7 @@ export default function Home() {
 
                           {(!isMobileViewport || showStyleStudio) && (
                             <>
-                          <div className={`mb-10 mt-8 grid grid-cols-1 gap-4 rounded-[18px] border p-5 sm:grid-cols-3 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/80'}`}>
+                          <div className={`mb-12 mt-10 grid grid-cols-1 gap-4 rounded-[18px] border p-5 sm:grid-cols-3 sm:p-6 2xl:grid-cols-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/80'}`}>
                             <button type="button" onClick={() => applyQuickStyleMood("professional")} className={`rounded-[14px] border px-5 py-4 text-sm font-bold text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'}`}>
                               <span className="block text-xs uppercase tracking-[0.18em] text-[#00BFA6]">Pikamuokkaus</span>
                               <span className="mt-2 block text-base font-black">Virallisempi</span>
@@ -4695,7 +4701,7 @@ export default function Home() {
                                 </p>
                               </div>
                             </div>
-                            <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+                            <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3 2xl:grid-cols-4">
                               {premiumStylePresets.map((preset) => (
                                 <button
                                   key={preset.id}
@@ -4725,7 +4731,7 @@ export default function Home() {
                               </div>
                             </div>
                             {savedStylePresets.length ? (
-                              <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
+                              <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-3">
                                 {savedStylePresets.map((preset) => (
                                   <div key={preset.id} className={`rounded-[14px] border p-4 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white'}`}>
                                     <div className="flex items-start justify-between gap-3">
@@ -4794,7 +4800,7 @@ export default function Home() {
                             {/* TYPOGRAFIA & ASETTELU */}
                             <div>
                               <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Asettelu & Typografia</h4>
-                              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                                 <div>
                                   <label htmlFor="style-layout" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Asettelu (Layout)</label>
                                   <select id="style-layout" value={customStyle.layout || "left-sidebar"} onChange={(e) => updateCustomStyle("layout", e.target.value as any)} className={`w-full rounded-[14px] border px-5 py-4 text-sm font-bold outline-none cursor-pointer focus-visible:ring-2 focus-visible:ring-[#00BFA6] ${theme === 'dark' ? 'bg-[#141414] border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'}`}>
@@ -4981,7 +4987,7 @@ export default function Home() {
                             {/* MITAT & VÄLIT */}
                             <div>
                               <h4 className={`font-bold text-xs uppercase tracking-widest mb-5 border-b pb-3 ${theme === 'dark' ? 'text-[#00BFA6] border-white/10' : 'text-[#00BFA6] border-gray-200'}`}>Mitat & Välit</h4>
-                              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                                 <div>
                                   <label htmlFor="range-headingSize" className={`mb-3 block text-sm font-bold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>Otsikoiden koko ({customStyle.headingSize || 16}px)</label>
                                   <input id="range-headingSize" type="range" min={12} max={32} value={customStyle.headingSize || 16} onChange={(e) => updateCustomStyle("headingSize", Number(e.target.value))} className="w-full accent-[#00BFA6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]" />
