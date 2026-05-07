@@ -5044,16 +5044,39 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className={`rounded-[28px] border p-8 sm:p-12 space-y-10 sm:space-y-12 ${theme === 'dark' ? 'border-white/10 bg-[#171717]' : 'border-gray-200 bg-white'}`}>
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between gap-4 border-b pb-5">
+                    {!showManualJobForm && (
+                      <div className={`rounded-[24px] border p-6 sm:p-8 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}>
+                        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                          <div className="max-w-2xl">
+                            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Lisätoiminto</p>
+                            <h3 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              Oma lisäyslomake on piilotettu, jotta työtila hengittää paremmin
+                            </h3>
+                            <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                              Avaa tämä vain silloin, kun haluat tallentaa yhden oman työpaikan käsin. Muulloin voit keskittyä ehdotuksiin ja listaan.
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowManualJobForm(true)}
+                            className="rounded-[14px] bg-[#00BFA6] px-6 py-4 text-sm font-black text-black transition-transform hover:scale-[1.02]"
+                          >
+                            Avaa lisäyslomake
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className={`${showManualJobForm ? 'block' : 'hidden'} rounded-[28px] border p-8 sm:p-12 ${theme === 'dark' ? 'border-white/10 bg-[#171717]' : 'border-gray-200 bg-white'}`}>
+                      <div className={`${showManualJobForm ? 'space-y-6' : 'space-y-5'}`}>
+                        <div className={`flex items-center justify-between gap-4 ${showManualJobForm ? 'border-b pb-5' : ''}`}>
                           <h3 className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                             Lisää oma työpaikka seurantaan
                           </h3>
                           <button
                             type="button"
                             onClick={() => setShowManualJobForm((prev) => !prev)}
-                            className={`sm:hidden rounded-full border px-4 py-2 text-xs font-black ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-700'}`}
+                            className={`rounded-full border px-4 py-2 text-xs font-black ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-gray-50 text-gray-700'}`}
                             aria-expanded={showManualJobForm}
                           >
                             {showManualJobForm ? "Piilota" : "Avaa"}
@@ -5064,7 +5087,7 @@ export default function Home() {
                         </p>
                       </div>
 
-                      {(!isMobileViewport || showManualJobForm) && (
+                      {showManualJobForm && (
                       <>
                       <div className="space-y-6">
                          <label htmlFor="job-title" className={LabelClass(theme)}>Otsikko</label>
