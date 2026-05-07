@@ -4234,7 +4234,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
+              <div className={`mt-16 sm:mt-24 xl:mt-28 rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
@@ -4316,17 +4316,9 @@ export default function Home() {
                             Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisätyökalut vasta kun niitä oikeasti tarvitset.
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:max-w-3xl">
-                          <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
-                            1. Generoi CV
-                          </div>
-                          <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
-                            2. Muokkaa tekstiä
-                          </div>
-                          <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
-                            3. Lataa valmis tiedosto
-                          </div>
-                        </div>
+                        <p className={`max-w-2xl rounded-[16px] border px-5 py-4 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-300' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
+                          Etene tässä rauhassa: avaa tekstieditori vasta kun haluat muokata, avaa esikatselu vasta kun haluat tarkistaa lopputuloksen.
+                        </p>
                       </div>
 
                       <div className="mt-6 grid grid-cols-1 gap-3 sm:hidden">
