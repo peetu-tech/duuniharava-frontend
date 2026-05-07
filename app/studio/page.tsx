@@ -4229,7 +4229,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[20px] border p-12 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-18 xl:p-24 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`rounded-[20px] border p-12 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-20 xl:p-24 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
