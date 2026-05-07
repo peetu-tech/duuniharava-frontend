@@ -4229,11 +4229,11 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`overflow-hidden rounded-[24px] border p-4 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-6 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+              <div className={`rounded-[28px] border p-3 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-5 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`z-40 mb-10 flex snap-x gap-4 overflow-x-auto whitespace-nowrap rounded-[18px] border px-3 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-12 sm:gap-6 sm:px-4 sm:py-4 ${theme === 'dark' ? 'bg-[#171717] border-white/8' : 'bg-white border-gray-200'}`}
+                  className={`z-40 mb-8 flex snap-x gap-4 overflow-x-auto whitespace-nowrap rounded-[22px] border px-4 py-4 custom-scrollbar lg:sticky lg:top-0 sm:mb-10 sm:gap-6 sm:px-5 sm:py-5 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
@@ -4299,8 +4299,8 @@ export default function Home() {
                 </div>
 
                 {tab === "cv" && (
-                  <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-16 overflow-hidden px-2 animate-in fade-in duration-500 sm:px-3 xl:px-4">
-                    <div className={`rounded-[24px] sm:rounded-[22px] border p-7 sm:p-10 lg:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                  <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-10 overflow-hidden px-1 animate-in fade-in duration-500 sm:space-y-12 sm:px-1 xl:space-y-14">
+                    <div className={`rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.09),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-3xl">
                           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">CV-työtila</p>
@@ -4371,7 +4371,7 @@ export default function Home() {
                     )}
 
                     {activeJobCvVariants.length > 0 && (
-                      <div className={`rounded-[18px] border p-6 sm:p-8 ${theme === 'dark' ? 'bg-white/[0.03] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                      <div className={`rounded-[22px] border p-7 sm:p-9 ${theme === 'dark' ? 'bg-[#151515] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
                         <h3 className={`mb-5 text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Tallennetut CV-versiot
                         </h3>
@@ -4401,7 +4401,7 @@ export default function Home() {
                     {cvResult ? (
                       <>
                         {(parsedCv.score || parsedCv.report.length > 0) && (
-                          <div className={`rounded-[22px] border p-6 sm:p-8 ${theme === 'dark' ? 'border-white/10 bg-[#181818]' : 'border-gray-200 bg-white'}`}>
+                          <div className={`rounded-[24px] border p-7 sm:p-9 ${theme === 'dark' ? 'border-white/10 bg-[#161616]' : 'border-gray-200 bg-white'}`}>
                             <button
                               type="button"
                               onClick={() => setShowCvAnalysis((prev) => !prev)}
@@ -4448,8 +4448,8 @@ export default function Home() {
                         )}
 
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
-                        <div className="rounded-[24px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-7 sm:p-10 xl:p-12 shadow-[0_10px_24px_rgba(0,191,166,0.08)] sm:shadow-[0_18px_60px_rgba(0,191,166,0.12)]">
-                          <div className={`mb-6 rounded-[18px] border p-4 sm:p-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/70'}`}>
+                        <div className="rounded-[28px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-8 sm:p-11 xl:p-14 shadow-[0_10px_24px_rgba(0,191,166,0.08)] sm:shadow-[0_18px_60px_rgba(0,191,166,0.12)]">
+                          <div className={`mb-8 rounded-[20px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/70'}`}>
                             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
                               Helpoin tapa muokata
                             </p>
@@ -4513,7 +4513,7 @@ export default function Home() {
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div id="cv-preview-panel" className={`rounded-[24px] border p-5 sm:p-9 overflow-x-auto shadow-[0_12px_30px_rgba(0,0,0,0.12)] custom-scrollbar mt-14 sm:shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-white'}`} role="region" aria-label="CV Esikatselu">
+                        <div id="cv-preview-panel" className={`rounded-[28px] border p-6 sm:p-10 overflow-x-auto shadow-[0_12px_30px_rgba(0,0,0,0.12)] custom-scrollbar mt-16 sm:mt-20 sm:shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-white'}`} role="region" aria-label="CV Esikatselu">
                           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
@@ -4575,7 +4575,7 @@ export default function Home() {
                         </div>
 
                         {/* --- CANVA TASON EDITOR --- */}
-                        <div className={`rounded-[20px] border p-6 md:p-10 mt-16 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
+                        <div className={`rounded-[26px] border p-7 md:p-11 mt-18 sm:mt-24 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
                           <div className={`flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
                             <div className="max-w-2xl">
                               <p className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Värit ja teema</p>
@@ -4997,8 +4997,8 @@ export default function Home() {
 
                 {/* --- TYÖPAIKAT TAB (TINDER-MALLI) --- */}
                 {tab === "jobs" && (
-                  <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-16 px-2 animate-in fade-in duration-500 pb-28 sm:space-y-18 sm:px-3 sm:pb-0 xl:px-4">
-                    <div className={`rounded-[24px] sm:rounded-[22px] border p-7 sm:p-10 lg:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                  <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 px-1 animate-in fade-in duration-500 pb-28 sm:space-y-12 sm:px-1 sm:pb-0 xl:space-y-14">
+                    <div className={`rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.09),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-3xl">
                           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Työpaikka-työtila</p>
@@ -5043,7 +5043,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className={`rounded-[24px] border p-8 sm:p-12 space-y-16 ${theme === 'dark' ? 'border-white/10 bg-[#171717]' : 'border-gray-200 bg-white'}`}>
+                    <div className={`rounded-[28px] border p-8 sm:p-12 space-y-10 sm:space-y-12 ${theme === 'dark' ? 'border-white/10 bg-[#171717]' : 'border-gray-200 bg-white'}`}>
                       <div className="space-y-6">
                         <div className="flex items-center justify-between gap-4 border-b pb-5">
                           <h3 className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -5217,7 +5217,7 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div id="jobs-list-start" className={`space-y-16 pt-20 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                    <div id="jobs-list-start" className={`space-y-16 pt-16 sm:pt-20 border-t ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
                       <div className="mb-6 flex flex-col justify-between gap-8 sm:mb-8 sm:flex-row sm:items-center">
                         <h3 className={`text-3xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                           Omat työpaikat
