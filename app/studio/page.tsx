@@ -3794,8 +3794,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-28 xl:gap-16 xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.28fr)] 2xl:grid-cols-[minmax(360px,0.74fr)_minmax(0,1.26fr)]">
-            <section className="flex flex-col gap-28 sm:gap-36">
+          <div className="grid grid-cols-1 items-start gap-28 xl:gap-24 2xl:gap-28 xl:grid-cols-[minmax(320px,0.68fr)_minmax(0,1.32fr)] 2xl:grid-cols-[minmax(360px,0.7fr)_minmax(0,1.3fr)]">
+            <section className="flex flex-col gap-28 sm:gap-36 xl:pr-4 2xl:pr-6">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4187,7 +4187,8 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-24 sm:space-y-32 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
+            <section id="studio-tulokset" className="space-y-24 sm:space-y-32 scroll-mt-24 xl:sticky xl:top-6 xl:self-start xl:pl-8 2xl:pl-12">
+              <div className={`space-y-14 rounded-[34px] border p-5 sm:p-7 xl:p-8 shadow-[0_24px_80px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-white/6 bg-[#111111]/72' : 'border-gray-200 bg-white/88'}`}>
               <div className={`rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
@@ -5873,6 +5874,8 @@ export default function Home() {
               </div>
             )}
           </div>
+
+              </div>
 
           {/* Ponnahdusilmoitukset (Alerts) */}
           {(message || errorMessage) && (
