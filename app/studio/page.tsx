@@ -768,7 +768,7 @@ function SectionShell({
         </div>
       </summary>
 
-      <div className="mt-16 pb-6 animate-in fade-in duration-300">
+      <div className="mt-14 pb-10 animate-in fade-in duration-300">
         {description ? (
           <p className={`mb-16 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {description}
@@ -3404,48 +3404,32 @@ export default function Home() {
         /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-56 sm:pb-20 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-28 sm:pb-20 transition-colors duration-300">
         
-    {/* MOBIILIN PIKANAVIGOINTI (5 NAPPIA) */}
-<nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-4 rounded-[20px] border p-3.5 pb-[max(0.85rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
-  
+    {/* MOBIILIN PIKANAVIGOINTI */}
+<nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-2 rounded-[20px] border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
+
   {/* 1. TIEDOT */}
-  <a href="#hakijan-tiedot" className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
-    <span className="text-xl" aria-hidden="true">◫</span> Tiedot
+  <a href="#hakijan-tiedot" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] px-1 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+    <span className="text-lg" aria-hidden="true">◫</span> Tiedot
   </a>
 
   {/* 2. HAKU */}
-  <a href="#tyonhaku" className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
-    <span className="text-xl" aria-hidden="true">⌕</span> Haku
+  <a href="#tyonhaku" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] px-1 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+    <span className="text-lg" aria-hidden="true">⌕</span> Haku
   </a>
 
-  {/* 3. TULOKSET */}
-  <a href="#studio-tulokset" className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] bg-[#00BFA6]/12 px-2 text-[10px] font-bold text-[#00BFA6]`}>
-    <span className="text-xl" aria-hidden="true">▣</span> Tulokset
+  {/* 3. TYÖTILA */}
+  <a href="#studio-tulokset" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] bg-[#00BFA6]/12 px-1 text-[10px] font-bold text-[#00BFA6]`}>
+    <span className="text-lg" aria-hidden="true">▣</span> Työtila
   </a>
 
-  {/* 4. TYÖKALUT (Mobiilissa) */}
-  <button 
-    onClick={() => router.push('/tyokalut')} 
-    className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'} focus-visible:outline-none`}
+  {/* 4. PRO */}
+  <button
+    onClick={() => setShowPaywall(true)}
+    className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] bg-[#FF6F3C]/12 px-1 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
   >
-    <span className="text-xl" aria-hidden="true">✦</span> Työkalut
-  </button>
-
-  {/* 5. TALLENTEET */}
-  <button 
-    onClick={openArchiveModal} 
-    className={`flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] px-2 text-[10px] font-black transition-all ${theme === 'dark' ? 'text-[#00BFA6] hover:bg-white/5' : 'text-[#00BFA6] hover:bg-gray-100'} focus-visible:outline-none`}
-  >
-    <span className="text-xl" aria-hidden="true">🗂️</span> Tallenteet
-  </button>
-
-  {/* 6. PRO (Pysyy aina tässä) */}
-  <button 
-    onClick={() => setShowPaywall(true)} 
-    className="flex min-h-[74px] flex-1 flex-col items-center justify-center gap-2 rounded-[14px] bg-[#FF6F3C]/12 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
-  >
-    <span className="text-xl" aria-hidden="true">▲</span> PRO
+    <span className="text-lg" aria-hidden="true">▲</span> PRO
   </button>
 </nav>
 
@@ -3810,7 +3794,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-24 xl:gap-28 xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.28fr)] 2xl:grid-cols-[minmax(360px,0.74fr)_minmax(0,1.26fr)]">
+          <div className="grid grid-cols-1 items-start gap-14 xl:gap-16 xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.28fr)] 2xl:grid-cols-[minmax(360px,0.74fr)_minmax(0,1.26fr)]">
             <section className="space-y-20 sm:space-y-24">
               <SectionShell
                 id="hakijan-tiedot"
@@ -3936,7 +3920,7 @@ export default function Home() {
                     </FieldHint>
                   </div>
 
-                  <div className="pt-4 sm:pt-6">
+                  <div className="pt-8 sm:pt-10">
                     <label htmlFor="input-experience" className={LabelClass(theme)}>Työkokemus</label>
                     <textarea
                       id="input-experience"
@@ -4216,7 +4200,7 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 lg:w-[460px]">
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 lg:flex-1">
                     <div className={`rounded-[16px] border px-5 py-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50'}`}>
                       <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">CV</p>
                       <p className={`mt-2 text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{cvResult ? "Valmis" : "Kesken"}</p>
@@ -4245,7 +4229,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[20px] border p-7 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-12 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`rounded-[20px] border p-8 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-14 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
@@ -4315,7 +4299,7 @@ export default function Home() {
                 </div>
 
                 {tab === "cv" && (
-                  <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-12 overflow-hidden animate-in fade-in duration-500">
+                  <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-16 sm:space-y-20 overflow-hidden animate-in fade-in duration-500">
                     <div className={`rounded-[20px] sm:rounded-[16px] border p-6 sm:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-3xl">
@@ -4327,7 +4311,7 @@ export default function Home() {
                             Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisätyökalut vasta kun niitä oikeasti tarvitset.
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-[520px]">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:flex-1">
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
                             1. Generoi CV
                           </div>
@@ -4529,7 +4513,7 @@ export default function Home() {
                         </div>
 
                         {/* CV PREVIEW */}
-                        <div id="cv-preview-panel" className={`rounded-[20px] border p-4 sm:p-8 overflow-x-auto shadow-[0_12px_30px_rgba(0,0,0,0.12)] custom-scrollbar mt-12 sm:shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
+                        <div id="cv-preview-panel" className={`rounded-[20px] border p-6 sm:p-10 overflow-x-auto shadow-[0_12px_30px_rgba(0,0,0,0.12)] custom-scrollbar mt-12 sm:shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-gray-100'}`} role="region" aria-label="CV Esikatselu">
                           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                               <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
@@ -5025,7 +5009,7 @@ export default function Home() {
                             Käytä ensin tekoälyn ehdotuksia. Lisää oma ilmoitus käsin vain silloin, kun haluat tallentaa jonkin yksittäisen paikan.
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-[520px]">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:flex-1">
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>1. Ehdota työpaikkoja</div>
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>2. Suodata lista</div>
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>3. Tallenna parhaat</div>
@@ -5442,7 +5426,7 @@ export default function Home() {
                             Valitse sävy, luo hakemus ja muokkaa tekstiä. Aiemmat versiot, videohakemus ja pikaviestit pysyvät alempana, etteivät ne sotke päätyötä.
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-[520px]">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:flex-1">
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>1. Valitse sävy</div>
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>2. Luo hakemus</div>
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>3. Muokkaa ja lataa</div>
