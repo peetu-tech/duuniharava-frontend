@@ -3404,7 +3404,7 @@ export default function Home() {
         /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white overflow-x-hidden font-sans pb-28 sm:pb-20 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white [overflow-x:clip] font-sans pb-28 sm:pb-20 transition-colors duration-300">
         
     {/* MOBIILIN PIKANAVIGOINTI */}
 <nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-2 rounded-[20px] border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
@@ -5414,7 +5414,7 @@ export default function Home() {
                 )}
 
                 {tab === "hakemus" && (
-                  <div id="panel-letter" role="tabpanel" aria-labelledby="tab-letter" className="space-y-10 animate-in fade-in duration-500">
+                  <div id="panel-letter" role="tabpanel" aria-labelledby="tab-letter" className="space-y-16 sm:space-y-20 animate-in fade-in duration-500">
                     <div className={`rounded-[20px] sm:rounded-[16px] border p-6 sm:p-8 lg:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(15,15,15,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-3xl">
@@ -5804,7 +5804,7 @@ export default function Home() {
 
             {/* VINKIT TAB */}
             {tab === "tips" && (
-              <div id="panel-tips" role="tabpanel" aria-labelledby="tab-tips" className="space-y-10 animate-in fade-in duration-500 mt-10">
+              <div id="panel-tips" role="tabpanel" aria-labelledby="tab-tips" className="space-y-16 sm:space-y-20 animate-in fade-in duration-500 mt-14">
                 <div className={`rounded-[20px] sm:rounded-[16px] border p-8 sm:p-12 shadow-[0_15px_50px_rgba(255,111,60,0.1)] ${theme === 'dark' ? 'border-[#FF6F3C]/30 bg-[#FF6F3C]/5' : 'border-[#FF6F3C]/30 bg-white'}`}>
                   <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Työnhaun tehovinkit</h2>
                   <p className="text-lg text-gray-400 mb-10">Lue nämä ohjeet ennen kuin lähetät seuraavan hakemuksesi, niin parannat mahdollisuuksiasi jopa 80%.</p>
