@@ -745,7 +745,7 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group rounded-[20px] border p-14 sm:p-20 xl:p-28 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group mb-16 sm:mb-24 xl:mb-28 rounded-[20px] border p-14 sm:p-20 xl:p-28 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
       <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-10 sm:gap-12 border-b pb-10 sm:pb-14 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
