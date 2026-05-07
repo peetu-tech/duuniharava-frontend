@@ -4187,9 +4187,9 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-24 sm:space-y-32 scroll-mt-24 xl:sticky xl:top-6 xl:self-start xl:pl-14 2xl:pl-20">
-              <div className={`space-y-20 rounded-[40px] border p-6 sm:p-8 xl:p-12 shadow-[0_24px_80px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-white/6 bg-[#111111]/72' : 'border-gray-200 bg-white/88'}`}>
-              <div className={`mx-auto max-w-[94%] xl:max-w-[92%] rounded-[24px] border p-7 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-8 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+            <section id="studio-tulokset" className="space-y-24 sm:space-y-32 scroll-mt-24 xl:sticky xl:top-6 xl:self-start xl:pl-8 2xl:pl-10">
+              <div className={`space-y-16 rounded-[40px] border p-5 sm:p-7 xl:p-8 shadow-[0_24px_80px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-white/6 bg-[#111111]/72' : 'border-gray-200 bg-white/88'}`}>
+              <div className={`rounded-[24px] border p-7 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-8 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Rauhallinen työtila</p>
@@ -4230,7 +4230,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`mx-auto max-w-[94%] xl:max-w-[92%] rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
+              <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
@@ -4302,7 +4302,7 @@ export default function Home() {
                 {tab === "cv" && (
                   <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-10 overflow-hidden px-1 animate-in fade-in duration-500 sm:space-y-12 sm:px-1 xl:space-y-14">
                     <div className={`rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.09),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
-                      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="flex flex-col gap-8">
                         <div className="max-w-3xl">
                           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">CV-työtila</p>
                           <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -4312,7 +4312,7 @@ export default function Home() {
                             Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisätyökalut vasta kun niitä oikeasti tarvitset.
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:flex-1">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:max-w-3xl">
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
                             1. Generoi CV
                           </div>
@@ -5000,7 +5000,7 @@ export default function Home() {
                 {tab === "jobs" && (
                   <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 px-1 animate-in fade-in duration-500 pb-28 sm:space-y-12 sm:px-1 sm:pb-0 xl:space-y-14">
                     <div className={`rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.09),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
-                      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="flex flex-col gap-8">
                         <div className="max-w-3xl">
                           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Työpaikka-työtila</p>
                           <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -5010,7 +5010,7 @@ export default function Home() {
                             Käytä ensin tekoälyn ehdotuksia. Lisää oma ilmoitus käsin vain silloin, kun haluat tallentaa jonkin yksittäisen paikan.
                           </p>
                         </div>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:flex-1">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:max-w-3xl">
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>1. Ehdota työpaikkoja</div>
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>2. Suodata lista</div>
                           <div className={`rounded-[16px] border px-5 py-5 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-200' : 'border-gray-200 bg-white/80 text-gray-700'}`}>3. Tallenna parhaat</div>
