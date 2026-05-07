@@ -745,7 +745,7 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-20 sm:mb-28 rounded-[20px] border p-10 sm:p-16 xl:p-20 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group rounded-[20px] border p-10 sm:p-16 xl:p-20 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
       <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-10 sm:gap-12 border-b pb-10 sm:pb-14 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
@@ -3668,8 +3668,8 @@ export default function Home() {
           </section>
         )}
 
-        <div className="mx-auto w-full max-w-[1720px] px-6 py-[4.5rem] sm:px-10 sm:py-[5.5rem] xl:px-16 2xl:px-24 lg:py-24">
-          <section className="mb-14 grid grid-cols-1 gap-8 sm:mb-16 xl:grid-cols-[minmax(0,1.08fr)_repeat(3,minmax(0,0.8fr))] 2xl:gap-9">
+        <div className="mx-auto w-full max-w-[1720px] px-6 py-28 sm:px-10 sm:py-36 xl:px-16 2xl:px-24 lg:py-44">
+          <section className="mb-24 grid grid-cols-1 gap-8 sm:mb-32 xl:grid-cols-[minmax(0,1.08fr)_repeat(3,minmax(0,0.8fr))] 2xl:gap-9">
             <div className={`relative overflow-hidden rounded-[20px] border p-8 shadow-[0_12px_34px_rgba(0,0,0,0.12)] sm:p-10 sm:shadow-[0_28px_70px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.12),rgba(20,20,20,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
               <div className="absolute right-0 top-0 hidden h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl sm:block" aria-hidden="true" />
               <p className="relative text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Aloita tästä</p>
@@ -3722,7 +3722,7 @@ export default function Home() {
             </div>
           </section>
 
-          <div className={`mb-16 rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+          <div className={`mb-28 rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl sm:mb-36 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
             <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
@@ -3794,8 +3794,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-14 xl:gap-16 xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.28fr)] 2xl:grid-cols-[minmax(360px,0.74fr)_minmax(0,1.26fr)]">
-            <section className="space-y-20 sm:space-y-24">
+          <div className="grid grid-cols-1 items-start gap-28 xl:gap-16 xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.28fr)] 2xl:grid-cols-[minmax(360px,0.74fr)_minmax(0,1.26fr)]">
+            <section className="flex flex-col gap-28 sm:gap-36">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4187,7 +4187,7 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-20 sm:space-y-24 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
+            <section id="studio-tulokset" className="space-y-24 sm:space-y-32 scroll-mt-24 xl:sticky xl:top-6 xl:self-start">
               <div className={`rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
