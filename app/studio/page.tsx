@@ -4235,6 +4235,8 @@ export default function Home() {
                 </div>
               )}
 
+              <div aria-hidden="true" className="h-20 sm:h-24 xl:h-28" />
+
               <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-7 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
@@ -4322,7 +4324,7 @@ export default function Home() {
                         </p>
                       </div>
 
-                      <div aria-hidden="true" className="h-6 sm:h-8 xl:h-10" />
+                      <div aria-hidden="true" className="h-12 sm:h-14 xl:h-16" />
 
                       <div className="grid grid-cols-1 gap-3 sm:hidden">
                         <button
