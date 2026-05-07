@@ -1190,6 +1190,8 @@ export default function Home() {
   const [showManualJobForm, setShowManualJobForm] = useState(false);
   const [showJobFilters, setShowJobFilters] = useState(false);
   const [showCvAnalysis, setShowCvAnalysis] = useState(false);
+  const [showCvEditorPanel, setShowCvEditorPanel] = useState(false);
+  const [showCvPreviewPanel, setShowCvPreviewPanel] = useState(false);
   const [showStyleStudio, setShowStyleStudio] = useState(false);
   const [showLetterHistory, setShowLetterHistory] = useState(false);
   const [showLetterExtras, setShowLetterExtras] = useState(false);
@@ -2251,6 +2253,8 @@ export default function Home() {
     setShowManualJobForm(false);
     setShowJobFilters(false);
     setShowCvAnalysis(false);
+    setShowCvEditorPanel(false);
+    setShowCvPreviewPanel(false);
     setShowStyleStudio(false);
     setShowLetterHistory(false);
     setShowLetterExtras(false);
@@ -4350,6 +4354,23 @@ export default function Home() {
                           </button>
                         </div>
                       </div>
+
+                      <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowCvEditorPanel((prev) => !prev)}
+                          className={`rounded-[14px] border px-5 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-black/25 text-white hover:bg-white/10' : 'border-gray-200 bg-white/80 text-gray-800 hover:bg-gray-50'}`}
+                        >
+                          {showCvEditorPanel ? "Piilota tekstieditori" : "Avaa tekstieditori"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowCvPreviewPanel((prev) => !prev)}
+                          className={`rounded-[14px] border px-5 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-black/25 text-white hover:bg-white/10' : 'border-gray-200 bg-white/80 text-gray-800 hover:bg-gray-50'}`}
+                        >
+                          {showCvPreviewPanel ? "Piilota esikatselu" : "Avaa esikatselu"}
+                        </button>
+                      </div>
                     </div>
 
                     {parsedCv.cvBody && activeJob && (
@@ -4449,6 +4470,27 @@ export default function Home() {
                         )}
 
                         {/* VAPAA CV-TEKSTIN MUOKKAUS */}
+                        {!showCvEditorPanel && (
+                          <div className={`rounded-[24px] border p-6 sm:p-8 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}>
+                            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                              <div className="max-w-2xl">
+                                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Päämuokkaus</p>
+                                <h4 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Tekstieditori on piilotettu</h4>
+                                <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                  Avaa editori vasta kun haluat oikeasti muokata CV-tekstiä. Näin työtila pysyy kevyempänä.
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowCvEditorPanel(true)}
+                                className="rounded-[14px] bg-[#00BFA6] px-6 py-4 text-sm font-black text-black transition-transform hover:scale-[1.02]"
+                              >
+                                Avaa tekstieditori
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {showCvEditorPanel && (
                         <div className="rounded-[28px] border border-[#00BFA6]/20 bg-[#00BFA6]/5 p-8 sm:p-11 xl:p-14 shadow-[0_10px_24px_rgba(0,191,166,0.08)] sm:shadow-[0_18px_60px_rgba(0,191,166,0.12)]">
                           <div className={`mb-8 rounded-[20px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/70'}`}>
                             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">
@@ -4512,8 +4554,31 @@ export default function Home() {
                             className={`min-h-[380px] w-full rounded-[18px] border px-5 py-5 font-mono text-[15px] leading-8 outline-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] sm:min-h-[560px] lg:min-h-[680px] ${theme === 'dark' ? 'border-white/10 bg-black/50 text-gray-100' : 'border-gray-200 bg-white text-gray-800'}`}
                           />
                         </div>
+                        )}
 
                         {/* CV PREVIEW */}
+                        {!showCvPreviewPanel && (
+                          <div className={`rounded-[24px] border p-6 sm:p-8 mt-12 sm:mt-16 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}>
+                            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                              <div className="max-w-2xl">
+                                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
+                                <h4 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Esikatselu on piilotettu</h4>
+                                <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                  Avaa esikatselu silloin kun haluat nähdä lopputuloksen. Muulloin tämä jättää työtilaan enemmän hengitystilaa.
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowCvPreviewPanel(true)}
+                                className="rounded-[14px] bg-[#00BFA6] px-6 py-4 text-sm font-black text-black transition-transform hover:scale-[1.02]"
+                              >
+                                Avaa esikatselu
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {showCvPreviewPanel && (
+                        <>
                         <div id="cv-preview-panel" className={`rounded-[28px] border p-6 sm:p-10 overflow-x-auto shadow-[0_12px_30px_rgba(0,0,0,0.12)] custom-scrollbar mt-16 sm:mt-20 sm:shadow-2xl ${theme === 'dark' ? 'border-white/10 bg-[#0F0F0F]' : 'border-gray-200 bg-white'}`} role="region" aria-label="CV Esikatselu">
                           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -4574,6 +4639,8 @@ export default function Home() {
                             {downloadingDocx ? "Luodaan DOCX..." : "LATAA DOCX"}
                           </button>
                         </div>
+                        </>
+                        )}
 
                         {/* --- CANVA TASON EDITOR --- */}
                         <div className={`rounded-[26px] border p-7 md:p-11 mt-18 sm:mt-24 shadow-2xl ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-gray-200'}`}>
