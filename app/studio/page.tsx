@@ -745,7 +745,7 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group rounded-[20px] border p-10 sm:p-16 xl:p-20 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group rounded-[20px] border p-14 sm:p-20 xl:p-28 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
       <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-10 sm:gap-12 border-b pb-10 sm:pb-14 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
@@ -768,7 +768,7 @@ function SectionShell({
         </div>
       </summary>
 
-      <div className="mt-14 pb-10 animate-in fade-in duration-300">
+      <div className="mt-20 pb-20 sm:pb-24 animate-in fade-in duration-300">
         {description ? (
           <p className={`mb-16 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {description}
@@ -4229,11 +4229,11 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[20px] border p-8 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-14 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
+              <div className={`rounded-[20px] border p-12 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-18 xl:p-24 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`z-40 mb-16 flex snap-x gap-4 overflow-x-auto whitespace-nowrap border-b pb-7 pt-2 custom-scrollbar lg:sticky lg:top-0 sm:gap-6 sm:pt-0 ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
+                  className={`z-40 mb-20 sm:mb-24 flex snap-x gap-4 overflow-x-auto whitespace-nowrap border-b pb-7 pt-2 custom-scrollbar lg:sticky lg:top-0 sm:gap-6 sm:pt-0 ${theme === 'dark' ? 'bg-[#141414] border-white/5' : 'bg-white border-gray-100'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
@@ -5809,7 +5809,7 @@ export default function Home() {
                   <h2 className={`text-3xl font-black mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Työnhaun tehovinkit</h2>
                   <p className="text-lg text-gray-400 mb-10">Lue nämä ohjeet ennen kuin lähetät seuraavan hakemuksesi, niin parannat mahdollisuuksiasi jopa 80%.</p>
 
-                  <div className="space-y-6 sm:space-y-8">
+                  <div className="space-y-12 sm:space-y-16">
                     <article className={`p-8 sm:p-10 rounded-[18px] border shadow-inner ${theme === 'dark' ? 'bg-[#0A0A0A] border-white/5' : 'bg-gray-50 border-gray-200'}`}>
                       <h3 className="text-xl font-bold text-[#FF6F3C] mb-4 flex items-center gap-3">
                         <span className="w-8 h-8 rounded-full bg-[#FF6F3C]/20 flex items-center justify-center text-sm" aria-hidden="true">1</span> 
