@@ -4193,7 +4193,7 @@ export default function Home() {
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
             <section id="studio-tulokset" className="space-y-24 sm:space-y-32 scroll-mt-24 xl:sticky xl:top-6 xl:self-start xl:pl-8 2xl:pl-10">
-              <div className={`space-y-16 rounded-[40px] border p-5 sm:p-7 xl:p-8 shadow-[0_24px_80px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-white/6 bg-[#111111]/72' : 'border-gray-200 bg-white/88'}`}>
+              <div className="space-y-16">
               <div className={`rounded-[24px] border p-7 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-8 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
