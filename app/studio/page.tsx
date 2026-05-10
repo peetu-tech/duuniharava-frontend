@@ -4196,6 +4196,7 @@ export default function Home() {
                   </div>
                 </div>
               </SectionShell>
+              <div aria-hidden="true" className="h-16 sm:h-20 xl:h-24 2xl:h-28" />
             </section>
 
             <div aria-hidden="true" className="hidden xl:block" />
@@ -6589,6 +6590,7 @@ function ArchiveModal({
                   </p>
                 )}
               </div>
+              <div aria-hidden="true" className="h-16 sm:h-20 xl:h-24 2xl:h-28" />
             </section>
 
             <section className={`rounded-[18px] border p-5 sm:p-6 ${theme === 'dark' ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-white'}`}>
