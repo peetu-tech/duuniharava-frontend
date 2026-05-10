@@ -3411,29 +3411,50 @@ export default function Home() {
       <main className="min-h-screen bg-[#0F0F0F] text-white [overflow-x:clip] font-sans pb-56 sm:pb-48 transition-colors duration-300">
         
     {/* MOBIILIN PIKANAVIGOINTI */}
-<nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-2 rounded-[20px] border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
+<nav className={`fixed bottom-3 left-3 right-3 z-50 flex items-stretch gap-2 rounded-[20px] border p-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
 
   {/* 1. TIEDOT */}
-  <a href="#hakijan-tiedot" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] px-1 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
-    <span className="text-lg" aria-hidden="true">◫</span> Tiedot
+  <a href="#hakijan-tiedot" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-1 text-[0px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black ${theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">1</span>
+    <span className="text-[10px]">Tiedot</span>
+    <span className="hidden" aria-hidden="true">◫</span> Tiedot
   </a>
 
   {/* 2. HAKU */}
-  <a href="#tyonhaku" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] px-1 text-[10px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
-    <span className="text-lg" aria-hidden="true">⌕</span> Haku
+  <a href="#tyonhaku" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-1 text-[0px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black ${theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">2</span>
+    <span className="text-[10px]">Haku</span>
+    <span className="hidden" aria-hidden="true">⌕</span> Haku
   </a>
 
   {/* 3. TYÖTILA */}
-  <a href="#studio-tulokset" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] bg-[#00BFA6]/12 px-1 text-[10px] font-bold text-[#00BFA6]`}>
-    <span className="text-lg" aria-hidden="true">▣</span> Työtila
+  <a href="#studio-tulokset" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] bg-[#00BFA6]/12 px-1 text-[0px] font-bold text-[#00BFA6]`}>
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00BFA6] text-[11px] font-black text-black" aria-hidden="true">3</span>
+    <span className="text-[10px]">Tyotila</span>
+    <span className="hidden" aria-hidden="true">▣</span> Työtila
   </a>
 
   {/* 4. PRO */}
   <button
-    onClick={() => setShowPaywall(true)}
-    className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[12px] bg-[#FF6F3C]/12 px-1 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
+    type="button"
+    onClick={() => {
+      setTab("cv");
+      setShowStyleStudio(true);
+      document.getElementById("studio-tulokset")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }}
+    className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-1 text-[10px] font-bold transition-all focus-visible:outline-none ${showStyleStudio ? 'bg-[#7C5CFF]/18 text-[#9D84FF]' : theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}
   >
-    <span className="text-lg" aria-hidden="true">▲</span> PRO
+    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black ${showStyleStudio ? 'bg-[#7C5CFF] text-white' : theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">4</span>
+    <span>Tyokalut</span>
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setShowPaywall(true)}
+    className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] bg-[#FF6F3C]/12 px-1 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
+  >
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FF6F3C] text-[11px] font-black text-black" aria-hidden="true">5</span>
+    <span className="hidden" aria-hidden="true">▲</span> PRO
   </button>
 </nav>
 
