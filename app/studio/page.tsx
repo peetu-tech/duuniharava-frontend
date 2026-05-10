@@ -4155,7 +4155,6 @@ export default function Home() {
                           <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                             Muokkaa CV:tä omassa rauhallisessa näkymässä
                           </h3>
-                        </p>
                       </div>
 
                       <div className="grid grid-cols-1 gap-3 sm:hidden">
