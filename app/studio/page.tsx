@@ -3728,8 +3728,8 @@ export default function Home() {
           </section>
           )}
 
-          <div className={`mb-10 rounded-[20px] border p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-6 sm:shadow-xl sm:mb-12 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
-            <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
+          <div className={`mb-6 rounded-[20px] border p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-5 sm:shadow-xl sm:mb-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
                 <h2 className={`mt-2 text-xl sm:text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -3737,12 +3737,12 @@ export default function Home() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:min-w-[560px]">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:min-w-[520px]">
                 <button
                   type="button"
                   onClick={() => setMode("improve")}
                   aria-pressed={mode === "improve"}
-                  className={`w-full rounded-[14px] px-6 py-4 text-base font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                    className={`w-full rounded-[14px] px-5 py-3.5 text-base font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                     mode === "improve"
                       ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
                       : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-800 hover:bg-white hover:-translate-y-1"
@@ -3755,7 +3755,7 @@ export default function Home() {
                   type="button"
                   onClick={() => setMode("create")}
                   aria-pressed={mode === "create"}
-                  className={`w-full rounded-[14px] px-6 py-4 text-base font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
+                    className={`w-full rounded-[14px] px-5 py-3.5 text-base font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] ${
                     mode === "create"
                       ? "bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] text-black shadow-[0_0_20px_rgba(0,191,166,0.3)]"
                       : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-800 hover:bg-white hover:-translate-y-1"
@@ -3766,7 +3766,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={`mt-8 flex flex-col gap-6 border-t pt-7 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
+            <div className={`mt-5 flex flex-col gap-4 border-t pt-5 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
               <div className="flex flex-wrap gap-4">
                 <button
                   type="button"
@@ -3800,8 +3800,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(440px,1fr)_minmax(0,1fr)] 2xl:gap-5">
-            <section className="flex flex-col gap-12 sm:gap-14 xl:pr-2 2xl:pr-3">
+          <div className="grid grid-cols-1 items-start gap-3 xl:grid-cols-[minmax(460px,1fr)_minmax(0,1fr)] 2xl:gap-4">
+            <section className="flex flex-col gap-10 sm:gap-12 xl:pr-1 2xl:pr-2">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4194,7 +4194,7 @@ export default function Home() {
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
             <section id="studio-tulokset" className="space-y-10 sm:space-y-12 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
-              <div className="space-y-5">
+              <div className="space-y-3">
               {false && (
               <div className={`rounded-[24px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -4238,13 +4238,13 @@ export default function Home() {
                 </div>
               )}
 
-              <div aria-hidden="true" className="h-4 sm:h-6 xl:h-8" />
+              <div aria-hidden="true" className="h-1 sm:h-2 xl:h-3" />
 
               <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-6 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`z-40 mb-10 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-4 custom-scrollbar lg:sticky lg:top-0 sm:mb-12 sm:gap-4 sm:px-5 sm:py-5 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
+                  className={`z-40 mb-6 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-7 sm:gap-4 sm:px-5 sm:py-4 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
