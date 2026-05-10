@@ -3408,7 +3408,7 @@ export default function Home() {
         /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white [overflow-x:clip] font-sans pb-40 sm:pb-32 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white [overflow-x:clip] font-sans pb-56 sm:pb-48 transition-colors duration-300">
         
     {/* MOBIILIN PIKANAVIGOINTI */}
 <nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-2 rounded-[20px] border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
@@ -3732,7 +3732,7 @@ export default function Home() {
           </section>
           )}
 
-          <div className={`mb-14 rounded-[20px] border p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-5 sm:shadow-xl sm:mb-16 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+          <div className={`mb-24 rounded-[20px] border p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:mb-28 sm:p-5 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
@@ -3804,8 +3804,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(440px,0.96fr)_minmax(0,1.04fr)] 2xl:gap-10">
-            <section className="flex flex-col gap-16 sm:gap-20 xl:pr-6 2xl:pr-8">
+          <div className="grid grid-cols-1 items-start gap-12 xl:grid-cols-[minmax(440px,0.95fr)_minmax(0,1.05fr)] 2xl:gap-16">
+            <section className="flex flex-col gap-20 sm:gap-24 xl:pr-10 2xl:pr-14">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4197,7 +4197,7 @@ export default function Home() {
             </section>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-10 sm:space-y-12 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
+            <section id="studio-tulokset" className="space-y-14 sm:space-y-16 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
               <div className="space-y-3">
               {false && (
               <div className={`rounded-[24px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
@@ -4242,13 +4242,13 @@ export default function Home() {
                 </div>
               )}
 
-              <div aria-hidden="true" className="h-1 sm:h-2 xl:h-3" />
+              <div aria-hidden="true" className="h-6 sm:h-8 xl:h-10" />
 
               <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-6 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
                 {/* VÄLILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`z-40 mb-6 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-7 sm:gap-4 sm:px-5 sm:py-4 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
+                  className={`z-40 mb-10 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-12 sm:gap-4 sm:px-5 sm:py-4 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
