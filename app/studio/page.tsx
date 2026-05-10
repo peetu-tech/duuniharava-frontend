@@ -5798,8 +5798,6 @@ export default function Home() {
             )}
           </div>
 
-              </div>
-
           {/* Ponnahdusilmoitukset (Alerts) */}
           {(message || errorMessage) && (
             <div
