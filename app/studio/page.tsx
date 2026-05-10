@@ -3408,7 +3408,7 @@ export default function Home() {
         /* Poikkeukset nappeihin, joissa pitää säilyttää värit */
         .light-theme .bg-\\[\\#FF6F3C\\] { color: #ffffff !important; }
       `}} />
-      <main className="min-h-screen bg-[#0F0F0F] text-white [overflow-x:clip] font-sans pb-28 sm:pb-20 transition-colors duration-300">
+      <main className="min-h-screen bg-[#0F0F0F] text-white [overflow-x:clip] font-sans pb-40 sm:pb-32 transition-colors duration-300">
         
     {/* MOBIILIN PIKANAVIGOINTI */}
 <nav className={`fixed bottom-3 left-3 right-3 z-50 flex justify-around items-stretch gap-2 rounded-[20px] border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_10px_24px_rgba(0,0,0,0.18)] sm:hidden transition-colors ${theme === 'dark' ? 'bg-[#101010] border-white/10' : 'bg-white border-gray-200 shadow-[0_10px_22px_rgba(0,0,0,0.08)]'}`} aria-label="Mobiilin pikavalikko">
@@ -3513,6 +3513,7 @@ export default function Home() {
                   Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä.
                 </p>
 
+                {false && (
                 <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:gap-5">
                   <button
                     type="button"
@@ -3540,7 +3541,9 @@ export default function Home() {
                     Avaa tallenteet
                   </button>
                 </div>
+                )}
 
+                {false && (
                 <div className={`mt-14 grid grid-cols-1 gap-5 sm:mt-12 sm:grid-cols-3 lg:gap-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   <div className={`rounded-[16px] border px-6 py-7 text-sm leading-7 shadow-[0_8px_24px_rgba(0,0,0,0.06)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
                     1. Täytä tärkeimmät tiedot
@@ -3552,6 +3555,7 @@ export default function Home() {
                     3. Avaa työkalut vasta kun tarvitset niitä
                   </div>
                 </div>
+                )}
 
                 {(latestSavedCvVariant || latestSavedLetter || latestTouchedJob) && (
                   <div className={`mt-14 rounded-[18px] border p-6 sm:p-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.04]' : 'border-gray-200 bg-white/80'}`}>
@@ -3728,7 +3732,7 @@ export default function Home() {
           </section>
           )}
 
-          <div className={`mb-6 rounded-[20px] border p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-5 sm:shadow-xl sm:mb-7 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+          <div className={`mb-14 rounded-[20px] border p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-5 sm:shadow-xl sm:mb-16 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
@@ -3766,7 +3770,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={`mt-5 flex flex-col gap-4 border-t pt-5 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
+            <div className={`mt-6 flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
               <div className="flex flex-wrap gap-4">
                 <button
                   type="button"
@@ -3800,8 +3804,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-3 xl:grid-cols-[minmax(460px,1fr)_minmax(0,1fr)] 2xl:gap-4">
-            <section className="flex flex-col gap-10 sm:gap-12 xl:pr-1 2xl:pr-2">
+          <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(440px,0.96fr)_minmax(0,1.04fr)] 2xl:gap-10">
+            <section className="flex flex-col gap-16 sm:gap-20 xl:pr-6 2xl:pr-8">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
