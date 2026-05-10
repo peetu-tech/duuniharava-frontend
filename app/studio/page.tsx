@@ -745,7 +745,7 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-16 sm:mb-24 xl:mb-28 rounded-[20px] border p-14 sm:p-20 xl:p-28 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group mb-24 sm:mb-28 xl:mb-32 rounded-[20px] border p-14 sm:p-20 xl:p-28 shadow-[0_12px_30px_rgba(0,0,0,0.12)] sm:shadow-[0_24px_60px_rgba(0,0,0,0.16)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
       open={defaultOpen}
     >
       <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-10 sm:gap-12 border-b pb-10 sm:pb-14 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
@@ -3804,13 +3804,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div
-            aria-hidden="true"
-            className={`mb-12 h-12 rounded-[24px] sm:mb-16 sm:h-16 xl:mb-20 xl:h-20 ${theme === 'dark' ? 'bg-white/[0.025] border border-white/[0.04]' : 'bg-gray-100/80 border border-gray-200'}`}
-          />
+          <div aria-hidden="true" className="mb-16 h-16 sm:mb-20 sm:h-20 xl:mb-24 xl:h-24" />
 
-          <div className="grid grid-cols-1 items-start gap-y-12 xl:grid-cols-[minmax(440px,0.94fr)_72px_minmax(0,1.06fr)] xl:gap-y-0 2xl:grid-cols-[minmax(440px,0.94fr)_96px_minmax(0,1.06fr)]">
-            <section className="flex flex-col gap-20 sm:gap-24 xl:pr-10 2xl:pr-14">
+          <div className="grid grid-cols-1 items-start gap-y-16 xl:grid-cols-[minmax(440px,0.93fr)_112px_minmax(0,1.07fr)] xl:gap-y-0 2xl:grid-cols-[minmax(440px,0.93fr)_144px_minmax(0,1.07fr)]">
+            <section className="flex flex-col gap-24 sm:gap-28 xl:pr-0">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4201,12 +4198,7 @@ export default function Home() {
               </SectionShell>
             </section>
 
-            <div
-              aria-hidden="true"
-              className="hidden xl:block xl:min-h-full"
-            >
-              <div className={`mx-auto h-full w-px ${theme === 'dark' ? 'bg-white/6' : 'bg-gray-200'}`} />
-            </div>
+            <div aria-hidden="true" className="hidden xl:block" />
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
             <section id="studio-tulokset" className="space-y-14 sm:space-y-16 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
