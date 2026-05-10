@@ -4885,6 +4885,7 @@ export default function Home() {
                             </>
                           )}
                         </div>
+                      </>
                     ) : (
                       <div className={`rounded-[20px] sm:rounded-[16px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`} role="status" aria-live="polite">
                         <div className="text-5xl mb-6" aria-hidden="true">✦</div>
