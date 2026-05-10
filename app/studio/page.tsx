@@ -4894,6 +4894,7 @@ export default function Home() {
                       </div>
                     )}
                   </div>
+                )}
                 {/* --- TYÖPAIKAT TAB (TINDER-MALLI) --- */}
                 {tab === "jobs" && (
                   <div id="panel-job" role="tabpanel" aria-labelledby="tab-job" className="space-y-10 px-1 animate-in fade-in duration-500 pb-28 sm:space-y-12 sm:px-1 sm:pb-0 xl:space-y-14">
