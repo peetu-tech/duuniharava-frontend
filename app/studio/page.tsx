@@ -3439,7 +3439,7 @@ export default function Home() {
 
         {/* HEADER (Tietokone) */}
         <nav className={`sticky top-0 z-50 border-b transition-colors sm:backdrop-blur-xl ${theme === 'dark' ? 'bg-[#0F0F0F] sm:bg-[#0F0F0F]/80 border-white/10' : 'bg-white sm:bg-white/80 border-gray-200'}`}>
-          <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-5 flex justify-between items-center gap-6">
+          <div className="w-full max-w-[1880px] mx-auto px-4 sm:px-6 xl:px-10 2xl:px-14 py-4 sm:py-5 flex justify-between items-center gap-6">
             <div className="flex items-center gap-5">
               <span className="font-black text-2xl tracking-tighter"><span className="text-[#00BFA6]">DUUNI</span><span className="text-[#FF6F3C]">HARAVA</span></span>
               
@@ -3501,7 +3501,7 @@ export default function Home() {
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
           
-          <div className="relative mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-10 py-16 sm:py-20 lg:py-24">
+          <div className="relative mx-auto w-full max-w-[1880px] px-4 sm:px-6 xl:px-10 2xl:px-14 py-16 sm:py-20 lg:py-24">
             
             <div className="grid gap-14 sm:gap-16 lg:items-center">
               <div>
@@ -3622,7 +3622,7 @@ export default function Home() {
 
         {/* --- OHJE-OSIO --- */}
         {showHelp && (
-          <section id="help-section" className="mx-auto mt-14 w-full max-w-[1600px] animate-in fade-in slide-in-from-top-6 px-4 sm:px-6 lg:px-8 xl:px-10" aria-labelledby="help-heading">
+          <section id="help-section" className="mx-auto mt-14 w-full max-w-[1880px] animate-in fade-in slide-in-from-top-6 px-4 sm:px-6 xl:px-10 2xl:px-14" aria-labelledby="help-heading">
             <div className="rounded-[20px] border-2 border-[#00BFA6]/30 bg-zinc-900 p-8 shadow-[0_12px_30px_rgba(0,0,0,0.16)] sm:p-14 sm:shadow-2xl sm:backdrop-blur-xl">
               <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
                 <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
@@ -3672,7 +3672,7 @@ export default function Home() {
           </section>
         )}
 
-        <div className="mx-auto w-full max-w-[1600px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 xl:px-10 lg:py-16">
+        <div className="mx-auto w-full max-w-[1880px] px-4 py-12 sm:px-6 sm:py-14 xl:px-10 2xl:px-14 lg:py-16">
           <section className="mb-10 grid grid-cols-1 gap-5 sm:mb-12 xl:grid-cols-[minmax(0,1.18fr)_repeat(3,minmax(0,0.72fr))] xl:gap-5 2xl:gap-6">
             <div className={`relative overflow-hidden rounded-[20px] border p-8 shadow-[0_12px_34px_rgba(0,0,0,0.12)] sm:p-10 sm:shadow-[0_28px_70px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.12),rgba(20,20,20,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
               <div className="absolute right-0 top-0 hidden h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl sm:block" aria-hidden="true" />
@@ -3798,7 +3798,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(360px,0.92fr)_minmax(0,1.08fr)] 2xl:gap-10 2xl:grid-cols-[minmax(380px,0.9fr)_minmax(0,1.1fr)]">
+          <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(420px,0.88fr)_48px_minmax(0,1.12fr)] 2xl:gap-0 2xl:grid-cols-[minmax(460px,0.9fr)_56px_minmax(0,1.1fr)]">
             <section className="flex flex-col gap-28 sm:gap-36 xl:pr-8 2xl:pr-10">
               <SectionShell
                 id="hakijan-tiedot"
@@ -4190,8 +4190,13 @@ export default function Home() {
               </SectionShell>
             </section>
 
+            <div
+              aria-hidden="true"
+              className={`hidden xl:block xl:sticky xl:top-4 self-stretch min-h-[900px] rounded-full border ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.05),rgba(255,255,255,0.02))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)]' : 'border-gray-200 bg-[linear-gradient(180deg,rgba(15,23,42,0.03),rgba(15,23,42,0.07),rgba(15,23,42,0.03))]'}`}
+            />
+
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-10 sm:space-y-12 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
+            <section id="studio-tulokset" className="space-y-10 sm:space-y-12 scroll-mt-24 xl:sticky xl:top-4 xl:self-start xl:pl-2 2xl:pl-4">
               <div className="space-y-8">
               <div className={`rounded-[24px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
