@@ -3672,7 +3672,8 @@ export default function Home() {
           </section>
         )}
 
-        <div className="mx-auto w-full max-w-[1600px] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 xl:px-10 lg:py-16">
+        <div className="mx-auto w-full max-w-[1880px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 xl:px-10 lg:py-12">
+          {false && (
           <section className="mb-10 grid grid-cols-1 gap-5 sm:mb-12 xl:grid-cols-[minmax(0,1.18fr)_repeat(3,minmax(0,0.72fr))] xl:gap-5 2xl:gap-6">
             <div className={`relative overflow-hidden rounded-[20px] border p-8 shadow-[0_12px_34px_rgba(0,0,0,0.12)] sm:p-10 sm:shadow-[0_28px_70px_rgba(0,0,0,0.18)] ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.12),rgba(20,20,20,0.96))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(135deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
               <div className="absolute right-0 top-0 hidden h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl sm:block" aria-hidden="true" />
@@ -3725,8 +3726,9 @@ export default function Home() {
               </p>
             </div>
           </section>
+          )}
 
-          <div className={`mb-28 rounded-[20px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl sm:mb-36 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+          <div className={`mb-10 rounded-[20px] border p-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-6 sm:shadow-xl sm:mb-12 ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
             <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
@@ -3798,8 +3800,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(360px,0.92fr)_minmax(0,1.08fr)] 2xl:gap-10 2xl:grid-cols-[minmax(380px,0.9fr)_minmax(0,1.1fr)]">
-            <section className="flex flex-col gap-28 sm:gap-36 xl:pr-8 2xl:pr-10">
+          <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(440px,1fr)_minmax(0,1fr)] 2xl:gap-5">
+            <section className="flex flex-col gap-12 sm:gap-14 xl:pr-2 2xl:pr-3">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4192,7 +4194,8 @@ export default function Home() {
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
             <section id="studio-tulokset" className="space-y-10 sm:space-y-12 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
-              <div className="space-y-8">
+              <div className="space-y-5">
+              {false && (
               <div className={`rounded-[24px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
@@ -4221,6 +4224,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              )}
               
               {/* OSTATKO PRO-TASON? Nappi näkyy oikean sarakkeen huipulla, jos ei ole vielä pro */}
               {!isPro && (
