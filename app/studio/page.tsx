@@ -3807,7 +3807,7 @@ export default function Home() {
           <div aria-hidden="true" className="mb-16 h-16 sm:mb-20 sm:h-20 xl:mb-24 xl:h-24" />
 
           <div className="grid grid-cols-1 items-start gap-y-16 xl:grid-cols-[minmax(440px,0.93fr)_112px_minmax(0,1.07fr)] xl:gap-y-0 2xl:grid-cols-[minmax(440px,0.93fr)_144px_minmax(0,1.07fr)]">
-            <section className="flex flex-col gap-24 sm:gap-28 xl:pr-0">
+            <section className="flex flex-col gap-24 sm:gap-28 xl:pr-2 2xl:pr-4">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4201,7 +4201,7 @@ export default function Home() {
             <div aria-hidden="true" className="hidden xl:block" />
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-14 sm:space-y-16 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
+            <section id="studio-tulokset" className="space-y-14 sm:space-y-16 scroll-mt-24 xl:sticky xl:top-4 xl:self-start xl:pl-2 2xl:pl-4">
               <div className="space-y-3">
               {false && (
               <div className={`rounded-[24px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
@@ -4245,8 +4245,6 @@ export default function Home() {
                   </button>
                 </div>
               )}
-
-              <div aria-hidden="true" className="h-6 sm:h-8 xl:h-10" />
 
               <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-6 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
                 
