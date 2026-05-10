@@ -4381,48 +4381,6 @@ export default function Home() {
 
                       <div aria-hidden="true" className="h-16 sm:h-20 xl:h-24" />
 
-                      <div className="grid grid-cols-1 gap-3 sm:hidden">
-                        <button
-                          type="button"
-                          onClick={() => document.getElementById("cv-text-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                          className={`rounded-[14px] px-5 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'bg-[#00BFA6] text-black' : 'bg-[#00BFA6] text-black'}`}
-                        >
-                          Mene muokkaukseen
-                        </button>
-                        <div className="grid grid-cols-2 gap-3">
-                          <button
-                            type="button"
-                            onClick={() => document.getElementById("cv-preview-panel")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                            className={`rounded-[14px] border px-5 py-5 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
-                          >
-                            Esikatselu
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setShowStyleStudio((prev) => !prev)}
-                            className={`rounded-[14px] border px-5 py-5 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white' : 'border-gray-200 bg-white text-gray-700'}`}
-                          >
-                            {showStyleStudio ? "Piilota tyylit" : "Tyylit"}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <button
-                          type="button"
-                          onClick={() => setShowCvEditorPanel((prev) => !prev)}
-                          className={`rounded-[14px] border px-5 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-black/25 text-white hover:bg-white/10' : 'border-gray-200 bg-white/80 text-gray-800 hover:bg-gray-50'}`}
-                        >
-                          {showCvEditorPanel ? "Piilota tekstieditori" : "Avaa tekstieditori"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowCvPreviewPanel((prev) => !prev)}
-                          className={`rounded-[14px] border px-5 py-4 text-sm font-black transition-all ${theme === 'dark' ? 'border-white/10 bg-black/25 text-white hover:bg-white/10' : 'border-gray-200 bg-white/80 text-gray-800 hover:bg-gray-50'}`}
-                        >
-                          {showCvPreviewPanel ? "Piilota esikatselu" : "Avaa esikatselu"}
-                        </button>
-                      </div>
                     </div>
 
                     {parsedCv.cvBody && activeJob && (
