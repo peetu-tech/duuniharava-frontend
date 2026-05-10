@@ -3806,8 +3806,8 @@ export default function Home() {
 
           <div aria-hidden="true" className="mb-16 h-16 sm:mb-20 sm:h-20 xl:mb-24 xl:h-24" />
 
-          <div className="grid grid-cols-1 items-start gap-y-16 xl:grid-cols-[minmax(440px,0.93fr)_112px_minmax(0,1.07fr)] xl:gap-y-0 2xl:grid-cols-[minmax(440px,0.93fr)_144px_minmax(0,1.07fr)]">
-            <section className="flex flex-col gap-24 sm:gap-28 xl:pr-6 2xl:pr-8">
+          <div className="grid grid-cols-1 items-start gap-y-16 pb-20 sm:pb-24 xl:grid-cols-[minmax(440px,0.93fr)_112px_minmax(0,1.07fr)] xl:gap-y-0 xl:pb-28 2xl:grid-cols-[minmax(440px,0.93fr)_144px_minmax(0,1.07fr)] 2xl:pb-32">
+            <section className="flex flex-col gap-24 pb-12 sm:gap-28 sm:pb-16 xl:pr-6 xl:pb-24 2xl:pr-8 2xl:pb-28">
               <SectionShell
                 id="hakijan-tiedot"
                 step="Vaihe 1"
@@ -4201,7 +4201,7 @@ export default function Home() {
             <div aria-hidden="true" className="hidden xl:block" />
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
-            <section id="studio-tulokset" className="space-y-14 sm:space-y-16 scroll-mt-24 xl:sticky xl:top-4 xl:self-start xl:pl-6 2xl:pl-8">
+            <section id="studio-tulokset" className="space-y-14 pb-12 sm:space-y-16 sm:pb-16 scroll-mt-24 xl:sticky xl:top-4 xl:self-start xl:pl-6 xl:pb-24 2xl:pl-8 2xl:pb-28">
               <div className="space-y-3">
               {false && (
               <div className={`rounded-[24px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
