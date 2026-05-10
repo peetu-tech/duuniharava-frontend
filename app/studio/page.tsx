@@ -3804,7 +3804,12 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-12 xl:grid-cols-[minmax(440px,0.95fr)_minmax(0,1.05fr)] 2xl:gap-16">
+          <div
+            aria-hidden="true"
+            className={`mb-12 h-12 rounded-[24px] sm:mb-16 sm:h-16 xl:mb-20 xl:h-20 ${theme === 'dark' ? 'bg-white/[0.025] border border-white/[0.04]' : 'bg-gray-100/80 border border-gray-200'}`}
+          />
+
+          <div className="grid grid-cols-1 items-start gap-y-12 xl:grid-cols-[minmax(440px,0.94fr)_72px_minmax(0,1.06fr)] xl:gap-y-0 2xl:grid-cols-[minmax(440px,0.94fr)_96px_minmax(0,1.06fr)]">
             <section className="flex flex-col gap-20 sm:gap-24 xl:pr-10 2xl:pr-14">
               <SectionShell
                 id="hakijan-tiedot"
@@ -4195,6 +4200,13 @@ export default function Home() {
                 </div>
               </SectionShell>
             </section>
+
+            <div
+              aria-hidden="true"
+              className="hidden xl:block xl:min-h-full"
+            >
+              <div className={`mx-auto h-full w-px ${theme === 'dark' ? 'bg-white/6' : 'bg-gray-200'}`} />
+            </div>
 
             {/* OIKEA SARAKE: VÄLILEHDET */}
             <section id="studio-tulokset" className="space-y-14 sm:space-y-16 scroll-mt-24 xl:sticky xl:top-4 xl:self-start">
