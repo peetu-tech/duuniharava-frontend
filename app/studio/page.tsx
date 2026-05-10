@@ -3452,11 +3452,7 @@ export default function Home() {
   {/* 4. PRO */}
   <button
     type="button"
-    onClick={() => {
-      setTab("cv");
-      setShowStyleStudio(true);
-      document.getElementById("studio-tulokset")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }}
+    onClick={() => router.push('/tyokalut')}
     className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-1 text-[10px] font-bold transition-all focus-visible:outline-none ${showStyleStudio ? 'bg-[#7C5CFF]/18 text-[#9D84FF]' : theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}
   >
     <span className={`flex h-6 w-6 items-center justify-center rounded-full ${showStyleStudio ? 'bg-[#7C5CFF] text-white' : theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">
