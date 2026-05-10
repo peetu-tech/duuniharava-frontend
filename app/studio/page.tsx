@@ -3415,21 +3415,36 @@ export default function Home() {
 
   {/* 1. TIEDOT */}
   <a href="#hakijan-tiedot" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-1 text-[0px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
-    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black ${theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">1</span>
+    <span className={`flex h-6 w-6 items-center justify-center rounded-full ${theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="2">
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 19c1.8-3.2 4.3-4.8 7-4.8s5.2 1.6 7 4.8" />
+      </svg>
+    </span>
     <span className="text-[10px]">Tiedot</span>
     <span className="hidden" aria-hidden="true">◫</span> Tiedot
   </a>
 
   {/* 2. HAKU */}
   <a href="#tyonhaku" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-1 text-[0px] font-bold transition-all ${theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
-    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black ${theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">2</span>
+    <span className={`flex h-6 w-6 items-center justify-center rounded-full ${theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="2">
+        <circle cx="11" cy="11" r="5.5" />
+        <path d="M16 16l4 4" />
+      </svg>
+    </span>
     <span className="text-[10px]">Haku</span>
     <span className="hidden" aria-hidden="true">⌕</span> Haku
   </a>
 
   {/* 3. TYÖTILA */}
   <a href="#studio-tulokset" className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] bg-[#00BFA6]/12 px-1 text-[0px] font-bold text-[#00BFA6]`}>
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00BFA6] text-[11px] font-black text-black" aria-hidden="true">3</span>
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00BFA6] text-black" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="2">
+        <path d="M4.5 5.5h15v13h-15z" />
+        <path d="M8 9h8M8 12h8M8 15h5" />
+      </svg>
+    </span>
     <span className="text-[10px]">Tyotila</span>
     <span className="hidden" aria-hidden="true">▣</span> Työtila
   </a>
@@ -3444,7 +3459,12 @@ export default function Home() {
     }}
     className={`flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-1 text-[10px] font-bold transition-all focus-visible:outline-none ${showStyleStudio ? 'bg-[#7C5CFF]/18 text-[#9D84FF]' : theme === 'dark' ? 'text-gray-300 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}
   >
-    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black ${showStyleStudio ? 'bg-[#7C5CFF] text-white' : theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">4</span>
+    <span className={`flex h-6 w-6 items-center justify-center rounded-full ${showStyleStudio ? 'bg-[#7C5CFF] text-white' : theme === 'dark' ? 'bg-white/8 text-white' : 'bg-gray-100 text-gray-700'}`} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="2">
+        <path d="M12 3.5l1.2 2.6 2.9.5-2.1 2.1.5 2.9-2.5-1.4-2.5 1.4.5-2.9-2.1-2.1 2.9-.5z" />
+        <path d="M5 14.5h5M14 18.5h5" />
+      </svg>
+    </span>
     <span>Tyokalut</span>
   </button>
 
@@ -3453,7 +3473,11 @@ export default function Home() {
     onClick={() => setShowPaywall(true)}
     className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-[12px] bg-[#FF6F3C]/12 px-1 text-[10px] font-black text-[#FF6F3C] transition-all hover:bg-[#FF6F3C]/18 focus-visible:outline-none"
   >
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FF6F3C] text-[11px] font-black text-black" aria-hidden="true">5</span>
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FF6F3C] text-black" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
+        <path d="M12 2l2.3 6.7H21l-5.4 3.9 2.1 6.9-5.7-4.1-5.7 4.1 2.1-6.9L3 8.7h6.7z" />
+      </svg>
+    </span>
     <span className="hidden" aria-hidden="true">▲</span> PRO
   </button>
 </nav>
