@@ -5796,23 +5796,26 @@ export default function Home() {
             )}
           </div>
 
-          {/* Ponnahdusilmoitukset (Alerts) */}
-          {(message || errorMessage) && (
-            <div
-              role="alert"
-              aria-live={errorMessage ? "assertive" : "polite"}
-              className={`fixed bottom-[100px] sm:bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[16px] border p-5 sm:p-6 text-sm sm:text-base font-bold shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all animate-in slide-in-from-bottom-5 ${
-                errorMessage
-                  ? "border-red-500/30 bg-[#1f1012]/95 text-red-200 backdrop-blur-xl"
-                  : "border-[#00BFA6]/30 bg-[#0f172a]/92 text-white backdrop-blur-xl"
-              }`}
-            >
-              {errorMessage || message}
-            </div>
-          )}
         </section>
       </div>
-    </div>{/* MODAALIT */}
+    </div>
+
+    {/* Ponnahdusilmoitukset (Alerts) */}
+    {(message || errorMessage) && (
+      <div
+        role="alert"
+        aria-live={errorMessage ? "assertive" : "polite"}
+        className={`fixed bottom-[100px] sm:bottom-8 right-4 left-4 sm:left-auto sm:right-8 sm:max-w-md z-50 rounded-[16px] border p-5 sm:p-6 text-sm sm:text-base font-bold shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-all animate-in slide-in-from-bottom-5 ${
+          errorMessage
+            ? "border-red-500/30 bg-[#1f1012]/95 text-red-200 backdrop-blur-xl"
+            : "border-[#00BFA6]/30 bg-[#0f172a]/92 text-white backdrop-blur-xl"
+        }`}
+      >
+        {errorMessage || message}
+      </div>
+    )}
+
+    {/* MODAALIT */}
 
     {/* ATS SCANNER */}
     {atsJob && (
