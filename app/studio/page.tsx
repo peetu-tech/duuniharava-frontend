@@ -943,7 +943,7 @@ function JobCard({
                   theme === 'dark' ? "border-white/10 bg-white/5 text-white hover:bg-white/10" : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                {showJobTools ? "Piilota lisäTy�kalut" : "LisäTy�kalut"}
+                {showJobTools ? "Piilota lis?ty?kalut" : "Lis?ty?kalut"}
               </button>
 
               <button
@@ -970,7 +970,7 @@ function JobCard({
             {showJobTools && (
               <div className={`mt-4 rounded-[18px] border p-4 sm:p-5 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-gray-50/90'}`}>
                 <p className={`mb-4 text-xs font-black uppercase tracking-[0.2em] ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                  LisäTy�kalut
+                  Lis?ty?kalut
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
@@ -1109,7 +1109,7 @@ function JobCard({
             id={`salary-${job.id}`}
             value={job.salary || ""}
             onChange={(e) => onUpdate({ salary: e.target.value })}
-            placeholder="Esim. 2800�?"3200 �,�/kk"
+            placeholder={"Esim. 2800\u20133200 \u20AC/kk"}
             className={InputClass(theme)}
           />
         </div>
@@ -1853,7 +1853,7 @@ export default function Home() {
     ) || 0;
   const workspaceTabLabel =
     tab === "cv"
-      ? "CV-Ty�tila"
+      ? "CV-ty?tila"
       : tab === "jobs"
         ? "Työpaikkaseuranta"
         : tab === "hakemus"
@@ -1884,13 +1884,13 @@ export default function Home() {
       ? "Tarkenna työnhaku ja hae paikkoja"
       : activeJob
         ? `Jatka työpaikan "${activeJob.title || "valittu paikka"}" kanssa`
-        : "Avaa Ty�tila ja jatka valituista korteista";
+        : "Avaa ty?tila ja jatka valituista korteista";
   const nextStepDescription = !cvResult
     ? "Aloita vain nimellä, sähköpostilla, tavoitteella ja kokemuksella. Muut kentät voi täydentää myöhemmin."
     : filteredJobs.length === 0
       ? "Kun kerrot roolit, alueen ja työajan, studio hakee sinulle sopivimmat paikat valmiiksi."
       : activeJob
-        ? "CV, työpaikka ja hakemus löytyvät nyt samasta Ty�tilasta ilman ylimääräistä pomppimista."
+        ? "CV, ty?paikka ja hakemus l?ytyv?t nyt samasta ty?tilasta ilman ylim??r?ist? pomppimista."
         : "Oikea puoli on nyt tärkein alue. Siellä muokkaat, vertailet ja viimeistelet.";
 
   useEffect(() => {
@@ -2289,7 +2289,7 @@ export default function Home() {
       desiredLocation: "Pirkanmaa",
       workType: "Kokoaikainen",
       shiftPreference: "Päivätyö",
-      salaryWish: "4500 �,� / kk",
+      salaryWish: "4500 ? / kk",
       keywords: "B2B, myynti, tavoitteellinen",
     });
 
@@ -2729,7 +2729,7 @@ export default function Home() {
         sources: ["Duunitori", "Oikotie", "LinkedIn", "Työmarkkinatori"],
         strictFreshness: true,
         instructions:
-          "Hae vain oikeasti NYT avoinna olevia, aitoja työpaikkoja useista lähteistä. �"lä keksi ilmoituksia äläkä palauta vanhoja (esim. vuodelta 2024 tai 2025).",
+          "Hae vain oikeasti NYT avoinna olevia, aitoja ty?paikkoja useista l?hteist?. ?l? keksi ilmoituksia ?l?k? palauta vanhoja (esim. vuodelta 2024 tai 2025).",
       };
       const searchKey = JSON.stringify({
         targetJob: searchPayload.targetJob,
@@ -2747,7 +2747,7 @@ export default function Home() {
       ) {
         setLastJobsSearchMeta({
           searchedAt: new Date(cachedSearch.timestamp).toISOString(),
-          sourceSummary: "�"skeinen haku muistista",
+          sourceSummary: "?skeinen haku muistista",
           resultCount: cachedSearch.jobs.length,
           sources: Array.from(
             new Set(
@@ -3074,7 +3074,7 @@ export default function Home() {
       setSavedLetters((prev) => [savedLetter, ...prev]);
       setTab("hakemus");
       setLetterViewMode("edit");
-      setMessage("Hakemus luotu �?" muokkaa ja lataa se alta.");
+      setMessage("Hakemus luotu ? muokkaa ja lataa se alta.");
       setTimeout(() => setMessage(""), 2500);
       void trackUsageEvent("cover_letter_generated", {
         tone: letterTone,
@@ -3188,7 +3188,7 @@ export default function Home() {
       const data = await res.json();
       setSparringChat([...newChat, { role: "ai", text: data.output || "Jokin meni pieleen, yritä uudelleen." }]);
     } catch {
-      setSparringChat([...newChat, { role: "ai", text: "Yhteysvirhe �?" tarkista internetyhteys ja yritä uudelleen." }]);
+      setSparringChat([...newChat, { role: "ai", text: "Yhteysvirhe ? tarkista internetyhteys ja yrit? uudelleen." }]);
     } finally {
       setIsSparringTyping(false);
     }
@@ -3213,7 +3213,7 @@ export default function Home() {
       const data = await res.json();
       setSkillOutput(data.output || "Tekoäly ei palauttanut tulosta.");
     } catch {
-      setErrorMessage("Yhteysvirhe �?" yritä uudelleen.");
+      setErrorMessage("Yhteysvirhe ? yrit? uudelleen.");
     } finally {
       setIsTranslating(false);
     }
@@ -3248,7 +3248,7 @@ export default function Home() {
         missing: Array.isArray(parsed.missing) ? parsed.missing : [],
       });
     } catch {
-      setErrorMessage("ATS-skannaus epäonnistui �?" yritä uudelleen.");
+      setErrorMessage("ATS-skannaus ep?onnistui ? yrit? uudelleen.");
     } finally {
       setIsAtsScanning(false);
     }
@@ -3279,7 +3279,7 @@ export default function Home() {
       const parsed = JSON.parse(data.output || "[]");
       setPrepQuestions(Array.isArray(parsed) ? parsed : []);
     } catch {
-      setErrorMessage("Haastattelukysymysten generointi epäonnistui �?" yritä uudelleen.");
+      setErrorMessage("Haastattelukysymysten generointi ep?onnistui ? yrit? uudelleen.");
     } finally {
       setIsPrepping(false);
     }
@@ -3445,7 +3445,7 @@ export default function Home() {
         <path d="M8 9h8M8 12h8M8 15h5" />
       </svg>
     </span>
-    <span className="text-[10px]">Ty�tila</span>
+    <span className="text-[10px]">{"Ty\u00F6tila"}</span>
     <span className="hidden" aria-hidden="true">�-�</span> Ty�tila
   </a>
 
@@ -3461,7 +3461,7 @@ export default function Home() {
         <path d="M5 14.5h5M14 18.5h5" />
       </svg>
     </span>
-    <span>Ty�kalut</span>
+    <span>{"Ty\u00F6kalut"}</span>
   </button>
 
   <button
@@ -3502,7 +3502,7 @@ export default function Home() {
                   onClick={() => setShowPaywall(true)} 
                   className="hidden rounded-[14px] bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-6 py-2.5 text-sm font-black text-black shadow-[0_0_15px_rgba(0,191,166,0.3)] transition-transform hover:scale-[1.02] md:flex"
                 >
-                  �o� P�"IVIT�" PRO
+                  {"P\u00C4IVIT\u00C4 PRO"}
                 </button>
               )}
 
@@ -3510,21 +3510,21 @@ export default function Home() {
                 onClick={openArchiveModal}
                 className="rounded-[14px] border border-white/10 px-4 py-2.5 text-xs font-black whitespace-nowrap text-[#00BFA6] transition-all hover:bg-[#00BFA6]/10 hover:text-[#7af4e2] focus-visible:outline-none sm:text-sm"
               >
-                �Y-,️ TALLENTEET
+                TALLENTEET
               </button>
 
               <button
                 onClick={() => setShowSettings(true)}
                 className="rounded-[14px] border border-white/10 px-4 py-2.5 text-xs font-black whitespace-nowrap text-gray-400 transition-all hover:bg-white/5 hover:text-white focus-visible:outline-none sm:text-sm"
               >
-                �sT️ ASETUKSET
+                ASETUKSET
               </button>
 
               <button
                 onClick={() => router.push('/tyokalut')}
                 className="hidden rounded-[14px] border border-purple-500/30 bg-purple-500/10 px-4 py-2.5 text-xs font-black whitespace-nowrap text-purple-400 transition-all hover:bg-purple-500/20 hover:text-purple-300 focus-visible:outline-none sm:inline-block sm:text-sm"
               >
-                �Y>�️ TY�-KALUPAKKI
+                {"TY\u00D6KALUPAKKI"}
               </button>
 
               <button
@@ -3532,7 +3532,7 @@ export default function Home() {
                 className="rounded-[14px] border border-white/10 px-4 py-2.5 text-xs font-black whitespace-nowrap text-gray-400 transition-all hover:bg-white/5 hover:text-white focus-visible:outline-none sm:text-sm"
                 aria-label={theme === 'light' ? 'Vaihda tummaan teemaan' : 'Vaihda vaaleaan teemaan'}
               >
-                {theme === 'light' ? '�YOT TUMMA' : '�~?️ VAALEA'}
+                {theme === 'light' ? 'TUMMA' : 'VAALEA'}
               </button>
             </div>
           </div>
@@ -3563,7 +3563,7 @@ export default function Home() {
                     aria-expanded={showHelp}
                     aria-controls="help-section"
                   >
-                    <span className="text-2xl" aria-hidden="true">�Y'�</span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
+                    <span className="text-2xl" aria-hidden="true"></span> {showHelp ? "Piilota ohjeet" : "Näytä selkeät käyttöohjeet"}
                   </button>
 
                   <button
@@ -3590,10 +3590,10 @@ export default function Home() {
                     1. Täytä tärkeimmät tiedot
                   </div>
                   <div className={`rounded-[16px] border px-6 py-7 text-sm leading-7 shadow-[0_8px_24px_rgba(0,0,0,0.06)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
-                    2. Muokkaa CV:tä omassa Ty�tilassa
+                    {"2. Muokkaa CV:t\u00E4 omassa ty\u00F6tilassa"}
                   </div>
                   <div className={`rounded-[16px] border px-6 py-7 text-sm leading-7 shadow-[0_8px_24px_rgba(0,0,0,0.06)] ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/70'}`}>
-                    3. Avaa Ty�kalut vasta kun tarvitset niitä
+                    {"3. Avaa ty\u00F6kalut vasta kun tarvitset niit\u00E4"}
                   </div>
                 </div>
                 )}
@@ -3671,7 +3671,7 @@ export default function Home() {
             <div className="rounded-[20px] border-2 border-[#00BFA6]/30 bg-zinc-900 p-8 shadow-[0_12px_30px_rgba(0,0,0,0.16)] sm:p-14 sm:shadow-2xl sm:backdrop-blur-xl">
               <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
                 <h2 id="help-heading" className="text-3xl sm:text-4xl font-black text-white tracking-tight">Näin käytät Duuniharavaa</h2>
-                <button onClick={() => setShowHelp(false)} aria-label="Sulje ohjeet" className="p-2 text-xl font-bold text-gray-400 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">�o. Sulje</button>
+                <button onClick={() => setShowHelp(false)} aria-label="Sulje ohjeet" className="p-2 text-xl font-bold text-gray-400 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]">Sulje</button>
               </div>
               
               <div className="space-y-10 text-gray-300 text-lg leading-relaxed">
@@ -3742,7 +3742,7 @@ export default function Home() {
                   onClick={() => scrollToSection("studio-tulokset")}
                   className={`rounded-[14px] border px-6 py-4 text-sm font-black transition-all sm:text-base ${theme === 'dark' ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-200 bg-white/80 text-gray-800 hover:bg-white'}`}
                 >
-                  Avaa Ty�tila
+                  {"Avaa ty\u00F6tila"}
                 </button>
               </div>
             </div>
@@ -3764,7 +3764,7 @@ export default function Home() {
             </div>
 
             <div className={`rounded-[18px] border p-8 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Ty�tila nyt</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">{"Ty\u00F6tila nyt"}</p>
               <p className={`mt-4 text-2xl font-black leading-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{workspaceTabLabel}</p>
               <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                 {workspaceSummary}
@@ -3832,7 +3832,7 @@ export default function Home() {
                   onClick={() => scrollToSection("studio-tulokset")}
                   className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition-all ${theme === 'dark' ? 'border border-white/10 bg-black/30 text-gray-300 hover:border-[#00BFA6]/40 hover:text-white' : 'border border-gray-200 bg-gray-50 text-gray-700 hover:bg-white'}`}
                 >
-                  Ty�tila
+                  Työtila
                 </button>
               </div>
 
@@ -4191,7 +4191,7 @@ export default function Home() {
                           <label htmlFor="search-salaryWish" className={LabelClass(theme)}>Palkkatoive</label>
                           <input
                             id="search-salaryWish"
-                            placeholder="Esim. 3000�,� / kk"
+                            placeholder={"Esim. 3000 \u20AC / kk"}
                             value={searchProfile.salaryWish}
                             onChange={(e) =>
                               updateSearchProfile("salaryWish", e.target.value)
@@ -4229,7 +4229,7 @@ export default function Home() {
                       className="w-full rounded-[14px] bg-gradient-to-r from-[#00BFA6] to-[#FF6F3C] px-8 py-6 text-lg sm:text-xl font-black text-black transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_0_25px_rgba(0,191,166,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6F3C]"
                       aria-live="polite"
                     >
-                      {loadingJobs ? "Etsitään..." : "2. EHDOTA TY�-PAIKKOJA"}
+                      {loadingJobs ? "Etsit\u00E4\u00E4n..." : "2. EHDOTA TY\u00D6PAIKKOJA"}
                     </button>
                     <FieldHint theme={theme}>
                       Kun painat tätä, studio hakee sinulle ehdotuksia tämän profiilin perusteella ja siirtää ne heti Työpaikat-välilehden kortteihin.
@@ -4249,7 +4249,7 @@ export default function Home() {
               <div className={`rounded-[24px] border p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:p-7 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-3xl">
-                    <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Rauhallinen Ty�tila</p>
+                    <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Rauhallinen työtila</p>
                     <h3 className={`mt-2 text-2xl sm:text-3xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {workspaceTabLabel}
                     </h3>
@@ -4283,7 +4283,7 @@ export default function Home() {
                     onClick={() => setShowPaywall(true)} 
                     className="flex items-center gap-2 rounded-[14px] border border-white/20 bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-3 text-sm font-black text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-transform hover:scale-[1.02]"
                   >
-                    <span className="text-lg">�-�</span> P�"IVIT�" PRO -TASOLLE
+                    <span className="text-lg"></span> {"P\u00C4IVIT\u00C4 PRO -TASOLLE"}
                   </button>
                 </div>
               )}
@@ -4362,12 +4362,12 @@ export default function Home() {
                     <div className={`rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.09),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div className="flex flex-col gap-8">
                         <div className="max-w-3xl">
-                          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">CV-Ty�tila</p>
+                          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">{"CV-ty\u00F6tila"}</p>
                           <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                             Muokkaa CV:tä omassa rauhallisessa näkymässä
                           </h3>
                           <p className={`mt-3 text-sm sm:text-base leading-7 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisäTy�kalut vasta kun niitä oikeasti tarvitset.
+                            Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisätyökalut vasta kun niitä oikeasti tarvitset.
                           </p>
                         </div>
                         <p className={`max-w-2xl rounded-[16px] border px-5 py-4 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-300' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
@@ -4485,7 +4485,7 @@ export default function Home() {
                                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Päämuokkaus</p>
                                 <h4 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Tekstieditori on piilotettu</h4>
                                 <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                  Avaa editori vasta kun haluat oikeasti muokata CV-tekstiä. Näin Ty�tila pysyy kevyempänä.
+                                  Avaa editori vasta kun haluat oikeasti muokata CV-tekstiä. Näin työtila pysyy kevyempänä.
                                 </p>
                               </div>
                               <button
@@ -4574,7 +4574,7 @@ export default function Home() {
                                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00BFA6]">Esikatselu</p>
                                 <h4 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Esikatselu on piilotettu</h4>
                                 <p className={`mt-3 text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                  Avaa esikatselu silloin kun haluat nähdä lopputuloksen. Muulloin tämä jättää Ty�tilaan enemmän hengitystilaa.
+                                  Avaa esikatselu silloin kun haluat nähdä lopputuloksen. Muulloin tämä jättää työtilaan enemmän hengitystilaa.
                                 </p>
                               </div>
                               <button
@@ -4596,7 +4596,7 @@ export default function Home() {
                               <h3 className={`mt-2 text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Näin CV näyttää</h3>
                             </div>
                             <p className={`max-w-xl text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                              Esikatselu skaalautuu puhelimen leveyteen. Muokkaa tekstiä yllä olevassa editorissa �?" muutokset näkyvät heti tässä.
+                              Esikatselu skaalautuu puhelimen leveyteen. Muokkaa tekstiä yllä olevassa editorissa – muutokset näkyvät heti tässä.
                             </p>
                           </div>
                           {isMobileViewport ? (
