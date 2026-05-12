@@ -5689,7 +5689,7 @@ export default function Home() {
                       >
                         {loadingLetter
                           ? "Tekoäly kirjoittaa..."
-                          : "3. KIRJOITA HAKEMUS T�"H�"N PAIKKAAN"}
+                          : {"3. KIRJOITA HAKEMUS T\u00C4H\u00C4N PAIKKAAN"}}
                       </button>
                     </div>
 
@@ -6710,7 +6710,7 @@ function SettingsModal({
             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 font-sans">Nykyinen jäsenyys</p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "? PRO-J�"SENYYS" : "Ilmaisversio"}</span>
+                <span className={`text-xl font-black ${isPro ? 'text-[#00BFA6]' : 'text-gray-400'}`}>{isPro ? "\u2B50 PRO-J\u00C4SENYYS" : "Ilmaisversio"}</span>
                 <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                   {isPro
                     ? "Kaikki tärkeimmät Ty�kalut, tallenteet ja räätälöinnit ovat käytössäsi."
