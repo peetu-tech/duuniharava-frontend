@@ -6751,10 +6751,10 @@ function PaywallModal({
 
   // Lista ominaisuuksista, jotka esitellään
   const features = [
-    { icon: "?", title: "Taikasauva-editori", desc: "Muokkaa tekstiä lennosta tekoälyllä suoraan esikatselussa." },
-    { icon: "�Y""", title: "Rajattomat asiakirjat", desc: "Luo ja räätälöi niin monta CV:tä ja hakemusta kuin tarvitset." },
-    { icon: "�YZ�", title: "Täydellinen räätälöinti", desc: "Räätälöi CV:si automaattisesti vastaamaan työpaikkailmoituksen vaatimuksia." },
-    { icon: "�Y-�️", title: "Haastattelusimulaattori", desc: "Harjoittele työhaastattelua varten räätälöidyillä kysymyksillä." },
+    { icon: "\u2728", title: "Taikasauva-editori", desc: "Muokkaa tekstiä lennosta tekoälyllä suoraan esikatselussa." },
+    { icon: "\u221E", title: "Rajattomat asiakirjat", desc: "Luo ja räätälöi niin monta CV:tä ja hakemusta kuin tarvitset." },
+    { icon: "\uD83C\uDFA8", title: "Täydellinen räätälöinti", desc: "Räätälöi CV:si automaattisesti vastaamaan työpaikkailmoituksen vaatimuksia." },
+    { icon: "\uD83C\uDFA4", title: "Haastattelusimulaattori", desc: "Harjoittele työhaastattelua varten räätälöidyillä kysymyksillä." },
   ];
 
   return (
