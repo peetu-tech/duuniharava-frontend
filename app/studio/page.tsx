@@ -5849,9 +5849,9 @@ export default function Home() {
                           <p className={`text-sm font-bold uppercase tracking-widest mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Pikaviestit</p>
                           <div className="flex flex-col gap-3">
                             {[
-                              { icon: "�o?️", label: "Kysy lisätietoja tehtävästä" },
-                              { icon: "�YT�", label: "Kiitosviesti haastattelun jälkeen" },
-                              { icon: "�Y"-", label: "LinkedIn-verkostoitumisviesti" },
+                              { icon: "\uD83D\uDCAC", label: "Kysy lisätietoja tehtävästä" },
+                              { icon: "\uD83D\uDE4F", label: "Kiitosviesti haastattelun jälkeen" },
+                              { icon: "\uD83E\uDD1D", label: "LinkedIn-verkostoitumisviesti" },
                             ].map(({ icon, label }) => (
                               <div
                                 key={label}
