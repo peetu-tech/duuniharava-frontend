@@ -5979,6 +5979,8 @@ export default function Home() {
 
               </div>
 
+          <div aria-hidden="true" className="hidden xl:block h-20 2xl:h-28" />
+
           {/* Ponnahdusilmoitukset (Alerts) */}
           {(message || errorMessage) && (
             <div
