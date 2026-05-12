@@ -5689,7 +5689,7 @@ export default function Home() {
                       >
                         {loadingLetter
                           ? "Tekoäly kirjoittaa..."
-                          : {"3. KIRJOITA HAKEMUS T\u00C4H\u00C4N PAIKKAAN"}}
+                          : "3. KIRJOITA HAKEMUS T\u00C4H\u00C4N PAIKKAAN"}
                       </button>
                     </div>
 
