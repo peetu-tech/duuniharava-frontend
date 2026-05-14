@@ -5072,6 +5072,7 @@ export default function Home() {
                         <p className="text-base">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
                       </div>
                     )}
+                    <div aria-hidden="true" className="hidden xl:block h-20 2xl:h-28" />
                   </div>
                 )}
 
