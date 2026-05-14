@@ -51,7 +51,7 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_40%,rgba(0,0,0,0.3))]" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-start px-4 py-6 sm:px-6 sm:py-12 lg:items-center lg:px-8 lg:py-16">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-start px-4 py-6 pb-20 sm:px-6 sm:py-12 lg:items-center lg:px-8 lg:py-16">
         <div className="grid w-full gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 xl:gap-20">
           <section className="max-w-2xl space-y-6 sm:space-y-8 lg:space-y-10">
             <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.24em] text-[#00BFA6] backdrop-blur-sm">
@@ -157,6 +157,8 @@ export default function LoginPage() {
           </section>
         </div>
       </div>
+
+      <div aria-hidden="true" className="h-16 sm:hidden" />
     </main>
   );
 }
