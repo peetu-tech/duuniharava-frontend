@@ -3545,18 +3545,18 @@ export default function Home() {
           
           <div className="relative mx-auto w-full max-w-[1680px] px-4 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-10 lg:py-12">
             
-            <div className="grid gap-5 sm:gap-6 lg:items-center">
+            <div className="grid gap-7 sm:gap-8 lg:items-center">
               <div>
-                <div className="mb-6 flex flex-wrap items-center gap-3">
+                <div className="mb-8 flex flex-wrap items-center gap-3">
                   <span className="rounded-full border border-[#00BFA6]/30 bg-[linear-gradient(135deg,rgba(0,191,166,0.18),rgba(0,191,166,0.08))] px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#7af4e2] shadow-[0_0_18px_rgba(0,191,166,0.18)]">
                     Duuniharava Studio
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-4">
                   <button
                     type="button"
                     onClick={() => setShowHelp(!showHelp)}
-                    className="rounded-[16px] border border-[#00BFA6]/30 bg-[linear-gradient(135deg,rgba(0,191,166,0.14),rgba(0,191,166,0.06))] px-6 py-3 text-sm font-black text-[#7af4e2] shadow-[0_0_18px_rgba(0,191,166,0.12)] transition-all hover:scale-[1.01] hover:border-[#00BFA6]/45 hover:bg-[#00BFA6]/16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]"
+                    className="rounded-[18px] border border-[#00BFA6]/35 bg-[linear-gradient(135deg,rgba(0,191,166,0.18),rgba(0,191,166,0.08))] px-7 py-4 text-base font-black text-[#9af8ed] shadow-[0_0_22px_rgba(0,191,166,0.16)] transition-all hover:scale-[1.01] hover:border-[#00BFA6]/50 hover:bg-[#00BFA6]/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]"
                     aria-expanded={showHelp}
                     aria-controls="help-section"
                   >
