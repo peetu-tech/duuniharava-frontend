@@ -5067,7 +5067,7 @@ export default function Home() {
                       </>
                     ) : (
                       <div className={`rounded-[20px] sm:rounded-[16px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`} role="status" aria-live="polite">
-                        <div className="text-5xl mb-6" aria-hidden="true">\uD83D\uDCC4</div>
+                        <div className="text-5xl mb-6" aria-hidden="true">{"\uD83D\uDCC4"}</div>
                         <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei esikatselua vielä</p>
                         <p className="text-base">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
                       </div>
@@ -6770,11 +6770,11 @@ function PaywallModal({
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           
           <button onClick={onClose} className="absolute top-6 right-6 text-black/60 hover:text-white transition-colors z-10 p-2 focus-visible:outline-none">
-            <span className="font-black text-2xl">\u00D7</span>
+            <span className="font-black text-2xl">{"\u00D7"}</span>
           </button>
           
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white mb-6 backdrop-blur-sm">
-            <span className="text-4xl" aria-hidden="true">\u2728</span>
+            <span className="text-4xl" aria-hidden="true">{"\u2728"}</span>
           </div>
           
           <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tighter mb-3">Vapauta täysi potentiaalisi</h2>
@@ -6808,7 +6808,7 @@ function PaywallModal({
 
           <div className={`p-6 rounded-[18px] border text-center ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
             <p className="text-5xl font-black tracking-tight mb-2">
-              9,90 \u20AC <span className="text-lg opacity-60 font-bold">/ kk</span>
+              {"9,90 \u20AC"} <span className="text-lg opacity-60 font-bold">/ kk</span>
             </p>
             <p className="text-sm opacity-60 mb-6 font-medium">Laskutetaan kuukausittain. Peruuta milloin tahansa.</p>
             
