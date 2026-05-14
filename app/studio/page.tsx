@@ -3538,16 +3538,17 @@ export default function Home() {
           </div>
         </nav>
 
-        <section className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,rgba(28,28,28,0.96),rgba(18,18,18,0.9))]" aria-labelledby="hero-heading">
+        <section className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,rgba(22,22,22,0.98),rgba(12,12,12,0.94))]" aria-labelledby="hero-heading">
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_32%,rgba(0,0,0,0.32))]" />
+          <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(180deg,rgba(0,0,0,0.6),transparent_85%)]" aria-hidden="true" />
           
           <div className="relative mx-auto w-full max-w-[1680px] px-4 sm:px-6 lg:px-8 xl:px-10 py-14 sm:py-18 lg:py-22">
             
             <div className="grid gap-10 sm:gap-12 lg:items-center">
               <div>
                 <div className="mb-6 flex flex-wrap items-center gap-3">
-                  <span className="rounded-full border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#00BFA6]">
+                  <span className="rounded-full border border-[#00BFA6]/30 bg-[linear-gradient(135deg,rgba(0,191,166,0.18),rgba(0,191,166,0.08))] px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#7af4e2] shadow-[0_0_18px_rgba(0,191,166,0.18)]">
                     Duuniharava Studio
                   </span>
                   <span className={`rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-300' : 'border-gray-200 bg-white/80 text-gray-600'}`}>
@@ -3555,23 +3556,23 @@ export default function Home() {
                   </span>
                 </div>
                 <h1 id="hero-heading" className="mb-7 max-w-5xl text-[3.1rem] font-black leading-[0.9] tracking-tight sm:mb-8 sm:text-6xl lg:text-7xl xl:text-[5.3rem]">
-                  Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
+                  Tee työhausta <span className="bg-[linear-gradient(135deg,#8CF3E6,#00BFA6_45%,#FF8B5C)] bg-clip-text text-transparent">terävämpää.</span>
                 </h1>
 
                 <p className={`mb-8 max-w-3xl text-base leading-8 sm:text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä.
+                  Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä. Tämän pitäisi tuntua enemmän työkalulta kuin lomakkeelta.
                 </p>
 
                 <div className="grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/80'}`}>
+                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/80'}`}>
                     <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Yksi työtila</p>
                     <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Ei irrallisia dokumentteja, muistiinpanoja ja välilehtiä eri paikoissa.</p>
                   </div>
-                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/80'}`}>
+                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/80'}`}>
                     <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Nopea flow</p>
                     <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Täytä, generoi, tarkenna, hae. Kaikki etenee samassa näkymässä.</p>
                   </div>
-                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/80'}`}>
+                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/80'}`}>
                     <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Terävämpi lopputulos</p>
                     <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>CV, paikat ja hakemukset näyttävät siltä että niillä voi oikeasti voittaa.</p>
                   </div>
@@ -4304,12 +4305,12 @@ export default function Home() {
               
               {/* OSTATKO PRO-TASON? Nappi näkyy oikean sarakkeen huipulla, jos ei ole vielä pro */}
               {!isPro && (
-                <div className="mb-5 flex w-full justify-end">
+                <div className="mb-6 flex w-full justify-end">
                   <button 
                     onClick={() => setShowPaywall(true)} 
-                    className="flex items-center gap-2 rounded-[14px] border border-white/20 bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-3 text-sm font-black text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-transform hover:scale-[1.02]"
+                    className="flex items-center gap-2 rounded-[16px] border border-purple-400/25 bg-[linear-gradient(135deg,rgba(139,92,246,0.28),rgba(99,102,241,0.2))] px-6 py-3 text-sm font-black text-white shadow-[0_0_24px_rgba(168,85,247,0.35)] transition-all hover:scale-[1.02] hover:border-purple-300/40 hover:shadow-[0_0_30px_rgba(168,85,247,0.45)]"
                   >
-                    <span className="text-lg"></span> {"P\u00C4IVIT\u00C4 PRO -TASOLLE"}
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-purple-100/90">Pro</span> {"P\u00C4IVIT\u00C4 PRO -TASOLLE"}
                   </button>
                 </div>
               )}
@@ -4397,7 +4398,7 @@ export default function Home() {
                             Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisätyökalut vasta kun niitä oikeasti tarvitset.
                           </p>
                         </div>
-                        <p className={`max-w-2xl rounded-[16px] border px-5 py-4 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-black/25 text-gray-300' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
+                        <p className={`max-w-2xl rounded-[18px] border px-5 py-4 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.18))] text-gray-300' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
                           Etene tässä rauhassa: avaa tekstieditori vasta kun haluat muokata, avaa esikatselu vasta kun haluat tarkistaa lopputuloksen.
                         </p>
                       </div>
