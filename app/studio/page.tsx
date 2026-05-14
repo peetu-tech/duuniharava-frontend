@@ -745,12 +745,13 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-24 sm:mb-28 xl:mb-32 rounded-[24px] border p-10 sm:p-14 xl:p-18 shadow-[0_14px_40px_rgba(0,0,0,0.14)] sm:shadow-[0_20px_54px_rgba(0,0,0,0.18)] transition-all duration-300 scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(24,24,24,0.98),rgba(15,15,15,0.98))] hover:border-white/14' : 'border-gray-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,250,251,0.98))] hover:border-gray-300'}`}
+      className={`group mb-24 sm:mb-28 xl:mb-32 rounded-[24px] border p-10 sm:p-14 xl:p-18 shadow-[0_14px_40px_rgba(0,0,0,0.14)] sm:shadow-[0_20px_54px_rgba(0,0,0,0.18)] transition-all duration-300 scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(24,24,24,0.98),rgba(15,15,15,0.98))] hover:border-[#00BFA6]/24' : 'border-gray-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,250,251,0.98))] hover:border-[#00BFA6]/30'}`}
       open={defaultOpen}
     >
       <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 sm:gap-10 border-b pb-8 sm:pb-10 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/6' : 'border-gray-100'}`}>
         <div className="w-full sm:w-auto flex justify-between items-center">
-          <div>
+          <div className="relative pl-5">
+            <span aria-hidden="true" className="absolute left-0 top-1 h-12 w-[3px] rounded-full bg-[linear-gradient(180deg,#00BFA6,#FF6F3C)] opacity-80" />
             <p className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
               {step}
             </p>
@@ -4301,7 +4302,7 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[32px] border p-5 shadow-[0_18px_48px_rgba(0,0,0,0.18)] transition-all sm:p-6 sm:shadow-[0_26px_72px_rgba(0,0,0,0.24)] ${theme === 'dark' ? 'bg-[linear-gradient(180deg,rgba(13,13,13,0.98),rgba(18,18,18,0.98))] border-white/8' : 'bg-gray-100/92 border-gray-200'}`}>
+          <div className={`rounded-[32px] border p-5 shadow-[0_18px_48px_rgba(0,0,0,0.18)] transition-all sm:p-6 sm:shadow-[0_26px_72px_rgba(0,0,0,0.24)] ${theme === 'dark' ? 'bg-[linear-gradient(180deg,rgba(13,13,13,0.98),rgba(18,18,18,0.98))] border-white/8' : 'bg-gray-100/92 border-gray-200'}`}>
                 
                 {/* V�"LILEHTINAPIT (ARIA TABLIST) */}
                 <div 
@@ -4372,8 +4373,9 @@ export default function Home() {
 
                 {tab === "cv" && (
                   <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-10 overflow-hidden px-1 animate-in fade-in duration-500 sm:space-y-12 sm:px-1 xl:space-y-14">
-                    <div className={`relative overflow-hidden rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.1),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                    <div className={`relative overflow-hidden rounded-[30px] sm:rounded-[32px] border p-8 sm:p-11 lg:p-14 shadow-[0_24px_70px_rgba(0,0,0,0.22)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/22 bg-[linear-gradient(180deg,rgba(0,191,166,0.11),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div aria-hidden="true" className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl" />
+                      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)]" />
                       <div className="flex flex-col gap-8">
                         <div className="max-w-3xl">
                           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">{"CV-ty\u00F6tila"}</p>
@@ -4384,7 +4386,7 @@ export default function Home() {
                             Täytä tiedot vasemmalla, muokkaa valmis CV tässä näkymässä ja avaa lisätyökalut vasta kun niitä oikeasti tarvitset.
                           </p>
                         </div>
-                        <p className={`max-w-2xl rounded-[18px] border px-5 py-4 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.18))] text-gray-300' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
+                        <p className={`max-w-2xl rounded-[18px] border px-5 py-4 text-sm leading-7 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.18))] text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]' : 'border-gray-200 bg-white/80 text-gray-700'}`}>
                           Etene tässä rauhassa: avaa tekstieditori vasta kun haluat muokata, avaa esikatselu vasta kun haluat tarkistaa lopputuloksen.
                         </p>
                       </div>
@@ -4394,7 +4396,7 @@ export default function Home() {
                     </div>
 
                     {parsedCv.cvBody && activeJob && (
-                      <div className={`flex flex-col sm:flex-row gap-5 p-6 rounded-[18px] border ${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                      <div className={`flex flex-col sm:flex-row gap-5 rounded-[20px] border p-6 ${theme === 'dark' ? 'bg-[linear-gradient(180deg,rgba(255,111,60,0.08),rgba(0,0,0,0.18))] border-[#FF6F3C]/20' : 'bg-gray-50 border-gray-200'}`}>
                         <div className="flex-1">
                           <p className={`text-base mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Valittu työpaikka: <strong className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeJob.title}</strong></p>
                           <button
