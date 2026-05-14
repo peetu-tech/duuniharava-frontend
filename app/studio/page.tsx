@@ -745,10 +745,10 @@ function SectionShell({
   return (
     <details 
       id={id} 
-      className={`group mb-24 sm:mb-28 xl:mb-32 rounded-[20px] border p-14 sm:p-20 xl:p-28 shadow-[0_10px_24px_rgba(0,0,0,0.1)] sm:shadow-[0_16px_36px_rgba(0,0,0,0.14)] transition-colors scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[#141414]' : 'border-gray-200 bg-white'}`}
+      className={`group mb-24 sm:mb-28 xl:mb-32 rounded-[24px] border p-10 sm:p-14 xl:p-18 shadow-[0_14px_40px_rgba(0,0,0,0.14)] sm:shadow-[0_20px_54px_rgba(0,0,0,0.18)] transition-all duration-300 scroll-mt-24 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(24,24,24,0.98),rgba(15,15,15,0.98))] hover:border-white/14' : 'border-gray-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,250,251,0.98))] hover:border-gray-300'}`}
       open={defaultOpen}
     >
-      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-10 sm:gap-12 border-b pb-10 sm:pb-14 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
+      <summary className={`list-none flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 sm:gap-10 border-b pb-8 sm:pb-10 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] rounded-[16px] [&::-webkit-details-marker]:hidden ${theme === 'dark' ? 'border-white/6' : 'border-gray-100'}`}>
         <div className="w-full sm:w-auto flex justify-between items-center">
           <div>
             <p className="text-[11px] sm:text-[13px] font-black uppercase tracking-[0.24em] text-[#00BFA6]" aria-hidden="true">
@@ -759,7 +759,7 @@ function SectionShell({
             </h2>
           </div>
           <div className={`sm:hidden flex items-center justify-center w-10 h-10 rounded-[14px] border transition-transform group-open:rotate-180 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
-            �O"
+            <span aria-hidden="true">⌄</span>
           </div>
         </div>
         
@@ -768,9 +768,9 @@ function SectionShell({
         </div>
       </summary>
 
-      <div className="mt-20 pb-20 sm:pb-24 animate-in fade-in duration-300">
+      <div className="mt-14 pb-14 sm:mt-16 sm:pb-18 animate-in fade-in duration-300">
         {description ? (
-          <p className={`mb-16 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`mb-12 max-w-3xl text-base sm:text-lg leading-8 transition-colors ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {description}
           </p>
         ) : null}
@@ -3538,19 +3538,19 @@ export default function Home() {
           </div>
         </nav>
 
-        <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-zinc-900/50 to-transparent" aria-labelledby="hero-heading">
+        <section className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,rgba(28,28,28,0.96),rgba(18,18,18,0.9))]" aria-labelledby="hero-heading">
           <div className={`absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,191,166,0.15),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(255,111,60,0.1),transparent_30%)] ${theme === 'light' ? 'opacity-50' : ''}`} />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%,rgba(0,0,0,0.3))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_32%,rgba(0,0,0,0.32))]" />
           
-          <div className="relative mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-10 py-16 sm:py-20 lg:py-24">
+          <div className="relative mx-auto w-full max-w-[1680px] px-4 sm:px-6 lg:px-8 xl:px-10 py-14 sm:py-18 lg:py-22">
             
-            <div className="grid gap-14 sm:gap-16 lg:items-center">
+            <div className="grid gap-10 sm:gap-12 lg:items-center">
               <div>
-                <h1 id="hero-heading" className="mb-9 max-w-5xl text-[3.35rem] font-black leading-[0.9] tracking-tight sm:mb-9 sm:text-6xl lg:text-7xl xl:text-[5.6rem]">
+                <h1 id="hero-heading" className="mb-7 max-w-5xl text-[3.1rem] font-black leading-[0.9] tracking-tight sm:mb-8 sm:text-6xl lg:text-7xl xl:text-[5.3rem]">
                   Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
                 </h1>
 
-                <p className={`mb-10 max-w-3xl text-base leading-8 sm:text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <p className={`mb-8 max-w-3xl text-base leading-8 sm:text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä.
                 </p>
 
@@ -3773,7 +3773,7 @@ export default function Home() {
           </section>
           )}
 
-          <div className={`mb-24 rounded-[20px] border p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] sm:mb-28 sm:p-5 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-white/[0.03]' : 'border-gray-200 bg-white/90'}`}>
+          <div className={`mb-20 rounded-[22px] border p-4 shadow-[0_10px_26px_rgba(0,0,0,0.08)] sm:mb-24 sm:p-5 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/92'}`}>
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
@@ -3811,7 +3811,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={`mt-6 flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
+            <div className={`mt-5 flex flex-col gap-4 border-t pt-5 sm:flex-row sm:items-center sm:justify-between ${theme === 'dark' ? 'border-white/5' : 'border-gray-200'}`}>
               <div className="flex flex-wrap gap-4">
                 <button
                   type="button"
@@ -3845,7 +3845,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div aria-hidden="true" className="mb-16 h-16 sm:mb-20 sm:h-20 xl:mb-24 xl:h-24" />
+          <div aria-hidden="true" className="mb-12 h-12 sm:mb-16 sm:h-16 xl:mb-20 xl:h-20" />
 
           <div className="grid grid-cols-1 items-start gap-y-16 pb-20 sm:pb-24 xl:grid-cols-[minmax(440px,0.93fr)_112px_minmax(0,1.07fr)] xl:gap-y-0 xl:pb-28 2xl:grid-cols-[minmax(440px,0.93fr)_144px_minmax(0,1.07fr)] 2xl:pb-32">
             <section className="flex flex-col gap-24 pb-12 sm:gap-28 sm:pb-16 xl:pr-6 xl:pb-24 2xl:pr-8 2xl:pb-28">
@@ -4288,11 +4288,11 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[32px] border p-5 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-all sm:p-6 sm:shadow-2xl ${theme === 'dark' ? 'bg-[#0c0c0c] border-white/8' : 'bg-gray-100/90 border-gray-200'}`}>
+              <div className={`rounded-[32px] border p-5 shadow-[0_16px_42px_rgba(0,0,0,0.16)] transition-all sm:p-6 sm:shadow-[0_22px_62px_rgba(0,0,0,0.2)] ${theme === 'dark' ? 'bg-[linear-gradient(180deg,rgba(13,13,13,0.98),rgba(18,18,18,0.98))] border-white/8' : 'bg-gray-100/92 border-gray-200'}`}>
                 
                 {/* V�"LILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`z-40 mb-10 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-12 sm:gap-4 sm:px-5 sm:py-4 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
+                  className={`z-40 mb-8 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-10 sm:gap-4 sm:px-5 sm:py-4 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
