@@ -3543,19 +3543,15 @@ export default function Home() {
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_32%,rgba(0,0,0,0.32))]" />
           <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:linear-gradient(180deg,rgba(0,0,0,0.6),transparent_85%)]" aria-hidden="true" />
           
-          <div className="relative mx-auto w-full max-w-[1680px] px-4 sm:px-6 lg:px-8 xl:px-10 py-14 sm:py-18 lg:py-22">
+          <div className="relative mx-auto w-full max-w-[1680px] px-4 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-10 lg:py-12">
             
-            <div className="grid gap-8 sm:gap-10 lg:items-center">
+            <div className="grid gap-5 sm:gap-6 lg:items-center">
               <div>
                 <div className="mb-6 flex flex-wrap items-center gap-3">
                   <span className="rounded-full border border-[#00BFA6]/30 bg-[linear-gradient(135deg,rgba(0,191,166,0.18),rgba(0,191,166,0.08))] px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#7af4e2] shadow-[0_0_18px_rgba(0,191,166,0.18)]">
                     Duuniharava Studio
                   </span>
                 </div>
-                <h1 id="hero-heading" className="mb-7 max-w-5xl text-[3.1rem] font-black leading-[0.9] tracking-tight sm:mb-8 sm:text-6xl lg:text-7xl xl:text-[5.3rem]">
-                  Tee työhausta <span className="bg-[linear-gradient(135deg,#8CF3E6,#00BFA6_45%,#FF8B5C)] bg-clip-text text-transparent">helppoa.</span>
-                </h1>
-
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
