@@ -797,16 +797,16 @@ function StatCard({ title, value, description, theme }: { title: string; value: 
 function InputClass(theme: "light" | "dark") {
   return `w-full rounded-[16px] border px-6 py-5 text-base outline-none transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] min-h-[68px] ${
     theme === "dark"
-      ? "border-white/10 bg-black/50 text-white placeholder:text-gray-600 focus:border-[#00BFA6]"
-      : "border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:border-[#00BFA6]"
+      ? "border-white/10 bg-[linear-gradient(180deg,rgba(0,0,0,0.48),rgba(10,10,10,0.72))] text-white placeholder:text-gray-600 focus:border-[#00BFA6] focus:bg-black/60 focus:shadow-[0_0_0_4px_rgba(0,191,166,0.08)]"
+      : "border-gray-200 bg-[linear-gradient(180deg,rgba(249,250,251,1),rgba(243,244,246,1))] text-gray-900 placeholder:text-gray-400 focus:border-[#00BFA6] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,191,166,0.08)]"
   }`;
 }
 
 function TextareaClass(minHeight: string, theme: "light" | "dark") {
   return `w-full rounded-[16px] border px-6 py-5 text-base leading-8 outline-none transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00BFA6] shadow-inner ${minHeight} ${
     theme === "dark"
-      ? "border-white/10 bg-black/50 text-white placeholder:text-gray-600 focus:border-[#00BFA6]"
-      : "border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:border-[#00BFA6]"
+      ? "border-white/10 bg-[linear-gradient(180deg,rgba(0,0,0,0.48),rgba(10,10,10,0.72))] text-white placeholder:text-gray-600 focus:border-[#00BFA6] focus:bg-black/60 focus:shadow-[0_0_0_4px_rgba(0,191,166,0.08)]"
+      : "border-gray-200 bg-[linear-gradient(180deg,rgba(249,250,251,1),rgba(243,244,246,1))] text-gray-900 placeholder:text-gray-400 focus:border-[#00BFA6] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,191,166,0.08)]"
   }`;
 }
 
@@ -3546,6 +3546,14 @@ export default function Home() {
             
             <div className="grid gap-10 sm:gap-12 lg:items-center">
               <div>
+                <div className="mb-6 flex flex-wrap items-center gap-3">
+                  <span className="rounded-full border border-[#00BFA6]/30 bg-[#00BFA6]/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#00BFA6]">
+                    Duuniharava Studio
+                  </span>
+                  <span className={`rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-300' : 'border-gray-200 bg-white/80 text-gray-600'}`}>
+                    CV, paikat ja hakemukset samassa rytmissä
+                  </span>
+                </div>
                 <h1 id="hero-heading" className="mb-7 max-w-5xl text-[3.1rem] font-black leading-[0.9] tracking-tight sm:mb-8 sm:text-6xl lg:text-7xl xl:text-[5.3rem]">
                   Tee työhausta <span className="text-[#00BFA6]">helppoa.</span>
                 </h1>
@@ -3553,6 +3561,21 @@ export default function Home() {
                 <p className={`mb-8 max-w-3xl text-base leading-8 sm:text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä.
                 </p>
+
+                <div className="grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/80'}`}>
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Yksi työtila</p>
+                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Ei irrallisia dokumentteja, muistiinpanoja ja välilehtiä eri paikoissa.</p>
+                  </div>
+                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/80'}`}>
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Nopea flow</p>
+                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Täytä, generoi, tarkenna, hae. Kaikki etenee samassa näkymässä.</p>
+                  </div>
+                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-black/25' : 'border-gray-200 bg-white/80'}`}>
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Terävämpi lopputulos</p>
+                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>CV, paikat ja hakemukset näyttävät siltä että niillä voi oikeasti voittaa.</p>
+                  </div>
+                </div>
 
                 {false && (
                 <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:gap-5">
@@ -3773,13 +3796,16 @@ export default function Home() {
           </section>
           )}
 
-          <div className={`mb-20 rounded-[22px] border p-4 shadow-[0_10px_26px_rgba(0,0,0,0.08)] sm:mb-24 sm:p-5 sm:shadow-xl ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/92'}`}>
+          <div className={`mb-20 rounded-[24px] border p-4 shadow-[0_14px_34px_rgba(0,0,0,0.12)] sm:mb-24 sm:p-6 sm:shadow-[0_18px_44px_rgba(0,0,0,0.16)] ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(246,247,249,0.98))]'}`}>
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between" role="group" aria-label="Valitse toiminto">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Studio-asetus</p>
                 <h2 className={`mt-2 text-xl sm:text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Valitse ensin tapa työskennellä, sitten etene omaan tahtiin
                 </h2>
+                <p className={`mt-3 max-w-2xl text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Pidä vasen puoli datalle, oikea puoli päätöksille. Kun rakenne pysyy selkeänä, työnhaku ei tunnu sekavalta.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:min-w-[520px]">
@@ -4288,11 +4314,11 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={`rounded-[32px] border p-5 shadow-[0_16px_42px_rgba(0,0,0,0.16)] transition-all sm:p-6 sm:shadow-[0_22px_62px_rgba(0,0,0,0.2)] ${theme === 'dark' ? 'bg-[linear-gradient(180deg,rgba(13,13,13,0.98),rgba(18,18,18,0.98))] border-white/8' : 'bg-gray-100/92 border-gray-200'}`}>
+              <div className={`rounded-[32px] border p-5 shadow-[0_18px_48px_rgba(0,0,0,0.18)] transition-all sm:p-6 sm:shadow-[0_26px_72px_rgba(0,0,0,0.24)] ${theme === 'dark' ? 'bg-[linear-gradient(180deg,rgba(13,13,13,0.98),rgba(18,18,18,0.98))] border-white/8' : 'bg-gray-100/92 border-gray-200'}`}>
                 
                 {/* V�"LILEHTINAPIT (ARIA TABLIST) */}
                 <div 
-                  className={`z-40 mb-8 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-10 sm:gap-4 sm:px-5 sm:py-4 ${theme === 'dark' ? 'bg-[#151515] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
+                  className={`z-40 mb-8 flex snap-x gap-3 overflow-x-auto whitespace-nowrap rounded-[24px] border px-4 py-3 custom-scrollbar lg:sticky lg:top-0 sm:mb-10 sm:gap-4 sm:px-5 sm:py-4 ${theme === 'dark' ? 'bg-[linear-gradient(180deg,rgba(24,24,24,0.98),rgba(18,18,18,0.98))] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]' : 'bg-white border-gray-200'}`}
                   role="tablist"
                   aria-label="Päätoiminnot"
                 >
@@ -4305,7 +4331,7 @@ export default function Home() {
                     onClick={() => setTab("cv")}
                     className={`rounded-[14px] px-5 py-3.5 text-sm font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] focus-visible:ring-offset-2 sm:px-8 sm:py-4 sm:text-base ${
                       tab === "cv"
-                        ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
+                        ? "bg-[linear-gradient(135deg,#00BFA6,#78E6C8)] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
@@ -4320,7 +4346,7 @@ export default function Home() {
                     onClick={() => setTab("jobs")}
                     className={`rounded-[14px] px-5 py-3.5 text-sm font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] focus-visible:ring-offset-2 sm:px-8 sm:py-4 sm:text-base ${
                       tab === "jobs"
-                        ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
+                        ? "bg-[linear-gradient(135deg,#00BFA6,#78E6C8)] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
@@ -4334,7 +4360,7 @@ export default function Home() {
                     onClick={() => setTab("hakemus")}
                     className={`rounded-[14px] px-5 py-3.5 text-sm font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6] focus-visible:ring-offset-2 sm:px-8 sm:py-4 sm:text-base ${
                       tab === "hakemus"
-                        ? "bg-[#00BFA6] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
+                        ? "bg-[linear-gradient(135deg,#00BFA6,#78E6C8)] text-black shadow-[0_0_20px_rgba(0,191,166,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
@@ -4349,7 +4375,7 @@ export default function Home() {
                     onClick={() => setTab("tips")}
                     className={`rounded-[14px] px-5 py-3.5 text-sm font-black transition-all duration-300 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6F3C] focus-visible:ring-offset-2 sm:px-8 sm:py-4 sm:text-base ${
                       tab === "tips"
-                        ? "bg-[#FF6F3C] text-black shadow-[0_0_20px_rgba(255,111,60,0.4)]"
+                        ? "bg-[linear-gradient(135deg,#FF6F3C,#FF9A6C)] text-black shadow-[0_0_20px_rgba(255,111,60,0.4)]"
                         : theme === 'dark' ? "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:-translate-y-1" : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:-translate-y-1"
                     }`}
                   >
@@ -4359,7 +4385,8 @@ export default function Home() {
 
                 {tab === "cv" && (
                   <div id="panel-cv" role="tabpanel" aria-labelledby="tab-cv" className="space-y-10 overflow-hidden px-1 animate-in fade-in duration-500 sm:space-y-12 sm:px-1 xl:space-y-14">
-                    <div className={`rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.09),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                    <div className={`relative overflow-hidden rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.1),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
+                      <div aria-hidden="true" className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#00BFA6]/10 blur-3xl" />
                       <div className="flex flex-col gap-8">
                         <div className="max-w-3xl">
                           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">{"CV-ty\u00F6tila"}</p>
