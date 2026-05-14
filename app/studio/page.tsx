@@ -815,6 +815,36 @@ function LabelClass(theme: "light" | "dark") {
   return `mb-5 block text-sm font-bold ml-1 transition-colors ${theme === 'dark' ? 'text-gray-500' : 'text-gray-700'}`;
 }
 
+function IconDocument({ className = "h-10 w-10" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden="true">
+      <path d="M7 3.75h7.5L19.5 8.75v11.5a1.5 1.5 0 0 1-1.5 1.5H7a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 7 3.75Z" />
+      <path d="M14.5 3.75v5h5" />
+      <path d="M8.5 12.25h7" />
+      <path d="M8.5 16.25h5.5" />
+    </svg>
+  );
+}
+
+function IconSpark({ className = "h-10 w-10" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="m12 2.5 1.78 4.72L18.5 9l-4.72 1.78L12 15.5l-1.78-4.72L5.5 9l4.72-1.78L12 2.5Z" />
+      <path d="m18.5 13 1.02 2.48L22 16.5l-2.48 1.02L18.5 20l-1.02-2.48L15 16.5l2.48-1.02L18.5 13Z" />
+      <path d="m5.5 14 1.1 2.4L9 17.5l-2.4 1.1L5.5 21l-1.1-2.4L2 17.5l2.4-1.1L5.5 14Z" />
+    </svg>
+  );
+}
+
+function IconClose({ className = "h-6 w-6" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className={className} aria-hidden="true">
+      <path d="M6 6 18 18" />
+      <path d="M18 6 6 18" />
+    </svg>
+  );
+}
+
 function FieldHint({
   children,
   theme,
@@ -5083,7 +5113,9 @@ export default function Home() {
                       </>
                     ) : (
                       <div className={`rounded-[20px] sm:rounded-[16px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`} role="status" aria-live="polite">
-                        <div className="text-5xl mb-6" aria-hidden="true">{"\uD83D\uDCC4"}</div>
+                        <div className="mb-6 flex justify-center text-gray-400" aria-hidden="true">
+                          <IconDocument className="h-12 w-12" />
+                        </div>
                         <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei esikatselua vielä</p>
                         <p className="text-base">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
                       </div>
@@ -6722,7 +6754,9 @@ function SettingsModal({
               Täältä hoidat jäsenyyden, uloskirjautumisen ja tilin poistamisen rauhassa yhdestä paikasta.
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-red-500 text-2xl font-black">�o.</button>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 transition-colors">
+            <IconClose className="h-6 w-6" />
+          </button>
         </div>
         <div className="space-y-6 sm:space-y-8">
           <div className={`p-5 sm:p-6 rounded-[26px] border ${isPro ? 'border-[#00BFA6]/30 bg-[#00BFA6]/5' : (theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100')}`}>
@@ -6770,10 +6804,10 @@ function PaywallModal({
 
   // Lista ominaisuuksista, jotka esitellään
   const features = [
-    { icon: "\u2728", title: "Taikasauva-editori", desc: "Muokkaa tekstiä lennosta tekoälyllä suoraan esikatselussa." },
-    { icon: "\u221E", title: "Rajattomat asiakirjat", desc: "Luo ja räätälöi niin monta CV:tä ja hakemusta kuin tarvitset." },
-    { icon: "\uD83C\uDFA8", title: "Täydellinen räätälöinti", desc: "Räätälöi CV:si automaattisesti vastaamaan työpaikkailmoituksen vaatimuksia." },
-    { icon: "\uD83C\uDFA4", title: "Haastattelusimulaattori", desc: "Harjoittele työhaastattelua varten räätälöidyillä kysymyksillä." },
+    { icon: <IconSpark className="h-5 w-5" />, title: "Taikasauva-editori", desc: "Muokkaa tekstiä lennosta tekoälyllä suoraan esikatselussa." },
+    { icon: <span className="text-[1.45rem] font-black leading-none">∞</span>, title: "Rajattomat asiakirjat", desc: "Luo ja räätälöi niin monta CV:tä ja hakemusta kuin tarvitset." },
+    { icon: <span className="text-[1.35rem] leading-none">🎨</span>, title: "Täydellinen räätälöinti", desc: "Räätälöi CV:si automaattisesti vastaamaan työpaikkailmoituksen vaatimuksia." },
+    { icon: <span className="text-[1.35rem] leading-none">🎤</span>, title: "Haastattelusimulaattori", desc: "Harjoittele työhaastattelua varten räätälöidyillä kysymyksillä." },
   ];
 
   return (
@@ -6786,11 +6820,11 @@ function PaywallModal({
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           
           <button onClick={onClose} className="absolute top-6 right-6 text-black/60 hover:text-white transition-colors z-10 p-2 focus-visible:outline-none">
-            <span className="font-black text-2xl">{"\u00D7"}</span>
+            <IconClose className="h-7 w-7" />
           </button>
           
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white mb-6 backdrop-blur-sm">
-            <span className="text-4xl" aria-hidden="true">{"\u2728"}</span>
+            <IconSpark className="h-9 w-9" />
           </div>
           
           <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tighter mb-3">Vapauta täysi potentiaalisi</h2>
@@ -6824,7 +6858,7 @@ function PaywallModal({
 
           <div className={`p-6 rounded-[18px] border text-center ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
             <p className="text-5xl font-black tracking-tight mb-2">
-              {"9,90 \u20AC"} <span className="text-lg opacity-60 font-bold">/ kk</span>
+              9,90 € <span className="text-lg opacity-60 font-bold">/ kk</span>
             </p>
             <p className="text-sm opacity-60 mb-6 font-medium">Laskutetaan kuukausittain. Peruuta milloin tahansa.</p>
             
