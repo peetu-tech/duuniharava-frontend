@@ -5067,7 +5067,7 @@ export default function Home() {
                       </>
                     ) : (
                       <div className={`rounded-[20px] sm:rounded-[16px] border-2 border-dashed p-12 sm:p-20 text-center font-medium ${theme === 'dark' ? 'border-white/10 bg-black/40 text-gray-500' : 'border-gray-300 bg-gray-50 text-gray-500'}`} role="status" aria-live="polite">
-                        <div className="text-5xl mb-6" aria-hidden="true">�o�</div>
+                        <div className="text-5xl mb-6" aria-hidden="true">\uD83D\uDCC4</div>
                         <p className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Ei esikatselua vielä</p>
                         <p className="text-base">Täytä tiedot vasemmalla ja paina "Generoi CV", niin näet miltä työsi näyttää.</p>
                       </div>
@@ -5082,7 +5082,7 @@ export default function Home() {
                     <div className={`rounded-[28px] sm:rounded-[30px] border p-8 sm:p-11 lg:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.18)] transition-all ${theme === 'dark' ? 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.09),rgba(17,17,17,0.97))]' : 'border-[#00BFA6]/20 bg-[linear-gradient(180deg,rgba(0,191,166,0.08),rgba(255,255,255,0.98))]'}`}>
                       <div className="flex flex-col gap-8">
                         <div className="max-w-3xl">
-                          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Työpaikka-Ty�tila</p>
+                          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00BFA6]">Työpaikka-työtila</p>
                           <h3 className={`mt-3 text-3xl sm:text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                             Etsi, suodata ja tallenna paikat ilman turhaa skrollausta
                           </h3>
@@ -6193,13 +6193,13 @@ export default function Home() {
         <div role="dialog" aria-modal="true" className={`border rounded-[20px] w-full max-w-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 ${theme === 'dark' ? 'bg-[#141414] border-blue-500/30' : 'bg-white border-blue-200'}`}>
           <div className={`p-6 sm:p-8 border-b flex justify-between items-center ${theme === 'dark' ? 'border-white/5' : 'border-gray-100'}`}>
             <h3 className={`font-black text-2xl tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Palkka-arvio</h3>
-            <button onClick={() => setSalaryJob(null)} className="text-gray-500 hover:text-blue-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">�o.</button>
+            <button onClick={() => setSalaryJob(null)} className="text-gray-500 hover:text-blue-500 font-black text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors">\u00D7</button>
           </div>
           <div className="p-6 sm:p-8 space-y-6 text-center">
             <p className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{salaryJob.title}</p>
             <div className="py-8">
               <p className="text-sm uppercase tracking-widest text-blue-500 font-bold mb-2">Markkinapalkka (Arvio)</p>
-              <p className={`text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3200<span className="text-3xl text-gray-500 font-medium"> - </span>3800<span className="text-2xl text-blue-500">�,�</span></p>
+              <p className={`text-6xl font-black ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>3200<span className="text-3xl text-gray-500 font-medium"> - </span>3800<span className="text-2xl text-blue-500">\u20AC</span></p>
             </div>
             <div className={`p-5 rounded-[14px] border text-left ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-gray-300' : 'bg-blue-50 border-blue-100 text-gray-700'}`}>
               <p className="font-bold mb-2 text-blue-500">Miten perustelet pyyntösi?</p>
@@ -6770,11 +6770,11 @@ function PaywallModal({
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           
           <button onClick={onClose} className="absolute top-6 right-6 text-black/60 hover:text-white transition-colors z-10 p-2 focus-visible:outline-none">
-            <span className="font-black text-2xl">�-�</span>
+            <span className="font-black text-2xl">\u00D7</span>
           </button>
           
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white mb-6 backdrop-blur-sm">
-            <span className="text-4xl" aria-hidden="true">�o�</span>
+            <span className="text-4xl" aria-hidden="true">\u2728</span>
           </div>
           
           <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tighter mb-3">Vapauta täysi potentiaalisi</h2>
@@ -6808,7 +6808,7 @@ function PaywallModal({
 
           <div className={`p-6 rounded-[18px] border text-center ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
             <p className="text-5xl font-black tracking-tight mb-2">
-              9,90 �,� <span className="text-lg opacity-60 font-bold">/ kk</span>
+              9,90 \u20AC <span className="text-lg opacity-60 font-bold">/ kk</span>
             </p>
             <p className="text-sm opacity-60 mb-6 font-medium">Laskutetaan kuukausittain. Peruuta milloin tahansa.</p>
             
@@ -6816,7 +6816,7 @@ function PaywallModal({
               onClick={onUpgrade}
               className="w-full rounded-[14px] bg-gradient-to-r from-[#00BFA6] to-[#00DF9F] py-5 text-xl font-black text-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#00BFA6]/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#00BFA6]/50"
             >
-              ALOITA PRO-TILAUS ?
+              ALOITA PRO-TILAUS
             </button>
             
             <button 
@@ -6827,7 +6827,7 @@ function PaywallModal({
             </button>
 
             <p className="mt-4 text-xs leading-6 opacity-60">
-              Tallenteet ja nykyinen Ty�tilasi säilyvät tililläsi. Päivitys vaikuttaa vain käytössä oleviin ominaisuuksiin.
+              Tallenteet ja nykyinen työtilasi säilyvät tililläsi. Päivitys vaikuttaa vain käytössä oleviin ominaisuuksiin.
             </p>
           </div>
         </div>
