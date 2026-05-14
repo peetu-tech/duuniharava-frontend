@@ -3545,37 +3545,30 @@ export default function Home() {
           
           <div className="relative mx-auto w-full max-w-[1680px] px-4 sm:px-6 lg:px-8 xl:px-10 py-14 sm:py-18 lg:py-22">
             
-            <div className="grid gap-10 sm:gap-12 lg:items-center">
+            <div className="grid gap-8 sm:gap-10 lg:items-center">
               <div>
                 <div className="mb-6 flex flex-wrap items-center gap-3">
                   <span className="rounded-full border border-[#00BFA6]/30 bg-[linear-gradient(135deg,rgba(0,191,166,0.18),rgba(0,191,166,0.08))] px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#7af4e2] shadow-[0_0_18px_rgba(0,191,166,0.18)]">
                     Duuniharava Studio
                   </span>
-                  <span className={`rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] ${theme === 'dark' ? 'border-white/10 bg-white/5 text-gray-300' : 'border-gray-200 bg-white/80 text-gray-600'}`}>
-                    CV, paikat ja hakemukset samassa rytmissä
-                  </span>
                 </div>
                 <h1 id="hero-heading" className="mb-7 max-w-5xl text-[3.1rem] font-black leading-[0.9] tracking-tight sm:mb-8 sm:text-6xl lg:text-7xl xl:text-[5.3rem]">
-                  Tee työhausta <span className="bg-[linear-gradient(135deg,#8CF3E6,#00BFA6_45%,#FF8B5C)] bg-clip-text text-transparent">terävämpää.</span>
+                  Tee työhausta <span className="bg-[linear-gradient(135deg,#8CF3E6,#00BFA6_45%,#FF8B5C)] bg-clip-text text-transparent">helppoa.</span>
                 </h1>
 
-                <p className={`mb-8 max-w-3xl text-base leading-8 sm:text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Rakenna CV, etsi sopivat työpaikat ja tee hakemukset samassa paikassa ilman turhaa sähläystä. Tämän pitäisi tuntua enemmän työkalulta kuin lomakkeelta.
-                </p>
-
-                <div className="grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/80'}`}>
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Yksi työtila</p>
-                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Ei irrallisia dokumentteja, muistiinpanoja ja välilehtiä eri paikoissa.</p>
-                  </div>
-                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/80'}`}>
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Nopea flow</p>
-                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Täytä, generoi, tarkenna, hae. Kaikki etenee samassa näkymässä.</p>
-                  </div>
-                  <div className={`rounded-[18px] border px-5 py-4 ${theme === 'dark' ? 'border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]' : 'border-gray-200 bg-white/80'}`}>
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#00BFA6]">Terävämpi lopputulos</p>
-                    <p className={`mt-2 text-sm leading-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>CV, paikat ja hakemukset näyttävät siltä että niillä voi oikeasti voittaa.</p>
-                  </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowHelp(!showHelp)}
+                    className="rounded-[16px] border border-[#00BFA6]/30 bg-[linear-gradient(135deg,rgba(0,191,166,0.14),rgba(0,191,166,0.06))] px-6 py-3 text-sm font-black text-[#7af4e2] shadow-[0_0_18px_rgba(0,191,166,0.12)] transition-all hover:scale-[1.01] hover:border-[#00BFA6]/45 hover:bg-[#00BFA6]/16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BFA6]"
+                    aria-expanded={showHelp}
+                    aria-controls="help-section"
+                  >
+                    {showHelp ? "Piilota ohjeet" : "Avaa ohjeet"}
+                  </button>
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Tarvitsetko apua alkuun? Ohjeet avautuvat tästä.
+                  </span>
                 </div>
 
                 {false && (
@@ -3804,9 +3797,6 @@ export default function Home() {
                 <h2 className={`mt-2 text-xl sm:text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   Valitse ensin tapa työskennellä, sitten etene omaan tahtiin
                 </h2>
-                <p className={`mt-3 max-w-2xl text-sm leading-7 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Pidä vasen puoli datalle, oikea puoli päätöksille. Kun rakenne pysyy selkeänä, työnhaku ei tunnu sekavalta.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:min-w-[520px]">
